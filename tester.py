@@ -1,22 +1,26 @@
 from lib.utils.objects import ArgClass
 from model import load_model
-import argparse
 
+import torch
+import torchsummary
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-c', dest='config', default='custom_pose',
-                    help='config dictionary location (default=custom_pose)')
-parser.add_argument('-p', dest='phase', default='test',
-                    help='network phase [train, test] (default=test)')
-parser.add_argument('-l', dest='limb', default='joint',
-                    help='limb [joint, bone] (default=joint)')
-parser.add_argument('-s', dest='save_name', default='',
-                    help='name to save the results dictionary as after training')
-parsed = parser.parse_args()
-
-
-print("### Libraries loaded")
-# pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
-arg = ArgClass(arg=parsed)
-
+arg = ArgClass('./config/custom_pose/train_joint.yaml')
 skel_model = load_model(arg)
+skel_model.load_model()
+model = skel_model.model
+
+# # This method wasn't working because the model still has these attributes
+# for key in ['fc', 'tcn3', 'sgcn3', 'gcn3d3']:
+#     skel_model.model._modules.pop(key)
+# print(skel_model.model._modules.keys())
+print(model.__dict__.keys())
+
+torchsummary.summary(model, (3,300,17,2))
+
+
+# b = 6
+# x = torch.randn(b,3,300,17,2).to(skel_model.output_device)
+
+# results = skel_model.model(x)
+
+# print(f'\nOutput shape (batch size = {b}): {results.shape}')
