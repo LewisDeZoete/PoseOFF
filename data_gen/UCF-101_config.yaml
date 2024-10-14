@@ -1,0 +1,27 @@
+# feeder
+feeder: feeders.feeder.Feeder
+dataloader:
+  data_path: ../Datasets/UCF-101/
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  debug: False
+  preprocessed: False
+  skel_path: ./data/UCF-101/
+
+#ignore_weights: ["data_bn.weight", "data_bn.bias", "data_bn.running_mean", "data_bn.running_var"]
+ignore_weights: []
+
+pose: 
+  detector: yolo11x-pose.pt
+
+# test
+phase: test
+device: cuda
+test_batch_size: 64
+#weights: ./pretrained_models/kinetics_joint.pt
+weights: 
+
+work_dir: ./eval/kinetics/joint/
+save_score: True
+# If the following parameter is provided, then the array given by 
+# the bash script is the indexes for elements in here
+# unfinished: [PlayingSitar, PlayingDhol, Billiards, PlayingDaf, RockClimbingIndoor, JumpRope, Punch, Drumming, IceDancing]

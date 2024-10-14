@@ -1,0 +1,41 @@
+# dataloader
+loader: lib.data.dataset.CustomVideoDataset
+dataloader:
+  data_path: ../Datasets/UCF-101/
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  debug: False
+  preprocessed: True
+  skel_path: ./data/UCF-101/
+
+# model
+model: model.msg3d.Model
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  num_gcn_scales: 8
+  num_g3d_scales: 8
+  graph: graph.yolo_pose.AdjMatrixGraph
+ignore_weights: []
+phase: train
+# weights: ./pretrained_models/kinetics_joint.pt
+weights: 
+
+# optim
+# weight_decay: 0.0005
+weight_decay: 0.0003
+# base_lr: 0.05
+base_lr: 0.5
+step: [45, 55]
+
+# training
+num_epoch: 1
+# device: [0,1]
+device: 0
+# batch_size: 32
+batch_size: 64
+# forward_batch_size: 32
+forward_batch_size: 64
+# test_batch_size: 32
+test_batch_size: 128
+nesterov: True

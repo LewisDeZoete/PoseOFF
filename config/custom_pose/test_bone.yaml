@@ -1,0 +1,30 @@
+# feeder
+feeder: feeders.feeder.Feeder
+test_feeder_args:
+  #data_path: ./data/kinetics/val_data_joint.npy
+  data_path: ../Datasets/UCF-101/
+  #label_path: ./data/kinetics/val_label.pkl
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  debug: False
+
+# model
+model: model.msg3d.Model
+model_args:
+  num_class: 101
+  num_point: 17 # if you change num points, must change graph option below!!
+  num_person: 2
+  num_gcn_scales: 8
+  num_g3d_scales: 8
+  graph: graph.yolo_pose.AdjMatrixGraph
+#ignore_weights: ["data_bn.weight", "data_bn.bias", "data_bn.running_mean", "data_bn.running_var"]
+ignore_weights: []
+
+
+# test
+phase: test
+device: 0
+test_batch_size: 8
+# weights: ./pretrained_models/kinetics_bone.pt
+
+work_dir: ./eval/kinetics/bone/
+save_score: True
