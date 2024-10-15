@@ -140,15 +140,15 @@ class Model(nn.Module):
         self.sgcn2[-1].act = nn.Identity()
         self.tcn2 = MS_TCN(c2, c2)
 
-        self.gcn3d3 = MultiWindow_MS_G3D(c2, c3, A_binary, num_g3d_scales, window_stride=2)
-        self.sgcn3 = nn.Sequential(
-            MS_GCN(num_gcn_scales, c2, c2, A_binary, disentangled_agg=True),
-            MS_TCN(c2, c3, stride=2),
-            MS_TCN(c3, c3))
-        self.sgcn3[-1].act = nn.Identity()
-        self.tcn3 = MS_TCN(c3, c3)
+        # self.gcn3d3 = MultiWindow_MS_G3D(c2, c3, A_binary, num_g3d_scales, window_stride=2)
+        # self.sgcn3 = nn.Sequential(
+        #     MS_GCN(num_gcn_scales, c2, c2, A_binary, disentangled_agg=True),
+        #     MS_TCN(c2, c3, stride=2),
+        #     MS_TCN(c3, c3))
+        # self.sgcn3[-1].act = nn.Identity()
+        # self.tcn3 = MS_TCN(c3, c3)
 
-        self.fc = nn.Linear(c3, num_class)
+        self.fc = nn.Linear(c2, num_class)
 
     def forward(self, x):
         N, C, T, V, M = x.size()
@@ -163,8 +163,8 @@ class Model(nn.Module):
         x = F.relu(self.sgcn2(x) + self.gcn3d2(x), inplace=True)
         x = self.tcn2(x)
 
-        x = F.relu(self.sgcn3(x) + self.gcn3d3(x), inplace=True)
-        x = self.tcn3(x)
+        # x = F.relu(self.sgcn3(x) + self.gcn3d3(x), inplace=True)
+        # x = self.tcn3(x)
 
         out = x
         out_channels = out.size(1)
