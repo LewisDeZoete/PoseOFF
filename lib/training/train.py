@@ -71,10 +71,10 @@ def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_f
     for name, score_func in score_funcs.items():
         try:
             results[prefix + " " + name].append( score_func(y_true, y_pred) )
-            print(f'{prefix}: {score_func(y_true, y_pred)}')
+            # print(f'{prefix}: {score_func(y_true, y_pred)}')
         except:
             results[prefix + " " + name].append(float("NaN"))
-            print('NaN')
+            # print('NaN')
     return end-start #time spent on epoch
 
 
@@ -97,11 +97,12 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
     if score_funcs == None:
         score_funcs = {}#Empty set
 
-    to_track = ["epoch", "total time", "train loss", "lr"]
+    to_track = ["epoch", "training time", "train loss", "lr"]
     if val_loader is not None:
         to_track.append("val loss")
     if test_loader is not None:
         to_track.append("test loss")
+        max_acc = 0 # If we have a test loader, track the best test accuracy!
     for eval_score in score_funcs:
         to_track.append("train " + eval_score )
         if val_loader is not None:
@@ -127,7 +128,7 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
 
         # Append the post-training results to the results dictionary
         results["epoch"].append( epoch )
-        results["total time"].append( total_train_time )
+        results["training time"].append( total_train_time )
 
         # VAL
         if val_loader is not None:
@@ -148,6 +149,12 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
             model = model.eval()
             with torch.no_grad():
                 run_epoch(model, optimiser, test_loader, loss_func, device, results, score_funcs, prefix="test", desc="Testing")
+            # Save best results!
+            if results['train accuracy'][-1] > max_acc:
+                max_acc = results['train accuracy']
+                print(f'\t\tBEST: {max_acc}')
+                # torch.save(model, f'./model/checkpoints/{checkpoint_file}.pt')
+
                     
         if checkpoint_file is not None:
             torch.save({

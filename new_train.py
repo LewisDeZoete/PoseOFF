@@ -23,7 +23,7 @@ parser.add_argument('-p', dest='phase', default='test',
                     help='network phase [train, test] (default=test)')
 parser.add_argument('-l', dest='limb', default='joint',
                     help='limb [joint, bone] (default=joint)')
-parser.add_argument('-s', dest='save_name', default='',
+parser.add_argument('-r', dest='run_name', default='',
                     help='name to save the results dictionary as after training')
 parsed = parser.parse_args()
 
@@ -56,13 +56,10 @@ train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=
 test_dataloader = DataLoader(test_dataset, batch_size=arg.batch_size, shuffle=True)
 
 # Get the parameters to optimise
-param_groups = defaultdict(list)
+param_groups = {'params': []}
 for name, params in skel_model.model.named_parameters():
-    param_groups['other'].append(params)
-optim_param_groups = {
-    'other': {'params': param_groups['other']}
-}
-params = list(optim_param_groups.values())
+    param_groups['params'].append(params)
+params = list({'other': param_groups}.values())
 
 # Create the optimiser
 optimiser = optim.SGD(
@@ -90,6 +87,3 @@ results = train_simple_network(model=skel_model.model, loss_func=loss, train_loa
 
 print('### Results')
 print(results)
-torch.save(skel_model.model, f'./results/{parsed.save_name}.pt')
-with open(f'./results/{parsed.save_name}.yaml', 'w') as outfile:
-    yaml.safe_dump(results, outfile, default_flow_style=False, sort_keys=False)

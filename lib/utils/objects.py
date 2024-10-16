@@ -12,6 +12,7 @@ class ArgClass(object):
         Args:
             arg (str) | (argparse.Namespace): either an `argparse.Namespace` object that contains the config type, phase and limb (bone/joint), or a `str` directly to the config dictionary.
         '''
+        # as an argparse object
         if isinstance(arg, argparse.Namespace):
             # Get arg file
             with open(f'./config/{arg.config}/{arg.phase}_{arg.limb}.yaml', 'r') as file:
@@ -19,6 +20,8 @@ class ArgClass(object):
         elif isinstance(arg, str):
             with open(arg, 'r') as file:
                 in_dict = yaml.safe_load(file)
+        elif isinstance(arg, dict):
+            in_dict = arg
         
         for key in in_dict:
             setattr(self, key, in_dict[key])
