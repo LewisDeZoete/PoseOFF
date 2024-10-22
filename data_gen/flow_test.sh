@@ -11,7 +11,5 @@
 #SBATCH --output='logs/UCF-101_extract.txt'
 #SBATCH --error='logs/error_UCF-101_extract.txt'
 
-#SBATCH --array=0-100
-
 source ../environment/bin/activate
-srun python ./data_gen/UCF-101_gendata.py -n $SLURM_ARRAY_TASK_ID
+srun python ./data_gen/flow_gendata.py -n 0

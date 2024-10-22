@@ -1,6 +1,10 @@
 import sys
-# TODO: DELETE THIS
-sys.path.insert(0,'/fred/oz141/ldezoete/MS-G3D')
+import os
+
+# # add lib to path
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
+
 import yaml
 import torch
 from torch.utils.data import Dataset
@@ -20,7 +24,8 @@ class CustomVideoDataset(Dataset):
         # Get the annotation file
         with open(arg.dataloader['label_path'], 'r') as file:
             self.ann_file = yaml.safe_load(file)
-        self.phase = arg.phase
+        # I don't actually think we use this...
+        # self.phase = arg.phase
 
         # If the data has been preprocessed, use the skel path not data path
         if 'preprocessed' in arg.dataloader.keys() and arg.dataloader['preprocessed'] == True:

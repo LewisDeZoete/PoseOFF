@@ -5,12 +5,10 @@ import torch
 class ArgClass(object):
     def __init__(self, arg):
         '''
-        Takes argument of an argparse object or a string that gives the path to
-        a config doctionary. Converts the first layer of dicionary keys into 
-        properties of this class object instance.
+        Takes argument of an argparse object or a string that gives the path to a config doctionary. Converts the first layer of dicionary keys into properties of this class object instance.
 
         Args:
-            arg (str) | (argparse.Namespace): either an `argparse.Namespace` object that contains the config type, phase and limb (bone/joint), or a `str` directly to the config dictionary.
+            arg (str | argparse.Namespace | dict): If `arg` is an `argparse.Namespace` object that contains the config type, phase and limb (bone/joint), or a `str`, load corresponding yaml file and convert to the config dictionary object with one level of keys as attributes. If input is a `dict`, convert directly to object with one level of keys as attributes.
         '''
         # as an argparse object
         if isinstance(arg, argparse.Namespace):
@@ -25,6 +23,40 @@ class ArgClass(object):
         
         for key in in_dict:
             setattr(self, key, in_dict[key])
+    
+    def get_labels(self):
+        '''
+        Gets the labels from the highlighted annotation directory in the config file.
+        '''
+        # Check if the ArgClass object even has the dataloader object
+        assert hasattr(self, 'dataloader'), "Input object had no key 'dataloader'"
+        assert 'label_path' in self.dataloader, "Input object has no key 'label_path' under 'dataloader'"
+
+        # If the label_path is wrong, it'll throw FileNotFound error
+        try:
+            with open(self.dataloader['label_path'], 'r') as file:
+                self.labels = yaml.safe_load(file)
+
+        except FileNotFoundError:
+            print(f"Could not file label file: '{self.dataloader['label_path']}'")
+            self.labels = {}
+        
+    def get_classes(self):
+        '''
+        Get the dataset classes from config file's highlighted annotation directory.
+        Sets the `classes` attribute for the ArgClass object instance and returns the classes on call.
+        Also sets the `labels` attribute of the ArgClass object.
+        '''
+        # First call the get_labels function and get the classes from there!
+        self.get_labels()
+        self.classes = {}
+        for elem, key in enumerate(dict.fromkeys(key.split('_')[1] for key in self.labels.keys())):
+            self.classes[key] = elem
+        
+        # Return the classes dict!
+        return self.classes
+
+
 
 
 def LayerCompare(dict1, dict2):

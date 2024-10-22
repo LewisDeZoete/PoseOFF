@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 from lib.data.dataset import CustomVideoDataset
 from lib.utils.transforms import GetPoses_YOLO
+from lib.utils.objects import ArgClass
 from ultralytics import YOLO
 import torch
 import torchvision.transforms.v2 as v2
@@ -14,26 +15,18 @@ import yaml
 import time
 import argparse
 
-parser = argparse.ArgumentParser(prog="gendata")
+parser = argparse.ArgumentParser(prog="skel_gendata")
 
-parser.add_argument('-n')
+parser.add_argument('-n', dest='number',
+                    help='Class number for processing skeleton keypoints of a specific class')
 
 parsed = parser.parse_args()
-arg_no = int(parsed.n)
+arg_no = int(parsed.number)
 
-# Get arg file
-with open('./data_gen/UCF-101_config.yaml', 'r') as file:
-    yaml_arg = yaml.safe_load(file)
+# Get the config dict object
+arg = ArgClass('.data_gen/UCF-101_config.yaml')
 
-class Dict2Class(object):
-    def __init__(self, my_dict):
-        for key in my_dict:
-            setattr(self, key, my_dict[key])
-
-# Convert args
-arg = Dict2Class(yaml_arg)
-
-# Get the annotation file
+# Get the annotation file 
 with open(arg.dataloader['label_path'], 'r') as file:
     ann_file = yaml.safe_load(file)
 
@@ -57,7 +50,7 @@ def get_range(class_no):# Get the number of videos in the class (used to get ind
 # Get the device
 device = torch.device(arg.device)
 # # Create pose detector
-detector = YOLO(arg.pose['detector'])
+detector = YOLO(arg.pose['weights'])
 detector.to(device)
 transforms = v2.Compose([
     v2.Resize(size=(384,640)),
@@ -67,7 +60,6 @@ transforms = v2.Compose([
     ])
 
 dataset = CustomVideoDataset(arg=arg, transforms=transforms)
-# dataset = CustomVideoDataset(arg=arg)
 
 start = time.time()
 # Check if the indices we've been given are for the overall 
@@ -75,7 +67,7 @@ start = time.time()
 if 'unfinished' in arg.__dict__:
     for idx in get_range(classes[arg.unfinished[arg_no]]):
         poses, label = dataset[idx]
-        path = f'/fred/oz141/ldezoete/MS-G3D/data/UCF-101/{list(ann_file.keys())[idx]}'.split('.')[0] + '.pt'
+        path = f'data/UCF-101/skeleton/{list(ann_file.keys())[idx]}'.split('.')[0] + '.pt'
         torch.save(poses, path)
         # print(f'Processed {path.split("/")[-1]}')
 
@@ -83,7 +75,8 @@ if 'unfinished' in arg.__dict__:
 else:
     for idx in get_range(arg_no):
         poses, label = dataset[idx]
-        folder = f'/fred/oz141/ldezoete/MS-G3D/data/UCF-101/{list(ann_file.keys())[idx].split("/")[0]}/'
+        # using the class folder from the annotated file so both methods work
+        folder = f'data/UCF-101/skeleton/{list(ann_file.keys())[idx].split("/")[0]}/'
         try:
             os.mkdir(folder)
         except FileExistsError:

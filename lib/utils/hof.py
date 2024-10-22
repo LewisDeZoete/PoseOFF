@@ -4,7 +4,6 @@ from scipy.ndimage import uniform_filter
 from skimage import exposure
 from skimage.feature import hog
 import cv2
-from .flow import getFlow
 
 ''' Taken with modifications from Scikit-Image version of HOG '''
 

@@ -3,6 +3,7 @@ import torch
 import decord
 from decord import VideoReader, cpu
 import re
+from .flow import stack_frames
 
 
 def LoadVideo(video_path, max_frames) -> torch.tensor:
@@ -13,7 +14,7 @@ def LoadVideo(video_path, max_frames) -> torch.tensor:
     OUTPUT:
         `result` - on `__call__`, when passing in a `result` dict with the
             key ['video_path'], it will get the frames of that video.
-            `output.shape == (nframes (<max_frames), height, width, color)`
+            `output.shape == (nframes (max_frames), height, width, color)`
     '''
     decord.bridge.set_bridge('torch')
     vr = VideoReader(video_path, ctx=cpu(0))
@@ -87,3 +88,34 @@ class GetPoses_YOLO:
         data_torch = data_torch[:, :, :, 0:2].type(torch.float32)
         # results['poses'] = data_torch
         return data_torch
+
+
+class GetFlow:
+    def __init__(self, model, device, minibatch_size:int=8):
+        self.model = model
+        self.device = device
+        self.minibatch_size = minibatch_size
+
+        # Move the model to the corresponding device
+        self.model.to(self.device)
+
+    def __call__(self, video) -> torch.tensor:
+        # Stack the frames in a tensor that looks like: [[0, 1],
+        stacked = stack_frames(video) #                  [1, 2]] etc.
+        # NOTE: this returns the video video stacked, we're batching it
+        
+        # Create a flow list, then calculate flow with raft (no_grad)
+        flow = []
+        with torch.no_grad():
+            # process each video in batches (faced OOM issues)
+            for i in range(0, stacked.shape[0], self.minibatch_size):
+                minibatch = stacked[i:i+self.minibatch_size].to(self.device)
+
+                # Calcualte the flow (returns a list of length 12, last element
+                # is the the last pass of the model and most accurate flow
+                flow_list = self.model(minibatch[:,0,...], minibatch[:,1,...])
+                flow.append(flow_list[-1])
+            
+            # Concatenate the list elements back into one array!
+            flow = torch.cat(flow, axis=0)
+            return flow

@@ -33,13 +33,7 @@ print("### Libraries loaded")
 arg = ArgClass(arg=parsed)
 
 # Get the annotation file
-with open(arg.dataloader['label_path'], 'r') as file:
-    ann_file = yaml.safe_load(file)
-
-# Get all the classes (may not use, but we'll see)
-classes = {}
-for elem, key in enumerate(dict.fromkeys(key.split('_')[1] for key in ann_file.keys())):
-    classes[key] = elem
+classes = arg.get_classes()
 
 print("### Arguments loaded")
 
