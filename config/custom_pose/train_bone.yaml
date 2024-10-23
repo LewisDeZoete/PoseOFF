@@ -11,8 +11,8 @@ train_feeder_args:
 test_feeder_args:
   data_path: ./data/kinetics/val_data_bone.npy
   label_path: ./data/kinetics/val_label.pkl
-  skel_path: ./data/UCF-101/skeleton
-  flow_path: ./data/UCF-101/flow
+  skel_path: ./data/UCF-101/skeleton/
+  flow_path: ./data/UCF-101/flow/
 
 # model
 model: model.msg3d.Model

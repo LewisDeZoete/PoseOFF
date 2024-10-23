@@ -39,13 +39,23 @@ class GetPoses_YOLO:
         (3,        300,        17,         2)
     Only parses video frames up to max_frames, the rest are skipped.
     '''
-    def __init__(self, detector, max_frames: int = 300, num_joints: int = 17, num_people_out: int = 2):
+    def __init__(self, detector, max_frames: int = 300, num_joints: int = 17, num_people_out: int = 2, resdict=False):
         self.detector = detector
         self.max_frames = max_frames
         self.num_joints = num_joints
         self.num_people_out = num_people_out
+        self.resdict = resdict
 
     def __call__(self, video) -> torch.tensor:
+        # If input is a dicitonary, we want the video to work with
+        if isinstance(video, dict):
+            video = video['rgb']
+        # If not, it could be we just want the poses
+        else:
+            # OR we may want to output a dict but we need to create it
+            if self.resdict:
+                results = {'rgb': video}
+
         data_torch = torch.zeros((3,                # channels (x,y,confidence)
                             self.max_frames,        # total_frames
                             self.num_joints,        # number of joints
@@ -86,20 +96,36 @@ class GetPoses_YOLO:
             # Took out a `.transpose(1,2,0)` on the second tensor... did it break?
             data_torch[:, t, :, :] = data_torch[:, t, :, s]
         data_torch = data_torch[:, :, :, 0:2].type(torch.float32)
-        # results['poses'] = data_torch
-        return data_torch
+        
+        # If we're expecting to output a dictionary, add the new pose key
+        if self.resdict:
+            results['pose'] = data_torch
+            return results
+        # Else simply return the poses
+        else:
+            return data_torch
 
 
 class GetFlow:
     def __init__(self, model, device, resdict=False, minibatch_size:int=8):
         self.model = model
         self.device = device
+        self.resdict = resdict
         self.minibatch_size = minibatch_size
 
         # Move the model to the corresponding device
         self.model.to(self.device)
 
     def __call__(self, video) -> torch.tensor:
+        # If input is a dicitonary, we want the video to work with
+        if isinstance(video, dict):
+            video = video['rgb']
+        # If not, it could be we just want the poses
+        else:
+            # OR we may want to output a dict but we need to create it
+            if self.resdict:
+                results = {'rgb': video}
+
         # Stack the frames in a tensor that looks like: [[0, 1],
         stacked = stack_frames(video) #                  [1, 2]] etc.
         # NOTE: this returns the video video stacked, we're batching it
@@ -116,6 +142,16 @@ class GetFlow:
                 flow_list = self.model(minibatch[:,0,...], minibatch[:,1,...])
                 flow.append(flow_list[-1])
             
-            # Concatenate the list elements back into one array!
-            flow = torch.cat(flow, axis=0)
+        # Concatenate the list elements back into one array!
+        flow = torch.cat(flow, axis=0)
+        # If we're expecting a dictionary output, add the new key
+        if self.resdict:
+            results['flow'] = flow
+            return results
+        # Otherwise simply return the flow
+        else:
             return flow
+
+
+if __name__ == '__main__':
+    from ..utils.objects import ArgClass

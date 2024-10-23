@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-import yaml
-from collections import defaultdict
+# import yaml
+# from collections import defaultdict
 # from torchvision.transforms import v2
 from model import load_model
 from lib.data.dataset import CustomVideoDataset

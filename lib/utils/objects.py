@@ -24,10 +24,6 @@ class ArgClass(object):
         for key in in_dict:
             setattr(self, key, in_dict[key])
     
-    def get_labels(self):
-        '''
-        Gets the labels from the highlighted annotation directory in the config file.
-        '''
         # Check if the ArgClass object even has the dataloader object
         assert hasattr(self, 'dataloader'), "Input object had no key 'dataloader'"
         assert 'label_path' in self.dataloader, "Input object has no key 'label_path' under 'dataloader'"
@@ -36,26 +32,14 @@ class ArgClass(object):
         try:
             with open(self.dataloader['label_path'], 'r') as file:
                 self.labels = yaml.safe_load(file)
-            return self.labels
 
         except FileNotFoundError:
             print(f"Could not file label file: '{self.dataloader['label_path']}'")
             self.labels = {}
         
-    def get_classes(self):
-        '''
-        Get the dataset classes from config file's highlighted annotation directory.
-        Sets the `classes` attribute for the ArgClass object instance and returns the classes on call.
-        Also sets the `labels` attribute of the ArgClass object.
-        '''
-        # First call the get_labels function and get the classes from there!
-        self.get_labels()
         self.classes = {}
         for elem, key in enumerate(dict.fromkeys(key.split('_')[1] for key in self.labels.keys())):
             self.classes[key] = elem
-        
-        # Return the classes dict!
-        return self.classes
 
 
 

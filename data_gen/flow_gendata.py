@@ -24,7 +24,7 @@ arg_no = int(parsed.number)
 
 # Get the arg object and create the classes
 arg = ArgClass(arg='./data_gen/UCF-101_config.yaml')
-classes = arg.get_classes() # This sets both arg.classes and arg.labels
+classes = arg.classes
 
 # Get the number of videos in the class (used to get indices of dataset)
 def get_range(class_no):
