@@ -13,6 +13,7 @@ pose:
 
 flow:
   weights: pretrained_models/raft_large.pt
+  minibatch_size: 16
 
 device: 0
 

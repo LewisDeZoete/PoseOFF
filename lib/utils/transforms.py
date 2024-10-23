@@ -91,7 +91,7 @@ class GetPoses_YOLO:
 
 
 class GetFlow:
-    def __init__(self, model, device, minibatch_size:int=8):
+    def __init__(self, model, device, resdict=False, minibatch_size:int=8):
         self.model = model
         self.device = device
         self.minibatch_size = minibatch_size

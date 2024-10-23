@@ -33,7 +33,7 @@ print("### Libraries loaded")
 arg = ArgClass(arg=parsed)
 
 # Get the annotation file
-classes = arg.get_classes()
+classes = arg.get_classes() # sets arg.classes & arg.labels
 
 print("### Arguments loaded")
 

@@ -36,6 +36,7 @@ class ArgClass(object):
         try:
             with open(self.dataloader['label_path'], 'r') as file:
                 self.labels = yaml.safe_load(file)
+            return self.labels
 
         except FileNotFoundError:
             print(f"Could not file label file: '{self.dataloader['label_path']}'")

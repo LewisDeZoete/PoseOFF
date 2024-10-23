@@ -1,6 +1,6 @@
 import torch
 
-def stack_frames(frames):
+def stack_frames(frames:torch.Tensor):
     '''
     Stack adjacent pairs of frames.
 

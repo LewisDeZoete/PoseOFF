@@ -11,6 +11,7 @@ from lib.utils.transforms import GetFlow
 import torch
 from torchvision.models.optical_flow import raft_large
 import torchvision.transforms.v2 as v2
+import time
 import argparse
 
 parser = argparse.ArgumentParser(prog="flow_gendata")
@@ -23,7 +24,7 @@ arg_no = int(parsed.number)
 
 # Get the arg object and create the classes
 arg = ArgClass(arg='./data_gen/UCF-101_config.yaml')
-classes = arg.get_classes()
+classes = arg.get_classes() # This sets both arg.classes and arg.labels
 
 # Get the number of videos in the class (used to get indices of dataset)
 def get_range(class_no):
@@ -51,36 +52,34 @@ transforms = v2.Compose([
     v2.ToImage(),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),  # map [0, 1] into [-1, 1]
-    GetFlow(model=model, device=device, minibatch_size=8)
+    GetFlow(model=model, device=device, minibatch_size=arg.flow['minibatch_size'])
     ])
 
 # Create the dataset object
 dataset = CustomVideoDataset(arg=arg, transforms=transforms)
 
-for idx in get_range(arg_no):
-    preprocessed_video, label = dataset[idx]
-    print(f'Class: {list(classes.keys())[label]}')
-    print(f'Shape: {preprocessed_video.shape}')
-    print(f'Max: {preprocessed_video.max()}')
-    print(f'Min: {preprocessed_video.min()}')
-    break
 
-# # Create a results list, then without calculating gradients process flow
-# results = []
-# torch.cuda.empty_cache()
-# batch_size = 8
-# results = []
-# with torch.no_grad():
-#     for i in range(0, stacked.shape[0], batch_size):
-#         input_tensor = stacked[i:i+batch_size].to(device)
+start = time.time()
+# Check if the indices we've been given are for the overall 
+# dataset or as indices for the 'unfinished' list in config
+if 'unfinished' in arg.__dict__:
+    for idx in get_range(classes[arg.unfinished[arg_no]]):
+        flow, label = dataset[idx]
+        path = f'data/UCF-101/skeleton/{list(arg.labels.keys())[idx]}' + '.pt'
+        torch.save(flow, path)
 
-#         flow_list = model(input_tensor[:,0,...], input_tensor[:,1,...])
-#         results.append(flow_list[-1])
-#         print(f'iteration {i+batch_size} done')
-#         torch.cuda.empty_cache()
+    print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
+else:
+    for idx in get_range(arg_no):
+        flow, label = dataset[idx] # We're using GetFlow transform so this returns  flow!
+        # Check if the folder that the videos belong in exists
+        folder = f'data/UCF-101/flow/{list(arg.labels.keys())[idx].split("/")[0]}/'
+        try:
+            # If not create the folder!
+            os.mkdir(folder)
+        except FileExistsError:
+            pass
+        path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1] + '.pt')
+        torch.save(flow, path)
 
-# print(torch.cat(results).shape)
-
-# for idx in get_range(arg_no):
-#     folder = f'data/UCF-101/flow/{list(arg.labels.keys())[idx].split("/")[0]}/'
-#     path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1].split('.')[0] + '.pt')
+    print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')
