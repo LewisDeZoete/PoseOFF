@@ -153,5 +153,49 @@ class GetFlow:
             return flow
 
 
+def compute_divergence_and_curl(flows, poses, kernel_size=3, threshold=0.5):
+    """
+    Calculate divergence and curl of an optical flow field at specified poses.
+
+    Args:
+        flow (torch.Tensor): A tensor of shape (num_frames, 2, height, width),
+                                     where the second dimension represents (u, v) optical flow.
+        poses (torch.Tensor): A tensor of pose keyposes of shape 
+                                (channels (x,y,v), max frames (300), keyposes (17), max persons (2)).
+        kernel_size (int): The size of the neighborhood to consider for calculations.
+        threshold (float): Confidence threshold for rejecting a pose keypoint.
+
+    Returns:
+        divergences (list): List of divergence values at the specified poses.
+        curls (list): List of curl values at the specified poses.
+    TODO: move to transforms!
+    """
+    num_frames, _, height, width = flows.shape
+
+    # Define the kernel size for neighborhood calculations
+    half_k = kernel_size // 2
+
+    for i, flow in enumerate(flows):
+        # Reshape the pose points to be a continuous array
+        pose_points = poses[:2,i].reshape(2,34)
+        # Get visibility tensor to use as a mask
+        vis = poses[2,i].reshape(34)
+        vis = vis > threshold
+        # Rescale values from (-0.5:0.5) to (0,height-1) since we're using it to index
+        pose_points[0] = (pose_points[0]+0.5)*(width-1)
+        pose_points[1] = (pose_points[1]+0.5)*(height-1)
+        pose_points = pose_points.type(torch.int)
+
+        # Get the divergence and curl for each keypoint
+        for keypoint_num in range(pose_points.shape[1]):
+            x,y = poses[0,keypoint_num], poses[1,keypoint_num]
+            # disregard the div and curl if the keypoint is too close to the edge
+            if y < half_k or y >= height - half_k or x < half_k or x >= width - half_k:
+                pass
+                
+        # For now just simply getting the flow points
+        flow_points = flows[i,:, pose_points[1], pose_points[0]]*vis
+
+
 if __name__ == '__main__':
     from ..utils.objects import ArgClass
