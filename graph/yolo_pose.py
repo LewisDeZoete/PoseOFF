@@ -47,5 +47,6 @@ if __name__ == '__main__':
     A_binary = graph.A_binary
     import matplotlib.pyplot as plt
     print(A_binary)
+
     plt.matshow(A_binary)
     plt.show()

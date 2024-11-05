@@ -27,7 +27,7 @@ class CustomDataset(Dataset):
         self.data_path = arg.dataloader.get("data_path", "")
 
         # Get the device, defaulting to 'cpu'
-        self.device = arg.device if torch.cuda.is_available() else "cpu"
+        self.device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
     def __len__(self):
         return len(self.labels)
@@ -49,7 +49,8 @@ class CustomDataset(Dataset):
 
 class SingleStreamDataset(CustomDataset):
     """
-    Load a single stream dataset (either flow or skeleton) by processing videos or loading preprocessed tensors.
+    Load a single stream dataset (either flow or skeleton) by loading preprocessed tensors.
+    PREPROCESSED DATA ONLY
     """
 
     def __init__(self, arg, stream: str, transforms=None, max_frames=300):
@@ -61,41 +62,40 @@ class SingleStreamDataset(CustomDataset):
         if stream not in ["skel", "flow"]:
             raise ValueError("stream must be 'skel' or 'flow'")
 
-        self.data_path = arg.dataloader[f"{stream}_path"]
-
-    def __getitem__(self, idx):
-        item_key = list(self.labels.keys())[idx]
-        item_path = f"{self.data_path}{item_key}{self.ext}"
-        label = self.labels[item_key]
-
-        # Load the preprocessed data directly
-        output = torch.load(item_path, map_location=self.device)
-
-        return output, label
+        self.data_path = arg.dataloader[f"{stream}_path"] if self.preprocessed else arg.dataloader['data_path']
 
 
 class MultiStreamDataset(CustomDataset):
-    def __init__(self, arg):
+    def __init__(self, arg, transforms):
         super().__init__(arg)
-        self.data_path = "./data/UCF-101/"
+        self.skel_path = arg.dataloader['skel_path']
+        self.flow_path = arg.dataloader['flow_path']
+        self.transforms = transforms
+        # We have to pass the FlowPoseSampler arg!
+        assert transforms is not None
 
     def __getitem__(self, idx):
         item_key = list(self.labels.keys())[idx]
-        flow = torch.load(
-            f"{self.data_path}flow/{item_key}{self.ext}", map_location=self.device
+        label = self.labels[item_key]
+        # Preload the pre-processed poses and flows
+        poses = torch.load(
+            f"{self.skel_path}{item_key}{self.ext}", map_location=self.device
         )
-        pose = torch.load(
-            f"{self.data_path}skeleton/{item_key}{self.ext}", map_location=self.device
+        flows = torch.load(
+            f"{self.flow_path}{item_key}{self.ext}", map_location=self.device
         )
 
-        return flow, pose
+        output = self.transforms(flows,poses)
+
+        return output, label
 
 
 if __name__ == "__main__":
     import argparse
     import time
 
-    from lib.utils import ArgClass
+    from lib.utils import ArgClass, FlowPoseSampler, FlowPoseSampler_FAST
+    # from torch.utils.data import DataLoader
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -105,27 +105,51 @@ if __name__ == "__main__":
         help="stream for SingleStreamDataset, either 'skel' or 'flow' (default skel)",
     )
     parsed = parser.parse_args()
-
     arg = ArgClass(arg="./config/custom_pose/train_joint.yaml")
-    single = SingleStreamDataset(arg, stream=parsed.stream)
-    multi = MultiStreamDataset(arg)
+
+    device = torch.device('cuda',arg.device) if torch.cuda.is_available() else "cpu"
+
+    # Create the FlowPoseSampler transform object
+    flowPoseTransform = FlowPoseSampler(device=device)
+    flowPoseTransform_fast = FlowPoseSampler_FAST(device=device)
+
+    # Create the datasets
+    # single = SingleStreamDataset(arg, stream=parsed.stream)
+    multi = MultiStreamDataset(arg,flowPoseTransform)
+
 
     # Test loading preprocessed data
     start = time.time()
-
-    # output, label = single[0]
-    # print(f"Single stream {parsed.stream} output shape: {output.shape}")
-    flows, poses = multi[0]
-    print(f"Multi-stream output shape - flow: {flows.shape}, pose: {poses.shape}")
     
-    for i, flow in enumerate(flows):
-        pass
-    # for person_no in range(poses.shape[-1]):
-    #     for pose_no in range(poses.shape[2]):
-    #         if poses[-1,frame_no,pose_no,person_no] > 0.5:
-    #             x,y,_ = poses[:,frame_no,pose_no,person_no]
-    #             print(f'({int((x+1/2)*flow.shape[2])}, {int((y+1)/2*flow.shape[3])})')
+    # Get the first 10 outputs from each dataset
+    for i in range(20):
+        # output_S, label = single[i]
+        output_M, label = multi[i]
 
-            
+        # # Interrogate the information
+        # print(f"Single stream {parsed.stream} output shape: {output_S.shape}")
+        # print(f"Multi-stream output shape {output_M.shape}")
 
-    print(f"Loaded in {time.time()-start} seconds")
+        # print(f"Single stream first row frame 10: {output_S[:,10,0,0]}")
+        # print(f"Multi-stream first row frame 10: {output_M[:,10,0,0]}\n")
+
+    print(f"Multi-stream first row frame 10: {output_M[:,10,0,0]}")
+    print(f"Original in {time.time()-start} seconds")
+
+     
+    
+    #### DELETE
+
+    # Create dataset again using fast flowpose sampler
+    multi = MultiStreamDataset(arg,flowPoseTransform_fast)
+
+    # Test loading preprocessed data
+    start = time.time()
+    
+    # Get the first 10 outputs from each dataset
+    for i in range(20):
+        # output_S, label = single[i]
+        output_M, label = multi[i]
+
+    print(f"Multi-stream first row frame 10: {output_M[:,10,0,0]}")
+    print(f"Fast in {time.time()-start} seconds")

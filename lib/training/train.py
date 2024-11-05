@@ -79,8 +79,8 @@ def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_f
 
 
 def train_simple_network(model, loss_func, train_loader, test_loader=None, val_loader=None,
-                        score_funcs=None, device="cpu", epochs=50,
-                        scheduler=None, optimiser=None, checkpoint_file=None):
+                        score_funcs=None, device="cpu", epochs:int=50,
+                        scheduler=None, optimiser=None, checkpoint_file:str=None):
     """
     Train simple neural networks
     
@@ -94,8 +94,8 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
     device -- the compute lodation to perform training\n
     
     """
-    if score_funcs == None:
-        score_funcs = {}#Empty set
+    if score_funcs is None:
+        score_funcs = {} #Empty set
 
     to_track = ["epoch", "training time", "train loss", "lr"]
     if val_loader is not None:
@@ -155,14 +155,14 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
                 print(f'\t\tBEST: {max_acc}')
                 # torch.save(model, f'./model/checkpoints/{checkpoint_file}.pt')
 
-                    
-        if checkpoint_file is not None:
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimiser_state_dict': optimiser.state_dict(),
-                'results' : results
-                }, checkpoint_file)
+    # If we pass checkpoint_file, save the model and results after training
+    if checkpoint_file is not None:
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimiser_state_dict': optimiser.state_dict(),
+            'results' : results
+            }, checkpoint_file)
 
     return results
 

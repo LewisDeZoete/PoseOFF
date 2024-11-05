@@ -8,7 +8,7 @@ from collections import OrderedDict
 from lib.utils.model_utils import count_params, import_class
 from lib.utils.objects import LayerCompare
 
-class load_model:
+class ModelLoader:
     def __init__(self, arg):
         self.arg = arg
         
@@ -30,16 +30,12 @@ class load_model:
         if self.arg.weights:
             try:
                 self.global_step = int(self.arg.weights[:-3].split('-')[-1])
-            except:
+            except AttributeError:
                 print('\tCannot parse global_step from model weights filename')
                 self.global_step = 0
 
             print(f'\tLoading weights from {self.arg.weights}')
-            if '.pkl' in self.arg.weights:
-                with open(self.arg.weights, 'r') as f:
-                    weights = pickle.load(f)
-            else:
-                weights = torch.load(self.arg.weights)
+            weights = torch.load(self.arg.weights)
 
             # removing the 'module.' part of key name and moving weight to device
             weights = OrderedDict(
@@ -76,14 +72,27 @@ class load_model:
 if __name__=='__main__':
     from lib.utils.objects import ArgClass
     import time
+    
+    in_channels = 5
+
     args = ArgClass('./config/custom_pose/train_joint.yaml')
-    model = load_model(args)
-    model.load_model()
+    args.model_args['in_channels'] = in_channels
+    modelLoader = ModelLoader(args)
+    modelLoader.load_model()
+    skel_model = modelLoader.model
 
-    start = time.time()
-    b = 6
-    x = torch.randn(b,3,300,17,2).to(model.output_device)
-    results = model.model(x)
-    print(f'\nOutput shape (batch size = {b}): {results.shape}')
-    print(f'in {time.time()-start:0.5f} seconds')
+    with torch.no_grad():
+        start = time.time()
+        b = 6
+        x = torch.randn(b,in_channels,300,17,2).to(modelLoader.output_device)
+        results = skel_model(x)
+        print(f'\nOutput shape (batch size = {b}): {results.shape}')
+        print(f'in {time.time()-start:0.5f} seconds')
 
+    # torch.save({
+    #     'epoch': 0,
+    #     'model_state_dict': skel_model.state_dict(),
+    #     'results': results
+    # }, './pretrained_models/ms-g3d_flow/test.pt')
+
+    # checkpoint = torch.load('./pretrained_models/ms-g3d_flow/test.pt')

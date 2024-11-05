@@ -5,7 +5,7 @@ import os
 curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
-from lib.data.dataset import CustomVideoDataset
+from lib.data.dataset import SingleStreamDataset
 from lib.utils.objects import ArgClass
 from lib.utils.transforms import GetFlow
 import torch
@@ -48,7 +48,7 @@ model.load_state_dict(weights)
 model = model.eval()
 
 transforms = v2.Compose([
-    # v2.Resize(size=(240,320)),
+    v2.Resize(size=(240,320)),
     v2.ToImage(),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),  # map [0, 1] into [-1, 1]
@@ -56,8 +56,7 @@ transforms = v2.Compose([
     ])
 
 # Create the dataset object
-dataset = CustomVideoDataset(arg=arg, transforms=transforms)
-
+dataset = SingleStreamDataset(arg=arg, stream='flow', transforms=transforms)
 
 start = time.time()
 # Check if the indices we've been given are for the overall 
@@ -65,7 +64,7 @@ start = time.time()
 if 'unfinished' in arg.__dict__:
     for idx in get_range(classes[arg.unfinished[arg_no]]):
         flow, label = dataset[idx]
-        path = f'data/UCF-101/skeleton/{list(arg.labels.keys())[idx]}' + '.pt'
+        path = f'{arg.dataloader["flow_path"]}{list(arg.labels.keys())[idx]}' + '.pt'
         torch.save(flow, path)
 
     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
@@ -73,7 +72,7 @@ else:
     for idx in get_range(arg_no):
         flow, label = dataset[idx] # We're using GetFlow transform so this returns  flow!
         # Check if the folder that the videos belong in exists
-        folder = f'data/UCF-101/flow/{list(arg.labels.keys())[idx].split("/")[0]}/'
+        folder = f'{arg.dataloader["flow_path"]}{list(arg.labels.keys())[idx].split("/")[0]}/'
         try:
             # If not create the folder!
             os.mkdir(folder)

@@ -15,6 +15,9 @@ class ArgClass(object):
             # Get arg file
             with open(f'./config/{arg.config}/{arg.phase}_{arg.limb}.yaml', 'r') as file:
                 in_dict = yaml.safe_load(file)
+            # Also add the attributes in parser to the arg class
+            for key in arg.__dict__:
+                in_dict[key] = arg.__dict__[key]
         elif isinstance(arg, str):
             with open(arg, 'r') as file:
                 in_dict = yaml.safe_load(file)
