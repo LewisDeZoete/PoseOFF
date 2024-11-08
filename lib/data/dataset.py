@@ -51,6 +51,7 @@ class SingleStreamDataset(CustomDataset):
     """
     Load a single stream dataset (either flow or skeleton) by loading preprocessed tensors.
     PREPROCESSED DATA ONLY
+    TODO: Since I preprocessed
     """
 
     def __init__(self, arg, stream: str, transforms=None, max_frames=300):
@@ -59,8 +60,8 @@ class SingleStreamDataset(CustomDataset):
         self.max_frames = max_frames
 
         # Ensure stream is either 'skel' or 'flow'
-        if stream not in ["skel", "flow"]:
-            raise ValueError("stream must be 'skel' or 'flow'")
+        if stream not in ["skel", "flow", "flowpose"]:
+            raise ValueError("stream must be 'skel', 'flow' or 'flowpose'")
 
         self.data_path = arg.dataloader[f"{stream}_path"] if self.preprocessed else arg.dataloader['data_path']
 
@@ -94,8 +95,8 @@ if __name__ == "__main__":
     import argparse
     import time
 
-    from lib.utils import ArgClass, FlowPoseSampler, FlowPoseSampler_FAST
-    # from torch.utils.data import DataLoader
+    from lib.utils import ArgClass, FlowPoseSampler
+    from torch.utils.data import DataLoader
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -107,49 +108,22 @@ if __name__ == "__main__":
     parsed = parser.parse_args()
     arg = ArgClass(arg="./config/custom_pose/train_joint.yaml")
 
-    device = torch.device('cuda',arg.device) if torch.cuda.is_available() else "cpu"
+    device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
     # Create the FlowPoseSampler transform object
     flowPoseTransform = FlowPoseSampler(device=device)
-    flowPoseTransform_fast = FlowPoseSampler_FAST(device=device)
 
-    # Create the datasets
-    # single = SingleStreamDataset(arg, stream=parsed.stream)
-    multi = MultiStreamDataset(arg,flowPoseTransform)
-
+    # Create the multi stream dataset
+    dataset = MultiStreamDataset(arg,flowPoseTransform)
+    dataloader = DataLoader(dataset, batch_size=16, shuffle=False)
 
     # Test loading preprocessed data
     start = time.time()
     
-    # Get the first 10 outputs from each dataset
-    for i in range(20):
-        # output_S, label = single[i]
-        output_M, label = multi[i]
+    # Get a few batches
+    for inputs, labels in dataloader:
+        print(inputs.shape)
+        print(labels.shape)
+        break
 
-        # # Interrogate the information
-        # print(f"Single stream {parsed.stream} output shape: {output_S.shape}")
-        # print(f"Multi-stream output shape {output_M.shape}")
-
-        # print(f"Single stream first row frame 10: {output_S[:,10,0,0]}")
-        # print(f"Multi-stream first row frame 10: {output_M[:,10,0,0]}\n")
-
-    print(f"Multi-stream first row frame 10: {output_M[:,10,0,0]}")
-    print(f"Original in {time.time()-start} seconds")
-
-     
-    
-    #### DELETE
-
-    # Create dataset again using fast flowpose sampler
-    multi = MultiStreamDataset(arg,flowPoseTransform_fast)
-
-    # Test loading preprocessed data
-    start = time.time()
-    
-    # Get the first 10 outputs from each dataset
-    for i in range(20):
-        # output_S, label = single[i]
-        output_M, label = multi[i]
-
-    print(f"Multi-stream first row frame 10: {output_M[:,10,0,0]}")
-    print(f"Fast in {time.time()-start} seconds")
+    print(f'Completed a batch of 8 in {time.time()-start}seconds')

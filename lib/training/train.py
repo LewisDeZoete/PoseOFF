@@ -151,9 +151,9 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
                 run_epoch(model, optimiser, test_loader, loss_func, device, results, score_funcs, prefix="test", desc="Testing")
             # Save best results!
             if results['train accuracy'][-1] > max_acc:
-                max_acc = results['train accuracy']
-                print(f'\t\tBEST: {max_acc}')
-                # torch.save(model, f'./model/checkpoints/{checkpoint_file}.pt')
+                max_acc = results['train accuracy'][-1]
+            print(f'\t\tBEST TEST ACC: {max(results["test accuracy"])}')
+            
 
     # If we pass checkpoint_file, save the model and results after training
     if checkpoint_file is not None:

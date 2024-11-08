@@ -4,12 +4,12 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from model import ModelLoader
-from lib.data.dataset import MultiStreamDataset
+from lib.data.dataset import SingleStreamDataset
 from lib.utils.objects import ArgClass
-from lib.utils.transforms import FlowPoseSampler
+# from lib.utils.transforms import FlowPoseSampler
 
 from lib.training import train_simple_network
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 import argparse
 
@@ -45,16 +45,17 @@ print("### Model created")
 
 # Get the correct device (since arg.device is simply an int, we want a torch.device)
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
+# loader_device = torch.device('cpu')
 
 # Create the transforms (for multistream, I just need the FlowPoseSampler)
 transform = arg.dataloader['transforms']
-flowPoseSampler = FlowPoseSampler(device=device,
-                                kernel_size=transform['kernel_size'],
-                                threshold=transform['threshold'])
+
+dataset = SingleStreamDataset(arg, stream='flowpose')
+# dataset.device = loader_device
 
 # Create the dataset and dataloader
 train_dataset, test_dataset = torch.utils.data.random_split(
-    MultiStreamDataset(arg,flowPoseSampler), 
+    dataset, 
     [0.8,0.2])
 train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=arg.batch_size, shuffle=True)
@@ -81,9 +82,9 @@ for scheduler_part in scheduler._schedulers:
 
 loss = nn.CrossEntropyLoss()
 
-
 # TRAINING! 
-score_funcs = {'accuracy': accuracy_score}
+score_funcs = {'accuracy': accuracy_score, 
+               'confusion_matrix': confusion_matrix}
 
 results = train_simple_network(model=skel_model, loss_func=loss, train_loader=train_dataloader, test_loader=test_dataloader,
                                 score_funcs=score_funcs, device=arg.device, epochs=100, 

@@ -1,10 +1,11 @@
 # dataloader
 dataloader:
-  preprocessed: False
+  preprocessed: True
   data_path: ../Datasets/UCF-101/
   label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
   skel_path: ./data/UCF-101/pose/
   flow_path: ./data/UCF-101/flow/
+  flowpose_path: ./data/UCF-101/flowpose/
 
 #ignore_weights: ["data_bn.weight", "data_bn.bias", "data_bn.running_mean", "data_bn.running_var"]
 ignore_weights: []
@@ -16,8 +17,12 @@ flow:
   weights: pretrained_models/raft_large.pt
   minibatch_size: 16
 
+flowpose:
+  kernel_size: 8
+  threshold: 0.05
+
 device: 0
 
 # If the following parameter is provided, then the array given by 
 # the bash script is the indexes for elements in here
-unfinished: [PommelHorse]
+# unfinished: [PommelHorse]

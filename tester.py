@@ -1,20 +1,6 @@
-import os
-import yaml
+import torch
 
+results = torch.load('./pretrained_models/ms-g3d_flow/flowpose_k3_t0.5.pt',
+                     map_location='cpu')
 
-with open('../Datasets/UCF-101/ucf101_annotations.yaml', 'r') as yaml_file:
-    annotations = yaml.safe_load(yaml_file)
-
-# Get the number of videos in the original videos
-count_dict_ann = {}
-for key in annotations.keys():
-    try:
-        count_dict_ann[key.split('/')[0]] += 1
-    except KeyError:
-        count_dict_ann[key.split('/')[0]] = 1
-
-# count_dict_flow = {}
-for key, val in count_dict_ann.items():
-    # count_dict_flow[key] = len(os.listdir(f'./data/UCF-101/flow/{key}'))
-    if len(os.listdir(f'./data/UCF-101/flow/{key}')) < val:
-        print(key)
+print(f"Highest test accuracy: {100*max(results['results']['test accuracy']):0.2f}%")

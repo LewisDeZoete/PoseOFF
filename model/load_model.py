@@ -13,10 +13,13 @@ class ModelLoader:
         self.arg = arg
         
     def load_model(self):
-        output_device = self.arg.device[0] if type(
-            self.arg.device) is list else self.arg.device
+        # If cuda isn't available device is cpu, print device name debug
         if not torch.cuda.is_available():
             output_device='cpu'
+        else: 
+            output_device = self.arg.device[0] if type(
+                self.arg.device) is list else self.arg.device
+        
         self.output_device = output_device
         print(f'\tOutput device: {self.output_device}')
         Model = import_class(self.arg.model)
@@ -73,7 +76,7 @@ if __name__=='__main__':
     from lib.utils.objects import ArgClass
     import time
     
-    in_channels = 5
+    in_channels = 3
 
     args = ArgClass('./config/custom_pose/train_joint.yaml')
     args.model_args['in_channels'] = in_channels
