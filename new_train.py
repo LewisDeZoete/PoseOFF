@@ -69,16 +69,14 @@ params = list({'other': param_groups}.values())
 # Create the optimiser
 optimiser = optim.SGD(
                 params,
-                lr=arg.base_lr,
+                lr=arg.optim['base_lr'],
                 momentum=0.9,
-                nesterov=arg.nesterov,
-                weight_decay=arg.weight_decay)
-# lr_scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.step, gamma=0.1)
-scheduler1 = optim.lr_scheduler.LinearLR(optimiser, start_factor=0.5, total_iters=10)
+                nesterov=arg.optim['nesterov'],
+                weight_decay=arg.optim['weight_decay'])
+
+scheduler1 = optim.lr_scheduler.LinearLR(optimiser, start_factor=0.5, total_iters=arg.optim['step'])
 scheduler2 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=0.93)
 scheduler = optim.lr_scheduler.SequentialLR(optimiser, schedulers=[scheduler1, scheduler2], milestones=[10])
-for scheduler_part in scheduler._schedulers:
-    print(scheduler_part.__dict__)
 
 loss = nn.CrossEntropyLoss()
 

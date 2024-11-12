@@ -9,7 +9,7 @@ dataloader:
   flow_path: ./data/UCF-101/flow/
   flowpose_path: ./data/UCF-101/flowpose/
   transforms: 
-    kernel_size: 8
+    kernel_size: 5
     threshold: 0.05
 
 # model
@@ -21,28 +21,28 @@ model_args:
   num_gcn_scales: 8
   num_g3d_scales: 8
   graph: graph.yolo_pose.AdjMatrixGraph
-  in_channels: 5
+  in_channels: 3
+  kernel_size: 5
 ignore_weights: []
 phase: train
 save_location: ./pretrained_models/ms-g3d_flow/
 weights: 
 # weights: ./pretrained_models/kinetics_joint.pt
 
-# optim
-# weight_decay: 0.0005
-weight_decay: 0.0003
-# base_lr: 0.05
-base_lr: 0.5
-step: [45, 55]
+optim:
+  # weight_decay: 0.0005
+  weight_decay: 0.0003
+  base_lr: 0.5
+  step: 10
+  nesterov: True
 
 # training
 num_epoch: 1
 # device: [0,1]
 device: 0
-# batch_size: 8
-batch_size: 64
-# forward_batch_size: 8
-forward_batch_size: 64
+# batch_size: 64
+batch_size: 128
+# forward_batch_size: 64
+forward_batch_size: 128
 # test_batch_size: 8
-test_batch_size: 128
-nesterov: True
+test_batch_size: 256

@@ -40,7 +40,7 @@ def get_range(class_no):
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
 # Create the FlowPoseSampler transform object
-flowPoseTransform = FlowPoseSampler(device=device, )
+flowPoseTransform = FlowPoseSampler(device=device, **arg.flowpose)
 
 # Create the dataset object
 dataset = MultiStreamDataset(arg=arg, transforms=flowPoseTransform)
@@ -50,14 +50,14 @@ start = time.time()
 # dataset or as indices for the 'unfinished' list in config
 if 'unfinished' in arg.__dict__:
     for idx in get_range(classes[arg.unfinished[arg_no]]):
-        flow, label = dataset[idx]
+        flowpose, label = dataset[idx]
         path = f'{arg.dataloader["flowpose_path"]}{list(arg.labels.keys())[idx]}' + '.pt'
-        torch.save(flow, path)
+        torch.save(flowpose, path)
 
     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
 else:
     for idx in get_range(arg_no):
-        flow, label = dataset[idx] # We're using GetFlow transform so this returns  flow!
+        flowpose, label = dataset[idx] # We're using FlowPoseSampler transform so this returns the flowpose!
         # Check if the folder that the videos belong in exists
         folder = f'{arg.dataloader["flowpose_path"]}{list(arg.labels.keys())[idx].split("/")[0]}/'
         try:
@@ -66,6 +66,6 @@ else:
         except FileExistsError:
             pass
         path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1] + '.pt')
-        torch.save(flow, path)
+        torch.save(flowpose, path)
 
     print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')

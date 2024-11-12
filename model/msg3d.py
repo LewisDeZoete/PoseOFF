@@ -102,6 +102,35 @@ class MultiWindow_MS_G3D(nn.Module):
         return out_sum
 
 
+class Flow_Windows(nn.Module):
+    def __init__(self, kernel_size, original_channels=3, out_channels=1):
+        '''
+        NOTE: We're assuming here we're completely reducing the additional
+        channels into a single channel
+        '''
+        super(Flow_Windows, self).__init__()
+
+        # 2D conv for learning just the flow windows
+        self.flow_conv = nn.Conv2d(in_channels=2, out_channels=out_channels, kernel_size=kernel_size)
+        self.original_channels = original_channels
+        self.out_channels = out_channels
+    
+    def forward(self, x):
+        N, C, T, V, M = x.size()
+        # x of shape (batch, 3+additional_channels, 300, 17, 2)
+        flow_data = x[:, self.original_channels:, ...] # (B, k**2*2, 300, 17, 2)
+        flow_data = flow_data.view(N, T, V, M, 5, 5, 2)
+        flow_data = flow_data.permute(0, 4, 5, 6, 1, 2, 3) # (B, K, K, 2, 300, 17, 2)
+
+        # Apply convolutional layer (flattened batch * frames * keypoints * people)
+        flow_featues = self.flow_conv(flow_data.contiguous().view(-1, 2, 5, 5))
+        flow_featues = flow_featues.view(N, T, V, M, self.out_channels).permute(0, 4, 1, 2, 3)
+
+        x = torch.cat((x[:,:self.original_channels,...], flow_featues), dim=1)
+
+        return x
+
+
 class Model(nn.Module):
     def __init__(self,
                  num_class,
@@ -110,25 +139,34 @@ class Model(nn.Module):
                  num_gcn_scales,
                  num_g3d_scales,
                  graph,
-                 in_channels=3):
+                 in_channels=3,
+                 kernel_size=5):
         super(Model, self).__init__()
 
         Graph = import_class(graph)
         A_binary = Graph().A_binary
 
-        self.data_bn = nn.BatchNorm1d(num_person * in_channels * num_point)
+        self.data_bn = nn.BatchNorm1d(num_person * 
+                                     (in_channels + (kernel_size**2*2)) *
+                                      num_point)
 
         # channels
         c1 = 96
         c2 = c1 * 2     # 192
         c3 = c2 * 2     # 384
 
-        # r=3 STGC blocks
+        # Adding the new Flow_Windows module
+        # Input to the rest of MS-G3D will simply be in_channels+1
+        self.flow_windows = Flow_Windows(kernel_size=kernel_size, 
+                                         original_channels=in_channels, 
+                                         out_channels=1)
+
+        # r=2? STGC blocks
         # self.gcn3d1 = MultiWindow_MS_G3D(3, c1, A_binary, num_g3d_scales, window_stride=1)
-        self.gcn3d1 = MultiWindow_MS_G3D(in_channels, c1, A_binary, num_g3d_scales, window_stride=1)
+        self.gcn3d1 = MultiWindow_MS_G3D(in_channels+1, c1, A_binary, num_g3d_scales, window_stride=1)
         self.sgcn1 = nn.Sequential(
             # MS_GCN(num_gcn_scales, 3, c1, A_binary, disentangled_agg=True),
-            MS_GCN(num_gcn_scales, in_channels, c1, A_binary, disentangled_agg=True),
+            MS_GCN(num_gcn_scales, in_channels+1, c1, A_binary, disentangled_agg=True),
             MS_TCN(c1, c1),
             MS_TCN(c1, c1))
         self.sgcn1[-1].act = nn.Identity()
@@ -154,9 +192,16 @@ class Model(nn.Module):
 
     def forward(self, x):
         N, C, T, V, M = x.size()
+        # (N, M*V*C, T)
         x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
         x = self.data_bn(x)
-        x = x.view(N * M, V, C, T).permute(0,2,3,1).contiguous()
+
+        # (N, C, T, V, M) 
+        x = x.view(N, M, V, C, T).permute(0,3,4,2,1).contiguous()
+        x = self.flow_windows(x)
+        
+        # (N * M, in_channels+1, T, V)
+        x = x.permute(0, 4, 1, 2, 3).contiguous().view(N * M, 4, T, V)
 
         # Apply activation to the sum of the pathways
         x = F.relu(self.sgcn1(x) + self.gcn3d1(x), inplace=True)
@@ -178,10 +223,13 @@ class Model(nn.Module):
         return out
 
 
+
 if __name__ == "__main__":
     # For debugging purposes
     import sys
     sys.path.append('..')
+
+    kernel_size=5
 
     model = Model(
         num_class=60,
@@ -189,11 +237,15 @@ if __name__ == "__main__":
         num_person=2,
         num_gcn_scales=13,
         num_g3d_scales=6,
-        graph='graph.ntu_rgb_d.AdjMatrixGraph'
+        graph='graph.ntu_rgb_d.AdjMatrixGraph',
+        in_channels=3,
+        kernel_size=kernel_size
     )
 
-    N, C, T, V, M = 6, 3, 50, 25, 2
+    N, C, T, V, M = 6, 3+kernel_size**2*2, 300, 25, 2
     x = torch.randn(N,C,T,V,M)
-    model.forward(x)
+    out = model.forward(x)
+
+    print(out.shape)
 
     print('Model total # params:', count_params(model))

@@ -49,9 +49,8 @@ class CustomDataset(Dataset):
 
 class SingleStreamDataset(CustomDataset):
     """
-    Load a single stream dataset (either flow or skeleton) by loading preprocessed tensors.
+    Load a single stream dataset (either flow, pose or flowpose) by loading preprocessed tensors.
     PREPROCESSED DATA ONLY
-    TODO: Since I preprocessed
     """
 
     def __init__(self, arg, stream: str, transforms=None, max_frames=300):
