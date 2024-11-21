@@ -15,10 +15,13 @@ pose:
 
 flow:
   weights: pretrained_models/raft_large.pt
+  imsize:
+    w: 320
+    h: 240
   minibatch_size: 16
 
 flowpose:
-  window_size: 5
+  window_size: 9
   threshold: 0.05
 
 device: 0

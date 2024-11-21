@@ -70,8 +70,8 @@ class random_choose(object):
 class random_move(object):
     '''
     TODO: Comprehensive docstring
-    TODO: Ensure only the first 3 channels get randomly moved
-    Randomly move skeleton keypoints a small amount?
+    TODO: Ensure only the first 2 channels get randomly moved
+    Randomly move skeleton keypoints a small amount.
     '''
     def __init__(self,
                 angle_candidate=[-10., -5., 0., 5., 10.],
@@ -139,6 +139,19 @@ class random_shift(object):
         data_shift[:, bias:bias + size, :, :] = data_numpy[:, begin:end, :, :]
 
         return data_shift
+    
+class flow_mag_norm(object):
+    '''
+    Normalise optical flow vectors to unit vectors by dividing by their magnitude.
+    TODO: double check that the input data is flow_pose!
+    '''
+    def __call__(self, data_numpy):
+        C,T,V,M = data_numpy.shape
+        flow = data_numpy[3:,...]
+        flow = flow.reshape(2, np.sqrt(C/2), np.sqrt(C/2), T,V,M) # (2,5,5,300,17,2)
+        mag = np.sqrt(flow[0]**2 + flow[1]**2+1e-8)
+        norm_flow = flow / mag
+        return(norm_flow)
 
 
 def openpose_match(data_numpy):
@@ -247,7 +260,7 @@ if __name__ == "__main__":
                   swap_numpy(device='cpu')]
     
     for i in range(1000):
-        data = torch.rand((3,150,17,2))
+        data = torch.rand((53,150,17,2))
         for transform in transforms:
             data = transform(data)
     print(data.shape)
