@@ -18,7 +18,7 @@ flow:
   minibatch_size: 16
 
 flowpose:
-  kernel_size: 5
+  window_size: 5
   threshold: 0.05
 
 device: 0

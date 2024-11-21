@@ -39,7 +39,7 @@ def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_f
         inputs = moveTo(inputs, device)
         labels = moveTo(labels, device)
 
-        y_hat = model(inputs) #this just computed f_Θ(x(i))
+        y_hat = model(inputs)
         # Compute loss.
         loss = loss_func(y_hat, labels)
 
@@ -67,14 +67,13 @@ def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_f
         y_pred = np.argmax(y_pred, axis=1)
     #Else, we assume we are working on a regression problem
     
+    # Using the score func dictionary we passed, calculate the scores and add to results dict
     results[prefix + " loss"].append( np.mean(running_loss) )
     for name, score_func in score_funcs.items():
         try:
             results[prefix + " " + name].append( score_func(y_true, y_pred) )
-            # print(f'{prefix}: {score_func(y_true, y_pred)}')
         except:
             results[prefix + " " + name].append(float("NaN"))
-            # print('NaN')
     return end-start #time spent on epoch
 
 

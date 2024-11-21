@@ -1,15 +1,15 @@
 #!/bin/bash
 
-#SBATCH --job-name=MS_G3D-Train_flowpose-embed_B128_k5_t0.05
+#SBATCH --job-name=MS_G3D-Train_flowpose-FIXED-cnn_transforms
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=05:00:00
+#SBATCH --time=09:00:00
 #SBATCH --mem-per-cpu=4000
 #SBATCH --gres=gpu:1
 
-#SBATCH --error='logs/errors_flowpose-embed_B128_k5_t0.05'
-#SBATCH --output='logs/train_flowpose-embed_B128_k5_t0.05'
+#SBATCH --error='logs/errors_flowpose-FIXED-cnn_transforms.txt'
+#SBATCH --output='logs/train_flowpose-FIXED-cnn_transforms.txt'
 
 #SBATCH --mail-user=ldezoetegrundy@swin.edu.au
 #SBATCH --mail-type=ALL
@@ -18,4 +18,4 @@ export PYTHONUNBUFFERED=TRUE
 
 source ../environment/bin/activate
 
-python new_train.py -p train -r flowpose-embed_B128_k5_t0.05
+python new_train.py -p train -r flowpose-FIXED-cnn_transforms -d 'Reshaping inside MS-G3D was wrong, added linear layer to flow_conv'

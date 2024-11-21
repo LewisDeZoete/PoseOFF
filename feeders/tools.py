@@ -157,3 +157,14 @@ def openpose_match(data_numpy):
     data_numpy = data_numpy[:, :, :, rank]
 
     return data_numpy
+
+
+if __name__ == "__main__":
+    import time
+    import torch
+    start = time.time()
+    for i in range(1000):
+        data = torch.rand((3,150,17,2))
+        data = np.array(data)
+        data = random_move(data)
+    print(time.time()-start)

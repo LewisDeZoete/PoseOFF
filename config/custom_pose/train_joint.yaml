@@ -8,9 +8,11 @@ dataloader:
   skel_path: ./data/UCF-101/pose/
   flow_path: ./data/UCF-101/flow/
   flowpose_path: ./data/UCF-101/flowpose/
-  transforms: 
-    kernel_size: 5
-    threshold: 0.05
+  transforms:
+    flow_sample: 
+      kernel_size: 5
+      threshold: 0.05
+    
 
 # model
 model: model.msg3d.Model
@@ -22,10 +24,12 @@ model_args:
   num_g3d_scales: 8
   graph: graph.yolo_pose.AdjMatrixGraph
   in_channels: 3
-  kernel_size: 5
+  flow_window: 5
+  kernel_size: 3
+  flow_channels: 4
 ignore_weights: []
 phase: train
-save_location: ./pretrained_models/ms-g3d_flow/
+save_location: ./results/ms-g3d_flow/
 weights: 
 # weights: ./pretrained_models/kinetics_joint.pt
 

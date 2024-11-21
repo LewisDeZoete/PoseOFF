@@ -11,6 +11,7 @@ import decord
 from decord import VideoReader, cpu
 import re
 from lib.utils.flow import stack_frames
+import lib.utils.augments as augments
 
 
 def LoadVideo(video_path, max_frames) -> torch.tensor:
@@ -193,10 +194,10 @@ class FlowPoseSampler_average:
     NOTE: Utilises the MultiStreamDataset, it passes in the loaded arrays.
     """
 
-    def __init__(self, device: torch.device, kernel_size: int = 3, threshold: float = 0.5):
+    def __init__(self, device: torch.device, window_size: int = 3, threshold: float = 0.5):
         self.device = device  # Making sure all tensors are on the same device
-        self.kernel_size = kernel_size  # Kernel size about pose keypoint
-        self.half_k = self.kernel_size // 2  # Half the kernel size
+        self.window_size = window_size  # window size about pose keypoint
+        self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
 
     def __call__(self, flows, poses):
@@ -237,17 +238,25 @@ class FlowPoseSampler_average:
         return flow_pose
 
 
+
 class FlowPoseSampler:
     """Sample optical flow using input poses.
     NOTE: Assumes pre-processed optical flow and poses (for now).
     NOTE: Utilises the MultiStreamDataset, it passes in the loaded arrays.
     """
 
-    def __init__(self, device: torch.device, kernel_size: int = 3, threshold: float = 0.5):
+    def __init__(self, 
+                 device: torch.device, 
+                 window_size: int = 3, 
+                 threshold: float = 0.5, 
+                 loop_graph: bool = True,
+                 to_cpu: bool = True):
         self.device = device  # Making sure all tensors are on the same device
-        self.kernel_size = kernel_size  # Kernel size about pose keypoint
-        self.half_k = self.kernel_size // 2  # Half the kernel size
+        self.window_size = window_size  # Window size about pose keypoint
+        self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
+        self.loop_graph = loop_graph
+        self.to_cpu = to_cpu
 
     def __call__(self, flows, poses):
         """Samples the optical flow in windows surrounding the pose keypoints.
@@ -263,14 +272,14 @@ class FlowPoseSampler:
         vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
 
         # Prepare stacker tensor for the flow data (pre-allocate the size)
-        stacker = torch.zeros((self.kernel_size**2*2, poses.shape[1], num_keypoints), device=self.device)
+        stacker = torch.zeros((self.window_size**2*2, poses.shape[1], num_keypoints), device=self.device)
 
         # Create a grid of valid indices (filter out bad points upfront)
         valid_indices = (vis.view(poses.shape[1], num_keypoints) & 
                          (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
                          (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
                         
-        # Loop through the frames and compute flow statistics for each valid keypoint
+        # Loop through the frames and sample flow in window around each valid keypoint
         for i in range(num_frames):
             flow = flows[i]
             for keypoint_num in range(num_keypoints):
@@ -283,13 +292,21 @@ class FlowPoseSampler:
         
         # Concatenate poses with computed flow
         flow_pose = torch.cat((poses, stacker.view(stacker.size()[0], *poses.size()[1:])), dim=0)
+        # If we pass loop_graph = True, then loop the graph using this function!
+        
+        # By default, move the flow_pose to the cpu (since we're manipulating with numpy)
+        if self.to_cpu:
+            flow_pose.to('cpu')
+        
         return flow_pose
+
 
 
 if __name__=='__main__':
     from objects import ArgClass
 
     arg = ArgClass('./data_gen/UCF-101_config.yaml')
+    print(arg.classes)
 
     flow = torch.load('./data/UCF-101/flow/Archery/v_Archery_g01_c01.pt',
                       map_location='cpu')
@@ -304,4 +321,7 @@ if __name__=='__main__':
     print(f'\tFlow: {flow.shape}\n\tPose: {pose.shape}')
     flow_pose = FPTransform(flow,pose)
     print(f'Flow pose sampler output shape: {flow_pose.shape}')
-    print(flow_pose[:5,1,0,0])
+    print(f'Frame 0: {flow_pose[:5,0,0,0]}')
+    print(f'Frame len(flow): {flow_pose[:5,len(flow),0,0]}')
+    print(f'Frame len(flow)+1: {flow_pose[:5,len(flow)+1,0,0]}')
+    print(f'Frame -1: {flow_pose[:5,-1,0,0]}')

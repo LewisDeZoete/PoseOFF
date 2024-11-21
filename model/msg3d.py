@@ -102,31 +102,48 @@ class MultiWindow_MS_G3D(nn.Module):
         return out_sum
 
 
-class Flow_Windows(nn.Module):
-    def __init__(self, kernel_size, original_channels=3, out_channels=1):
-        '''
-        NOTE: We're assuming here we're completely reducing the additional
-        channels into a single channel
-        '''
-        super(Flow_Windows, self).__init__()
+class Flow_conv(nn.Module):
+    def __init__(self, kernel_size, flow_window=5, original_channels=3, out_channels=4):
+        super(Flow_conv, self).__init__()
 
-        # 2D conv for learning just the flow windows
-        self.flow_conv = nn.Conv2d(in_channels=2, out_channels=out_channels, kernel_size=kernel_size)
+        # 3D conv for learning the flow windows
+        # in_channels = 2 since flow is x and y motion channels
+        # out_channels is the output shape of the convolutions
+        self.kernel_size = kernel_size
         self.original_channels = original_channels
         self.out_channels = out_channels
-    
+        self.flow_window = flow_window
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels=2,
+                      out_channels=16,
+                      kernel_size=self.kernel_size),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=16,
+                      out_channels=32, 
+                      kernel_size=self.kernel_size),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1,1))
+        )
+        self.fc = nn.Linear(32, self.out_channels)
+
     def forward(self, x):
-        N, C, T, V, M = x.size()
-        # x of shape (batch, 3+additional_channels, 300, 17, 2)
-        flow_data = x[:, self.original_channels:, ...] # (B, k**2*2, 300, 17, 2)
-        flow_data = flow_data.view(N, T, V, M, 5, 5, 2)
-        flow_data = flow_data.permute(0, 4, 5, 6, 1, 2, 3) # (B, K, K, 2, 300, 17, 2)
+        #(N, T, M, V, C)
+        N, T, M, V, C = x.size()
+        # x of shape (batch, 300, 2, 17, channels+2k**2)
+        flow_data = x.view(N*T*M*V, C)[:, self.original_channels:] # (N*T*M*V, 2K**2)
+        flow_data = flow_data.view(N*T*M*V, self.flow_window, self.flow_window, 2).permute(0, 3, 1, 2)
 
-        # Apply convolutional layer (flattened batch * frames * keypoints * people)
-        flow_featues = self.flow_conv(flow_data.contiguous().view(-1, 2, 5, 5))
-        flow_featues = flow_featues.view(N, T, V, M, self.out_channels).permute(0, 4, 1, 2, 3)
-
-        x = torch.cat((x[:,:self.original_channels,...], flow_featues), dim=1)
+        # Apply convolutions, dropout between then flatten 
+        # flow_features = torch.relu(self.flow_conv1(flow_data))
+        # flow_features = torch.relu(self.flow_conv2(flow_features))
+        # flow_features = self.pool(flow_features)
+        flow_features = self.conv(flow_data)    # Apply conv
+        flow_features = flow_features.view(flow_features.size(0), -1) # flatten
+        flow_features = self.fc(flow_features) # Linear layer to reduce out_channels
+        flow_features = flow_features.view(N,T,M,V, -1)
+        
+        # Stack the output of this cnn onto the original graph features
+        x = torch.cat((x[...,:self.original_channels], flow_features), dim=4)
 
         return x
 
@@ -140,33 +157,40 @@ class Model(nn.Module):
                  num_g3d_scales,
                  graph,
                  in_channels=3,
-                 kernel_size=5):
+                 flow_window=5,
+                 kernel_size=3,
+                 flow_channels=4):
+        '''
+        TODO: Test out other flow_conv models?
+        TODO: Create a attribute for flow out channels (for resizing and forward method)
+        '''
         super(Model, self).__init__()
 
         Graph = import_class(graph)
         A_binary = Graph().A_binary
 
         self.data_bn = nn.BatchNorm1d(num_person * 
-                                     (in_channels + (kernel_size**2*2)) *
+                                     (in_channels + (flow_window**2*2)) *
                                       num_point)
 
         # channels
         c1 = 96
         c2 = c1 * 2     # 192
         c3 = c2 * 2     # 384
+        self.flow_channels = flow_channels
 
         # Adding the new Flow_Windows module
         # Input to the rest of MS-G3D will simply be in_channels+1
-        self.flow_windows = Flow_Windows(kernel_size=kernel_size, 
-                                         original_channels=in_channels, 
-                                         out_channels=1)
+        self.flow_conv = Flow_conv(kernel_size=kernel_size, 
+                                   original_channels=in_channels, 
+                                   out_channels=self.flow_channels)
 
         # r=2? STGC blocks
         # self.gcn3d1 = MultiWindow_MS_G3D(3, c1, A_binary, num_g3d_scales, window_stride=1)
-        self.gcn3d1 = MultiWindow_MS_G3D(in_channels+1, c1, A_binary, num_g3d_scales, window_stride=1)
+        self.gcn3d1 = MultiWindow_MS_G3D(in_channels+flow_channels, c1, A_binary, num_g3d_scales, window_stride=1)
         self.sgcn1 = nn.Sequential(
             # MS_GCN(num_gcn_scales, 3, c1, A_binary, disentangled_agg=True),
-            MS_GCN(num_gcn_scales, in_channels+1, c1, A_binary, disentangled_agg=True),
+            MS_GCN(num_gcn_scales, in_channels+flow_channels, c1, A_binary, disentangled_agg=True),
             MS_TCN(c1, c1),
             MS_TCN(c1, c1))
         self.sgcn1[-1].act = nn.Identity()
@@ -196,12 +220,13 @@ class Model(nn.Module):
         x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
         x = self.data_bn(x)
 
-        # (N, C, T, V, M) 
-        x = x.view(N, M, V, C, T).permute(0,3,4,2,1).contiguous()
-        x = self.flow_windows(x)
+        # (N, T, M, V, C) 
+        x = x.view(N, M, V, C, T).permute(0,4,1,2,3).contiguous()
+        x = self.flow_conv(x)
         
-        # (N * M, in_channels+1, T, V)
-        x = x.permute(0, 4, 1, 2, 3).contiguous().view(N * M, 4, T, V)
+        # (N * M, in_channels+flow_out_channels, T, V)
+        # TODO: Make sure the channels here are correct!
+        x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 3+self.flow_channels, T, V)
 
         # Apply activation to the sum of the pathways
         x = F.relu(self.sgcn1(x) + self.gcn3d1(x), inplace=True)
@@ -229,7 +254,8 @@ if __name__ == "__main__":
     import sys
     sys.path.append('..')
 
-    kernel_size=5
+    flow_window = 5
+    kernel_size = 3
 
     model = Model(
         num_class=60,
@@ -239,13 +265,16 @@ if __name__ == "__main__":
         num_g3d_scales=6,
         graph='graph.ntu_rgb_d.AdjMatrixGraph',
         in_channels=3,
-        kernel_size=kernel_size
+        flow_window=flow_window,
+        kernel_size=kernel_size,
+        flow_channels=4
     )
+    pytorch_total_params = sum(p.numel() for p in model.parameters())
+    print(pytorch_total_params)
 
-    N, C, T, V, M = 6, 3+kernel_size**2*2, 300, 25, 2
+    N, C, T, V, M = 6, 3+2*flow_window**2, 100, 25, 2
     x = torch.randn(N,C,T,V,M)
     out = model.forward(x)
-
     print(out.shape)
 
-    print('Model total # params:', count_params(model))
+    # print('Model total # params:', count_params(model))

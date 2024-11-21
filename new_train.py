@@ -6,10 +6,10 @@ from torch.utils.data import DataLoader
 from model import ModelLoader
 from lib.data.dataset import SingleStreamDataset
 from lib.utils.objects import ArgClass
-# from lib.utils.transforms import FlowPoseSampler
+from lib.utils.augments import swap_numpy, random_shift, random_choose, random_move
 
 from lib.training import train_simple_network
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 import argparse
 
@@ -23,9 +23,11 @@ parser.add_argument('-l', dest='limb', default='joint',
                     help='limb [joint, bone] (default=joint)')
 parser.add_argument('-r', dest='run_name', default='',
                     help='name to save the results dictionary as after training')
+parser.add_argument('-d', dest='description', default='',
+                    help='Description of what is being tested in run') # TODO: DEBUG REMOVE
 parsed = parser.parse_args()
 
-
+print(parsed.description) # TODO: DEBUG REMOVE
 print("### Libraries loaded")
 # pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
 arg = ArgClass(arg=parsed)
@@ -48,15 +50,18 @@ device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 # loader_device = torch.device('cpu')
 
 # Create the transforms (for multistream, I just need the FlowPoseSampler)
-transform = arg.dataloader['transforms']
+transforms = [swap_numpy(device=device),
+              random_shift(),
+              random_move(),
+              swap_numpy(device=device)]
 
-dataset = SingleStreamDataset(arg, stream='flowpose')
-# dataset.device = loader_device
+train_dataset = SingleStreamDataset(arg, stream='flowpose',transforms=transforms)
+test_dataset = SingleStreamDataset(arg, stream='flowpose')
 
 # Create the dataset and dataloader
-train_dataset, test_dataset = torch.utils.data.random_split(
-    dataset, 
-    [0.8,0.2])
+train_idx, test_idx = torch.utils.data.random_split(range(len(train_dataset)),[0.8,0.2])
+train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
+test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
 train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=arg.batch_size, shuffle=True)
 
@@ -82,7 +87,8 @@ loss = nn.CrossEntropyLoss()
 
 # TRAINING! 
 score_funcs = {'accuracy': accuracy_score, 
-               'confusion_matrix': confusion_matrix}
+               'confusion matrix': confusion_matrix,
+               'classification report': classification_report}
 
 results = train_simple_network(model=skel_model, loss_func=loss, train_loader=train_dataloader, test_loader=test_dataloader,
                                 score_funcs=score_funcs, device=arg.device, epochs=100, 
