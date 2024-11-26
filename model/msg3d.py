@@ -104,6 +104,11 @@ class MultiWindow_MS_G3D(nn.Module):
 
 class Flow_conv(nn.Module):
     def __init__(self, kernel_size, flow_window=5, original_channels=3, out_channels=4):
+        '''
+        kernel_size - conv kernel size
+        flow_window - extracted window of flow around keypoints
+        original_channels - (x,y,vis) = 3 for yolo_pose data output
+        out_channels = number of channels to distill the flow information down to'''
         super(Flow_conv, self).__init__()
 
         # 3D conv for learning the flow windows
@@ -129,14 +134,11 @@ class Flow_conv(nn.Module):
     def forward(self, x):
         #(N, T, M, V, C)
         N, T, M, V, C = x.size()
-        # x of shape (batch, 300, 2, 17, channels+2k**2)
-        flow_data = x.view(N*T*M*V, C)[:, self.original_channels:] # (N*T*M*V, 2K**2)
+        # x of shape (batch, 300, 2, 17, channels+2W**2)
+        flow_data = x.view(N*T*M*V, C)[:, self.original_channels:] # (N*T*M*V, 2W**2)
         flow_data = flow_data.view(N*T*M*V, self.flow_window, self.flow_window, 2).permute(0, 3, 1, 2)
 
         # Apply convolutions, dropout between then flatten 
-        # flow_features = torch.relu(self.flow_conv1(flow_data))
-        # flow_features = torch.relu(self.flow_conv2(flow_features))
-        # flow_features = self.pool(flow_features)
         flow_features = self.conv(flow_data)    # Apply conv
         flow_features = flow_features.view(flow_features.size(0), -1) # flatten
         flow_features = self.fc(flow_features) # Linear layer to reduce out_channels
@@ -182,6 +184,7 @@ class Model(nn.Module):
         # Adding the new Flow_Windows module
         # Input to the rest of MS-G3D will simply be in_channels+1
         self.flow_conv = Flow_conv(kernel_size=kernel_size, 
+                                   flow_window = flow_window,
                                    original_channels=in_channels, 
                                    out_channels=self.flow_channels)
 
@@ -254,16 +257,17 @@ if __name__ == "__main__":
     import sys
     sys.path.append('..')
 
-    flow_window = 5
+    flow_window = 9
     kernel_size = 3
 
     model = Model(
         num_class=60,
-        num_point=25,
+        num_point=17,
         num_person=2,
         num_gcn_scales=13,
         num_g3d_scales=6,
-        graph='graph.ntu_rgb_d.AdjMatrixGraph',
+        # graph='graph.ntu_rgb_d.AdjMatrixGraph',
+        graph='graph.yolo_pose.AdjMatrixGraph',
         in_channels=3,
         flow_window=flow_window,
         kernel_size=kernel_size,
@@ -272,8 +276,10 @@ if __name__ == "__main__":
     pytorch_total_params = sum(p.numel() for p in model.parameters())
     print(pytorch_total_params)
 
-    N, C, T, V, M = 6, 3+2*flow_window**2, 100, 25, 2
-    x = torch.randn(N,C,T,V,M)
+    # N, C, T, V, M = 6, 3+2*flow_window**2, 100, 25, 2
+    # x = torch.randn(N,C,T,V,M)
+    x = torch.load('data/UCF-101/flowpose/Basketball/v_Basketball_g01_c01.pt')
+    x = x.unsqueeze(0)
     out = model.forward(x)
     print(out.shape)
 

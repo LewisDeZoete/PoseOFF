@@ -45,9 +45,8 @@ class CustomDataset(Dataset):
         
         # If transforms are defined, apply them to the array
         if hasattr(self, "transforms") and self.transforms:
-            for transform in transforms: # Apply the transforms passed
+            for transform in self.transforms: # Apply the transforms passed
                 output = transform(output)
-        
 
         return output, label
 
@@ -95,41 +94,33 @@ class MultiStreamDataset(CustomDataset):
 
 
 if __name__ == "__main__":
-    import argparse
     import time
 
     from lib.utils import ArgClass, FlowPoseSampler
-    from lib.utils.augments import swap_numpy, random_shift, random_move
+    from lib.utils.augments import swap_numpy, flow_mag_norm, random_shift, random_move
     from torch.utils.data import DataLoader
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-s",
-        dest="stream",
-        default="skel",
-        help="stream for SingleStreamDataset, either 'skel' or 'flow' (default skel)",
-    )
-    parsed = parser.parse_args()
     arg = ArgClass(arg="./config/custom_pose/train_joint.yaml")
 
-    batch_size=16
+    batch_size=1
     stream='flowpose'
     device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
     # Create the FlowPoseSampler transform object
     flowPoseTransform = FlowPoseSampler(device=device)
     # Create some transforms for debugging SingleStreamDataset
-    transforms = [swap_numpy(),
-                  random_shift(),
-                  random_move(),
-                  swap_numpy()]
+    input_transform = [swap_numpy(),
+                       flow_mag_norm(),
+                       random_shift(),
+                       random_move(),
+                       swap_numpy()]
 
     # Create the single- and multi-stream datasets
-    singledataset = SingleStreamDataset(arg, stream=stream,transforms=transforms)
-    multidataset = MultiStreamDataset(arg,flowPoseTransform)
+    singledataset = SingleStreamDataset(arg, stream=stream,transforms=input_transform)
+    multidataset = MultiStreamDataset(arg, flowPoseTransform)
     
     # Create the dataloaders!
-    singledataloader = DataLoader(singledataset, batch_size=batch_size, shuffle=False)
+    singledataloader = DataLoader(singledataset, batch_size=batch_size, shuffle=True)
     multidataloader = DataLoader(multidataset, batch_size=batch_size, shuffle=False)
 
     # Test loading preprocessed data

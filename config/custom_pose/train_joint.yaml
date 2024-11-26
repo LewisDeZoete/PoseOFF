@@ -1,4 +1,4 @@
-# dataloader
+# dataloader 
 loader: lib.data.dataset.CustomVideoDataset
 dataloader:
   data_path: ../Datasets/UCF-101/
@@ -9,8 +9,16 @@ dataloader:
   flow_path: ./data/UCF-101/flow/
   flowpose_path: ./data/UCF-101/flowpose/
   transforms:
-    flow_sample: 
-      kernel_size: 5
+    pose: 
+      weights: pretrained_models/yolo11x-pose.pt
+    flow:
+      weights: pretrained_models/raft_large.pt
+      imsize:
+        w: 320
+        h: 240
+      minibatch_size: 16
+    flowpose:
+      window_size: 9
       threshold: 0.05
     
 
@@ -24,7 +32,7 @@ model_args:
   num_g3d_scales: 8
   graph: graph.yolo_pose.AdjMatrixGraph
   in_channels: 3
-  flow_window: 5
+  flow_window: 9
   kernel_size: 3
   flow_channels: 4
 ignore_weights: []

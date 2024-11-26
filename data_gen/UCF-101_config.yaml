@@ -1,4 +1,5 @@
 # dataloader
+# TODO: remove this file and change the extract scripts to use the train_joint config file
 dataloader:
   preprocessed: True
   data_path: ../Datasets/UCF-101/

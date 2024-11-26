@@ -70,13 +70,16 @@ class random_choose(object):
 class random_move(object):
     '''
     TODO: Comprehensive docstring
-    TODO: Ensure only the first 2 channels get randomly moved
     Randomly move skeleton keypoints a small amount.
+    NOTE: changed default value of `transform_candidate` 
+        Previously, this was [-0.2, -0.1, 0.0, 0.1, 0.2], but given I'm passing
+        (x,y) keypoint values that are normalised between -0.5 and 0.5, 
+        this might be too wide of a range.
     '''
     def __init__(self,
                 angle_candidate=[-10., -5., 0., 5., 10.],
                 scale_candidate=[0.9, 1.0, 1.1],
-                transform_candidate=[-0.2, -0.1, 0.0, 0.1, 0.2],
+                transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1],
                 move_time_candidate=[1]):
         self.angle_candidate=angle_candidate
         self.scale_candidate=scale_candidate
@@ -127,6 +130,10 @@ class random_move(object):
 
 
 class random_shift(object):
+    '''
+    Introduces a random temporal shift, and pads any empty frames after the shift
+    with zeros.
+    '''
     def __call__(self, data_numpy):
         C, T, V, M = data_numpy.shape
         data_shift = np.zeros(data_numpy.shape)
@@ -139,68 +146,32 @@ class random_shift(object):
         data_shift[:, bias:bias + size, :, :] = data_numpy[:, begin:end, :, :]
 
         return data_shift
-    
+
+
 class flow_mag_norm(object):
     '''
     Normalise optical flow vectors to unit vectors by dividing by their magnitude.
     TODO: double check that the input data is flow_pose!
     '''
+    def __init__(self, flow_window=5):
+        self.flow_window = flow_window
     def __call__(self, data_numpy):
         C,T,V,M = data_numpy.shape
         flow = data_numpy[3:,...]
-        flow = flow.reshape(2, np.sqrt(C/2), np.sqrt(C/2), T,V,M) # (2,5,5,300,17,2)
-        mag = np.sqrt(flow[0]**2 + flow[1]**2+1e-8)
-        norm_flow = flow / mag
-        return(norm_flow)
+        flow = np.reshape(flow, (2, self.flow_window, self.flow_window, T,V,M)) # (2,5,5,300,17,2)
+        mag = np.sqrt(flow[0]**2 + flow[1]**2+1e-8) # Calculate the magnitude of each vector
+        norm_flow = flow / mag # Normalise flow vectors (divide by mag)
 
+        # Change the flow values in the numpy array to the normalised ones
+        data_numpy[3:] = norm_flow.reshape(2*self.flow_window**2,T,V,M)
 
-def openpose_match(data_numpy):
-    C, T, V, M = data_numpy.shape
-    assert (C == 3)
-    score = data_numpy[2, :, :, :].sum(axis=1)
-    # the rank of body confidence in each frame (shape: T-1, M)
-    rank = (-score[0:T - 1]).argsort(axis=1).reshape(T - 1, M)
-
-    # data of frame 1
-    xy1 = data_numpy[0:2, 0:T - 1, :, :].reshape(2, T - 1, V, M, 1)
-    # data of frame 2
-    xy2 = data_numpy[0:2, 1:T, :, :].reshape(2, T - 1, V, 1, M)
-    # square of distance between frame 1&2 (shape: T-1, M, M)
-    distance = ((xy2 - xy1) ** 2).sum(axis=2).sum(axis=0)
-
-    # match pose
-    forward_map = np.zeros((T, M), dtype=int) - 1
-    forward_map[0] = range(M)
-    for m in range(M):
-        choose = (rank == m)
-        forward = distance[choose].argmin(axis=1)
-        for t in range(T - 1):
-            distance[t, :, forward[t]] = np.inf
-        forward_map[1:][choose] = forward
-    assert (np.all(forward_map >= 0))
-
-    # string data
-    for t in range(T - 1):
-        forward_map[t + 1] = forward_map[t + 1][forward_map[t]]
-
-    # generate data
-    new_data_numpy = np.zeros(data_numpy.shape)
-    for t in range(T):
-        new_data_numpy[:, t, :, :] = data_numpy[:, t, :, forward_map[
-                                                             t]].transpose(1, 2, 0)
-    data_numpy = new_data_numpy
-
-    # score sort
-    trace_score = data_numpy[2, :, :, :].sum(axis=1).sum(axis=0)
-    rank = (-trace_score).argsort()
-    data_numpy = data_numpy[:, :, :, rank]
-
-    return data_numpy
+        return data_numpy
 
 
 class loop_graph(object):
     '''
     Pad empty frames with previous skeleton.
+    NOTE: TORCH VERSION
     '''
     def __init__(self, zaxis=[0, 1], xaxis=[8, 4]):
         self.zaxis=zaxis
@@ -232,6 +203,36 @@ class loop_graph(object):
         return data
 
 
+class mirror(object):
+    '''
+    Mirror augmentation for data (mirror the x positions and u vectors).
+    NOTE: assuming flow windows are square...
+    '''
+    def __init__(self, probability: float=0.2):
+        self.probability = probability
+    def __call__(self, data):
+        if random.random() <= self.probability+10:
+            C,T,V,M = data.shape
+            W = int((C/2)**(0.5))
+
+            # Flip x positons
+            data[0] = data[0]*(-1)
+
+            # Flip the x-direction of flow vectors
+            flow = data[3:]
+            flow = np.reshape(flow, (2, W, W, T, V, M)) # (2,5,5,300,17,2)
+            flow[0] = flow[0]*(-1)
+
+            # Change the flow values in the numpy array to the normalised ones
+            data[3:] = np.reshape(flow, (2*W**2,T,V,M))
+
+            return data
+
+        else:
+            return data
+        
+
+
 class swap_numpy(object):
     '''
     Swap between numpy array and torch tensor. Assumes torch tensor is on CPU.
@@ -252,16 +253,21 @@ class swap_numpy(object):
 if __name__ == "__main__":
     import time
     import torch
+    flow_window = 5
     start = time.time()
     transforms = [swap_numpy(device='cpu'),
+                  flow_mag_norm(5),
                   random_shift(),
+                  mirror(),
                   random_choose(300),
                   random_move(),
                   swap_numpy(device='cpu')]
+    # transforms = [pose_match()]
     
     for i in range(1000):
-        data = torch.rand((53,150,17,2))
+        data = torch.rand((3+2*flow_window**2,150,17,2))
         for transform in transforms:
             data = transform(data)
+
     print(data.shape)
     print(time.time()-start)

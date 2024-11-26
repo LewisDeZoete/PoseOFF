@@ -18,4 +18,4 @@ export PYTHONUNBUFFERED=TRUE
 
 source ../environment/bin/activate
 
-python new_train.py -p train -r flowpose-FIXED-cnn_transforms -d 'Reshaping inside MS-G3D was wrong, added linear layer to flow_conv'
+python new_train.py -p train -r flowpose-cnn_transforms -d 'Reshaping inside MS-G3D was wrong, added linear layer to flow_conv, normalised flow vectors, fewer transforms (only mirror?)'

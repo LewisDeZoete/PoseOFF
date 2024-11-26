@@ -185,58 +185,56 @@ class GetFlow:
             return results
         # Otherwise simply return the flow
         else:
-            return flow
-    
+            return flow 
 
-class FlowPoseSampler_average:
-    """Sample optical flow using input poses.
-    NOTE: Assumes pre-processed optical flow and poses (for now).
-    NOTE: Utilises the MultiStreamDataset, it passes in the loaded arrays.
-    """
 
-    def __init__(self, device: torch.device, window_size: int = 3, threshold: float = 0.5):
-        self.device = device  # Making sure all tensors are on the same device
-        self.window_size = window_size  # window size about pose keypoint
-        self.half_k = self.window_size // 2  # Half the window size
-        self.threshold = threshold
 
-    def __call__(self, flows, poses):
-        """Samples the optical flow in windows surrounding the pose keypoints.
-        Returns array of shape (5, frames, keypoints, num_people) e.g., (5, 300, 17, 2)"""
-        num_frames, _, height, width = flows.shape
-        num_keypoints = poses.shape[2]*poses.shape[3]
-        
-        # Convert poses once to the correct device and scale for indexing
-        poses = poses.to(self.device)
-        # Calculate pose points and visibility mask outside of the loop
-        pose_points = ((poses[:2, :, :] + 0.5).view(2,poses.size()[1],num_keypoints)
-                       * torch.tensor([width - 1, height - 1], device=self.device).view(2, 1, 1)).type(torch.int)
-        vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
+class pose_match(object):
+    '''
+    Pytorch version of the pose_match augmentation.
+    Matches skeletons across video using square of distance between frames.
+    Only takes pose as the input data.'''
+    def __call__(self, data):
+        C, T, V, M = data.shape
+        assert (C == 3)
+        score = data[2, :, :, :].sum(axis=1)
+        # the rank of body confidence in each frame (shape: T-1, M)
+        rank = (-score[0:T - 1]).argsort(axis=1).reshape(T - 1, M)
 
-        # Prepare stacker tensor for the flow data (pre-allocate the size)
-        stacker = torch.zeros((2, poses.shape[1], num_keypoints), device=self.device)
+        # data of frame 1
+        xy1 = data[0:2, 0:T - 1, :, :].reshape(2, T - 1, V, M, 1)
+        # data of frame 2
+        xy2 = data[0:2, 1:T, :, :].reshape(2, T - 1, V, 1, M)
+        # square of distance between frame 1&2 (shape: T-1, M, M)
+        distance = ((xy2 - xy1) ** 2).sum(axis=2).sum(axis=0)
 
-        # Create a grid of valid indices (filter out bad points upfront)
-        valid_indices = (vis.view(poses.shape[1], num_keypoints) & 
-                         (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
-                         (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
-                        
-        # Loop through the frames and compute flow statistics for each valid keypoint
-        for i in range(num_frames):
-            flow = flows[i]
-            for keypoint_num in range(num_keypoints):
-                if valid_indices[i+1, keypoint_num]:
-                    x, y = pose_points[0, i+1, keypoint_num], pose_points[1, i+1, keypoint_num]
-                    # Get the window of optical flow and calculate mean directly
-                    flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
-                    
-                    stacker[0, i+1, keypoint_num] = flow_window[0].mean()
-                    stacker[1, i+1, keypoint_num] = flow_window[1].mean()
+        # match pose
+        forward_map = torch.zeros((T, M), dtype=int) - 1
+        forward_map[0] = torch.arange(2)
+        for m in range(M):
+            choose = (rank == m)
+            forward = distance[choose].argmin(axis=1)
+            for t in range(T - 1):
+                distance[t, :, forward[t]] = np.inf
+            forward_map[1:][choose] = forward
+        assert (torch.all(forward_map >= 0))
 
-        # Concatenate poses with computed flow
-        flow_pose = torch.cat((poses, stacker.view(2, *(poses.size()[1:]))), dim=0)
-        return flow_pose
+        # string data
+        for t in range(T - 1):
+            forward_map[t + 1] = forward_map[t + 1][forward_map[t]]
 
+        # generate data
+        new_data = torch.zeros(data.shape)
+        for t in range(T):
+            new_data[:, t, :, :] = data[:, t, :, forward_map[t]]#.permute(1, 2, 0)
+        data = new_data
+
+        # score sort
+        trace_score = data[2, :, :, :].sum(axis=1).sum(axis=0)
+        rank = (-trace_score).argsort()
+        data_numpy = data[:, :, :, rank]
+
+        return data_numpy
 
 
 class FlowPoseSampler:
@@ -250,24 +248,31 @@ class FlowPoseSampler:
                  window_size: int = 3, 
                  threshold: float = 0.5, 
                  loop_graph: bool = True,
-                 to_cpu: bool = True):
+                 to_cpu: bool = True,
+                 norm: bool = True):
         self.device = device  # Making sure all tensors are on the same device
         self.window_size = window_size  # Window size about pose keypoint
         self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
         self.loop_graph = loop_graph
         self.to_cpu = to_cpu
+        if loop_graph:
+            self.loop_graph = augments.loop_graph()
+        if norm:
+            self.norm = augments.flow_mag_norm(flow_window=window_size)
+        self.pose_match = pose_match()
 
     def __call__(self, flows, poses):
         """Samples the optical flow in windows surrounding the pose keypoints.
         Returns array of shape (5, frames, keypoints, num_people) e.g., (5, 300, 17, 2)"""
         num_frames, _, height, width = flows.shape
         num_keypoints = poses.shape[2]*poses.shape[3]
+        poses = self.pose_match(poses)
         
         # Convert poses once to the correct device and scale for indexing
         poses = poses.to(self.device)
         # Calculate pose points and visibility mask outside of the loop
-        pose_points = ((poses[:2, :, :] + 0.5).view(2,poses.size()[1],num_keypoints)
+        pose_points = ((poses[:2, :, :] + 0.5).contiguous().view(2,poses.size()[1],num_keypoints)
                        * torch.tensor([width - 1, height - 1], device=self.device).view(2, 1, 1)).type(torch.int)
         vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
 
@@ -292,8 +297,14 @@ class FlowPoseSampler:
         
         # Concatenate poses with computed flow
         flow_pose = torch.cat((poses, stacker.view(stacker.size()[0], *poses.size()[1:])), dim=0)
-        # If we pass loop_graph = True, then loop the graph using this function!
         
+        # If we pass loop_graph = True, then loop the graph using this function!
+        if hasattr(self, 'loop_graph'):
+            flow_pose = self.loop_graph(flow_pose)
+        
+        if hasattr(self, 'norm'):
+            flow_pose = self.norm(flow_pose)
+
         # By default, move the flow_pose to the cpu (since we're manipulating with numpy)
         if self.to_cpu:
             flow_pose.to('cpu')
@@ -306,7 +317,6 @@ if __name__=='__main__':
     from objects import ArgClass
 
     arg = ArgClass('./data_gen/UCF-101_config.yaml')
-    print(arg.classes)
 
     flow = torch.load('./data/UCF-101/flow/Archery/v_Archery_g01_c01.pt',
                       map_location='cpu')

@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from model import ModelLoader
 from lib.data.dataset import SingleStreamDataset
 from lib.utils.objects import ArgClass
-from lib.utils.augments import swap_numpy, random_shift, random_choose, random_move
+import lib.utils.augments as augments
 
 from lib.training import train_simple_network
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
@@ -47,15 +47,16 @@ print("### Model created")
 
 # Get the correct device (since arg.device is simply an int, we want a torch.device)
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
-# loader_device = torch.device('cpu')
 
 # Create the transforms (for multistream, I just need the FlowPoseSampler)
-transforms = [swap_numpy(device=device),
-              random_shift(),
-              random_move(),
-              swap_numpy(device=device)]
+transforms = [augments.swap_numpy(device=device),
+              augments.mirror(),
+              augments.swap_numpy(device=device)]
+#               random_shift(),
+#               random_move(),
+#               swap_numpy(device=device)]
 
-train_dataset = SingleStreamDataset(arg, stream='flowpose',transforms=transforms)
+train_dataset = SingleStreamDataset(arg, stream='flowpose', transforms=transforms)
 test_dataset = SingleStreamDataset(arg, stream='flowpose')
 
 # Create the dataset and dataloader
@@ -96,4 +97,7 @@ results = train_simple_network(model=skel_model, loss_func=loss, train_loader=tr
                                 checkpoint_file=f'{arg.save_location}{arg.run_name}.pt')
 
 print('### Results')
-print(results)
+# TODO: Make the printout nicer, right now it prints out 100 confusion matrices...
+# print(f'\tTraining time: {results['training time'][-1]/60:0.2f)} minutes')
+# print(f'\tBest train accuracy: {results['train accyracy'].max()}')
+# print(f'\tBest test accuracy: {results['test accyracy'].max()}')

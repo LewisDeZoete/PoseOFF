@@ -3,19 +3,8 @@
 # ------------------------------------------------------------------------------
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
-from torch.utils.data import Dataset, DataLoader
-
 from tqdm.autonotebook import tqdm
-
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-# import pandas as pd
-
 import time
 
 def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_funcs, prefix="", desc=None):
@@ -151,7 +140,7 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
             # Save best results!
             if results['train accuracy'][-1] > max_acc:
                 max_acc = results['train accuracy'][-1]
-            print(f'\t\tBEST TEST ACC: {max(results["test accuracy"])}')
+            print(f'\t\t{epoch} EPOCH BEST TEST ACC: {max(results["test accuracy"])}')
             
 
     # If we pass checkpoint_file, save the model and results after training

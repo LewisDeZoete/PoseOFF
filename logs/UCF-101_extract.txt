@@ -1,221 +1,19 @@
 
-Finished processing JumpingJack in 48.26822 seconds
+Finished processing ApplyEyeMakeup in 90.04610 seconds
 
-Finished processing JavelinThrow in 48.38466 seconds
+Finished processing GolfSwing in 90.44261 seconds
 
-Finished processing BodyWeightSquats in 50.44423 seconds
-
-+------------------ Job Report: 62876517 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.4% (288.3 MB peak / 2 GB)    |
-| CPU           [##                  ] 14.5% average                   |
-| Time          [-->                 ] 11.5% (0-00:01:09 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            4                             |
-|   /fred   3.6 GB        154.3 MB       2.3 K                         |
-|   OS      760 KB        0 B            254                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing HighJump in 50.62628 seconds
-
-Finished processing FrisbeeCatch in 51.93985 seconds
-
-Finished processing HulaHoop in 51.87388 seconds
-
-+------------------ Job Report: 62876514 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.2% (263.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 15.9% average                   |
-| Time          [-->                 ] 11.5% (0-00:01:09 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            6                             |
-|   /fred   4.1 GB        139.8 MB       2.1 K                         |
-|   OS      796 KB        0 B            265                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876484 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 19.1% (381.3 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.7% average                   |
-| Time          [-->                 ] 11.8% (0-00:01:11 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   4.9 GB        132.1 MB       2 K                           |
-|   OS      1.1 MB        0 B            197                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing FieldHockeyPenalty in 52.73764 seconds
-
-+------------------ Job Report: 62876509 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.4% (287.2 MB peak / 2 GB)    |
-| CPU           [###                 ] 15.5% average                   |
-| Time          [-->                 ] 11.8% (0-00:01:11 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            8                             |
-|   /fred   4.7 GB        142.2 MB       2.2 K                         |
-|   OS      396 KB        0 B            174                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing CricketBowling in 53.35304 seconds
-
-Finished processing CuttingInKitchen in 53.48829 seconds
-
-Finished processing HandStandWalking in 53.70846 seconds
-
-+------------------ Job Report: 62876512 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.5% (249.4 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.1% average                   |
-| Time          [-->                 ] 12.0% (0-00:01:12 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            7                             |
-|   /fred   4.7 GB        144.3 MB       2.1 K                         |
-|   OS      648 KB        0 B            255                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876492 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.2% (304.6 MB peak / 2 GB)    |
-| CPU           [####                ] 20.3% average                   |
-| Time          [-->                 ] 12.3% (0-00:01:14 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   4.6 GB        154.1 MB       2.1 K                         |
-|   OS      712 KB        0 B            254                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876507 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.6% (232.8 MB peak / 2 GB)    |
-| CPU           [###                 ] 16.2% average                   |
-| Time          [-->                 ] 12.3% (0-00:01:14 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   828 KB        0 B            10                            |
-|   /fred   5.4 GB        132.1 MB       1.7 K                         |
-|   OS      3.8 MB        0 B            266                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876500 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.1% (221.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 15.1% average                   |
-| Time          [-->                 ] 12.2% (0-00:01:13 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            9                             |
-|   /fred   3.3 GB        133.8 MB       1.9 K                         |
-|   OS      596 KB        0 B            218                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876494 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.1% (402.2 MB peak / 2 GB)    |
-| CPU           [#                   ]  8.1% average                   |
-| Time          [-->                 ] 12.3% (0-00:01:14 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   2.6 MB        0 B                     20                   |
-|   /fred   3.7 GB        74 MB                  363                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876498 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.4% (247.5 MB peak / 2 GB)    |
-| CPU           [###                 ] 15.1% average                   |
-| Time          [-->                 ] 12.2% (0-00:01:13 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   4.8 GB        135.9 MB       2.4 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      960 KB        0 B            217                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing ApplyLipstick in 56.04957 seconds
-
-Finished processing Fencing in 57.42810 seconds
-
-Finished processing Hammering in 57.53929 seconds
-
-+------------------ Job Report: 62876461 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.7% (293.7 MB peak / 2 GB)    |
-| CPU           [##                  ] 13.2% average                   |
-| Time          [-->                 ] 12.7% (0-00:01:16 / 0-00:10:00) |
++------------------ Job Report: 62975777 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.6% (412 MB peak / 2 GB)      |
+| CPU           [##                  ] 13.3% average                   |
+| Time          [--->                ] 16.3% (0-00:01:38 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   6.4 GB        122.1 MB       1.6 K                         |
-|   OS      208 KB        0 B            153                           |
+|   /fred   9.2 GB        584.1 MB       1.2 K                         |
+|   OS      220 KB        0 B            54                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -223,196 +21,39 @@ Finished processing Hammering in 57.53929 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing HandStandPushups in 58.85515 seconds
+Finished processing HorseRace in 90.35082 seconds
 
-Finished processing BaseballPitch in 58.90248 seconds
-
-Finished processing Basketball in 58.91682 seconds
-
-Finished processing FloorGymnastics in 59.12724 seconds
-
-+------------------ Job Report: 62876497 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.5% (269.9 MB peak / 2 GB)    |
-| CPU           [####                ] 24.4% average                   |
-| Time          [-->                 ] 13.0% (0-00:01:18 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   4 KB          0 B            6                             |
-|   /fred   7.4 GB        196.2 MB       2.9 K                         |
-|   OS      9.1 MB        0 B            313                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876505 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.9% (238.4 MB peak / 2 GB)    |
-| CPU           [###                 ] 15.4% average                   |
-| Time          [-->                 ] 13.0% (0-00:01:18 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   8.7 GB        245.3 MB       2.6 K                         |
-|   OS      148 KB        0 B            147                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing PushUps in 36.71917 seconds
-
-+------------------ Job Report: 62876506 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.7% (233.7 MB peak / 2 GB)    |
-| CPU           [###                 ] 16.5% average                   |
-| Time          [-->                 ] 13.2% (0-00:01:19 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   152 KB        0 B            4                             |
-|   /fred   7 GB          220.4 MB       2.5 K                         |
-|   OS      360 KB        0 B            272                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876466 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.0% (300.6 MB peak / 2 GB)    |
-| CPU           [####                ] 21.5% average                   |
-| Time          [-->                 ] 13.2% (0-00:01:19 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   7.1 GB        256.8 MB       2.2 K                         |
-|   OS      152 KB        0 B            159                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876467 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.8% (255.9 MB peak / 2 GB)    |
-| CPU           [###                 ] 17.7% average                   |
-| Time          [-->                 ] 13.2% (0-00:01:19 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   8.6 GB        224.6 MB       2.4 K                         |
-|   OS      188 KB        0 B            213                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876499 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.0% (320.1 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.0% average                   |
-| Time          [-->                 ] 13.2% (0-00:01:19 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   9.1 GB        212.6 MB       2.4 K                         |
-|   OS      620 KB        0 B            192                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing FrontCrawl in 61.84220 seconds
-
-Finished processing Knitting in 62.44443 seconds
-
-Finished processing PullUps in 46.22921 seconds
-
-Finished processing BlowDryHair in 63.70385 seconds
-
-+------------------ Job Report: 62876542 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.6% (312.8 MB peak / 2 GB)    |
-| CPU           [##                  ] 14.0% average                   |
-| Time          [->                  ]  8.3% (0-00:00:50 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   3.4 GB        149.6 MB       1.6 K                         |
-|   OS      148 KB        0 B            139                           |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876501 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.5% (370.5 MB peak / 2 GB)    |
-| CPU           [##                  ] 11.0% average                   |
-| Time          [-->                 ] 13.7% (0-00:01:22 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   848 KB        0 B            11                            |
-|   /fred   10.2 GB       228.5 MB       2.1 K                         |
-|   OS      516 KB        0 B            145                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876519 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.3% (305.6 MB peak / 2 GB)    |
-| CPU           [#                   ]  6.0% average                   |
-| Time          [-->                 ] 13.8% (0-00:01:23 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      5                   |
-|   /fred   8.4 GB        151 MB                 760                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Mixing in 48.04497 seconds
-
-Finished processing Bowling in 65.20965 seconds
-
-+------------------ Job Report: 62876482 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.3% (245.3 MB peak / 2 GB)    |
++------------------ Job Report: 62975800 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.7% (413.1 MB peak / 2 GB)    |
 | CPU           [##                  ] 14.3% average                   |
-| Time          [-->                 ] 14.0% (0-00:01:24 / 0-00:10:00) |
+| Time          [--->                ] 16.3% (0-00:01:38 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   9.7 GB        540.4 MB               867                   |
+|   OS      0 B           0 B                      1                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing BlowDryHair in 91.26060 seconds
+
++------------------ Job Report: 62975775 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 14.4% (287.2 MB peak / 2 GB)    |
+| CPU           [###                 ] 19.2% average                   |
+| Time          [--->                ] 16.5% (0-00:01:39 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   11.7 GB       198.5 MB       3.2 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      640 KB        0 B            233                           |
+|   /fred   5.9 GB        691.2 MB       1.1 K                         |
+|   OS      0 B           0 B            1                             |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -420,201 +61,12 @@ Finished processing Bowling in 65.20965 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876540 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.6% (231.9 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.9% average                   |
-| Time          [->                  ]  8.8% (0-00:00:53 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   5.4 GB        142.3 MB               719                   |
-|   OS      0 B           0 B                      1                   |
-+----------------------------------------------------------------------+
+Finished processing BenchPress in 91.41917 seconds
 
-Finished processing CricketShot in 65.97742 seconds
-
-Finished processing Haircut in 66.05902 seconds
-
-Finished processing CleanAndJerk in 66.56038 seconds
-
-Finished processing BabyCrawling in 66.91457 seconds
-
-+------------------ Job Report: 62876485 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.5% (309.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 17.6% average                   |
-| Time          [-->                 ] 14.2% (0-00:01:25 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   2.8 MB        0 B                     12                   |
-|   /fred   6.3 GB        185.1 MB               925                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876523 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.0% (260.6 MB peak / 2 GB)    |
-| CPU           [#                   ]  9.3% average                   |
-| Time          [->                  ]  9.0% (0-00:00:54 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   6.1 GB        180.6 MB               910                   |
-|   OS      0 B           0 B                      1                   |
-+----------------------------------------------------------------------+
-
-Finished processing BenchPress in 67.93488 seconds
-
-+------------------ Job Report: 62876503 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.6% (232.4 MB peak / 2 GB)    |
++------------------ Job Report: 62975751 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.2% (363.3 MB peak / 2 GB)    |
 | CPU           [##                  ] 14.0% average                   |
-| Time          [-->                 ] 14.3% (0-00:01:26 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   9.4 GB        205 MB         2 K                           |
-|   OS      12 KB         0 B            191                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing PizzaTossing in 50.05528 seconds
-
-+------------------ Job Report: 62876493 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.2% (304.4 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.8% average                   |
-| Time          [-->                 ] 14.3% (0-00:01:26 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   2 MB          0 B                      8                   |
-|   /fred   4.6 GB        174.2 MB               866                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876490 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.4% (328.7 MB peak / 2 GB)    |
-| CPU           [####                ] 24.1% average                   |
-| Time          [-->                 ] 14.5% (0-00:01:27 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   24 KB         0 B            7                             |
-|   /fred   8.9 GB        169.6 MB       2.7 K                         |
-|   OS      512 KB        0 B            251                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876463 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.4% (407.1 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.5% average                   |
-| Time          [-->                 ] 14.5% (0-00:01:27 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   9 GB          195.9 MB       2.2 K                         |
-|   OS      272 KB        0 B            145                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing BasketballDunk in 69.00436 seconds
-
-Finished processing ApplyEyeMakeup in 69.13647 seconds
-
-Finished processing HorseRace in 69.41389 seconds
-
-Finished processing Kayaking in 69.80500 seconds
-
-+------------------ Job Report: 62876469 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.4% (407.2 MB peak / 2 GB)    |
-| CPU           [####                ] 20.5% average                   |
-| Time          [-->                 ] 14.7% (0-00:01:28 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   7.8 GB        239.6 MB       2.1 K                         |
-|   OS      4.6 MB        0 B            150                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Diving in 70.04250 seconds
-
-+------------------ Job Report: 62876527 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.7% (233.3 MB peak / 2 GB)    |
-| CPU           [####                ] 20.7% average                   |
-| Time          [->                  ]  9.7% (0-00:00:58 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   5 GB          142.1 MB               719                   |
-|   OS      0 B           0 B                      1                   |
-+----------------------------------------------------------------------+
-
-Finished processing SoccerPenalty in 47.06000 seconds
-
-+------------------ Job Report: 62876468 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.4% (288.8 MB peak / 2 GB)    |
-| CPU           [##                  ] 12.4% average                   |
-| Time          [-->                 ] 14.8% (0-00:01:29 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   3.9 GB        195 MB         1.9 K                         |
-|   OS      192 KB        0 B            144                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing GolfSwing in 71.02562 seconds
-
-Finished processing VolleyballSpiking in 48.17226 seconds
-
-+------------------ Job Report: 62876460 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.3% (266.6 MB peak / 2 GB)    |
-| CPU           [##                  ] 14.4% average                   |
-| Time          [--->                ] 15.0% (0-00:01:30 / 0-00:10:00) |
+| Time          [--->                ] 16.7% (0-00:01:40 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   No data available                                                  |
@@ -625,416 +77,16 @@ Finished processing VolleyballSpiking in 48.17226 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing Archery in 71.38942 seconds
-
-Finished processing ThrowDiscus in 48.64753 seconds
-
-+------------------ Job Report: 62876510 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.3% (285.8 MB peak / 2 GB)    |
-| CPU           [##                  ] 10.0% average                   |
-| Time          [--->                ] 15.0% (0-00:01:30 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   12.3 GB       184.7 MB       1.9 K                         |
-|   OS      144 KB        0 B            158                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876518 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.7% (253.9 MB peak / 2 GB)    |
-| CPU           [##                  ] 12.2% average                   |
-| Time          [--->                ] 15.0% (0-00:01:30 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            4                             |
-|   /fred   10.8 GB       198.8 MB       2.9 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      600 KB        0 B            274                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing ParallelBars in 55.02252 seconds
-
-Finished processing BrushingTeeth in 72.18206 seconds
-
-+------------------ Job Report: 62876495 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.9% (237.5 MB peak / 2 GB)    |
-| CPU           [##                  ] 11.1% average                   |
-| Time          [--->                ] 15.0% (0-00:01:30 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   828 KB        0 B            7                             |
-|   /fred   10.5 GB       212.7 MB       2.6 K                         |
-|   OS      624 KB        0 B            293                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing PlayingViolin in 55.51932 seconds
-
-+------------------ Job Report: 62876502 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.6% (291.9 MB peak / 2 GB)    |
-| CPU           [####                ] 22.0% average                   |
-| Time          [--->                ] 15.2% (0-00:01:31 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   1.9 MB        0 B            4                             |
-|   /fred   8.6 GB        196.5 MB       2 K                           |
-|   OS      284 KB        0 B            267                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876555 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.6% (231.9 MB peak / 2 GB)    |
-| CPU           [#                   ]  6.7% average                   |
-| Time          [-->                 ] 10.0% (0-00:01:00 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   2.8 MB        0 B                     11                   |
-|   /fred   854.7 MB      36 MB                  177                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing UnevenBars in 49.98527 seconds
-
-+------------------ Job Report: 62876462 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 17.4% (348.7 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.5% average                   |
-| Time          [--->                ] 15.3% (0-00:01:32 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   9.4 GB        200.3 MB       2 K                           |
-|   OS      240 KB        0 B            217                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876526 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.9% (237.9 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.0% average                   |
-| Time          [-->                 ] 10.2% (0-00:01:01 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   5.5 GB        134.4 MB               913                   |
-|   OS      0 B           0 B                     34                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing MilitaryParade in 56.68720 seconds
-
-+------------------ Job Report: 62876563 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.9% (258.3 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.0% average                   |
-| Time          [-->                 ] 10.2% (0-00:01:01 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   4 GB          140.1 MB       1.6 K                         |
-|   OS      80 KB         0 B            141                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing WallPushups in 50.72245 seconds
-
-+------------------ Job Report: 62876489 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.0% (240.9 MB peak / 2 GB)    |
-| CPU           [###                 ] 16.3% average                   |
-| Time          [--->                ] 15.3% (0-00:01:32 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   1.6 MB        0 B            20                            |
-|   /fred   11.1 GB       183.7 MB       2.2 K                         |
-|   OS      5 MB          0 B            343                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876537 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.7% (234.4 MB peak / 2 GB)    |
++------------------ Job Report: 62975784 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.2% (343.7 MB peak / 2 GB)    |
 | CPU           [####                ] 21.0% average                   |
-| Time          [-->                 ] 10.3% (0-00:01:02 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   5.9 GB        114.2 MB               580                   |
-|   OS      0 B           0 B                      1                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Skijet in 51.80405 seconds
-
-+------------------ Job Report: 62876567 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.3% (286.7 MB peak / 2 GB)    |
-| CPU           [####                ] 21.3% average                   |
-| Time          [-->                 ] 10.2% (0-00:01:01 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            4                             |
-|   /fred   4.1 GB        136.1 MB       2.2 K                         |
-|   OS      840 KB        0 B            272                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876566 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 17.1% (341.2 MB peak / 2 GB)    |
-| CPU           [##                  ] 14.5% average                   |
-| Time          [-->                 ] 10.3% (0-00:01:02 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   4.3 GB        104.1 MB       1.5 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      332 KB        0 B            134                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876522 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.7% (233.8 MB peak / 2 GB)    |
-| CPU           [####                ] 23.8% average                   |
-| Time          [-->                 ] 10.5% (0-00:01:03 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   5.1 GB        144.3 MB               832                   |
-|   OS      0 B           0 B                     25                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing BoxingSpeedBag in 75.56258 seconds
-
-+------------------ Job Report: 62876569 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.3% (245.5 MB peak / 2 GB)    |
-| CPU           [####                ] 20.6% average                   |
-| Time          [-->                 ] 10.5% (0-00:01:03 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            5                             |
-|   /fred   4.5 GB        142.3 MB       2.3 K                         |
-|   OS      1 MB          0 B            370                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing SkateBoarding in 52.52541 seconds
-
-+------------------ Job Report: 62876552 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.2% (243.7 MB peak / 2 GB)    |
-| CPU           [##                  ] 12.5% average                   |
-| Time          [-->                 ] 10.7% (0-00:01:04 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   6.4 GB        102 MB         1.3 K                         |
-|   OS      124 KB        0 B            135                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876487 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.9% (238.4 MB peak / 2 GB)    |
-| CPU           [###                 ] 17.7% average                   |
-| Time          [--->                ] 16.0% (0-00:01:36 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   10.7 GB       172.4 MB       2.6 K                         |
-|   OS      4.3 MB        0 B            221                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876550 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.7% (315 MB peak / 2 GB)      |
-| CPU           [###                 ] 16.9% average                   |
-| Time          [-->                 ] 10.8% (0-00:01:05 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   4.7 GB        120 MB         1.5 K                         |
-|   OS      4.8 MB        0 B            134                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing HeadMassage in 77.67021 seconds
-
-Finished processing HammerThrow in 78.68136 seconds
-
-+------------------ Job Report: 62876508 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 17.7% (354.6 MB peak / 2 GB)    |
-| CPU           [####                ] 20.4% average                   |
-| Time          [--->                ] 16.3% (0-00:01:38 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   4 KB          0 B                     13                   |
-|   /fred   6.7 GB        138.7 MB               697                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Biking in 79.61082 seconds
-
-Finished processing PlayingPiano in 61.34005 seconds
-
-+------------------ Job Report: 62876504 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.9% (237.6 MB peak / 2 GB)    |
-| CPU           [####                ] 20.2% average                   |
-| Time          [--->                ] 16.5% (0-00:01:39 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   9.6 GB        188.2 MB       1.9 K                         |
-|   OS      288 KB        0 B            195                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing MoppingFloor in 63.80583 seconds
-
-Finished processing StillRings in 57.78925 seconds
-
-Finished processing JugglingBalls in 81.11055 seconds
-
-+------------------ Job Report: 62876480 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.5% (369.9 MB peak / 2 GB)    |
-| CPU           [####                ] 20.0% average                   |
 | Time          [--->                ] 16.7% (0-00:01:40 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   14.1 GB       237.9 MB       2.4 K                         |
-|   OS      132 KB        0 B            142                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing LongJump in 64.49360 seconds
-
-Finished processing Shotput in 58.52481 seconds
-
-+------------------ Job Report: 62876534 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.1% (262.9 MB peak / 2 GB)    |
-| CPU           [####                ] 21.4% average                   |
-| Time          [-->                 ] 11.7% (0-00:01:10 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B                      1                   |
-|   /fred   10.7 GB       171.6 MB               856                   |
+|   /fred   7.6 GB        551.6 MB               896                   |
 |   OS      0 B           0 B                      1                   |
 |                                                                      |
 | Warnings:                                                            |
@@ -1043,18 +95,16 @@ Finished processing Shotput in 58.52481 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing TaiChi in 59.14150 seconds
-
-+------------------ Job Report: 62876524 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.7% (373.5 MB peak / 2 GB)    |
-| CPU           [####                ] 22.9% average                   |
-| Time          [-->                 ] 11.7% (0-00:01:10 / 0-00:10:00) |
++------------------ Job Report: 62975792 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.2% (403.7 MB peak / 2 GB)    |
+| CPU           [##                  ] 11.9% average                   |
+| Time          [--->                ] 16.8% (0-00:01:41 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B                      1                   |
-|   /fred   10.3 GB       186 MB                 929                   |
+|   /fred   10.3 GB       484.8 MB               779                   |
 |   OS      0 B           0 B                      1                   |
 |                                                                      |
 | Warnings:                                                            |
@@ -1063,17 +113,19 @@ Finished processing TaiChi in 59.14150 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876556 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 12.4% (248.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 15.7% average                   |
-| Time          [-->                 ] 11.7% (0-00:01:10 / 0-00:10:00) |
+Finished processing Archery in 92.67158 seconds
+
++------------------ Job Report: 62975764 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 15.3% (306.5 MB peak / 2 GB)    |
+| CPU           [###                 ] 15.8% average                   |
+| Time          [--->                ] 16.8% (0-00:01:41 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
+|   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   8.4 GB        181.1 MB       1.7 K                         |
-|   OS      20 KB         0 B            135                           |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   9 GB          459.1 MB               764                   |
+|   OS      0 B           0 B                      1                   |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1081,17 +133,17 @@ Finished processing TaiChi in 59.14150 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876515 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.5% (369.9 MB peak / 2 GB)    |
-| CPU           [####                ] 21.8% average                   |
++------------------ Job Report: 62975760 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.6% (331.3 MB peak / 2 GB)    |
+| CPU           [###                 ] 19.8% average                   |
 | Time          [--->                ] 16.8% (0-00:01:41 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   14.8 GB       213.1 MB       2 K                           |
-|   OS      188 KB        0 B            194                           |
+|   /fred   6.3 GB        602.5 MB       1.2 K                         |
+|   OS      76 KB         0 B            87                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1099,18 +151,82 @@ Finished processing TaiChi in 59.14150 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing Rafting in 60.16326 seconds
+Finished processing BrushingTeeth in 94.23025 seconds
 
-+------------------ Job Report: 62876520 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.6% (231.5 MB peak / 2 GB)    |
-| CPU           [#####               ] 25.4% average                   |
-| Time          [-->                 ] 11.8% (0-00:01:11 / 0-00:10:00) |
++------------------ Job Report: 62975753 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.0% (379.7 MB peak / 2 GB)    |
+| CPU           [###                 ] 18.4% average                   |
+| Time          [--->                ] 17.2% (0-00:01:43 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   7.9 GB        215.2 MB       1.1 K                         |
+|   /fred   10.7 GB       729.4 MB       1.4 K                         |
+|   OS      208 KB        0 B            49                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975771 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.6% (392.2 MB peak / 2 GB)    |
+| CPU           [###                 ] 16.3% average                   |
+| Time          [--->                ] 17.3% (0-00:01:44 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   12.8 GB       654 MB         1.4 K                         |
+|   OS      12 KB         0 B            53                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing BoxingSpeedBag in 97.91961 seconds
+
+Finished processing HeadMassage in 99.02568 seconds
+
+Finished processing HammerThrow in 98.95224 seconds
+
++------------------ Job Report: 62975769 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.2% (404.3 MB peak / 2 GB)    |
+| CPU           [###                 ] 17.6% average                   |
+| Time          [--->                ] 18.0% (0-00:01:48 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   12.5 GB       605.6 MB       1.3 K                         |
+|   OS      76 KB         0 B            51                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing PushUps in 37.60040 seconds
+
+Finished processing JugglingBalls in 100.74921 seconds
+
++------------------ Job Report: 62975790 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.9% (337.7 MB peak / 2 GB)    |
+| CPU           [####                ] 20.2% average                   |
+| Time          [--->                ] 18.2% (0-00:01:49 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   11.4 GB       646.8 MB       1 K                           |
 |   OS      0 B           0 B            1                             |
 |                                                                      |
 | Warnings:                                                            |
@@ -1119,160 +235,17 @@ Finished processing Rafting in 60.16326 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876549 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.7% (273 MB peak / 2 GB)      |
-| CPU           [###                 ] 18.3% average                   |
-| Time          [-->                 ] 11.8% (0-00:01:11 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   5.9 GB        230.9 MB       1.9 K                         |
-|   OS      180 KB        0 B            121                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing RopeClimbing in 60.64477 seconds
-
-+------------------ Job Report: 62876561 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.8% (276.1 MB peak / 2 GB)    |
-| CPU           [####                ] 22.5% average                   |
-| Time          [-->                 ] 11.8% (0-00:01:11 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   7.9 GB        157.7 MB       1.6 K                         |
-|   OS      236 KB        0 B            132                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing SkyDiving in 61.42604 seconds
-
-+------------------ Job Report: 62876543 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.6% (372 MB peak / 2 GB)      |
-| CPU           [###                 ] 19.2% average                   |
-| Time          [-->                 ] 12.2% (0-00:01:13 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   9.6 GB        166 MB         1.7 K                         |
-|   OS      64 KB         0 B            126                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876545 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.0% (320.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.2% average                   |
-| Time          [-->                 ] 12.2% (0-00:01:13 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   8.5 GB        182 MB         1.7 K                         |
-|   OS      136 KB        0 B            132                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876553 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.8% (275.2 MB peak / 2 GB)    |
-| CPU           [####                ] 21.6% average                   |
-| Time          [-->                 ] 12.3% (0-00:01:14 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            7                             |
-|   /fred   8.6 GB        170 MB         1.7 K                         |
-|   OS      84 KB         0 B            202                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Typing in 64.08977 seconds
-
-Finished processing WritingOnBoard in 65.58626 seconds
-
-Finished processing BoxingPunchingBag in 88.85668 seconds
-
-+------------------ Job Report: 62876565 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 17.0% (339.3 MB peak / 2 GB)    |
-| CPU           [#                   ]  9.2% average                   |
-| Time          [-->                 ] 12.7% (0-00:01:16 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   10.9 GB       194.3 MB       1.8 K                         |
-|   OS      60 KB         0 B            134                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Surfing in 67.22929 seconds
-
-Finished processing PoleVault in 73.66634 seconds
-
-Finished processing TrampolineJumping in 67.53738 seconds
-
-+------------------ Job Report: 62876570 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 19.8% (395.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 17.9% average                   |
-| Time          [-->                 ] 13.0% (0-00:01:18 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            4                             |
-|   /fred   9.6 GB        222.2 MB       2.6 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      1.1 MB        0 B            268                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876486 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.3% (325.9 MB peak / 2 GB)    |
++------------------ Job Report: 62975786 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.3% (325.2 MB peak / 2 GB)    |
 | CPU           [####                ] 22.0% average                   |
 | Time          [--->                ] 18.2% (0-00:01:49 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   13.6 GB       256.3 MB       3.1 K                         |
-|   OS      744 KB        0 B            214                           |
+|   /apps   0 B           0 B            1                             |
+|   /fred   11.2 GB       690.4 MB       1.1 K                         |
+|   OS      0 B           0 B            1                             |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1280,19 +253,570 @@ Finished processing TrampolineJumping in 67.53738 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing HorseRiding in 91.63920 seconds
++------------------ Job Report: 62975797 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.8% (395.8 MB peak / 2 GB)    |
+| CPU           [####                ] 22.5% average                   |
+| Time          [--->                ] 18.5% (0-00:01:51 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   12.8 GB       554.2 MB       1 K                           |
+|   OS      4 KB          0 B            26                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876558 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.7% (373.4 MB peak / 2 GB)    |
-| CPU           [##                  ] 13.9% average                   |
+Finished processing Biking in 102.11726 seconds
+
++------------------ Job Report: 62975762 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.0% (420.7 MB peak / 2 GB)    |
+| CPU           [####                ] 21.4% average                   |
+| Time          [--->                ] 18.7% (0-00:01:52 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   11.5 GB       602.6 MB       1.3 K                         |
+|   OS      228 KB        0 B            73                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975839 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.5% (331 MB peak / 2 GB)      |
+| CPU           [###                 ] 19.2% average                   |
+| Time          [->                  ]  8.7% (0-00:00:52 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1.1 MB        0 B            7                             |
+|   /fred   2.2 GB        276 MB         1.6 K                         |
+|   OS      1.6 MB        0 B            314                           |
++----------------------------------------------------------------------+
+
+Finished processing SoccerPenalty in 45.67346 seconds
+
+Finished processing PullUps in 45.91244 seconds
+
++------------------ Job Report: 62975852 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.0% (259.4 MB peak / 2 GB)    |
+| CPU           [##                  ] 12.1% average                   |
+| Time          [->                  ]  9.7% (0-00:00:58 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   2.9 GB        306 MB         1.3 K                         |
+|   OS      0 B           0 B            84                            |
++----------------------------------------------------------------------+
+
+Finished processing UnevenBars in 49.91180 seconds
+
+Finished processing HorseRiding in 111.93579 seconds
+
+Finished processing BoxingPunchingBag in 112.24716 seconds
+
++------------------ Job Report: 62975837 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.8% (276.2 MB peak / 2 GB)    |
+| CPU           [####                ] 23.3% average                   |
+| Time          [-->                 ] 10.0% (0-00:01:00 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1.8 MB        0 B            6                             |
+|   /fred   2.8 GB        210 MB         1.5 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      18.5 MB       0 B            322                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing VolleyballSpiking in 52.22732 seconds
+
++------------------ Job Report: 62975863 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.9% (357.4 MB peak / 2 GB)    |
+| CPU           [###                 ] 18.0% average                   |
+| Time          [-->                 ] 10.2% (0-00:01:01 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   3.1 GB        222 MB         1.2 K                         |
+|   OS      0 B           0 B            37                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing WallPushups in 52.35151 seconds
+
++------------------ Job Report: 62975793 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.9% (398.1 MB peak / 2 GB)    |
+| CPU           [####                ] 20.5% average                   |
+| Time          [---->               ] 20.3% (0-00:02:02 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   11.3 GB       666.9 MB       1.1 K                         |
+|   OS      0 B           0 B            1                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975768 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.3% (366.7 MB peak / 2 GB)    |
+| CPU           [####                ] 21.3% average                   |
+| Time          [---->               ] 20.3% (0-00:02:02 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   14.7 GB       854.9 MB       1.4 K                         |
+|   OS      0 B           0 B            8                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing Mixing in 52.82360 seconds
+
+Finished processing Shotput in 54.38621 seconds
+
++------------------ Job Report: 62975864 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.6% (371.4 MB peak / 2 GB)    |
+| CPU           [#####               ] 25.0% average                   |
+| Time          [-->                 ] 10.7% (0-00:01:04 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   5.1 GB        510.8 MB       1.6 K                         |
+|   OS      0 B           0 B            35                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing BandMarching in 114.81422 seconds
+
+Finished processing Skijet in 54.98433 seconds
+
+Finished processing ThrowDiscus in 55.17065 seconds
+
+Finished processing PizzaTossing in 54.58780 seconds
+
++------------------ Job Report: 62975866 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.1% (322.4 MB peak / 2 GB)    |
+| CPU           [####                ] 21.9% average                   |
+| Time          [-->                 ] 10.7% (0-00:01:04 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   6.1 GB        578 MB         1.7 K                         |
+|   OS      0 B           0 B            26                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing SkateBoarding in 55.33658 seconds
+
++------------------ Job Report: 62975809 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.8% (336.3 MB peak / 2 GB)    |
+| CPU           [##                  ] 13.8% average                   |
+| Time          [-->                 ] 10.8% (0-00:01:05 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   888 KB        0 B                      1                   |
+|   /fred   6 GB          531.4 MB               893                   |
+|   OS      1.4 MB        0 B                    228                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing PlayingViolin in 53.77970 seconds
+
+Finished processing ParallelBars in 55.95575 seconds
+
++------------------ Job Report: 62975756 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.2% (384.9 MB peak / 2 GB)    |
+| CPU           [#####               ] 28.0% average                   |
+| Time          [---->               ] 20.8% (0-00:02:05 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   13.9 GB       790.6 MB       1.2 K                         |
+|   OS      0 B           0 B            1                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975846 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.3% (266.2 MB peak / 2 GB)    |
+| CPU           [####                ] 24.2% average                   |
+| Time          [-->                 ] 11.0% (0-00:01:06 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   828 KB        0 B                      3                   |
+|   /fred   2.1 GB        264 MB                 446                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975849 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.2% (265 MB peak / 2 GB)      |
+| CPU           [###                 ] 16.4% average                   |
+| Time          [-->                 ] 11.2% (0-00:01:07 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   8.4 GB        400.6 MB       1.5 K                         |
+|   OS      0 B           0 B            73                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975813 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.2% (264.2 MB peak / 2 GB)    |
+| CPU           [####                ] 22.4% average                   |
+| Time          [-->                 ] 11.2% (0-00:01:07 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   5.1 GB        446.1 MB               751                   |
+|   OS      156 KB        0 B                     42                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975834 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.6% (352.1 MB peak / 2 GB)    |
+| CPU           [####                ] 23.5% average                   |
+| Time          [-->                 ] 11.3% (0-00:01:08 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   8 KB          0 B            5                             |
+|   /fred   6.7 GB        386.9 MB       1.8 K                         |
+|   OS      592 KB        0 B            224                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+
+
++------------------ Job Report: 62975812 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.7% (333.8 MB peak / 2 GB)    |
+| CPU           [####                ] 22.1% average                   |
+| Time          [-->                 ] 11.3% (0-00:01:08 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   6 GB          440.5 MB               740                   |
+|   /home   0 B           0 B                      1                   |
+|   OS      240 KB        0 B                     36                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+Finished processing PlayingPiano in 60.54275 seconds
+
++------------------ Job Report: 62975860 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 15.7% (313.5 MB peak / 2 GB)    |
+| CPU           [####                ] 20.9% average                   |
+| Time          [-->                 ] 11.2% (0-00:01:07 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   5.1 GB        548.4 MB       1.6 K                         |
+|   OS      0 B           0 B            29                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+
++------------------ Job Report: 62975847 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 15.8% (316.4 MB peak / 2 GB)    |
+| CPU           [####                ] 20.9% average                   |
+| Time          [-->                 ] 11.2% (0-00:01:07 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   6.4 GB        486.7 MB       1.6 K                         |
+|   OS      0 B           0 B            46                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+
+Finished processing MilitaryParade in 58.35146 seconds
+Finished processing StillRings in 57.46239 seconds
+Finished processing Billiards in 120.66913 seconds
+Finished processing TaiChi in 60.55043 seconds
+
+Finished processing RopeClimbing in 62.02548 seconds
+
++------------------ Job Report: 62975763 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.4% (409 MB peak / 2 GB)      |
+| CPU           [###                 ] 18.3% average                   |
+| Time          [---->               ] 21.8% (0-00:02:11 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   17.6 GB       712.2 MB       1.1 K                         |
+|   OS      0 B           0 B            11                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975808 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.9% (337.4 MB peak / 2 GB)    |
+| CPU           [####                ] 23.6% average                   |
+| Time          [-->                 ] 12.0% (0-00:01:12 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   5.4 GB        458.5 MB               770                   |
+|   OS      300 KB        0 B                     42                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing Rafting in 60.50191 seconds
+
++------------------ Job Report: 62975831 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.6% (391 MB peak / 2 GB)      |
+| CPU           [####                ] 24.7% average                   |
+| Time          [-->                 ] 12.2% (0-00:01:13 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   7.9 GB        404.1 MB       1.4 K                         |
+|   OS      824 KB        0 B            243                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975853 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.3% (266.2 MB peak / 2 GB)    |
+| CPU           [###                 ] 19.4% average                   |
+| Time          [-->                 ] 12.0% (0-00:01:12 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   7 GB          462.7 MB       1.5 K                         |
+|   OS      0 B           0 B            29                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975858 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.1% (322.8 MB peak / 2 GB)    |
+| CPU           [####                ] 23.3% average                   |
+| Time          [-->                 ] 12.2% (0-00:01:13 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   6.4 GB        389.5 MB       1.5 K                         |
+|   OS      0 B           0 B            38                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975842 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 12.9% (258.2 MB peak / 2 GB)    |
+| CPU           [####                ] 21.6% average                   |
+| Time          [-->                 ] 12.3% (0-00:01:14 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   6.8 GB        449.9 MB       1.5 K                         |
+|   OS      0 B           0 B            33                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975840 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.4% (387.2 MB peak / 2 GB)    |
+| CPU           [####                ] 24.3% average                   |
+| Time          [-->                 ] 12.3% (0-00:01:14 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   716 KB        0 B            8                             |
+|   /fred   7.4 GB        374.9 MB       1.8 K                         |
+|   OS      712 KB        0 B            234                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing SkyDiving in 65.21943 seconds
+
+Finished processing LongJump in 65.46799 seconds
+
+Finished processing Typing in 67.25201 seconds
+
++------------------ Job Report: 62975850 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.9% (378.8 MB peak / 2 GB)    |
+| CPU           [####                ] 24.7% average                   |
+| Time          [-->                 ] 12.8% (0-00:01:17 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   6.8 GB        401.9 MB       1.4 K                         |
+|   OS      0 B           0 B            32                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing MoppingFloor in 66.68936 seconds
+
++------------------ Job Report: 62975806 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.5% (349.2 MB peak / 2 GB)    |
+| CPU           [#####               ] 26.9% average                   |
+| Time          [-->                 ] 13.0% (0-00:01:18 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   5.3 GB        446.1 MB               445                   |
+|   OS      408 KB        0 B                     39                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing Surfing in 68.77206 seconds
+
++------------------ Job Report: 62975862 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.3% (386.4 MB peak / 2 GB)    |
+| CPU           [##                  ] 12.7% average                   |
 | Time          [-->                 ] 13.2% (0-00:01:19 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   9.8 GB        167.8 MB       1.7 K                         |
-|   OS      224 KB        0 B            126                           |
+|   /fred   8.3 GB        443.5 MB       1.5 K                         |
+|   OS      0 B           0 B            26                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1300,8 +824,26 @@ Finished processing HorseRiding in 91.63920 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876538 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 17.6% (352.7 MB peak / 2 GB)    |
++------------------ Job Report: 62975810 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 13.2% (263.3 MB peak / 2 GB)    |
+| CPU           [####                ] 24.1% average                   |
+| Time          [-->                 ] 13.2% (0-00:01:19 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   7 GB          344.5 MB               580                   |
+|   OS      504 KB        0 B                     84                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975855 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 14.1% (282.6 MB peak / 2 GB)    |
 | CPU           [###                 ] 17.5% average                   |
 | Time          [-->                 ] 13.3% (0-00:01:20 / 0-00:10:00) |
 |                                                                      |
@@ -1309,8 +851,8 @@ Finished processing HorseRiding in 91.63920 seconds
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   10.5 GB       196 MB         1.6 K                         |
-|   OS      0 B           0 B            136                           |
+|   /fred   8 GB          396.3 MB       1.4 K                         |
+|   OS      0 B           0 B            26                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1318,138 +860,27 @@ Finished processing HorseRiding in 91.63920 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876564 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 11.6% (231.2 MB peak / 2 GB)    |
-| CPU           [####                ] 22.5% average                   |
-| Time          [-->                 ] 13.3% (0-00:01:20 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   9.2 GB        157.8 MB       1.6 K                         |
-|   OS      64 KB         0 B            132                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
+Finished processing WritingOnBoard in 70.97567 seconds
 
-+------------------ Job Report: 62876511 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 13.9% (278 MB peak / 2 GB)      |
-| CPU           [###                 ] 17.9% average                   |
-| Time          [--->                ] 18.7% (0-00:01:52 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   13.1 GB       248.3 MB       2.5 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      128 KB        0 B            151                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
+Finished processing TrampolineJumping in 71.48314 seconds
 
-Finished processing Swing in 70.42616 seconds
+Finished processing Swing in 72.15854 seconds
 
-Finished processing BandMarching in 93.77612 seconds
+Finished processing PoleVault in 71.10265 seconds
 
-Finished processing Billiards in 94.59256 seconds
+Finished processing JumpRope in 134.33147 seconds
 
-+------------------ Job Report: 62876559 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.4% (328.6 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.3% average                   |
-| Time          [-->                 ] 13.8% (0-00:01:23 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   7.8 GB        171.6 MB       1.7 K                         |
-|   OS      112 KB        0 B            135                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing TableTennisShot in 72.50240 seconds
-
-+------------------ Job Report: 62876465 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.2% (304.1 MB peak / 2 GB)    |
-| CPU           [#####               ] 28.9% average                   |
-| Time          [--->                ] 19.0% (0-00:01:54 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            4                             |
-|   /fred   12.5 GB       236.4 MB       2.4 K                         |
-|   OS      164 KB        0 B            145                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing WalkingWithDog in 72.88396 seconds
-
-+------------------ Job Report: 62876481 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 17.1% (342.1 MB peak / 2 GB)    |
-| CPU           [###                 ] 19.1% average                   |
-| Time          [--->                ] 19.2% (0-00:01:55 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   13.4 GB       180.2 MB               895                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing SumoWrestling in 73.86255 seconds
-
-+------------------ Job Report: 62876560 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.0% (319.7 MB peak / 2 GB)    |
-| CPU           [####                ] 21.2% average                   |
-| Time          [-->                 ] 14.2% (0-00:01:25 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            3                             |
-|   /fred   7.9 GB        190.4 MB       1.8 K                         |
-|   OS      68 KB         0 B            136                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Skiing in 74.12347 seconds
-
-+------------------ Job Report: 62876568 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.5% (369.5 MB peak / 2 GB)    |
++------------------ Job Report: 62975835 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.6% (331.6 MB peak / 2 GB)    |
 | CPU           [####                ] 23.5% average                   |
 | Time          [-->                 ] 14.2% (0-00:01:25 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
+|   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   3.7 MB        0 B                     23                   |
-|   /fred   5.2 GB        82.1 MB                412                   |
+|   /apps   0 B           0 B            1                             |
+|   /fred   7.2 GB        399.4 MB       1.8 K                         |
+|   OS      1.1 MB        0 B            229                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1457,19 +888,17 @@ Finished processing Skiing in 74.12347 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing Lunges in 80.61362 seconds
-
-+------------------ Job Report: 62876557 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.0% (320.1 MB peak / 2 GB)    |
-| CPU           [######              ] 31.4% average                   |
-| Time          [-->                 ] 14.3% (0-00:01:26 / 0-00:10:00) |
++------------------ Job Report: 62975861 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.9% (418.6 MB peak / 2 GB)    |
+| CPU           [####                ] 24.7% average                   |
+| Time          [-->                 ] 14.2% (0-00:01:25 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   7.9 GB        141.6 MB       1.5 K                         |
-|   OS      0 B           0 B            121                           |
+|   /fred   7.3 GB        365.5 MB       1.4 K                         |
+|   OS      0 B           0 B            20                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1477,17 +906,38 @@ Finished processing Lunges in 80.61362 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876551 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.9% (337.5 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.4% average                   |
-| Time          [-->                 ] 14.5% (0-00:01:27 / 0-00:10:00) |
+
++------------------ Job Report: 62975856 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.3% (366.5 MB peak / 2 GB)    |
+| CPU           [####                ] 22.4% average                   |
+| Time          [-->                 ] 14.2% (0-00:01:25 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   14.6 GB       237.5 MB       2 K                           |
-|   OS      44 KB         0 B            121                           |
+|   /fred   6.4 GB        419.9 MB       1.5 K                         |
+|   OS      0 B           0 B            36                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+Finished processing Drumming in 136.00840 seconds
+
++------------------ Job Report: 62975867 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.7% (373.7 MB peak / 2 GB)    |
+| CPU           [####                ] 20.0% average                   |
+| Time          [-->                 ] 14.2% (0-00:01:25 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   7.1 GB        523.6 MB       1.7 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      0 B           0 B            22                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1495,242 +945,58 @@ Finished processing Lunges in 80.61362 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing TennisSwing in 77.19538 seconds
++------------------ Job Report: 62975798 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.6% (432.2 MB peak / 2 GB)    |
+| CPU           [#####               ] 29.0% average                   |
+| Time          [---->               ] 24.2% (0-00:02:25 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   16.3 GB       600 MB         1.1 K                         |
+|   OS      24 KB         0 B            18                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876521 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.0% (319.2 MB peak / 2 GB)    |
-| CPU           [#####               ] 26.1% average                   |
+Finished processing Skiing in 76.39629 seconds
+
++------------------ Job Report: 62975778 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.8% (435.4 MB peak / 2 GB)    |
+| CPU           [####                ] 21.9% average                   |
+| Time          [---->               ] 24.3% (0-00:02:26 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   22.3 GB       854.8 MB       1.3 K                         |
+|   OS      0 B           0 B            1                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing TableTennisShot in 76.78325 seconds
+
+Finished processing SumoWrestling in 77.75445 seconds
+
++------------------ Job Report: 62975848 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.7% (353.1 MB peak / 2 GB)    |
+| CPU           [####                ] 21.6% average                   |
 | Time          [-->                 ] 14.7% (0-00:01:28 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   14.6 GB       225.5 MB       1.1 K                         |
-|   OS      0 B           0 B            1                             |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing PlayingTabla in 83.93385 seconds
-
-+------------------ Job Report: 62876562 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 19.1% (381 MB peak / 2 GB)      |
-| CPU           [###                 ] 19.1% average                   |
-| Time          [-->                 ] 14.8% (0-00:01:29 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   12.4 GB       288.6 MB       2.2 K                         |
-|   OS      216 KB        0 B            132                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Nunchucks in 83.56588 seconds
-
-+------------------ Job Report: 62876536 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.7% (374.2 MB peak / 2 GB)    |
-| CPU           [#####               ] 28.6% average                   |
-| Time          [--->                ] 15.2% (0-00:01:31 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B                      1                   |
-|   /fred   14.1 GB       191 MB                 949                   |
-|   OS      0 B           0 B                      1                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876525 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.9% (378.8 MB peak / 2 GB)    |
-| CPU           [#####               ] 27.5% average                   |
-| Time          [--->                ] 15.2% (0-00:01:31 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   14.6 GB       217.5 MB       1.1 K                         |
-|   OS      0 B           0 B            1                             |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing Rowing in 83.07303 seconds
-
-+------------------ Job Report: 62876546 (COMPLETED) ------------------+
-| Memory (RAM)  [##                  ] 14.7% (293.3 MB peak / 2 GB)    |
-| CPU           [###                 ] 18.8% average                   |
-| Time          [--->                ] 16.0% (0-00:01:36 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   15.4 GB       205.2 MB       1.8 K                         |
-|   OS      216 KB        0 B            138                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing ShavingBeard in 88.02931 seconds
-
-Finished processing YoYo in 62.75464 seconds
-
-+------------------ Job Report: 62876548 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 15.8% (315.1 MB peak / 2 GB)    |
-| CPU           [###                 ] 16.8% average                   |
-| Time          [--->                ] 16.8% (0-00:01:41 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   13.7 GB       231.6 MB       2 K                           |
-|   OS      280 KB        0 B            138                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876459 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 16.2% (323.1 MB peak / 2 GB)    |
-| CPU           [####                ] 24.3% average                   |
-| Time          [-->                 ] 11.7% (0-00:01:10 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   8.3 GB        163 MB         1.6 K                         |
-|   OS      4 KB          0 B            170                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing SalsaSpin in 92.87376 seconds
-
-Finished processing Drumming in 116.37945 seconds
-
-Finished processing PlayingFlute in 99.05559 seconds
-
-Finished processing JumpRope in 117.83101 seconds
-
-+------------------ Job Report: 62876547 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.5% (409.5 MB peak / 2 GB)    |
-| CPU           [######              ] 33.3% average                   |
-| Time          [--->                ] 17.5% (0-00:01:45 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   11.1 GB       186.7 MB       1.8 K                         |
-|   OS      56 KB         0 B            137                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876496 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.4% (407.8 MB peak / 2 GB)    |
-| CPU           [####                ] 21.9% average                   |
-| Time          [---->               ] 22.8% (0-00:02:17 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   1.1 MB        0 B            16                            |
-|   /fred   20.5 GB       252.9 MB       2.3 K                         |
-|   OS      116 KB        0 B            176                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing PommelHorse in 101.51737 seconds
-
-+------------------ Job Report: 62876532 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.1% (362.6 MB peak / 2 GB)    |
-| CPU           [####                ] 21.7% average                   |
-| Time          [--->                ] 17.7% (0-00:01:46 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   15.1 GB       217.4 MB       1.1 K                         |
-|   OS      0 B           0 B            1                             |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-+------------------ Job Report: 62876516 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.4% (407.2 MB peak / 2 GB)    |
-| CPU           [#####               ] 29.0% average                   |
-| Time          [---->               ] 23.0% (0-00:02:18 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            4                             |
-|   /fred   18.4 GB       216.4 MB       2.6 K                         |
-|   OS      5.2 MB        0 B            377                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
-
-Finished processing PlayingGuitar in 102.10477 seconds
-
-Finished processing PlayingCello in 103.05242 seconds
-
-Finished processing IceDancing in 119.90587 seconds
-
-+------------------ Job Report: 62876539 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.3% (366.9 MB peak / 2 GB)    |
-| CPU           [####                ] 24.1% average                   |
-| Time          [--->                ] 18.0% (0-00:01:48 / 0-00:10:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            1                             |
-|   /fred   13.7 GB       170.6 MB       1 K                           |
+|   /fred   12.7 GB       654.1 MB       1.8 K                         |
 |   OS      0 B           0 B            24                            |
 |                                                                      |
 | Warnings:                                                            |
@@ -1739,19 +1005,17 @@ Finished processing IceDancing in 119.90587 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing SoccerJuggling in 97.87598 seconds
-
-+------------------ Job Report: 62876533 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.9% (378 MB peak / 2 GB)      |
-| CPU           [####                ] 22.9% average                   |
-| Time          [--->                ] 18.2% (0-00:01:49 / 0-00:10:00) |
++------------------ Job Report: 62975857 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.7% (393.3 MB peak / 2 GB)    |
+| CPU           [#####               ] 25.0% average                   |
+| Time          [-->                 ] 14.7% (0-00:01:28 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   15.5 GB       221.4 MB       1.1 K                         |
-|   OS      0 B           0 B            1                             |
+|   /fred   9.7 GB        724.4 MB       1.9 K                         |
+|   OS      0 B           0 B            20                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1759,17 +1023,17 @@ Finished processing SoccerJuggling in 97.87598 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876513 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 18.7% (373.1 MB peak / 2 GB)    |
-| CPU           [######              ] 32.9% average                   |
-| Time          [---->               ] 23.3% (0-00:02:20 / 0-00:10:00) |
++------------------ Job Report: 62975854 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.0% (319.8 MB peak / 2 GB)    |
+| CPU           [######              ] 31.5% average                   |
+| Time          [-->                 ] 14.8% (0-00:01:29 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   16.1 GB       232.3 MB       2.1 K                         |
-|   OS      144 KB        0 B            148                           |
+|   /apps   0 B           0 B            1                             |
+|   /fred   9.5 GB        551 MB         1.7 K                         |
+|   OS      0 B           0 B            34                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1777,16 +1041,24 @@ Finished processing SoccerJuggling in 97.87598 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876528 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.3% (406.3 MB peak / 2 GB)    |
-| CPU           [#####               ] 28.4% average                   |
-| Time          [--->                ] 18.2% (0-00:01:49 / 0-00:10:00) |
+Finished processing TennisSwing in 80.99698 seconds
+
+Finished processing WalkingWithDog in 81.15944 seconds
+
+Finished processing IceDancing in 143.36367 seconds
+
+Finished processing PlayingTabla in 82.41413 seconds
+
++------------------ Job Report: 62975859 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.5% (429 MB peak / 2 GB)      |
+| CPU           [####                ] 21.5% average                   |
+| Time          [--->                ] 15.5% (0-00:01:33 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   14.5 GB       237.9 MB       1.2 K                         |
+|   /fred   10.5 GB       750.4 MB       1.9 K                         |
 |   OS      0 B           0 B            28                            |
 |                                                                      |
 | Warnings:                                                            |
@@ -1795,19 +1067,17 @@ Finished processing SoccerJuggling in 97.87598 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing PlayingDaf in 105.05900 seconds
-
-+------------------ Job Report: 62876554 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 19.5% (390.9 MB peak / 2 GB)    |
-| CPU           [#####               ] 26.4% average                   |
-| Time          [--->                ] 18.3% (0-00:01:50 / 0-00:10:00) |
++------------------ Job Report: 62975865 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 16.1% (322.7 MB peak / 2 GB)    |
+| CPU           [####                ] 24.7% average                   |
+| Time          [--->                ] 15.5% (0-00:01:33 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   0 B           0 B            2                             |
-|   /fred   18.8 GB       254.6 MB       2.1 K                         |
-|   OS      112 KB        0 B            133                           |
+|   /apps   0 B           0 B            1                             |
+|   /fred   10.8 GB       545.4 MB       1.6 K                         |
+|   OS      0 B           0 B            48                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1815,18 +1085,16 @@ Finished processing PlayingDaf in 105.05900 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing RockClimbingIndoor in 100.33961 seconds
-
-+------------------ Job Report: 62876529 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 19.0% (379.6 MB peak / 2 GB)    |
-| CPU           [#####               ] 25.2% average                   |
-| Time          [--->                ] 18.5% (0-00:01:51 / 0-00:10:00) |
++------------------ Job Report: 62975795 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.1% (401.2 MB peak / 2 GB)    |
+| CPU           [######              ] 32.7% average                   |
+| Time          [----->              ] 25.5% (0-00:02:33 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   20.1 GB       264.9 MB       1.3 K                         |
+|   /fred   17.8 GB       790.5 MB       1.2 K                         |
 |   OS      0 B           0 B            1                             |
 |                                                                      |
 | Warnings:                                                            |
@@ -1835,17 +1103,19 @@ Finished processing RockClimbingIndoor in 100.33961 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-+------------------ Job Report: 62876544 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.3% (405.2 MB peak / 2 GB)    |
-| CPU           [####                ] 22.1% average                   |
-| Time          [--->                ] 18.8% (0-00:01:53 / 0-00:10:00) |
+Finished processing Lunges in 84.17938 seconds
+
++------------------ Job Report: 62975833 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.5% (371 MB peak / 2 GB)      |
+| CPU           [######              ] 33.0% average                   |
+| Time          [--->                ] 15.7% (0-00:01:34 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   848 KB        0 B            13                            |
-|   /fred   19.4 GB       246.4 MB       2 K                           |
-|   OS      36 KB         0 B            135                           |
+|   /apps   0 B           0 B            1                             |
+|   /fred   11.4 GB       493.6 MB       1.7 K                         |
+|   OS      940 KB        0 B            320                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1853,19 +1123,141 @@ Finished processing RockClimbingIndoor in 100.33961 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing PlayingSitar in 110.03398 seconds
+Finished processing Rowing in 85.88495 seconds
 
-+------------------ Job Report: 62876535 (COMPLETED) ------------------+
-| Memory (RAM)  [###                 ] 19.4% (388.5 MB peak / 2 GB)    |
-| CPU           [#####               ] 27.6% average                   |
++------------------ Job Report: 62975807 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 22.2% (443.1 MB peak / 2 GB)    |
+| CPU           [#####               ] 27.1% average                   |
+| Time          [--->                ] 16.0% (0-00:01:36 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   868 KB        0 B                      5                   |
+|   /fred   11.2 GB       511.9 MB               839                   |
+|   OS      232 KB        0 B                     38                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975843 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.5% (429.7 MB peak / 2 GB)    |
+| CPU           [####                ] 21.6% average                   |
+| Time          [--->                ] 16.2% (0-00:01:37 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   13.8 GB       563.8 MB       1.7 K                         |
+|   OS      0 B           0 B            82                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing ShavingBeard in 89.23038 seconds
+
+Finished processing Nunchucks in 89.47703 seconds
+
++------------------ Job Report: 62975845 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.4% (428.6 MB peak / 2 GB)    |
+| CPU           [###                 ] 18.8% average                   |
+| Time          [--->                ] 16.8% (0-00:01:41 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   12.1 GB       666.6 MB       1.8 K                         |
+|   OS      0 B           0 B            30                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975811 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.5% (410.5 MB peak / 2 GB)    |
+| CPU           [#####               ] 27.5% average                   |
+| Time          [--->                ] 17.0% (0-00:01:42 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   10.5 GB       480.6 MB               790                   |
+|   OS      312 KB        0 B                     38                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing SalsaSpin in 95.96666 seconds
+
++------------------ Job Report: 62975844 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.7% (434.6 MB peak / 2 GB)    |
+| CPU           [######              ] 34.3% average                   |
+| Time          [--->                ] 18.0% (0-00:01:48 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   12.6 GB       664.5 MB       1.8 K                         |
+|   OS      0 B           0 B            48                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing YoYo in 69.18331 seconds
+
++------------------ Job Report: 62975750 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.1% (381.6 MB peak / 2 GB)    |
+| CPU           [#####               ] 25.6% average                   |
+| Time          [-->                 ] 13.0% (0-00:01:18 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   8.4 GB        501.7 MB               833                   |
+|   OS      0 B           0 B                      1                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing PommelHorse in 101.02358 seconds
+
+Finished processing SoccerJuggling in 104.66794 seconds
+
+Finished processing PlayingFlute in 103.58953 seconds
+
++------------------ Job Report: 62975836 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 22.1% (441.2 MB peak / 2 GB)    |
+| CPU           [#####               ] 26.7% average                   |
 | Time          [--->                ] 19.3% (0-00:01:56 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   19.7 GB       265.2 MB       1.3 K                         |
-|   OS      0 B           0 B            1                             |
+|   /fred   14.9 GB       567.1 MB       2 K                           |
+|   OS      1.2 MB        0 B            243                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1873,19 +1265,17 @@ Finished processing PlayingSitar in 110.03398 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing PlayingDhol in 117.88213 seconds
-
-+------------------ Job Report: 62876531 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 20.4% (407.4 MB peak / 2 GB)    |
-| CPU           [#####               ] 28.6% average                   |
-| Time          [---->               ] 21.0% (0-00:02:06 / 0-00:10:00) |
++------------------ Job Report: 62975851 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.0% (380.1 MB peak / 2 GB)    |
+| CPU           [#####               ] 28.4% average                   |
+| Time          [--->                ] 19.3% (0-00:01:56 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   19 GB         250.6 MB       1.2 K                         |
-|   OS      0 B           0 B            1                             |
+|   /fred   15.8 GB       658.6 MB       1.8 K                         |
+|   OS      0 B           0 B            26                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
@@ -1893,19 +1283,157 @@ Finished processing PlayingDhol in 117.88213 seconds
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+
 
-Finished processing Punch in 123.43196 seconds
+Finished processing RockClimbingIndoor in 104.32213 seconds
 
-+------------------ Job Report: 62876541 (COMPLETED) ------------------+
-| Memory (RAM)  [####                ] 21.6% (432.9 MB peak / 2 GB)    |
-| CPU           [######              ] 34.1% average                   |
-| Time          [---->               ] 21.5% (0-00:02:09 / 0-00:10:00) |
++------------------ Job Report: 62975841 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.8% (415.4 MB peak / 2 GB)    |
+| CPU           [#####               ] 25.8% average                   |
+| Time          [---->               ] 20.0% (0-00:02:00 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   8.3 MB        0 B            1                             |
+|   /fred   16.9 GB       653.6 MB       2.1 K                         |
+|   OS      632 KB        0 B            221                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing PlayingDaf in 110.33280 seconds
+
++------------------ Job Report: 62975829 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 14.9% (297.3 MB peak / 2 GB)    |
+| CPU           [#####               ] 25.0% average                   |
+| Time          [---->               ] 20.0% (0-00:02:00 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            2                             |
+|   /fred   15.8 GB       698.5 MB       2.7 K                         |
+|   OS      1.5 MB        0 B            309                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing PlayingSitar in 111.14346 seconds
+
+Finished processing PlayingCello in 112.20829 seconds
+
++------------------ Job Report: 62975815 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.2% (423.9 MB peak / 2 GB)    |
+| CPU           [#####               ] 26.8% average                   |
+| Time          [---->               ] 20.5% (0-00:02:03 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
 |   /apps   0 B           0 B            1                             |
-|   /fred   22.4 GB       296.5 MB       1.8 K                         |
-|   OS      0 B           0 B            38                            |
+|   /fred   15.6 GB       634.7 MB       1 K                           |
+|   OS      4.9 MB        0 B            37                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975832 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.9% (417.9 MB peak / 2 GB)    |
+| CPU           [######              ] 31.7% average                   |
+| Time          [---->               ] 20.5% (0-00:02:03 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.5 MB        0 B            13                            |
+|   /fred   16.6 GB       699.7 MB       1.9 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      2.9 MB        0 B            542                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975814 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.8% (435.8 MB peak / 2 GB)    |
+| CPU           [#####               ] 29.0% average                   |
+| Time          [---->               ] 20.7% (0-00:02:04 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   17.9 GB       892.9 MB       1.4 K                         |
+|   OS      356 KB        0 B            75                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing PlayingGuitar in 114.26944 seconds
+
++------------------ Job Report: 62975830 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.2% (403.9 MB peak / 2 GB)    |
+| CPU           [#####               ] 25.8% average                   |
+| Time          [---->               ] 21.3% (0-00:02:08 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   2.8 MB        0 B            13                            |
+|   /fred   14.9 GB       655.3 MB       1 K                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
+Finished processing Punch in 127.98328 seconds
+
+Finished processing PlayingDhol in 128.52041 seconds
+
++------------------ Job Report: 62975838 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 23.1% (461.6 MB peak / 2 GB)    |
+| CPU           [#######             ] 35.9% average                   |
+| Time          [---->               ] 23.7% (0-00:02:22 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                     22                   |
+|   /fred   14.6 GB       578 MB                 910                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
+
++------------------ Job Report: 62975828 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 21.0% (420.1 MB peak / 2 GB)    |
+| CPU           [######              ] 30.8% average                   |
+| Time          [---->               ] 23.8% (0-00:02:23 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   22.6 GB       926.7 MB       3.2 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      1.4 MB        0 B            318                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |

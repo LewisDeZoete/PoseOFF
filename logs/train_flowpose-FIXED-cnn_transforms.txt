@@ -1,0 +1,18 @@
+Reshaping inside MS-G3D was wrong, added linear layer to flow_conv, normalised flow vectors, fewer transforms (only mirror?)
+### Libraries loaded
+### Arguments loaded
+	Output device: 0
+	Model total number of params: 770231
+### Model created
+	Tracking:
+		epoch
+		training time
+		train loss
+		lr
+		test loss
+		train accuracy
+		test accuracy
+		train confusion matrix
+		test confusion matrix
+		train classification report
+		test classification report
