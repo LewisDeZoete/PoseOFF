@@ -62,8 +62,8 @@ class SingleStreamDataset(CustomDataset):
         self.max_frames = max_frames
 
         # Ensure stream is either 'skel' or 'flow'
-        if stream not in ["skel", "flow", "flowpose"]:
-            raise ValueError("stream must be 'skel', 'flow' or 'flowpose'")
+        if stream not in ["pose", "flow", "flowpose"]:
+            raise ValueError("stream must be 'pose', 'flow' or 'flowpose'")
 
         self.data_path = arg.dataloader[f"{stream}_path"] if self.preprocessed else arg.dataloader['data_path']
 

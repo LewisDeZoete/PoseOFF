@@ -204,33 +204,28 @@ class loop_graph(object):
 
 
 class mirror(object):
-    '''
+    """
     Mirror augmentation for data (mirror the x positions and u vectors).
-    NOTE: assuming flow windows are square...
-    '''
-    def __init__(self, probability: float=0.2):
+    NOTE: Assumes flow windows are square.
+    """
+    def __init__(self, probability: float = 0.2):
         self.probability = probability
-    def __call__(self, data):
-        if random.random() <= self.probability+10:
-            C,T,V,M = data.shape
-            W = int((C/2)**(0.5))
 
-            # Flip x positons
-            data[0] = data[0]*(-1)
+    def __call__(self, data: torch.Tensor):
+        # Apply transformation based on probability
+        if random.random() <= self.probability:
+            C, T, V, M = data.shape
+            W = int((C / 2) ** 0.5)
+
+            # Flip x positions (assuming the first channel corresponds to x positions)
+            data[0] *= -1
 
             # Flip the x-direction of flow vectors
-            flow = data[3:]
-            flow = np.reshape(flow, (2, W, W, T, V, M)) # (2,5,5,300,17,2)
-            flow[0] = flow[0]*(-1)
+            flow = data[3:].view(2, W, W, T, V, M)  # Reshape to (2, W, W, T, V, M)
+            flow[0] *= -1  # Flip x-direction flow
+            data[3:] = flow.view(-1, T, V, M)  # Reshape back to original dimensions
 
-            # Change the flow values in the numpy array to the normalised ones
-            data[3:] = np.reshape(flow, (2*W**2,T,V,M))
-
-            return data
-
-        else:
-            return data
-        
+        return data        
 
 
 class swap_numpy(object):

@@ -1,104 +1,58 @@
 Epoch:   0%|          | 0/100 [00:00<?, ?it/s]
-Training:   0%|          | 0/84 [00:00<?, ?it/s][A
-Training:   1%|          | 1/84 [00:25<35:42, 25.81s/it][A
-Training:   2%|▏         | 2/84 [00:40<26:38, 19.50s/it][A
-Training:   4%|▎         | 3/84 [00:55<23:17, 17.25s/it][A
-Training:   5%|▍         | 4/84 [01:15<24:39, 18.49s/it][A
-Training:   6%|▌         | 5/84 [01:39<26:36, 20.21s/it][A
-Training:   7%|▋         | 6/84 [03:00<53:22, 41.06s/it][A
-Training:   8%|▊         | 7/84 [03:25<45:49, 35.70s/it][A
-Training:  10%|▉         | 8/84 [03:48<40:15, 31.79s/it][A
-Training:  11%|█         | 9/84 [04:12<36:44, 29.40s/it][A
-Training:  12%|█▏        | 10/84 [04:37<34:31, 27.99s/it][A
-Training:  13%|█▎        | 11/84 [05:02<32:44, 26.91s/it][A
-Training:  14%|█▍        | 12/84 [05:26<31:19, 26.10s/it][A
-Training:  15%|█▌        | 13/84 [05:51<30:33, 25.82s/it][A
-Training:  17%|█▋        | 14/84 [06:15<29:30, 25.30s/it][A
-Training:  18%|█▊        | 15/84 [06:40<28:50, 25.08s/it][A
-Training:  19%|█▉        | 16/84 [07:03<27:41, 24.44s/it][A
-Training:  20%|██        | 17/84 [07:28<27:26, 24.57s/it][A
-Training:  21%|██▏       | 18/84 [07:52<27:03, 24.60s/it][A
-Training:  23%|██▎       | 19/84 [08:17<26:48, 24.74s/it][A
-Training:  24%|██▍       | 20/84 [08:42<26:28, 24.82s/it][A
-Training:  25%|██▌       | 21/84 [09:08<26:10, 24.93s/it][A
-Training:  26%|██▌       | 22/84 [09:31<25:20, 24.52s/it][A
-Training:  27%|██▋       | 23/84 [09:56<24:55, 24.52s/it][A
-Training:  29%|██▊       | 24/84 [10:20<24:29, 24.50s/it][A
-Training:  30%|██▉       | 25/84 [10:45<24:10, 24.59s/it][A
-Training:  31%|███       | 26/84 [11:11<24:21, 25.20s/it][A
-Training:  32%|███▏      | 27/84 [11:35<23:26, 24.67s/it][A
-Training:  33%|███▎      | 28/84 [11:59<22:55, 24.56s/it][A
-Training:  35%|███▍      | 29/84 [13:00<32:26, 35.39s/it][A
-Training:  36%|███▌      | 30/84 [13:42<33:41, 37.43s/it][A
-Training:  37%|███▋      | 31/84 [14:05<29:18, 33.18s/it][A
-Training:  38%|███▊      | 32/84 [14:29<26:22, 30.43s/it][A
-Training:  39%|███▉      | 33/84 [14:53<24:05, 28.34s/it][A
-Training:  40%|████      | 34/84 [15:17<22:41, 27.23s/it][A
-Training:  42%|████▏     | 35/84 [15:42<21:28, 26.29s/it][A
-Training:  43%|████▎     | 36/84 [17:11<36:04, 45.09s/it][A
-Training:  44%|████▍     | 37/84 [17:35<30:22, 38.77s/it][A
-Training:  45%|████▌     | 38/84 [18:00<26:40, 34.79s/it][A
-Training:  46%|████▋     | 39/84 [18:25<23:54, 31.88s/it][A
-Training:  48%|████▊     | 40/84 [18:51<22:02, 30.06s/it][A
-Training:  49%|████▉     | 41/84 [19:16<20:33, 28.67s/it][A
-Training:  50%|█████     | 42/84 [20:06<24:25, 34.88s/it][A
-Training:  51%|█████     | 43/84 [20:36<22:55, 33.56s/it][A
-Training:  52%|█████▏    | 44/84 [21:01<20:40, 31.02s/it][A
-Training:  54%|█████▎    | 45/84 [21:27<19:10, 29.51s/it][A
-Training:  55%|█████▍    | 46/84 [21:52<17:49, 28.14s/it][A
-Training:  56%|█████▌    | 47/84 [22:17<16:46, 27.21s/it][A
-Training:  57%|█████▋    | 48/84 [22:41<15:41, 26.16s/it][A
-Training:  58%|█████▊    | 49/84 [23:05<14:55, 25.58s/it][A
-Training:  60%|█████▉    | 50/84 [23:31<14:27, 25.51s/it][A
-Training:  61%|██████    | 51/84 [23:55<13:52, 25.24s/it][A
-Training:  62%|██████▏   | 52/84 [24:20<13:25, 25.17s/it][A
-Training:  63%|██████▎   | 53/84 [24:45<13:00, 25.19s/it][A
-Training:  64%|██████▍   | 54/84 [25:23<14:28, 28.96s/it][A
-Training:  65%|██████▌   | 55/84 [25:49<13:30, 27.94s/it][A
-Training:  67%|██████▋   | 56/84 [26:15<12:50, 27.52s/it][A
-Training:  68%|██████▊   | 57/84 [26:41<12:04, 26.84s/it][A
-Training:  69%|██████▉   | 58/84 [27:05<11:20, 26.16s/it][A
-Training:  70%|███████   | 59/84 [27:32<10:56, 26.28s/it][A
-Training:  71%|███████▏  | 60/84 [27:57<10:21, 25.91s/it][A
-Training:  73%|███████▎  | 61/84 [28:23<09:57, 25.96s/it][A
-Training:  74%|███████▍  | 62/84 [28:48<09:27, 25.81s/it][A
-Training:  75%|███████▌  | 63/84 [29:14<09:03, 25.87s/it][A
-Training:  76%|███████▌  | 64/84 [29:40<08:39, 25.97s/it][A
-Training:  77%|███████▋  | 65/84 [30:07<08:16, 26.14s/it][A
-Training:  79%|███████▊  | 66/84 [30:32<07:45, 25.86s/it][A
-Training:  80%|███████▉  | 67/84 [30:59<07:22, 26.03s/it][A
-Training:  81%|████████  | 68/84 [31:23<06:48, 25.55s/it][A
-Training:  82%|████████▏ | 69/84 [31:48<06:20, 25.38s/it][A
-Training:  83%|████████▎ | 70/84 [32:13<05:53, 25.24s/it][A
-Training:  85%|████████▍ | 71/84 [32:39<05:31, 25.51s/it][A
-Training:  86%|████████▌ | 72/84 [33:04<05:04, 25.37s/it][A
-Training:  87%|████████▋ | 73/84 [33:29<04:37, 25.27s/it][A
-Training:  88%|████████▊ | 74/84 [33:56<04:17, 25.77s/it][A
-Training:  89%|████████▉ | 75/84 [34:20<03:47, 25.27s/it][A
-Training:  90%|█████████ | 76/84 [34:47<03:25, 25.64s/it][A
-Training:  92%|█████████▏| 77/84 [35:13<03:00, 25.72s/it][A
-Training:  93%|█████████▎| 78/84 [35:38<02:33, 25.58s/it][A
-Training:  94%|█████████▍| 79/84 [36:04<02:08, 25.68s/it][A
-Training:  95%|█████████▌| 80/84 [36:29<01:42, 25.54s/it][A
-Training:  96%|█████████▋| 81/84 [36:54<01:15, 25.28s/it][A
-Training:  98%|█████████▊| 82/84 [37:19<00:50, 25.29s/it][A
-Training:  99%|█████████▉| 83/84 [37:43<00:25, 25.06s/it][A
-Training: 100%|██████████| 84/84 [37:50<00:00, 19.57s/it][A
-                                                         [A/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
-/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
-/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/sklearn/metrics/_classification.py:1531: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
-
-Testing:   0%|          | 0/21 [00:00<?, ?it/s][A
-Testing:   5%|▍         | 1/21 [00:24<08:00, 24.02s/it][A
-Testing:  10%|▉         | 2/21 [00:47<07:26, 23.51s/it][A
-Testing:  14%|█▍        | 3/21 [01:16<07:54, 26.35s/it][A
-Testing:  19%|█▉        | 4/21 [03:16<17:53, 63.16s/it][A
-Testing:  24%|██▍       | 5/21 [03:51<14:06, 52.90s/it][A
-Testing:  29%|██▊       | 6/21 [04:14<10:44, 42.97s/it][A
-Testing:  33%|███▎      | 7/21 [04:38<08:34, 36.74s/it][A
-Testing:  38%|███▊      | 8/21 [05:02<07:04, 32.62s/it][A
-Testing:  43%|████▎     | 9/21 [05:25<05:56, 29.67s/it][A
-Testing:  48%|████▊     | 10/21 [06:19<06:48, 37.09s/it][A
+Training:   0%|          | 0/167 [00:00<?, ?it/s][A
+Training:   1%|          | 1/167 [00:12<34:30, 12.47s/it][A
+Training:   1%|          | 2/167 [00:15<19:47,  7.20s/it][A
+Training:   2%|▏         | 3/167 [00:19<15:01,  5.50s/it][A
+Training:   2%|▏         | 4/167 [00:23<13:00,  4.79s/it][A
+Training:   3%|▎         | 5/167 [00:26<11:39,  4.32s/it][A
+Training:   4%|▎         | 6/167 [00:30<11:01,  4.11s/it][A
+Training:   4%|▍         | 7/167 [00:33<10:27,  3.92s/it][A
+Training:   5%|▍         | 8/167 [00:37<09:54,  3.74s/it][A
+Training:   5%|▌         | 9/167 [00:40<09:36,  3.65s/it][A
+Training:   6%|▌         | 10/167 [00:43<09:10,  3.51s/it][A
+Training:   7%|▋         | 11/167 [00:47<08:58,  3.45s/it][A
+Training:   7%|▋         | 12/167 [00:50<08:49,  3.41s/it][A
+Training:   8%|▊         | 13/167 [00:54<08:51,  3.45s/it][A
+Training:   8%|▊         | 14/167 [00:57<08:50,  3.47s/it][A
+Training:   9%|▉         | 15/167 [01:00<08:36,  3.40s/it][A
+Training:  10%|▉         | 16/167 [01:04<08:26,  3.36s/it][A
+Training:  10%|█         | 17/167 [01:07<08:29,  3.39s/it][A
+Training:  11%|█         | 18/167 [01:11<08:28,  3.42s/it][A
+Training:  11%|█▏        | 19/167 [01:14<08:35,  3.48s/it][A
+Training:  12%|█▏        | 20/167 [01:18<08:34,  3.50s/it][A
+Training:  13%|█▎        | 21/167 [01:21<08:31,  3.50s/it][A
+Training:  13%|█▎        | 22/167 [01:25<08:19,  3.45s/it][A
+Training:  14%|█▍        | 23/167 [01:28<08:18,  3.46s/it][A
+Training:  14%|█▍        | 24/167 [01:32<08:20,  3.50s/it][A
+Training:  15%|█▍        | 25/167 [01:35<08:10,  3.46s/it][A
+Training:  16%|█▌        | 26/167 [01:39<08:11,  3.49s/it][A
+Training:  16%|█▌        | 27/167 [01:42<08:09,  3.50s/it][A
+Training:  17%|█▋        | 28/167 [01:46<08:05,  3.49s/it][A
+Training:  17%|█▋        | 29/167 [01:49<08:06,  3.52s/it][A
+Training:  18%|█▊        | 30/167 [01:53<07:57,  3.49s/it][A
+Training:  19%|█▊        | 31/167 [01:56<07:48,  3.45s/it][A
+Training:  19%|█▉        | 32/167 [01:59<07:44,  3.44s/it][A
+Training:  20%|█▉        | 33/167 [02:03<07:39,  3.43s/it][A
+Training:  20%|██        | 34/167 [02:06<07:35,  3.42s/it][A
+Training:  21%|██        | 35/167 [02:09<07:23,  3.36s/it][A
+Training:  22%|██▏       | 36/167 [02:13<07:14,  3.31s/it][A
+Training:  22%|██▏       | 37/167 [02:16<07:08,  3.30s/it][A
+Training:  23%|██▎       | 38/167 [02:19<07:17,  3.39s/it][A
+Training:  23%|██▎       | 39/167 [02:23<07:16,  3.41s/it][A
+Training:  24%|██▍       | 40/167 [02:26<07:06,  3.36s/it][A
+Training:  25%|██▍       | 41/167 [02:30<07:06,  3.39s/it][A
+Training:  25%|██▌       | 42/167 [02:33<07:10,  3.44s/it][A
+Training:  26%|██▌       | 43/167 [02:37<07:12,  3.49s/it][A
+Training:  26%|██▋       | 44/167 [02:41<07:21,  3.59s/it][A
+Training:  27%|██▋       | 45/167 [02:44<07:09,  3.52s/it][A
+Training:  28%|██▊       | 46/167 [02:47<07:08,  3.54s/it][A
+Training:  28%|██▊       | 47/167 [02:51<06:56,  3.47s/it][A
+Training:  29%|██▊       | 48/167 [02:54<06:55,  3.49s/it][A
+Training:  29%|██▉       | 49/167 [02:58<06:52,  3.50s/it][A
+Training:  30%|██▉       | 50/167 [03:01<06:47,  3.49s/it][A
+Training:  31%|███       | 51/167 [03:05<06:47,  3.51s/it][A
+Training:  31%|███       | 52/167 [03:08<06:34,  3.43s/it][A
+Training:  32%|███▏      | 53/167 [03:12<06:49,  3.59s/it][A
+Training:  32%|███▏      | 54/167 [03:16<06:40,  3.55s/it][A
+Training:  33%|███▎      | 55/167 [03:19<06:32,  3.51s/it][A
+Training:  34%|███▎      | 56/167 [03:22<06:23,  3.45s/it][A

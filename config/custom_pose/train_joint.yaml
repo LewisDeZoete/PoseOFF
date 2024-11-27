@@ -13,12 +13,10 @@ dataloader:
       weights: pretrained_models/yolo11x-pose.pt
     flow:
       weights: pretrained_models/raft_large.pt
-      imsize:
-        w: 320
-        h: 240
+      imsize: [240,320]
       minibatch_size: 16
     flowpose:
-      window_size: 9
+      window_size: 5
       threshold: 0.05
     
 
@@ -32,13 +30,11 @@ model_args:
   num_g3d_scales: 8
   graph: graph.yolo_pose.AdjMatrixGraph
   in_channels: 3
-  flow_window: 9
+  flow_window: 5 # Check transforms.flowpose.window_size
   kernel_size: 3
-  flow_channels: 4
+  flow_channels: 2
 ignore_weights: []
 phase: train
-save_location: ./results/ms-g3d_flow/
-weights: 
 # weights: ./pretrained_models/kinetics_joint.pt
 
 optim:
@@ -49,12 +45,11 @@ optim:
   nesterov: True
 
 # training
-num_epoch: 1
-# device: [0,1]
+num_epoch: 100
 device: 0
-# batch_size: 64
-batch_size: 128
-# forward_batch_size: 64
-forward_batch_size: 128
-# test_batch_size: 8
+batch_size: 64
+forward_batch_size: 64
 test_batch_size: 256
+
+checkpoint_freq: 10 # how often to save the model and training state
+save_location: ./results/ms-g3d_flow/ # where to save the checkpoints

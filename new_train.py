@@ -32,8 +32,9 @@ print("### Libraries loaded")
 # pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
 arg = ArgClass(arg=parsed)
 
-# Get the annotation file
+# Get the annotation file and define checkpoint file
 classes = arg.classes
+arg.checkpoint_file=f'{arg.save_location}{arg.run_name}.pt'
 
 print("### Arguments loaded")
 
@@ -48,13 +49,8 @@ print("### Model created")
 # Get the correct device (since arg.device is simply an int, we want a torch.device)
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
-# Create the transforms (for multistream, I just need the FlowPoseSampler)
-transforms = [augments.swap_numpy(device=device),
-              augments.mirror(),
-              augments.swap_numpy(device=device)]
-#               random_shift(),
-#               random_move(),
-#               swap_numpy(device=device)]
+# Create the data augmentations for training dataset
+transforms = [augments.mirror()]
 
 train_dataset = SingleStreamDataset(arg, stream='flowpose', transforms=transforms)
 test_dataset = SingleStreamDataset(arg, stream='flowpose')
@@ -92,9 +88,9 @@ score_funcs = {'accuracy': accuracy_score,
                'classification report': classification_report}
 
 results = train_simple_network(model=skel_model, loss_func=loss, train_loader=train_dataloader, test_loader=test_dataloader,
-                                score_funcs=score_funcs, device=arg.device, epochs=100, 
-                                scheduler=scheduler, optimiser=optimiser, 
-                                checkpoint_file=f'{arg.save_location}{arg.run_name}.pt')
+                               score_funcs=score_funcs, device=arg.device, epochs=arg.num_epoch, 
+                               scheduler=scheduler, optimiser=optimiser, 
+                               checkpoint_file=arg.checkpoint_file, checkpoint_freq=arg.checkpoint_freq)
 
 print('### Results')
 # TODO: Make the printout nicer, right now it prints out 100 confusion matrices...

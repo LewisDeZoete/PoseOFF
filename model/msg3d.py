@@ -256,23 +256,24 @@ if __name__ == "__main__":
     # For debugging purposes
     import sys
     sys.path.append('..')
+    from lib.utils.objects import ArgClass
 
-    flow_window = 9
-    kernel_size = 3
+    arg = ArgClass('config/custom_pose/train_joint.yaml')
+    model = Model(**arg.model_args)
 
-    model = Model(
-        num_class=60,
-        num_point=17,
-        num_person=2,
-        num_gcn_scales=13,
-        num_g3d_scales=6,
-        # graph='graph.ntu_rgb_d.AdjMatrixGraph',
-        graph='graph.yolo_pose.AdjMatrixGraph',
-        in_channels=3,
-        flow_window=flow_window,
-        kernel_size=kernel_size,
-        flow_channels=4
-    )
+    # model = Model(
+    #     num_class=60,
+    #     num_point=17,
+    #     num_person=2,
+    #     num_gcn_scales=13,
+    #     num_g3d_scales=6,
+    #     # graph='graph.ntu_rgb_d.AdjMatrixGraph',
+    #     graph='graph.yolo_pose.AdjMatrixGraph',
+    #     in_channels=3,
+    #     flow_window=flow_window,
+    #     kernel_size=kernel_size,
+    #     flow_channels=4
+    # )
     pytorch_total_params = sum(p.numel() for p in model.parameters())
     print(pytorch_total_params)
 

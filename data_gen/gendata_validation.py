@@ -1,12 +1,10 @@
 import sys
 import os
+import yaml
 
 # # add lib to path
 curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
-
-import yaml
-from lib.utils.objects import ArgClass
 
 # Get the annotations
 with open('../Datasets/UCF-101/ucf101_annotations.yaml', 'r') as yaml_file:

@@ -19,12 +19,13 @@ parser = argparse.ArgumentParser(prog="flow_gendata")
 parser.add_argument('-n', dest='number',
                     help='Class number for processing flow of a specific class')
 parsed = parser.parse_args()
-# Get the command line argument given for the class number (0-100)
-arg_no = int(parsed.number)
+arg_no = int(parsed.number) # Get class number command line arg
 
 # Get the arg object and create the classes
-arg = ArgClass(arg='./data_gen/UCF-101_config.yaml')
+arg = ArgClass(arg='./config/custom_pose/train_joint.yaml')
+arg.dataloader['preprocessed'] = False # Override this value, since this is gendata script!
 classes = arg.classes
+transform_args = arg.dataloader['transforms']['flow']
 
 # Get the number of videos in the class (used to get indices of dataset)
 def get_range(class_no):
@@ -42,18 +43,18 @@ def get_range(class_no):
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
 # Create the model, move it to device and turn to eval mode
-weights = torch.load(arg.flow['weights'], weights_only=True, map_location=device)
+weights = torch.load(transform_args['weights'], weights_only=True, map_location=device)
 model = raft_large(progress=False)
 model.load_state_dict(weights)
 model = model.eval()
 
-transforms = v2.Compose([
-    v2.Resize(size=(240,320)),
+transforms = [
+    v2.Resize(size=transform_args['imsize']),
     v2.ToImage(),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),  # map [0, 1] into [-1, 1]
-    GetFlow(model=model, device=device, minibatch_size=arg.flow['minibatch_size'])
-    ])
+    GetFlow(model=model, device=device, minibatch_size=transform_args['minibatch_size'])
+    ]
 
 # Create the dataset object
 dataset = SingleStreamDataset(arg=arg, stream='flow', transforms=transforms)

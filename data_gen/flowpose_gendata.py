@@ -17,12 +17,12 @@ parser = argparse.ArgumentParser(prog="flowpose_gendata")
 parser.add_argument('-n', dest='number',
                     help='Class number for processing flow of a specific class')
 parsed = parser.parse_args()
-# Get the command line argument given for the class number (0-100)
-arg_no = int(parsed.number)
+arg_no = int(parsed.number) # Get class number command line arg
 
 # Get the arg object and create the classes
-arg = ArgClass(arg='./data_gen/UCF-101_config.yaml')
+arg = ArgClass(arg='./config/custom_pose/train_joint.yaml')
 classes = arg.classes
+transform_args = arg.dataloader['transforms']['flowpose']
 
 # Get the number of videos in the class (used to get indices of dataset)
 def get_range(class_no):
@@ -40,7 +40,7 @@ def get_range(class_no):
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
 # Create the FlowPoseSampler transform object
-flowPoseTransform = FlowPoseSampler(device=device, **arg.flowpose)
+flowPoseTransform = FlowPoseSampler(device=device, **transform_args)
 
 # Create the dataset object
 dataset = MultiStreamDataset(arg=arg, transforms=flowPoseTransform)

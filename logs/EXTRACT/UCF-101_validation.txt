@@ -1,0 +1,14 @@
+Extract test complete.
+Incomplete classes:
+flow: []
+pose: []
+flowpose: []
+
++------------------ Job Report: 63015097 (COMPLETED) ------------------+
+| Memory (RAM)  [                    ]  0.1% (88 KB peak / 100 MB)     |
+| CPU           [##                  ] 14.3% average                   |
+| Time          [>                   ]  2.3% (0-00:00:07 / 0-00:05:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   No data available                                                  |
++----------------------------------------------------------------------+

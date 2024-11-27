@@ -68,7 +68,7 @@ def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_f
 
 def train_simple_network(model, loss_func, train_loader, test_loader=None, val_loader=None,
                         score_funcs=None, device="cpu", epochs:int=50,
-                        scheduler=None, optimiser=None, checkpoint_file:str=None):
+                        scheduler=None, optimiser=None, checkpoint_file:str=None, checkpoint_freq:int=10):
     """
     Train simple neural networks
     
@@ -108,7 +108,19 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
 
     #Place the model on the correct compute resource (CPU or GPU)
     model.to(device)
-    for epoch in tqdm(range(epochs), desc="Epoch"):
+    
+    # If we pass checkpoint_file, make sure it's initialised
+    if checkpoint_file is not None:
+        checkpoint = load_checkpoint(checkpoint_file, device)
+        start_epoch = checkpoint['epoch']
+        try: 
+            optimiser.load_state_dict(checkpoint['optimiser_state_dict'])
+            scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+        except KeyError:
+            pass # Only just created the checkpoint file
+        del checkpoint # might save us from OOM issues
+
+    for epoch in tqdm(range(start_epoch, epochs), desc="Epoch"):
         model = model.train()#Put our model in training mode
         
         # Run the training epoch
@@ -141,16 +153,10 @@ def train_simple_network(model, loss_func, train_loader, test_loader=None, val_l
             if results['train accuracy'][-1] > max_acc:
                 max_acc = results['train accuracy'][-1]
             print(f'\t\t{epoch} EPOCH BEST TEST ACC: {max(results["test accuracy"])}')
-            
-
-    # If we pass checkpoint_file, save the model and results after training
-    if checkpoint_file is not None:
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimiser_state_dict': optimiser.state_dict(),
-            'results' : results
-            }, checkpoint_file)
+        
+        if checkpoint_file is not None:
+            if epoch%checkpoint_freq == 0:
+                save_checkpoint(checkpoint_file, epoch, model, optimiser, scheduler, results, device)
 
     return results
 
@@ -175,3 +181,30 @@ def moveTo(obj, device):
         return to_ret
     else:
         return obj
+
+
+def load_checkpoint(checkpoint_file: str, device):
+    try:
+        checkpoint = torch.load(checkpoint_file, map_location=device)
+        print(f'\tResuming from checkpoint at epoch {checkpoint["epoch"]}')
+    except FileNotFoundError:
+        print(f'\tCreated new checkpoint file: {checkpoint_file}')
+        checkpoint = {'epoch': 0}
+        torch.save(checkpoint, checkpoint_file)
+    return checkpoint
+
+
+def save_checkpoint(checkpoint_file: str, epoch: int, model, optimiser, scheduler, results: dict, device):
+    '''
+    Save checkpoint, overriding previous checkpoint
+    '''
+    # Load an existing checkpoint
+    checkpoint = torch.load(checkpoint_file, map_location=device)
+    # Add results to the checkpoint dictionary
+    checkpoint['epoch'] = epoch
+    checkpoint['model_state_dict'] = model.state_dict()
+    checkpoint['optimiser_state_dict'] = optimiser.state_dict()
+    checkpoint['scheduler_state_dict'] = scheduler.state_dict()
+    checkpoint['results'] = results # simply set the results to the running results dict
+        
+    torch.save(checkpoint, checkpoint_file) # SAVE!
