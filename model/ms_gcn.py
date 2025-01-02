@@ -47,6 +47,8 @@ class MultiScale_GraphConv(nn.Module):
         A = self.A_powers.to(x.dtype)
         if self.use_mask:
             A = A + self.A_res.to(x.dtype)
+
+        # Here is the graph convolution
         support = torch.einsum('vu,nctu->nctv', A, x)
         support = support.view(N, C, T, self.num_scales, V)
         support = support.permute(0,3,1,2,4).contiguous().view(N, self.num_scales*C, T, V)
@@ -55,8 +57,9 @@ class MultiScale_GraphConv(nn.Module):
 
 
 if __name__ == "__main__":
-    from graph.mp_pose import AdjMatrixGraph
+    from graph.yolo_pose import AdjMatrixGraph
     graph = AdjMatrixGraph()
     A_binary = graph.A_binary
     msgcn = MultiScale_GraphConv(num_scales=15, in_channels=3, out_channels=64, A_binary=A_binary)
-    msgcn.forward(torch.randn(16,3,30,33))
+    x = torch.randn(2,53,300,17) # (N*M, C, T, V)
+    msgcn.forward(x)

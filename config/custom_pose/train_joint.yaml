@@ -30,7 +30,7 @@ model_args:
   num_g3d_scales: 8
   graph: graph.yolo_pose.AdjMatrixGraph
   in_channels: 3
-  flow_window: 5 # Check transforms.flowpose.window_size
+  flow_window: 5 # must equal dataloader.transforms['flowpose']['window_size']
   kernel_size: 3
   flow_channels: 2
 ignore_weights: []
@@ -38,14 +38,15 @@ phase: train
 # weights: ./pretrained_models/kinetics_joint.pt
 
 optim:
-  # weight_decay: 0.0005
-  weight_decay: 0.0003
   base_lr: 0.5
-  step: 10
   nesterov: True
+  weight_decay: 0.0005
+  # weight_decay: 0.0003
+  step: [45,55,65]
+  gamma: 0.1
 
 # training
-num_epoch: 100
+num_epoch: 80
 device: 0
 batch_size: 64
 forward_batch_size: 64

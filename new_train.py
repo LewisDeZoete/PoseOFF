@@ -50,13 +50,20 @@ print("### Model created")
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
 # Create the data augmentations for training dataset
-transforms = [augments.mirror()]
+transforms = [augments.mirror(),
+              augments.swap_numpy(),
+              augments.random_shift(),
+              augments.random_move(),
+              augments.swap_numpy(device=device)]
 
 train_dataset = SingleStreamDataset(arg, stream='flowpose', transforms=transforms)
 test_dataset = SingleStreamDataset(arg, stream='flowpose')
 
 # Create the dataset and dataloader
-train_idx, test_idx = torch.utils.data.random_split(range(len(train_dataset)),[0.8,0.2])
+generator = torch.Generator().manual_seed(42) # It shouldn't be random when you resume training
+train_idx, test_idx = torch.utils.data.random_split(range(len(train_dataset)),
+                                                    [0.8,0.2], 
+                                                    generator=generator)
 train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
 test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
 train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=True)
@@ -76,9 +83,10 @@ optimiser = optim.SGD(
                 nesterov=arg.optim['nesterov'],
                 weight_decay=arg.optim['weight_decay'])
 
-scheduler1 = optim.lr_scheduler.LinearLR(optimiser, start_factor=0.5, total_iters=arg.optim['step'])
-scheduler2 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=0.93)
-scheduler = optim.lr_scheduler.SequentialLR(optimiser, schedulers=[scheduler1, scheduler2], milestones=[10])
+# scheduler1 = optim.lr_scheduler.LinearLR(optimiser, start_factor=0.5, total_iters=arg.optim['step'])
+# scheduler2 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=0.93)
+# scheduler = optim.lr_scheduler.SequentialLR(optimiser, schedulers=[scheduler1, scheduler2], milestones=[10])
+scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
 
 loss = nn.CrossEntropyLoss()
 
@@ -88,12 +96,10 @@ score_funcs = {'accuracy': accuracy_score,
                'classification report': classification_report}
 
 results = train_simple_network(model=skel_model, loss_func=loss, train_loader=train_dataloader, test_loader=test_dataloader,
-                               score_funcs=score_funcs, device=arg.device, epochs=arg.num_epoch, 
+                               score_funcs=score_funcs, device=device, epochs=arg.num_epoch, 
                                scheduler=scheduler, optimiser=optimiser, 
                                checkpoint_file=arg.checkpoint_file, checkpoint_freq=arg.checkpoint_freq)
 
-print('### Results')
-# TODO: Make the printout nicer, right now it prints out 100 confusion matrices...
 # print(f'\tTraining time: {results['training time'][-1]/60:0.2f)} minutes')
 # print(f'\tBest train accuracy: {results['train accyracy'].max()}')
 # print(f'\tBest test accuracy: {results['test accyracy'].max()}')

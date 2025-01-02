@@ -11,10 +11,10 @@ class ModelLoader:
         self.arg = arg
         # If cuda isn't available device is cpu, print device name debug
         if not torch.cuda.is_available():
-            output_device='cpu'
+            output_device=torch.device('cpu')
         else: 
-            output_device = self.arg.device[0] if type(
-                self.arg.device) is list else self.arg.device
+            output_device = torch.device(self.arg.device[0]) if type(
+                self.arg.device) is list else torch.device(self.arg.device)
         
         self.output_device = output_device
         print(f'\tOutput device: {self.output_device}')

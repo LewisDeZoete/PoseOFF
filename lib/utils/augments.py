@@ -69,12 +69,32 @@ class random_choose(object):
 
 class random_move(object):
     '''
-    TODO: Comprehensive docstring
-    Randomly move skeleton keypoints a small amount.
+    This class applies random transformations to skeleton keypoints, including
+    rotation, scaling, and translation. The transformations are applied over
+    a specified number of time steps.
     NOTE: changed default value of `transform_candidate` 
-        Previously, this was [-0.2, -0.1, 0.0, 0.1, 0.2], but given I'm passing
-        (x,y) keypoint values that are normalised between -0.5 and 0.5, 
-        this might be too wide of a range.
+    Previously, this was [-0.2, -0.1, 0.0, 0.1, 0.2], but given I'm passing
+    (x,y) keypoint values that are normalised between -0.5 and 0.5, 
+    this might be too wide of a range.
+
+    Attributes:
+        angle_candidate (list of float): List of possible rotation angles in degrees.
+        scale_candidate (list of float): List of possible scaling factors.
+        transform_candidate (list of float): List of possible translation values.
+        move_time_candidate (list of int): List of possible numbers of time steps over which to apply the transformations.
+
+    Methods:
+        __call__(data_numpy):
+            Apply the random transformations to the input data.
+
+    Args:
+        angle_candidate (list of float, optional): List of possible rotation angles in degrees. Default is [-10., -5., 0., 5., 10.].
+        scale_candidate (list of float, optional): List of possible scaling factors. Default is [0.9, 1.0, 1.1].
+        transform_candidate (list of float, optional): List of possible translation values. Default is [-0.1, -0.05, 0.0, 0.05, 0.1].
+        move_time_candidate (list of int, optional): List of possible numbers of time steps over which to apply the transformations. Default is [1].
+
+    Returns:
+        numpy.ndarray: Transformed data with the same shape as the input.
     '''
     def __init__(self,
                 angle_candidate=[-10., -5., 0., 5., 10.],
@@ -250,10 +270,10 @@ if __name__ == "__main__":
     import torch
     flow_window = 5
     start = time.time()
-    transforms = [swap_numpy(device='cpu'),
+    transforms = [mirror(),
+                  swap_numpy(device='cpu'),
                   flow_mag_norm(5),
                   random_shift(),
-                  mirror(),
                   random_choose(300),
                   random_move(),
                   swap_numpy(device='cpu')]

@@ -1,0 +1,68 @@
+Epochs: 65\nlr steps: [45, 55]\ngamma at lr steps: 0.1 (second run)
+### Libraries loaded
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 759081
+	Loading weights from ./results/ms-g3d_flow/flowpose_cnn_E65_S45-55_G0.1.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+### Model created
+	Tracking:
+		epoch
+		training time
+		train loss
+		lr
+		test loss
+		train accuracy
+		test accuracy
+		train confusion matrix
+		test confusion matrix
+		train classification report
+		test classification report
+	Resuming from checkpoint at epoch 40
+		40 EPOCH BEST TEST ACC: 0.4560810810810811
+		41 EPOCH BEST TEST ACC: 0.47147147147147145
+		42 EPOCH BEST TEST ACC: 0.47147147147147145
+		43 EPOCH BEST TEST ACC: 0.47147147147147145
+		44 EPOCH BEST TEST ACC: 0.7323573573573574
+		45 EPOCH BEST TEST ACC: 0.7578828828828829
+		46 EPOCH BEST TEST ACC: 0.7578828828828829
+		47 EPOCH BEST TEST ACC: 0.7578828828828829
+		48 EPOCH BEST TEST ACC: 0.7612612612612613
+		49 EPOCH BEST TEST ACC: 0.7777777777777778
+		50 EPOCH BEST TEST ACC: 0.7777777777777778
+		51 EPOCH BEST TEST ACC: 0.7777777777777778
+		52 EPOCH BEST TEST ACC: 0.7777777777777778
+		53 EPOCH BEST TEST ACC: 0.7777777777777778
+		54 EPOCH BEST TEST ACC: 0.8168168168168168
+		55 EPOCH BEST TEST ACC: 0.8168168168168168
+		56 EPOCH BEST TEST ACC: 0.8171921921921922
+		57 EPOCH BEST TEST ACC: 0.8171921921921922
+		58 EPOCH BEST TEST ACC: 0.8216966966966966
+		59 EPOCH BEST TEST ACC: 0.8216966966966966
+		60 EPOCH BEST TEST ACC: 0.8216966966966966
+		61 EPOCH BEST TEST ACC: 0.8216966966966966
+		62 EPOCH BEST TEST ACC: 0.8235735735735735
+		63 EPOCH BEST TEST ACC: 0.825075075075075
+		64 EPOCH BEST TEST ACC: 0.825075075075075
+### Results
+
++------------------ Job Report: 63566623 (COMPLETED) ------------------+
+| Memory (RAM)  [###########         ] 56.5% (1.1 GB peak / 2 GB)      |
+| CPU           [##########          ] 51.8% average                   |
+| GPU           [####                ] 24.4% average                   |
+| Time          [---------->         ] 50.0% (0-03:00:04 / 0-06:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   716 KB        0 B            5                             |
+|   /fred   670.6 GB      28.8 MB        751 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      19.5 MB       0 B            833                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

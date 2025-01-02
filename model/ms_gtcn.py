@@ -73,7 +73,7 @@ class SpatialTemporal_MS_GCN(nn.Module):
 
         self.mlp = MLP(in_channels * num_scales, [out_channels], dropout=dropout, activation='linear')
 
-        # Residual connection
+        # Residual connection (allows the network to skip layers and pass information directly)
         if not residual:
             self.residual = lambda x: 0
         elif (in_channels == out_channels):
