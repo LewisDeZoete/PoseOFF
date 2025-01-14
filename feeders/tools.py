@@ -12,13 +12,12 @@ def downsample(data_numpy, step, random_sample=True):
 def temporal_slice(data_numpy, step):
     # input: C,T,V,M
     C, T, V, M = data_numpy.shape
-    return data_numpy.reshape(C, T / step, step, V, M).transpose(
-        (0, 1, 3, 2, 4)).reshape(C, T / step, V, step * M)
+    return data_numpy.reshape(C, int(T / step), step, V, M).transpose(
+        (0, 1, 3, 2, 4)).reshape(C, int(T / step), V, step * M)
 
 
 def mean_subtractor(data_numpy, mean):
     # input: C,T,V,M
-    # naive version
     if mean == 0:
         return
     C, T, V, M = data_numpy.shape
@@ -102,6 +101,10 @@ def random_move(data_numpy,
 
 
 def random_shift(data_numpy):
+    '''
+    Introduces a random temporal shift, and pads any empty frames after the shift
+    with zeros.
+    '''
     C, T, V, M = data_numpy.shape
     data_shift = np.zeros(data_numpy.shape)
     valid_frame = (data_numpy != 0).sum(axis=3).sum(axis=2).sum(axis=0) > 0
@@ -159,12 +162,26 @@ def openpose_match(data_numpy):
     return data_numpy
 
 
+def mirror(data_numpy, probability: float = 0.2):
+    # Apply transformation based on probability
+    if random.random() <= probability:
+        C, T, V, M = data_numpy.shape
+        W = int((C / 2) ** 0.5)
+
+        # Flip x positions (assuming the first channel corresponds to x positions)
+        data_numpy[0] *= -1
+
+        # Flip the x-direction of flow vectors
+        flow = data_numpy[3:].reshape(2, W, W, T, V, M)  # Reshape to (2, W, W, T, V, M)
+        flow[0] *= -1  # Flip x-direction flow
+        data_numpy[3:] = flow.reshape(-1, T, V, M)  # Reshape back to original dimensions
+
+    return data_numpy 
+    
+
 if __name__ == "__main__":
-    import time
-    import torch
-    start = time.time()
-    for i in range(1000):
-        data = torch.rand((3,150,17,2))
-        data = np.array(data)
-        data = random_move(data)
-    print(time.time()-start)
+    data = np.load('data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy')
+    print(data.shape)
+    data = data[:, :50, ...]
+    data = auto_pading(data, 64)
+    print(data.shape)

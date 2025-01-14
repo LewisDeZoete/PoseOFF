@@ -18,7 +18,7 @@ source ../environment/bin/activate
 # Main job for each array task
 # srun python ./data_gen/skeleton_gendata.py -n $SLURM_ARRAY_TASK_ID
 # srun python ./data_gen/flow_gendata.py -n $SLURM_ARRAY_TASK_ID
-srun python ./data_gen/flowpose_gendata.py -n $SLURM_ARRAY_TASK_ID
+srun python ./data_gen/flowpose_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
 
 
 # Run validation script once all other tasks are finished

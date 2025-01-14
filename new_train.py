@@ -60,7 +60,7 @@ train_dataset = SingleStreamDataset(arg, stream='flowpose', transforms=transform
 test_dataset = SingleStreamDataset(arg, stream='flowpose')
 
 # Create the dataset and dataloader
-generator = torch.Generator().manual_seed(42) # It shouldn't be random when you resume training
+generator = torch.Generator().manual_seed(50) # It shouldn't be random when you resume training
 train_idx, test_idx = torch.utils.data.random_split(range(len(train_dataset)),
                                                     [0.8,0.2], 
                                                     generator=generator)
@@ -83,10 +83,11 @@ optimiser = optim.SGD(
                 nesterov=arg.optim['nesterov'],
                 weight_decay=arg.optim['weight_decay'])
 
-# scheduler1 = optim.lr_scheduler.LinearLR(optimiser, start_factor=0.5, total_iters=arg.optim['step'])
-# scheduler2 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=0.93)
-# scheduler = optim.lr_scheduler.SequentialLR(optimiser, schedulers=[scheduler1, scheduler2], milestones=[10])
-scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
+scheduler1 = optim.lr_scheduler.LinearLR(optimiser, start_factor=0.5, total_iters=arg.optim['step'][0])
+scheduler2 = optim.lr_scheduler.ConstantLR(optimiser, factor=1, total_iters=arg.optim['step'][1])
+scheduler3 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=arg.optim['gamma'])
+scheduler = optim.lr_scheduler.SequentialLR(optimiser, schedulers=[scheduler1, scheduler2, scheduler3], milestones=arg.optim['step'])
+# scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
 
 loss = nn.CrossEntropyLoss()
 
@@ -99,6 +100,8 @@ results = train_simple_network(model=skel_model, loss_func=loss, train_loader=tr
                                score_funcs=score_funcs, device=device, epochs=arg.num_epoch, 
                                scheduler=scheduler, optimiser=optimiser, 
                                checkpoint_file=arg.checkpoint_file, checkpoint_freq=arg.checkpoint_freq)
+
+
 
 # print(f'\tTraining time: {results['training time'][-1]/60:0.2f)} minutes')
 # print(f'\tBest train accuracy: {results['train accyracy'].max()}')

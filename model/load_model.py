@@ -27,7 +27,7 @@ class ModelLoader:
             weights = checkpoint['model_state_dict'] # we just want state dict!
             return weights
         except FileNotFoundError as error:
-            print(f"\tCheckpoint file does not yet exist")
+            print("\tCheckpoint file does not yet exist")
             print(f'\t({error})')
             return None
         except KeyError:

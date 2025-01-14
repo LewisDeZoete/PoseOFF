@@ -38,7 +38,6 @@ def k_adjacency(A, k, with_self=False, self_factor=1):
         Ak += (self_factor * I)
     return Ak
 
-
 def normalize_adjacency_matrix(A):
     node_degrees = A.sum(-1)
     degs_inv_sqrt = np.power(node_degrees, -0.5)
@@ -51,3 +50,15 @@ def get_adjacency_matrix(edges, num_nodes):
     for edge in edges:
         A[edge] = 1.
     return A
+
+# TODO: DEBUG REMOVE
+if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, '')
+    from graph.yolo_pose import AdjMatrixGraph
+    graph = AdjMatrixGraph()
+    A_binary = graph.A_binary
+    num_scales = 8
+    A_powers = [k_adjacency(A_binary, k, with_self=True) for k in range(num_scales)]
+    A_powers = np.concatenate([normalize_adjacency_matrix(g) for g in A_powers])
+    print(A_powers.shape)

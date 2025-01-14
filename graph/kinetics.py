@@ -1,8 +1,8 @@
 import sys
+import numpy as np
+
 sys.path.insert(0, '')
 sys.path.extend(['../'])
-
-import numpy as np
 
 from graph import tools
 

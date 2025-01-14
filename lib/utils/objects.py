@@ -2,6 +2,7 @@ import yaml
 import argparse
 import torch
 
+# TODO: Move to config
 class ArgClass(object):
     def __init__(self, arg):
         '''

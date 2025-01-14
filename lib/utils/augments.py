@@ -3,6 +3,7 @@ import random
 import torch
 import numpy as np
 
+# TODO: Move this under feeders/tools or data_gen/postprocess
 
 def downsample(data_numpy, step, random_sample=True):
     # input: C,T,V,M
@@ -20,9 +21,8 @@ def temporal_slice(data_numpy, step):
 def mean_subtractor(data_numpy, mean):
     '''
     Subtract mean from all non-zero values of skeleton graph.
-'''
+    '''
     # input: C,T,V,M
-    # naive version
     if mean == 0:
         return
     C, T, V, M = data_numpy.shape
@@ -171,7 +171,7 @@ class random_shift(object):
 class flow_mag_norm(object):
     '''
     Normalise optical flow vectors to unit vectors by dividing by their magnitude.
-    TODO: double check that the input data is flow_pose!
+    TODO: Delete! Moved to gendata/postprocess.py
     '''
     def __init__(self, flow_window=5):
         self.flow_window = flow_window
@@ -191,7 +191,7 @@ class flow_mag_norm(object):
 class loop_graph(object):
     '''
     Pad empty frames with previous skeleton.
-    NOTE: TORCH VERSION
+    TODO: Delete! Moved to gendata/postprocess.py
     '''
     def __init__(self, zaxis=[0, 1], xaxis=[8, 4]):
         self.zaxis=zaxis
@@ -268,21 +268,23 @@ class swap_numpy(object):
 if __name__ == "__main__":
     import time
     import torch
-    flow_window = 5
-    start = time.time()
-    transforms = [mirror(),
-                  swap_numpy(device='cpu'),
-                  flow_mag_norm(5),
-                  random_shift(),
-                  random_choose(300),
-                  random_move(),
-                  swap_numpy(device='cpu')]
-    # transforms = [pose_match()]
-    
-    for i in range(1000):
-        data = torch.rand((3+2*flow_window**2,150,17,2))
-        for transform in transforms:
-            data = transform(data)
+    # flow_window = 5
+    # start = time.time()
+    # transforms = [mirror(),
+    #               swap_numpy(device='cpu'),
+    #               flow_mag_norm(5),
+    #               random_shift(),
+    #               random_choose(300),
+    #               random_move(),
+    #               swap_numpy(device='cpu')]
 
+    data = torch.load('data/UCF-101/flowpose/Archery/v_Archery_g01_c01.pt')
     print(data.shape)
-    print(time.time()-start)
+    print(data[:, 130, 0, 0])
+
+    # for i in range(1000):
+    #     data = torch.rand((3+2*flow_window**2,150,17,2))
+    #     for transform in transforms:
+    #         data = transform(data)
+
+    # print(time.time()-start)

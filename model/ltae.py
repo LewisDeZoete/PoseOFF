@@ -214,58 +214,7 @@ def get_sinusoid_encoding_table_var(positions, d_hid, clip=4, offset=3, T=1000):
         return torch.FloatTensor(sinusoid_table)
 
 
-class Flow_conv(nn.Module):
-    def __init__(self, kernel_size, flow_window=5, original_channels=3, out_channels=16):
-        '''
-        NOTE: We're assuming here we're completely reducing the additional
-        channels into a single channel
-        '''
-        super(Flow_conv, self).__init__()
-
-        # 3D conv for learning the flow windows
-        # in_channels = 2 since flow is x and y motion channels
-        # out_channels is the output shape of the convolutions
-        self.kernel_size = kernel_size
-        self.flow_conv1 = nn.Conv3d(in_channels=2,
-                                    out_channels=8,
-                                    kernel_size=self.kernel_size)
-        self.flow_conv2 = nn.Conv3d(in_channels=8,
-                                    out_channels=16,
-                                    kernel_size=self.kernel_size)
-        self.pool = nn.AdaptiveAvgPool2d((1,1))
-        self.original_channels = original_channels
-        self.out_channels = out_channels
-        self.flow_window = flow_window
-        
-    
-    def forward(self, x):
-        #(N, T, M, V, C)
-        N, T, M, V, C = x.size()
-        print(x.shape)
-        flow_data = x.permute(0, 2, 3, 1, 4).contiguous() # N, M, V, T, C
-        # x of shape (batch, 300, 2, 17, channels+2k**2)
-        flow_data = flow_data[:,:,:,:, self.original_channels:] # (N, M, V, T, 2K**2)
-        flow_data = flow_data.view(N*M*V, T, self.flow_window, self.flow_window, 2).permute(0, 4, 1, 2, 3)
-        # flow_data of shape (N*M*V, C(2), T, flow_window(5), flow_window(5))
-
-        # Apply convolutions and flatten 
-        flow_features = torch.relu(self.flow_conv1(flow_data))
-        flow_features = torch.relu(self.flow_conv2(flow_features))
-        flow_features = self.pool(flow_features)
-        
-        flow_features = flow_features.view(N,-1,M,V,self.out_channels)
-        print(flow_features.shape)
-        
-        
-        x = torch.cat((x[...,:self.original_channels], flow_features), dim=4)
-
-        return flow_features
-
-
-
-
 if __name__ == '__main__':
-    import time
     window_size = 5
     len_seq_max = 300
     out_features = 16
@@ -287,8 +236,4 @@ if __name__ == '__main__':
     # out, attn = ltae(input)
     # out = out.view(N,V,M,out_features)
 
-
-    flow_conv = Flow_conv(3, 5)
     input = torch.randn((N,T,M,V,C+3))
-    output = flow_conv(input)
-    print(output.shape)

@@ -4,6 +4,7 @@ import lib.utils as utils
 import sys
 from types import ModuleType, FunctionType
 from gc import get_referents
+import torch
 
 def get_im(data, batch_no, frame_no):
 

@@ -11,13 +11,17 @@ from lib.utils.transforms import FlowPoseSampler
 import torch
 import time
 import argparse
+import numpy as np
 
 parser = argparse.ArgumentParser(prog="flowpose_gendata")
 
 parser.add_argument('-n', dest='number',
                     help='Class number for processing flow of a specific class')
+parser.add_argument('--numpy', action='store_true',
+                    help='Option to save data as numpy arrays')
 parsed = parser.parse_args()
 arg_no = int(parsed.number) # Get class number command line arg
+save_as_numpy = parsed.numpy
 
 # Get the arg object and create the classes
 arg = ArgClass(arg='./config/custom_pose/train_joint.yaml')
@@ -51,8 +55,11 @@ start = time.time()
 if 'unfinished' in arg.__dict__:
     for idx in get_range(classes[arg.unfinished[arg_no]]):
         flowpose, label = dataset[idx]
-        path = f'{arg.dataloader["flowpose_path"]}{list(arg.labels.keys())[idx]}' + '.pt'
-        torch.save(flowpose, path)
+        path = f'{arg.dataloader["flowpose_path"]}{list(arg.labels.keys())[idx]}' + ('.npy' if save_as_numpy else '.pt')
+        if save_as_numpy:
+            np.save(path, flowpose.numpy())
+        else:
+            torch.save(flowpose, path)
 
     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
 else:
@@ -65,7 +72,10 @@ else:
             os.mkdir(folder)
         except FileExistsError:
             pass
-        path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1] + '.pt')
-        torch.save(flowpose, path)
+        path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1] + ('.npy' if save_as_numpy else '.pt'))
+        if save_as_numpy:
+            np.save(path, flowpose.numpy())
+        else:
+            torch.save(flowpose, path)
 
     print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')

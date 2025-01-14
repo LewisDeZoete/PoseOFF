@@ -104,9 +104,10 @@ class MultiScale_TemporalConv(nn.Module):
 
 
 if __name__ == "__main__":
-    mstcn = MultiScale_TemporalConv(288, 288)
-    x = torch.randn(32, 288, 100, 20)
-    mstcn.forward(x)
-    for name, param in mstcn.named_parameters():
-        print(f'{name}: {param.numel()}')
-    print(sum(p.numel() for p in mstcn.parameters() if p.requires_grad))
+    mstcn = MultiScale_TemporalConv(96, 96)
+    # (N*M, C, T, V) -> MS_GCN -> (N*M, MS_GCN_out_channels, T, V)
+    N, M, C, T, V = 1, 2, 4, 300, 17
+    MS_GCN_out_channels = 96
+    x = torch.randn(N*M, MS_GCN_out_channels, T, V)
+    out = mstcn.forward(x) # (N*M, MS_GCN_out_channels, T, V)
+    print(out.shape)

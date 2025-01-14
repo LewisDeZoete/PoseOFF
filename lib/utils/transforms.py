@@ -254,7 +254,6 @@ class FlowPoseSampler:
         self.window_size = window_size  # Window size about pose keypoint
         self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
-        self.loop_graph = loop_graph
         self.to_cpu = to_cpu
         if loop_graph:
             self.loop_graph = augments.loop_graph()

@@ -67,8 +67,8 @@ def run_epoch(model, optimiser, data_loader, loss_func, device, results, score_f
 
 
 def train_simple_network(model, loss_func, train_loader, test_loader=None, val_loader=None,
-                        score_funcs=None, device="cpu", epochs:int=50,
-                        scheduler=None, optimiser=None, checkpoint_file:str=None, checkpoint_freq:int=10):
+                         score_funcs=None, device="cpu", epochs:int=50,
+                         scheduler=None, optimiser=None, checkpoint_file:str=None, checkpoint_freq:int=10):
     """
     Train simple neural networks
     

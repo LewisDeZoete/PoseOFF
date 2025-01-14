@@ -60,6 +60,19 @@ if __name__ == "__main__":
     from graph.yolo_pose import AdjMatrixGraph
     graph = AdjMatrixGraph()
     A_binary = graph.A_binary
-    msgcn = MultiScale_GraphConv(num_scales=15, in_channels=3, out_channels=64, A_binary=A_binary)
-    x = torch.randn(2,53,300,17) # (N*M, C, T, V)
-    msgcn.forward(x)
+    
+    out_channels = 96
+    msgcn = MultiScale_GraphConv(num_scales=8, 
+                                 in_channels=4, 
+                                 out_channels=out_channels, 
+                                 A_binary=A_binary)
+    N, M, C, T, V = 1, 2, 4, 300, 17
+    x = torch.randn(N*M, C, T, V) # (N*M, C, T, V)
+    out = msgcn.forward(x) # (N*M, out_channels, T, V)
+
+    # Passing the data through the tcn (and g3d layers) doesn't change the shape
+    out_channels = out.size(1) # out_channels
+    out = out.view(N, M, out_channels, -1) # (N, M, out_channels, T*V)
+    out = out.mean(3)   # Global Average Pooling (Spatial+Temporal)
+    out = out.mean(1)   # Average pool number of bodies in the sequence
+    print(out.shape)

@@ -113,3 +113,6 @@ venv.bak/
 
 # Pytorch checkpoint files
 *.pt
+
+# Numpy files
+*.npy
