@@ -2,11 +2,28 @@ import sys
 sys.path.extend(['../'])
 
 from tqdm import tqdm
+import torch
+import numpy as np
+from data_gen.rotation import angle_between, rotation_matrix
 
-from data_gen.rotation import *
 
 
 def pre_normalization(data, zaxis=[0, 1], xaxis=[8, 4]):
+    """
+    Perform pre-normalization on skeleton data.
+    Parameters:
+    data (numpy.ndarray): The input skeleton data with shape (N, C, T, V, M), where
+                          N is the number of samples,
+                          C is the number of channels,
+                          T is the number of frames,
+                          V is the number of joints,
+                          M is the number of people.
+    zaxis (list): Indices of the joints to define the z-axis for rotation. Default is [0, 1].
+    xaxis (list): Indices of the joints to define the x-axis for rotation. Default is [8, 4].
+    Returns:
+    numpy.ndarray: The normalized skeleton data with the same shape as the input.
+    """
+    
     N, C, T, V, M = data.shape
     s = np.transpose(data, [0, 4, 2, 3, 1])  # N, C, T, V, M  to  N, M, T, V, C
 
@@ -80,6 +97,24 @@ def pre_normalization(data, zaxis=[0, 1], xaxis=[8, 4]):
 
     data = np.transpose(s, [0, 4, 2, 3, 1])
     return data
+
+
+def stack_frames(frames: torch.Tensor):
+    """
+    Stack adjacent pairs of frames.
+
+    Args:
+        frames (torch.Tensor): Preprocessed input frames to be stacked prior to calculating flow, shape (N,C,H,W).
+
+    Returns:
+        frame_pairs (torch.Tensor): Stacked frames, where frame N is at index (:,0,...) and frame N+1 is at index (:,1,...).
+        Shape: (N,2,C,H,W)
+    """
+    frame_pairs = torch.zeros(tuple([frames.shape[0] - 1, 2]) + tuple(frames.shape[1:]))
+    for i in range(len(frames) - 1):
+        frame_pairs[i, 0] = frames[i]
+        frame_pairs[i, 1] = frames[i + 1]
+    return frame_pairs
 
 
 if __name__ == '__main__':

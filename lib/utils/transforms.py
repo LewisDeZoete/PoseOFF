@@ -42,6 +42,7 @@ def LoadVideo(video_path, max_frames) -> torch.tensor:
 
 class GetPoses_YOLO:
     """
+    # TODO: DELETE -> moved to data_gen/extractors.py
     Creates a numpy array of shape:
         (channels, max_frames, num_joints, max_number_people)
         (3,        300,        17,         2)
@@ -127,7 +128,9 @@ class GetPoses_YOLO:
 
 
 class GetFlow:
-    """Calculates flow for each image pair in a video using RAFT.
+    """
+    TODO: DELETE -> moved to data_gen/extractors.py
+    Calculates flow for each image pair in a video using RAFT.
 
     Returns a tensor with (N, 2, H, W) where each entry corresponds to the
     horizontal and vertical displacement of each pixel from the first image
@@ -191,9 +194,11 @@ class GetFlow:
 
 class pose_match(object):
     '''
+    TODO: DELETE -> moved to data_gen/postprocess.py
     Pytorch version of the pose_match augmentation.
     Matches skeletons across video using square of distance between frames.
-    Only takes pose as the input data.'''
+    Only takes pose as the input data.
+    '''
     def __call__(self, data):
         C, T, V, M = data.shape
         assert (C == 3)
@@ -238,7 +243,9 @@ class pose_match(object):
 
 
 class FlowPoseSampler:
-    """Sample optical flow using input poses.
+    """
+    TODO: DELETE -> moved to data_gen/extract.py
+    Sample optical flow using input poses.
     NOTE: Assumes pre-processed optical flow and poses (for now).
     NOTE: Utilises the MultiStreamDataset, it passes in the loaded arrays.
     """

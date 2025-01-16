@@ -25,15 +25,16 @@ parser.add_argument('-r', dest='run_name', default='',
                     help='name to save the results dictionary as after training')
 parser.add_argument('-d', dest='description', default='',
                     help='Description of what is being tested in run') # TODO: DEBUG REMOVE
+parser.add_argument('-v', dest='verbose', action='store_true', 
+                    help='Print verbose output for argparse')
 parsed = parser.parse_args()
 
-print(parsed.description) # TODO: DEBUG REMOVE
+print(parsed.description)
 print("### Libraries loaded")
-# pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
-arg = ArgClass(arg=parsed)
+# Pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
+arg = ArgClass(arg=parsed, verbose=parsed.verbose)
 
-# Get the annotation file and define checkpoint file
-classes = arg.classes
+# Define checkpoint file
 arg.checkpoint_file=f'{arg.save_location}{arg.run_name}.pt'
 
 print("### Arguments loaded")

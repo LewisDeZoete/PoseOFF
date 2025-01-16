@@ -14,7 +14,7 @@ from lib.utils.transforms import LoadVideo
 class CustomDataset(Dataset):
     """
     CustomDataset base class for unprocessed data loading.
-    TODO: Implement a more robust way to apply transforms.
+    TODO: Implement a more robust way to apply transforms. SEE FEEDER_YOLO.PY
     """
 
     def __init__(self, arg):

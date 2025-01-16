@@ -15,13 +15,12 @@ from feeders import tools
 
 
 class Feeder(Dataset):
-    def __init__(self, data_path, labels, ext='.pt', p_interval=1, split='train', random_choose=False, random_shift=False,
+    def __init__(self, data_path, labels, p_interval=[1], split='train', random_choose=False, random_shift=False,
                  random_move=False, random_rot=False, window_size=64, debug=False, use_mmap=False,
                  vel=False, sort=False, A=None):
         """
         :param data_path:
         :param labels: `dict` containing the labels of the dataset
-        :param ext: extension of the files
         :param split: training set or test set
         :param random_choose: If true, randomly choose a portion of the input sequence
         :param random_shift: If true, randomly pad zeros at the begining or end of sequence
@@ -38,7 +37,6 @@ class Feeder(Dataset):
         self.debug = debug
         self.data_path = data_path
         self.labels = labels
-        self.ext = ext
         self.split = split
         self.random_choose = random_choose
         self.random_shift = random_shift
@@ -103,29 +101,30 @@ class Feeder(Dataset):
         return self
 
     def __getitem__(self, index):
+        # NOTE: here we assume that we're working with preprocessed (flowpose) data
         item_key = list(self.labels.keys())[index]
-        item_path = f"{self.data_path}{item_key}{self.ext}"
+        item_path = f"{self.data_path}{item_key}.npy" 
         label = self.labels[item_key]
 
-        data_numpy = torch.load(item_path, map_location=self.device)
-        # valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
-        # valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
+        data_numpy = np.load(item_path)
+        valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
+        valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
         # # reshape Tx(MVC) to CTVM
-        # data_numpy = tools.valid_crop_resize(data_numpy, valid_frame_num, self.p_interval, self.window_size)
-        # mask = (abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0)
-        # # TODO: Implement transforms AFTER moving augments in lib to feeders/tools.py
+        data_numpy = tools.valid_crop_resize(data_numpy, valid_frame_num, self.p_interval, self.window_size)
+        mask = (abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0)
+        # Apply optional transforms
         # if self.normalization:
         #     data_numpy = (data_numpy - self.mean_map) / self.std_map
-        # if self.random_shift:
-        #     data_numpy = tools.random_shift(data_numpy)
-        # if self.random_choose:
-        #     data_numpy = tools.random_choose(data_numpy, self.window_size)
-        # elif self.window_size > 0:
-        #     data_numpy = tools.auto_pading(data_numpy, self.window_size)
-        # if self.random_move:
-            # data_numpy = tools.random_move(data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1])
+        if self.random_shift:
+            data_numpy = tools.random_shift(data_numpy)
+        if self.random_choose:
+            data_numpy = tools.random_choose(data_numpy, self.window_size)
+        elif self.window_size > 0:
+            data_numpy = tools.auto_pading(data_numpy, self.window_size)
+        if self.random_move:
+            data_numpy = tools.random_move(data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1])
 
-        # return data_numpy, label, mask, index
+        return data_numpy, label, mask, index
 
     def top_k(self, score, top_k):
         rank = score.argsort()
@@ -142,13 +141,31 @@ def import_class(name):
 
 
 if __name__=='__main__':
-    from lib.utils.objects import ArgClass     
-    arg = ArgClass('./config/custom_pose/train_joint.yaml')
+    from lib.utils.objects import ArgClass
+    import time
 
-    # Get the annotation file and define checkpoint file
-    classes = arg.classes
+    arg = ArgClass('./config/custom_pose/train_joint.yaml', verbose=True)
     
-    feeder = Feeder(data_path=arg.dataloader['data_path'], 
-                    labels=arg.labels, 
-                    split='train')
-    print(feeder[0])
+    feeder = Feeder(data_path = arg.dataloader['flowpose_path'],
+                    labels = arg.labels,
+                    p_interval = [0.5, 1], # These are the values used for train, [0.95] for test
+                    split = 'train',
+                    random_choose = True,
+                    random_shift = True,
+                    random_move = True,
+                    random_rot = True,
+                    window_size = 64,
+                    debug = False,
+                    use_mmap = False,
+                    vel = False,)
+    
+    start = time.time()
+    n_samps = 200
+    for i in range(n_samps):
+        data_numpy, label, mask, index = feeder[i]
+
+    print(f'\nTotal samples: {len(feeder)}')
+    print(f'Time taken for {n_samps} sample loads: {time.time() - start:.2f} seconds')
+    print(f'Label for index {index}: {label}')
+    print(f'Data shape: {data_numpy.shape}')
+    print(f'Mask shape: {mask.shape}')

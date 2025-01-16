@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 from lib.data.dataset import MultiStreamDataset
 from lib.utils.objects import ArgClass
-from lib.utils.transforms import FlowPoseSampler
+from extractors import FlowPoseSampler
 import torch
 import time
 import argparse
@@ -60,8 +60,8 @@ if 'unfinished' in arg.__dict__:
             np.save(path, flowpose.numpy())
         else:
             torch.save(flowpose, path)
-
     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
+
 else:
     for idx in get_range(arg_no):
         flowpose, label = dataset[idx] # We're using FlowPoseSampler transform so this returns the flowpose!
@@ -77,5 +77,4 @@ else:
             np.save(path, flowpose.numpy())
         else:
             torch.save(flowpose, path)
-
     print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')

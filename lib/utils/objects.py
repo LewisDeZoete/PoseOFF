@@ -4,12 +4,13 @@ import torch
 
 # TODO: Move to config
 class ArgClass(object):
-    def __init__(self, arg):
+    def __init__(self, arg, verbose=False):
         '''
         Takes argument of an argparse object or a string that gives the path to a config doctionary. Converts the first layer of dicionary keys into properties of this class object instance.
 
         Args:
             arg (str | argparse.Namespace | dict): If `arg` is an `argparse.Namespace` object that contains the config type, phase and limb (bone/joint), or a `str`, load corresponding yaml file and convert to the config dictionary object with one level of keys as attributes. If input is a `dict`, convert directly to object with one level of keys as attributes.
+            verbose (bool): If True, print the attributes and their values as they are being set (prior to classes and labels so it doesn't get messy).
         '''
         # as an argparse object
         if isinstance(arg, argparse.Namespace):
@@ -27,6 +28,14 @@ class ArgClass(object):
         
         for key in in_dict:
             setattr(self, key, in_dict[key])
+            if verbose:
+                if isinstance(in_dict[key], dict):
+                    # Print subkeys, only 1 level deep
+                    print(f'{key}:')
+                    for subkey in in_dict[key]:
+                        print(f'  {subkey}: {in_dict[key][subkey]}')
+                else:
+                    print(f'{key}: {in_dict[key]}')
     
         # Check if the ArgClass object even has the dataloader object
         assert hasattr(self, 'dataloader'), "Input object had no key 'dataloader'"
@@ -47,7 +56,7 @@ class ArgClass(object):
 
 
 
-
+# TODO: move to model/utils.py
 def LayerCompare(dict1, dict2):
     """
     Compare the shapes of tensors in two dictionaries with the same keys.

@@ -18,7 +18,6 @@ for key in annotations.keys():
     except KeyError:
         count_dict_ann[key.split('/')[0]] = 1
 
-
 # Now loop over all the streams (may as well do this for all streams every time)
 incomplete = {'flow': [], 'pose': [], 'flowpose': []}
 for class_name, val in count_dict_ann.items():

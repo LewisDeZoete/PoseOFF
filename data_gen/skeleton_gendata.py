@@ -6,12 +6,12 @@ curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 from lib.data.dataset import SingleStreamDataset
-from lib.utils.transforms import GetPoses_YOLO
+from extractors import GetPoses_YOLO
 from lib.utils.objects import ArgClass
+import numpy as np
 from ultralytics import YOLO
 import torch
 import torchvision.transforms.v2 as v2
-import yaml
 import time
 import argparse
 
@@ -19,8 +19,11 @@ parser = argparse.ArgumentParser(prog="skel_gendata")
 
 parser.add_argument('-n', dest='number',
                     help='Class number for processing skeleton keypoints of a specific class')
+parser.add_argument('--numpy', action='store_true',
+                    help='Option to save data as numpy arrays')
 parsed = parser.parse_args()
 arg_no = int(parsed.number) # Get class number command line arg
+save_as_numpy = parsed.numpy
 
 # Get the arg object and create the classes
 arg = ArgClass(arg='./config/custom_pose/train_joint.yaml')
@@ -56,19 +59,25 @@ transforms = [
 # Create the dataset object
 dataset = SingleStreamDataset(arg=arg, stream='pose', transforms=transforms)
 
+# ----------------- TESTING -----------------
 pose, label = dataset[0]
 print(pose.shape)
 print(label.shape)
+# ----------------- TESTING -----------------
+
 
 # start = time.time()
-# # Check if the indices we've been given are for the overall 
-# # dataset or as indices for the 'unfinished' list in config
+# Check if the indices we've been given are for the overall 
+# dataset or as indices for the 'unfinished' list in config
 # if 'unfinished' in arg.__dict__:
 #     for idx in get_range(classes[arg.unfinished[arg_no]]):
 #         poses, label = dataset[idx]
-#         path = f'data/UCF-101/skeleton/{list(arg.labels.keys())[idx]}'.split('.')[0] + '.pt'
-#         torch.save(poses, path)
-#         # print(f'Processed {path.split("/")[-1]}')
+#         path = f'data/UCF-101/skeleton/{list(arg.labels.keys())[idx]}'.split('.')[0]  + ('.npy' if save_as_numpy else '.pt')
+#         if save_as_numpy:
+#             np.save(path, poses.numpy())
+#         else:
+#             torch.save(poses, path)
+        
 
 #     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
 # else:
@@ -81,7 +90,10 @@ print(label.shape)
 #             os.mkdir(folder)
 #         except FileExistsError:
 #             pass
-#         path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1].split('.')[0] + '.pt')
-#         torch.save(poses, path)
+#         path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1].split('.')[0] + ('.npy' if save_as_numpy else '.pt'))
+#         if save_as_numpy:
+#             np.save(path, poses.numpy())
+#         else:
+#             torch.save(poses, path)
 
 #     print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')

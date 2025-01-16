@@ -1,6 +1,42 @@
+'''
+These are all effectively augments to be used during dataloading.
+'''
 import random
-
 import numpy as np
+
+import torch
+import torch.nn.functional as F
+
+
+def valid_crop_resize(data_numpy: np.array, valid_frame_num: int, p_interval: list, window: int):
+    # input: C,T,V,M
+    C, T, V, M = data_numpy.shape
+    begin = 0
+    end = valid_frame_num
+    valid_size = end - begin
+
+    # crop
+    if len(p_interval) == 1:
+        p = p_interval[0]
+        bias = int((1-p) * valid_size/2)
+        data = data_numpy[:, begin+bias:end-bias, :, :]# center_crop
+        cropped_length = data.shape[1]
+    else:
+        p = np.random.rand(1)*(p_interval[1]-p_interval[0])+p_interval[0] # random float between 0.5-1
+        cropped_length = np.minimum(np.maximum(int(np.floor(valid_size*p)),64), valid_size)# constraint cropped_length lower bound as 64
+        bias = np.random.randint(0,valid_size-cropped_length+1)
+        data = data_numpy[:, begin+bias:begin+bias+cropped_length, :, :]
+        if data.shape[1] == 0:
+            print(cropped_length, bias, valid_size)
+
+    # resize
+    data = torch.tensor(data,dtype=torch.float)
+    data = data.permute(0, 2, 3, 1).contiguous().view(C * V * M, cropped_length)
+    data = data[None, None, :, :]
+    data = F.interpolate(data, size=(C * V * M, window), mode='bilinear',align_corners=False).squeeze() # could perform both up sample and down sample
+    data = data.contiguous().view(C, V, M, window).permute(0, 3, 1, 2).contiguous().numpy()
+
+    return data
 
 
 def downsample(data_numpy, step, random_sample=True):

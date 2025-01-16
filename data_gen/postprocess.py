@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 def loop_graph(data):
         '''
@@ -38,5 +39,53 @@ def flow_mag_norm(data_numpy, flow_window=5):
 
     # Change the flow values in the numpy array to the normalised ones
     data_numpy[3:] = norm_flow.reshape(2*flow_window**2,T,V,M)
+
+    return data_numpy
+
+
+def pose_match(data):
+    '''
+    Pytorch version of the pose_match augmentation.
+    Matches skeletons across video using square of distance between frames.
+    Only takes pose as the input data.
+    '''
+    C, T, V, M = data.shape
+    assert (C == 3)
+    score = data[2, :, :, :].sum(axis=1)
+    # the rank of body confidence in each frame (shape: T-1, M)
+    rank = (-score[0:T - 1]).argsort(axis=1).reshape(T - 1, M)
+
+    # data of frame 1
+    xy1 = data[0:2, 0:T - 1, :, :].reshape(2, T - 1, V, M, 1)
+    # data of frame 2
+    xy2 = data[0:2, 1:T, :, :].reshape(2, T - 1, V, 1, M)
+    # square of distance between frame 1&2 (shape: T-1, M, M)
+    distance = ((xy2 - xy1) ** 2).sum(axis=2).sum(axis=0)
+
+    # match pose
+    forward_map = torch.zeros((T, M), dtype=int) - 1
+    forward_map[0] = torch.arange(2)
+    for m in range(M):
+        choose = (rank == m)
+        forward = distance[choose].argmin(axis=1)
+        for t in range(T - 1):
+            distance[t, :, forward[t]] = np.inf
+        forward_map[1:][choose] = forward
+    assert (torch.all(forward_map >= 0))
+
+    # string data
+    for t in range(T - 1):
+        forward_map[t + 1] = forward_map[t + 1][forward_map[t]]
+
+    # generate data
+    new_data = torch.zeros(data.shape)
+    for t in range(T):
+        new_data[:, t, :, :] = data[:, t, :, forward_map[t]]#.permute(1, 2, 0)
+    data = new_data
+
+    # score sort
+    trace_score = data[2, :, :, :].sum(axis=1).sum(axis=0)
+    rank = (-trace_score).argsort()
+    data_numpy = data[:, :, :, rank]
 
     return data_numpy

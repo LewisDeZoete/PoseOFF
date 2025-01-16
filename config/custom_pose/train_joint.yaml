@@ -7,8 +7,8 @@ dataloader:
   preprocessed: True
   skel_path: ./data/UCF-101/pose/
   flow_path: ./data/UCF-101/flow/
-  flowpose_path: ./data/UCF-101/flowpose/
-  transforms:
+  flowpose_path: ./data/UCF-101/flowpose/ 
+  transforms: # TODO: transforms are only for data_gen, move out of dataloader
     pose: 
       weights: pretrained_models/yolo11x-pose.pt
     flow:
@@ -29,7 +29,8 @@ model_args:
   num_person: 2
   num_gcn_scales: 8
   num_g3d_scales: 8
-  graph: graph.yolo_pose.AdjMatrixGraph
+  # graph: graph.yolo_pose.AdjMatrixGraph
+  graph: graph.yolo_pose.Graph
   in_channels: 3
   flow_window: 5 # must equal dataloader.transforms['flowpose']['window_size']
   kernel_size: 3

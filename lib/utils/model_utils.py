@@ -1,3 +1,4 @@
+# TODO: DELETE and refactor code under model(s) folder, moved to movels/utils
 def import_class(name):
     components = name.split('.')
     mod = __import__(components[0])

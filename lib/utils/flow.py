@@ -3,6 +3,7 @@ import torch
 
 def stack_frames(frames: torch.Tensor):
     """
+    TODO: DELETE -> moved to data_gen/preprocess.py
     Stack adjacent pairs of frames.
 
     Args:
