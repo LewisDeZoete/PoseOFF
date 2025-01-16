@@ -1,13 +1,16 @@
-class tmp:
-    def __init__(self, fn):
-        self.fn = fn
+import yaml
+from deepdiff import DeepDiff
+
+def compare_yaml_files(file1, file2):
+    with open(file1, 'r') as f1, open(file2, 'r') as f2:
+        yaml1 = yaml.safe_load(f1)
+        yaml2 = yaml.safe_load(f2)
     
-    def __call__(self, input):
-        return self.fn(input)
+    differences = DeepDiff(yaml1, yaml2, ignore_order=True)
+    return differences
 
-def fn(input):
-    return input**2
-
-if __name__=='__main__':
-    cls = tmp(fn)
-    print(cls(3)) # 9
+# Example usage
+file1 = './ucf101_annotations.yaml'
+file2 = '../Datasets/UCF-101/ucf101_annotations.yaml'
+diffs = compare_yaml_files(file1, file2)
+print(diffs)
