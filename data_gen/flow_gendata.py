@@ -6,8 +6,8 @@ curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 from lib.data.dataset import SingleStreamDataset
-from lib.utils.objects import ArgClass
 from lib.utils.transforms import GetFlow
+from config.argclass import ArgClass
 import torch
 from torchvision.models.optical_flow import raft_large
 import torchvision.transforms.v2 as v2
@@ -22,20 +22,20 @@ parsed = parser.parse_args()
 arg_no = int(parsed.number) # Get class number command line arg
 
 # Get the arg object and create the classes
-arg = ArgClass(arg='./config/custom_pose/train_joint.yaml')
-arg.dataloader['preprocessed'] = False # Override this value, since this is gendata script!
+arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
+arg.extractor['preprocessed'] = False # Override this value, since this is gendata script!
 classes = arg.classes
-transform_args = arg.dataloader['transforms']['flow']
+transform_args = arg.extractor['flow']
 
 # Get the number of videos in the class (used to get indices of dataset)
 def get_range(class_no):
     len_class = 0
-    for i in arg.labels.keys():
+    for i in arg.feeder_args['labels'].keys():
         if i.split('/')[0] == list(classes.keys())[class_no]:
             try:
                 assert start_index >= 0
             except NameError:
-                start_index = list(arg.labels.keys()).index(i)
+                start_index = list(arg.feeder_args['labels'].keys()).index(i)
             len_class += 1
     return range(start_index, (start_index+len_class))
 
@@ -57,7 +57,8 @@ transforms = [
     ]
 
 # Create the dataset object
-dataset = SingleStreamDataset(arg=arg, stream='flow', transforms=transforms)
+dataset = SingleStreamDataset(arg=arg, stream='rgb', ext='.avi', transforms=transforms)
+
 
 start = time.time()
 # Check if the indices we've been given are for the overall 
@@ -65,7 +66,7 @@ start = time.time()
 if 'unfinished' in arg.__dict__:
     for idx in get_range(classes[arg.unfinished[arg_no]]):
         flow, label = dataset[idx]
-        path = f'{arg.dataloader["flow_path"]}{list(arg.labels.keys())[idx]}' + '.pt'
+        path = f'{arg.feeder_args["data_paths"]["flow_path"]}{list(arg.feeder_args["labels"].keys())[idx]}' + '.pt'
         torch.save(flow, path)
 
     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
@@ -73,13 +74,13 @@ else:
     for idx in get_range(arg_no):
         flow, label = dataset[idx] # We're using GetFlow transform so this returns  flow!
         # Check if the folder that the videos belong in exists
-        folder = f'{arg.dataloader["flow_path"]}{list(arg.labels.keys())[idx].split("/")[0]}/'
+        folder = f'{arg.feeder_args["data_paths"]["flow_path"]}{list(arg.feeder_args["labels"].keys())[idx].split("/")[0]}/'
         try:
             # If not create the folder!
             os.mkdir(folder)
         except FileExistsError:
             pass
-        path = os.path.join(folder, list(arg.labels.keys())[idx].split('/')[-1] + '.pt')
+        path = os.path.join(folder, list(arg.feeder_args['labels'].keys())[idx].split('/')[-1] + '.pt')
         torch.save(flow, path)
 
     print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')

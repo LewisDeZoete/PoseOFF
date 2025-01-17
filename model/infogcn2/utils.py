@@ -53,3 +53,38 @@ def max_pooling(x, dim=-1):
 
 def count_params(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+# TODO: Find all instances of this function!
+def LayerCompare(dict1, dict2):
+    """
+    Compare the shapes of tensors in two dictionaries with the same keys.
+
+    Args:
+        dict1 (dict): The first dictionary with tensor values.
+        dict2 (dict): The second dictionary with tensor values.
+
+    Returns:
+        bool: True if all shapes match, False otherwise.
+        list: A list of keys where the shapes do not match.
+    """
+    # Check if both dictionaries have the same keys
+    if dict1.keys() != dict2.keys():
+        raise ValueError("Dictionaries have different keys.")
+
+    mismatched_keys = []
+
+    for key in dict1.keys():
+        tensor1 = dict1[key]
+        tensor2 = dict2[key]
+
+        # Check if both values are tensors
+        if not isinstance(tensor1, torch.Tensor) or not isinstance(tensor2, torch.Tensor):
+            raise ValueError(f"Values for key '{key}' are not both tensors.")
+
+        # Compare shapes
+        if tensor1.shape != tensor2.shape:
+            mismatched_keys.append(key)
+
+    # Return the result
+    return len(mismatched_keys) == 0, mismatched_keys

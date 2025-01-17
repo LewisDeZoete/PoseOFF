@@ -1,4 +1,5 @@
 # dataloader 
+# TODO: Move to feeder/extractor model (like the infogcn config)
 loader: lib.data.dataset.CustomVideoDataset
 dataloader:
   data_path: ../Datasets/UCF-101/
@@ -8,7 +9,7 @@ dataloader:
   skel_path: ./data/UCF-101/pose/
   flow_path: ./data/UCF-101/flow/
   flowpose_path: ./data/UCF-101/flowpose/ 
-  transforms: # TODO: transforms are only for data_gen, move out of dataloader
+  transforms:
     pose: 
       weights: pretrained_models/yolo11x-pose.pt
     flow:
@@ -20,7 +21,6 @@ dataloader:
       threshold: 0.05
       loop_graph: False
     
-
 # model
 model: model.msg3d.testModel
 model_args:

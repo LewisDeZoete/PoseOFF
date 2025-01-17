@@ -6,18 +6,16 @@ curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 import numpy as np
-import pickle
 
-import torch
 from torch.utils.data import Dataset
 
 from feeders import tools
 
 
 class Feeder(Dataset):
-    def __init__(self, data_path, labels, p_interval=[1], split='train', random_choose=False, random_shift=False,
-                 random_move=False, random_rot=False, window_size=64, debug=False, use_mmap=False,
-                 vel=False, sort=False, A=None):
+    def __init__(self, data_paths, label_path, labels, modality, p_interval=[1], split='train', 
+                 random_choose=False, random_shift=False, random_move=False, random_rot=False, 
+                 window_size=64, debug=False, use_mmap=False, vel=False, sort=False, A=None):
         """
         :param data_path:
         :param labels: `dict` containing the labels of the dataset
@@ -35,7 +33,9 @@ class Feeder(Dataset):
         """
 
         self.debug = debug
-        self.data_path = data_path
+        self.data_paths = data_paths
+        self.data_path = self.data_paths[f'{modality}_path']
+        self.label_path = label_path
         self.labels = labels
         self.split = split
         self.random_choose = random_choose
@@ -48,34 +48,12 @@ class Feeder(Dataset):
         self.random_rot = random_rot
         self.vel = vel
         self.A = A
-        # self.load_data()
         if sort:
             self.get_n_per_class()
             self.sort()
         # if normalization:
         #     self.get_mean_map()
 
-    # def load_data(self):
-    #     # data: N C V T M
-    #     npz_data = np.load(self.data_path)
-    #     if self.split == 'train':
-    #         self.data = npz_data['x_train']
-    #         self.labels = np.argmax(npz_data['y_train'], axis=-1)
-    #     elif self.split == 'test':
-    #         self.data = npz_data['x_test']
-    #         self.labels = np.argmax(npz_data['y_test'], axis=-1)
-    #     else:
-    #         raise NotImplementedError('data split only supports train/test')
-    #     nan_out = np.isnan(self.data.mean(-1).mean(-1))==False
-    #     self.data = self.data[nan_out]
-    #     self.labels = self.labels[nan_out]
-    #     self.sample_name = [self.split + '_' + str(i) for i in range(len(self.data))]
-    #     N, T, _ = self.data.shape
-    #     if self.A is not None:
-    #         self.data = self.data.reshape((N*T*2, 25, 3))
-    #         self.data = np.array(self.A) @ self.data # x = N C T V M
-    #     self.data = self.data.reshape(N, T, 2, 25, 3).transpose(0, 4, 1, 3, 2)
-    #     # self.data -= self.data[:,:,:,1:2]
 
     def get_n_per_class(self):
         self.n_per_cls = np.zeros(len(self.labels), dtype=int)
@@ -132,35 +110,16 @@ class Feeder(Dataset):
         return sum(hit_top_k) * 1.0 / len(hit_top_k)
 
 
-def import_class(name):
-    components = name.split('.')
-    mod = __import__(components[0])
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
-
-
 if __name__=='__main__':
-    from lib.utils.objects import ArgClass
+    from config.argclass import ArgClass
     import time
 
-    arg = ArgClass('./config/custom_pose/train_joint.yaml', verbose=True)
+    arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml', verbose=True)
     
-    feeder = Feeder(data_path = arg.dataloader['flowpose_path'],
-                    labels = arg.labels,
-                    p_interval = [0.5, 1], # These are the values used for train, [0.95] for test
-                    split = 'train',
-                    random_choose = True,
-                    random_shift = True,
-                    random_move = True,
-                    random_rot = True,
-                    window_size = 64,
-                    debug = False,
-                    use_mmap = False,
-                    vel = False,)
+    feeder = Feeder(**arg.feeder_args)
     
     start = time.time()
-    n_samps = 200
+    n_samps = 100
     for i in range(n_samps):
         data_numpy, label, mask, index = feeder[i]
 

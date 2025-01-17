@@ -1,7 +1,6 @@
 import yaml
 import argparse
 
-# TODO: Move to config
 class ArgClass(object):
     def __init__(self, arg, verbose=False):
         '''
@@ -37,21 +36,21 @@ class ArgClass(object):
                 else:
                     print(f'{key}: {in_dict[key]}')
     
-        # Check if the ArgClass object even has the dataloader object
-        assert hasattr(self, 'dataloader'), "Input object had no key 'dataloader'"
-        assert 'label_path' in self.dataloader, "Input object has no key 'label_path' under 'dataloader'"
+        # Check if the ArgClass object even has the feeder args
+        assert hasattr(self, 'feeder_args'), "Input object had no key 'feeder_args'"
+        assert 'label_path' in self.feeder_args.keys(), "Input object has no key 'label_path' under 'feeder_args'"
 
         # If the label_path is wrong, it'll throw FileNotFound error
         try:
-            with open(self.dataloader['label_path'], 'r') as file:
-                self.labels = yaml.safe_load(file)
+            with open(self.feeder_args['label_path'], 'r') as file:
+                self.feeder_args['labels'] = yaml.safe_load(file)
         except FileNotFoundError:
-            print(f"Could not file label file: '{self.dataloader['label_path']}'")
-            self.labels = {}
+            print(f"Could not file label file: '{self.feeder_args['label_path']}'")
+            self.feeder_args['labels'] = {}
         
         # Create classes dictionary
         self.classes = {}
-        for elem, key in enumerate(dict.fromkeys(key.split('_')[1] for key in self.labels.keys())):
+        for elem, key in enumerate(dict.fromkeys(key.split('_')[1] for key in self.feeder_args['labels'].keys())):
             self.classes[key] = elem
 
 

@@ -163,14 +163,14 @@ class FlowPoseSampler:
                  threshold: float = 0.5, 
                  loop: bool = True,
                  to_cpu: bool = True,
-                 norm: bool = True):
+                 norm: bool = False):
         self.device = device  # Making sure all tensors are on the same device
         self.window_size = window_size  # Window size about pose keypoint
         self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
         self.to_cpu = to_cpu
         if loop:
-            self.loop_graph = loop_graph
+            self.loop_graph = loop_graph()
         if norm:
             self.norm = flow_mag_norm(flow_window=window_size)
         self.pose_match = pose_match

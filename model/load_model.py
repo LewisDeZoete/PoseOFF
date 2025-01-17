@@ -4,7 +4,7 @@ sys.path.insert(0, '')
 import torch
 from collections import OrderedDict
 from lib.utils.model_utils import count_params, import_class
-from lib.utils.objects import LayerCompare
+from model.infogcn2.utils import LayerCompare
 
 class ModelLoader:
     def __init__(self, arg):
@@ -19,35 +19,26 @@ class ModelLoader:
         self.output_device = output_device
         print(f'\tOutput device: {self.output_device}')
 
-
-    def load_checkpoint_weights(self):
-        try:
-            # checkpoint_file attr will stay as string
-            checkpoint = torch.load(self.arg.checkpoint_file, map_location=self.output_device)
-            weights = checkpoint['model_state_dict'] # we just want state dict!
-            return weights
-        except FileNotFoundError as error:
-            print("\tCheckpoint file does not yet exist")
-            print(f'\t({error})')
-            return None
-        except KeyError:
-            print(f'Checkpoint file {self.arg.checkpoint_file} does not contain a model state dict')
-            return None
+        # Load the model on object creation
+        self.load_model()
 
 
     def load_model(self):
-        '''Load the model, using the arguments passed in `arg.model_args`
+        '''
+        Load the model, using the arguments passed in `arg.model_args`
         If `arg.weights` exists, it will try to load the weights from the file passed.
         '''
         Model = import_class(self.arg.model)
+        # InfoGCN++ takes the device argument, we want it to be dynamic
+        if 'device' in self.arg.model_args:
+            self.arg.model_args['device'] = self.output_device
         self.model = Model(**self.arg.model_args).to(self.output_device)
         print(f'\tModel total number of params: {count_params(self.model)}')
 
-        #TODO: Turn this into a method to load a state dict from checkpoint
         # If checkpoint file is found, try and load the model_state_dict
         if hasattr(self.arg, 'checkpoint_file'):
             print(f'\tLoading weights from {self.arg.checkpoint_file}')
-            weights = self.load_checkpoint_weights()
+            weights = self._get_weights()
             # load_checkpoint_weights returns None if there is no weights in file
             if weights:
                 # removing the 'module.' part of key name and moving weight to device
@@ -80,30 +71,41 @@ class ModelLoader:
                     print('\tCan not find these weights:')
                     for d in diff:
                         print('\t  ' + d)
+    
+    
+    def _get_weights(self):
+        try:
+            # checkpoint_file attr will stay as string
+            checkpoint = torch.load(self.arg.checkpoint_file, map_location=self.output_device)
+            weights = checkpoint['model_state_dict'] # we just want state dict!
+            return weights
+        except FileNotFoundError as error:
+            print("\tCheckpoint file does not yet exist")
+            print(f'\t({error})')
+            return None
+        except KeyError:
+            print(f'Checkpoint file {self.arg.checkpoint_file} does not contain a model state dict')
+            return None
 
 
 if __name__=='__main__':
     from lib.utils.objects import ArgClass
     import time
     
-    arg = ArgClass('./config/custom_pose/train_joint.yaml')
-    # This checkpoint may not fit the correct keys and shape to be loaded but oh well
+    arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml')
     # arg.checkpoint_file = 'results/ms-g3d_flow/flowpose-cnn_k5_t0.05.pt'
-    arg.checkpoint_file = 'results/ms-g3d_flow/jiden.pt'
-    
-    # checkpoint = torch.load(arg.checkpoint_file, map_location=torch.device('cpu'))
-    
+    arg.checkpoint_file = 'results/ms-g3d_flow/TMP.pt'
 
+    # Load the model!
     modelLoader = ModelLoader(arg)
-    modelLoader.load_model()
     skel_model = modelLoader.model
-
-    in_channels = arg.model_args['in_channels'] + 2*arg.model_args['flow_window']**2
 
     with torch.no_grad():
         start = time.time()
-        b = 6
-        x = torch.randn(b,in_channels,300,17,2).to(modelLoader.output_device)
-        results = skel_model(x)
-        print(f'\nOutput shape (batch size = {b}): {results.shape}')
+        b = 8
+        # N, C, T, V, M
+        x = torch.randn((8, 3, 64, 17, 2)).to(modelLoader.output_device)
+        out = skel_model(x) # tuple(y, x_hat, z_0, z_hat_shifted, self.zero)
+        print(out[0].shape)
+        print(f'\nOutput shape (batch size = {b}): {out[0].shape}')
         print(f'in {time.time()-start:0.5f} seconds')

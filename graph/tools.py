@@ -90,16 +90,3 @@ def get_adjacency_matrix(edges, num_nodes):
 def get_uniform_graph(num_node, self_link, neighbor):
     A = normalize_digraph(edge2mat(neighbor + self_link, num_node))
     return A
-
-
-# TODO: DEBUG REMOVE
-if __name__ == "__main__":
-    import sys
-    sys.path.insert(0, '')
-    from graph.yolo_pose import AdjMatrixGraph
-    graph = AdjMatrixGraph()
-    A_binary = graph.A_binary
-    num_scales = 8
-    A_powers = [k_adjacency(A_binary, k, with_self=True) for k in range(num_scales)]
-    A_powers = np.concatenate([normalize_adjacency_matrix(g) for g in A_powers])
-    print(A_powers.shape)

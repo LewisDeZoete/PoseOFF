@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 import os
 import yaml
-from lib.utils.objects import ArgClass
+from config.argclass import ArgClass
 
 # Get the arg class
 arg = ArgClass(arg='./config/custom_pose/train_joint.yaml')

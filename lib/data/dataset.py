@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "../..")))
 
 import torch
 from torch.utils.data import Dataset
-
 from lib.utils.transforms import LoadVideo
 
 
@@ -19,12 +18,12 @@ class CustomDataset(Dataset):
 
     def __init__(self, arg):
         self.classes = arg.classes
-        self.labels = arg.labels
+        self.labels = arg.feeder_args['labels']
 
         # Determine if the dataset is preprocessed
-        self.preprocessed = arg.dataloader.get("preprocessed", False)
+        self.preprocessed = arg.extractor.get("preprocessed", False)
         self.ext = ".pt" if self.preprocessed else ".avi"
-        self.data_path = arg.dataloader.get("data_path", "")
+        self.data_paths = arg.feeder_args['data_paths']
 
         # Get the device, defaulting to 'cpu'
         self.device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
@@ -53,26 +52,36 @@ class CustomDataset(Dataset):
 
 class SingleStreamDataset(CustomDataset):
     """
-    Load a single stream dataset (either flow, pose or flowpose) by loading preprocessed tensors.
-    """
+    A dataset class for handling single stream data.
 
-    def __init__(self, arg, stream: str, transforms=None, max_frames=300):
+    Args:
+        arg: Arguments required by the CustomDataset.
+        stream (str): The type of stream data. Must be one of 'rgb', 'pose', 'flow', or 'flowpose'.
+        ext (str, optional): The file extension for the data files. Defaults to '.pt'.
+        transforms (callable, optional): A function/transform that takes in a sample and returns a transformed version. Defaults to None.
+        max_frames (int, optional): The maximum number of frames to consider. Defaults to 300.
+
+    Raises:
+        ValueError: If the stream is not one of 'rgb', 'pose', 'flow', or 'flowpose'.
+    """
+    def __init__(self, arg, stream: str, ext: str = '.pt', transforms=None, max_frames=300):
         super().__init__(arg)
         self.transforms = transforms
         self.max_frames = max_frames
 
-        # Ensure stream is either 'skel' or 'flow'
-        if stream not in ["pose", "flow", "flowpose"]:
-            raise ValueError("stream must be 'pose', 'flow' or 'flowpose'")
+        # Ensure stream is one of the data types
+        if stream not in ["rgb", "pose", "flow", "flowpose"]:
+            raise ValueError("stream must be 'rgb', 'pose', 'flow' or 'flowpose'")
 
-        self.data_path = arg.dataloader[f"{stream}_path"] if self.preprocessed else arg.dataloader['data_path']
+        self.data_path = arg.feeder_args['data_paths'][f"{stream}_path"]
+        self.ext = ext
 
 
 class MultiStreamDataset(CustomDataset):
     def __init__(self, arg, transforms):
         super().__init__(arg)
-        self.skel_path = arg.dataloader['skel_path']
-        self.flow_path = arg.dataloader['flow_path']
+        self.pose_path = arg.feeder_args['data_paths']['pose_path']
+        self.flow_path = arg.feeder_args['data_paths']['flow_path']
         self.transforms = transforms
         # We have to pass the FlowPoseSampler arg!
         assert transforms is not None
@@ -82,7 +91,7 @@ class MultiStreamDataset(CustomDataset):
         label = self.labels[item_key]
         # Preload the pre-processed poses and flows
         poses = torch.load(
-            f"{self.skel_path}{item_key}{self.ext}", map_location=self.device
+            f"{self.pose_path}{item_key}{self.ext}", map_location=self.device
         )
         flows = torch.load(
             f"{self.flow_path}{item_key}{self.ext}", map_location=self.device
@@ -96,27 +105,27 @@ class MultiStreamDataset(CustomDataset):
 if __name__ == "__main__":
     import time
 
-    from lib.utils import ArgClass, FlowPoseSampler
-    from lib.utils.augments import swap_numpy, flow_mag_norm, random_shift, random_move
+    from config.argclass import ArgClass
+    from lib.utils import FlowPoseSampler
     from torch.utils.data import DataLoader
+    import torchvision.transforms.v2 as v2
 
     arg = ArgClass(arg="./config/custom_pose/train_joint.yaml")
 
     batch_size=1
-    stream='flowpose'
+    stream='pose'
     device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
+    # Create some transforms for debugging SingleStreamDataset
+    single_transforms = [
+        v2.Resize(size=(384,640)), # YOLO pose has a minimum input image size
+        v2.ToDtype(torch.float32),
+        v2.Lambda(lambda x: x/255.0),]
     # Create the FlowPoseSampler transform object
     flowPoseTransform = FlowPoseSampler(device=device)
-    # Create some transforms for debugging SingleStreamDataset
-    input_transform = [swap_numpy(),
-                       flow_mag_norm(),
-                       random_shift(),
-                       random_move(),
-                       swap_numpy()]
 
     # Create the single- and multi-stream datasets
-    singledataset = SingleStreamDataset(arg, stream=stream,transforms=input_transform)
+    singledataset = SingleStreamDataset(arg, stream=stream,transforms=single_transforms)
     multidataset = MultiStreamDataset(arg, flowPoseTransform)
     
     # Create the dataloaders!

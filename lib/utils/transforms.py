@@ -320,7 +320,7 @@ class FlowPoseSampler:
 
 
 if __name__=='__main__':
-    from objects import ArgClass
+    from config.argclass import ArgClass
 
     arg = ArgClass('./data_gen/UCF-101_config.yaml')
 

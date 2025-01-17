@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from model import ModelLoader
 from lib.data.dataset import SingleStreamDataset
 from lib.utils.objects import ArgClass
-import lib.utils.augments as augments
+import config.argclass as augments
 
 from lib.training import train_simple_network
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
@@ -17,7 +17,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', dest='config', default='custom_pose',
                     help='config dictionary location (default=custom_pose)')
-parser.add_argument('-p', dest='phase', default='test',
+parser.add_argument('-p', dest='phase', default='train',
                     help='network phase [train, test] (default=test)')
 parser.add_argument('-l', dest='limb', default='joint',
                     help='limb [joint, bone] (default=joint)')
@@ -39,10 +39,9 @@ arg.checkpoint_file=f'{arg.save_location}{arg.run_name}.pt'
 
 print("### Arguments loaded")
 
-# Using the load_model class to create an object to hold model related objects
-# to access the actual model, we can use skel_model.model (maybe unnecessary)
+# Using the ModelLoader class to create an object to hold model related objects
+# to access the actual model, we can use skel_model.model
 modelLoader = ModelLoader(arg)
-modelLoader.load_model()
 skel_model = modelLoader.model
 
 print("### Model created")
