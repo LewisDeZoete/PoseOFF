@@ -24,7 +24,7 @@ parser.add_argument('-l', dest='limb', default='joint',
 parser.add_argument('-r', dest='run_name', default='',
                     help='name to save the results dictionary as after training')
 parser.add_argument('-d', dest='description', default='',
-                    help='Description of what is being tested in run') # TODO: DEBUG REMOVE
+                    help='Description of what is being tested in run')
 parser.add_argument('-v', dest='verbose', action='store_true', 
                     help='Print verbose output for argparse')
 parsed = parser.parse_args()
@@ -89,6 +89,7 @@ scheduler3 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=arg.optim['gamma'
 scheduler = optim.lr_scheduler.SequentialLR(optimiser, schedulers=[scheduler1, scheduler2, scheduler3], milestones=arg.optim['step'])
 # scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
 
+# Create the loss function
 loss = nn.CrossEntropyLoss()
 
 # TRAINING! 

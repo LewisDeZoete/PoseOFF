@@ -1,5 +1,5 @@
 # Feeder
-feeder: feeders.feeder_yolo.Feeder
+feeder: feeders.feeder.Feeder
 feeder_args:
   data_paths: 
     rgb_path: ../Datasets/UCF-101/
@@ -38,7 +38,7 @@ model_args:
   num_point: 17
   num_person: 2
   graph: graph.yolo_pose.Graph
-  in_channels: 3
+  in_channels: 53
   num_head: 3
   ode_method: euler
   k: 8
@@ -64,6 +64,11 @@ optim:
   # gamma: 0.1
   step: [10, 45]
   gamma: 0.90
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.1
+lambda_4: 0.0
+lambda_5: 0.0
   
 
 # training
@@ -72,6 +77,7 @@ device: 0
 batch_size: 64
 forward_batch_size: 64
 test_batch_size: 256
+half: False
 
 checkpoint_freq: 10 # how often to save the model and training state
 save_location: ./results/infogcn2/ # where to save the checkpoints

@@ -12,6 +12,15 @@
 
 #SBATCH --array=0-100
 
+# Create a directory and refresh the annotations before the array jobs start
+if [ "$SLURM_ARRAY_TASK_ID" -eq 1 ]; then
+    mkdir -p ./TMP
+    python ./data_gen/UCF-101_annotations.py
+fi
+
+# Give time to complete the file creation
+sleep 2
+
 # Activate the environment
 source ../environment/bin/activate
 
@@ -29,5 +38,6 @@ if [ "$SLURM_ARRAY_TASK_ID" -eq 0 ]; then
 #SBATCH --output='logs/EXTRACT/UCF-101_validation.txt'
 
 python ./data_gen/gendata_validation.py
+rm -r ./TMP
 EOF
 fi

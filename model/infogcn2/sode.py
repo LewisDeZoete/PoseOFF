@@ -235,6 +235,7 @@ class SODE(nn.Module):
         return  torch.from_numpy(I - np.linalg.matrix_power(A_outward, k))
 
     def KL_div(self, z_mu, z_std, kl_coef=1):
+        # TODO: remove (never called, z_mu and z_std must be torch...Distribution's)
         z_distr = Normal(z_mu, z_std)
         kldiv_z0 = kl_divergence(z_distr, self.z0_prior)
         if torch.isnan(kldiv_z0).any():
@@ -300,7 +301,7 @@ if __name__=='__main__':
             num_point=17,
             num_person=2,
             graph='graph.yolo_pose.Graph',
-            in_channels=3,
+            in_channels=53,
             num_head=3,
             ode_method='euler',
             k=8,
@@ -317,6 +318,5 @@ if __name__=='__main__':
     model = model.to(device)
     
     # N, C, T, V, M
-    x = torch.randn((8, 3, 64, 17, 2)).to(device)
-    out = model(x) # tuple(y, x_hat, z_0, z_hat_shifted, self.zero)
-    print(out[0].shape)
+    x = torch.randn((8, 53, 64, 17, 2)).to(device)
+    y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)

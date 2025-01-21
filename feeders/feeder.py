@@ -1,82 +1,96 @@
 import sys
-sys.path.extend(['../'])
+import os
 
-import torch
-import pickle
+# # add lib to path
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
+
 import numpy as np
 from torch.utils.data import Dataset
-
 from feeders import tools
 
 
 class Feeder(Dataset):
-    def __init__(self, data_path, label_path,
-                 random_choose=False, random_shift=False, random_move=False,
-                 window_size=-1, normalization=False, debug=False, use_mmap=True):
+    def __init__(self, data_paths, label_path, labels, modality, p_interval=[0.95], split='train', 
+                 random_choose=False, random_shift=False, random_move=False, random_rot=False, 
+                 window_size=64, debug=False, use_mmap=False, vel=False, sort=False, A=None):
         """
         :param data_path:
-        :param label_path:
+        :param labels: `dict` containing the labels of the dataset
+        :param split: training set or test set TODO: REMOVE split references
         :param random_choose: If true, randomly choose a portion of the input sequence
         :param random_shift: If true, randomly pad zeros at the begining or end of sequence
         :param random_move:
+        :param random_rot: rotate skeleton around xyz axis
         :param window_size: The length of the output sequence
         :param normalization: If true, normalize input sequence
         :param debug: If true, only use the first 100 samples
         :param use_mmap: If true, use mmap mode to load data, which can save the running memory
+        :param vel: use motion modality or not
+        :param only_label: only load label for ensemble score compute
         """
 
         self.debug = debug
-        self.data_path = data_path
+        self.data_paths = data_paths
+        self.data_path = self.data_paths[f'{modality}_path']
         self.label_path = label_path
+        self.labels = labels
+        self.split = split
         self.random_choose = random_choose
         self.random_shift = random_shift
         self.random_move = random_move
         self.window_size = window_size
-        self.normalization = normalization
+        # self.normalization = normalization TODO: REMOVE all normalization references
         self.use_mmap = use_mmap
-        self.load_data()
-        if normalization:
-            self.get_mean_map()
+        self.p_interval = p_interval
+        self.random_rot = random_rot
+        self.vel = vel
+        self.A = A
+        if sort:
+            self.get_n_per_class()
+            self.sort()
+        # if normalization:
+        #     self.get_mean_map()
 
-    def load_data(self):
-        # data: N C V T M
-        try:
-            with open(self.label_path) as f:
-                self.sample_name, self.label = pickle.load(f)
-        except:
-            # for pickle file from python2
-            with open(self.label_path, 'rb') as f:
-                self.sample_name, self.label = pickle.load(f, encoding='latin1')
 
-        # load data
-        if self.use_mmap:
-            self.data = np.load(self.data_path, mmap_mode='r')
-        else:
-            self.data = np.load(self.data_path)
-        if self.debug:
-            self.label = self.label[0:100]
-            self.data = self.data[0:100]
-            self.sample_name = self.sample_name[0:100]
+    def get_n_per_class(self):
+        self.n_per_cls = np.zeros(len(self.labels), dtype=int)
+        for label in self.labels:
+            self.n_per_cls[label] += 1
+        self.csum_n_per_cls = np.insert(np.cumsum(self.n_per_cls), 0, 0)
 
-    def get_mean_map(self):
-        data = self.data
-        N, C, T, V, M = data.shape
-        self.mean_map = data.mean(axis=2, keepdims=True).mean(axis=4, keepdims=True).mean(axis=0)
-        self.std_map = data.transpose((0, 2, 4, 1, 3)).reshape((N * T * M, C * V)).std(axis=0).reshape((C, 1, V, 1))
+    def sort(self):
+        sorted_idx = self.labels.argsort()
+        self.data = self.data[sorted_idx]
+        self.labels = self.labels[sorted_idx]
+
+    # def get_mean_map(self):
+    #     data = self.data
+    #     N, C, T, V, M = data.shape
+    #     self.mean_map = data.mean(axis=2, keepdims=True).mean(axis=4, keepdims=True).mean(axis=0)
+    #     self.std_map = data.transpose((0, 2, 4, 1, 3)).reshape((N * T * M, C * V)).std(axis=0).reshape((C, 1, V, 1))
 
     def __len__(self):
-        return len(self.label)
+        return len(self.labels)
 
     def __iter__(self):
         return self
 
     def __getitem__(self, index):
-        data_numpy = self.data[index]
-        label = self.label[index]
-        data_numpy = np.array(data_numpy)
+        # NOTE: here we assume that we're working with preprocessed (flowpose) data
+        item_key = list(self.labels.keys())[index]
+        item_path = f"{self.data_path}{item_key}.npy" 
+        label = self.labels[item_key]
 
-        if self.normalization:
-            data_numpy = (data_numpy - self.mean_map) / self.std_map
+        data_numpy = np.load(item_path)
+        valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
+        valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
+        # # reshape Tx(MVC) to CTVM
+        data_numpy = tools.valid_crop_resize(data_numpy, valid_frame_num, self.p_interval, self.window_size)
+        mask = (abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0)
+        # Apply optional transforms
+        # if self.normalization:
+        #     data_numpy = (data_numpy - self.mean_map) / self.std_map
         if self.random_shift:
             data_numpy = tools.random_shift(data_numpy)
         if self.random_choose:
@@ -84,9 +98,9 @@ class Feeder(Dataset):
         elif self.window_size > 0:
             data_numpy = tools.auto_pading(data_numpy, self.window_size)
         if self.random_move:
-            data_numpy = tools.random_move(data_numpy)
+            data_numpy = tools.random_move(data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1])
 
-        return data_numpy, label, index
+        return data_numpy, label, mask, index
 
     def top_k(self, score, top_k):
         rank = score.argsort()
@@ -94,104 +108,27 @@ class Feeder(Dataset):
         return sum(hit_top_k) * 1.0 / len(hit_top_k)
 
 
-def import_class(name):
-    components = name.split('.')
-    mod = __import__(components[0])
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
+if __name__=='__main__':
+    from config.argclass import ArgClass
+    import time
+    from torch.utils.data import DataLoader
 
+    arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml', verbose=True)
+    
+    feeder = Feeder(**arg.feeder_args)
+    dataloader = DataLoader(feeder, batch_size=arg.batch_size, shuffle=True)
+    
+    start = time.time()
+    n_samps = 100
+    # for i in range(n_samps):
+    #     data_numpy, label, mask, index = feeder[i]    
+    for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
+        if epoch == 10:
+            break
+        
 
-def test(data_path, label_path, vid=None, graph=None, is_3d=False):
-    '''
-    vis the samples using matplotlib
-    :param data_path:
-    :param label_path:
-    :param vid: the id of sample
-    :param graph:
-    :param is_3d: when vis NTU, set it True
-    :return:
-    '''
-    import matplotlib.pyplot as plt
-    loader = torch.utils.data.DataLoader(
-        dataset=Feeder(data_path, label_path),
-        batch_size=64,
-        shuffle=False,
-        num_workers=2)
-
-    if vid is not None:
-        sample_name = loader.dataset.sample_name
-        sample_id = [name.split('.')[0] for name in sample_name]
-        index = sample_id.index(vid)
-        data, label, index = loader.dataset[index]
-        data = data.reshape((1,) + data.shape)
-
-        # for batch_idx, (data, label) in enumerate(loader):
-        N, C, T, V, M = data.shape
-
-        plt.ion()
-        fig = plt.figure()
-        if is_3d:
-            from mpl_toolkits.mplot3d import Axes3D
-            ax = fig.add_subplot(111, projection='3d')
-        else:
-            ax = fig.add_subplot(111)
-
-        if graph is None:
-            p_type = ['b.', 'g.', 'r.', 'c.', 'm.', 'y.', 'k.', 'k.', 'k.', 'k.']
-            pose = [
-                ax.plot(np.zeros(V), np.zeros(V), p_type[m])[0] for m in range(M)
-            ]
-            ax.axis([-1, 1, -1, 1])
-            for t in range(T):
-                for m in range(M):
-                    pose[m].set_xdata(data[0, 0, t, :, m])
-                    pose[m].set_ydata(data[0, 1, t, :, m])
-                fig.canvas.draw()
-                plt.pause(0.001)
-        else:
-            p_type = ['b-', 'g-', 'r-', 'c-', 'm-', 'y-', 'k-', 'k-', 'k-', 'k-']
-            import sys
-            from os import path
-            sys.path.append(
-                path.dirname(path.dirname(path.dirname(path.abspath(__file__)))))
-            G = import_class(graph)()
-            edge = G.inward
-            pose = []
-            for m in range(M):
-                a = []
-                for i in range(len(edge)):
-                    if is_3d:
-                        a.append(ax.plot(np.zeros(3), np.zeros(3), p_type[m])[0])
-                    else:
-                        a.append(ax.plot(np.zeros(2), np.zeros(2), p_type[m])[0])
-                pose.append(a)
-            ax.axis([-1, 1, -1, 1])
-            if is_3d:
-                ax.set_zlim3d(-1, 1)
-            for t in range(T):
-                for m in range(M):
-                    for i, (v1, v2) in enumerate(edge):
-                        x1 = data[0, :2, t, v1, m]
-                        x2 = data[0, :2, t, v2, m]
-                        if (x1.sum() != 0 and x2.sum() != 0) or v1 == 1 or v2 == 1:
-                            pose[m][i].set_xdata(data[0, 0, t, [v1, v2], m])
-                            pose[m][i].set_ydata(data[0, 1, t, [v1, v2], m])
-                            if is_3d:
-                                pose[m][i].set_3d_properties(data[0, 2, t, [v1, v2], m])
-                fig.canvas.draw()
-                # plt.savefig('/home/lshi/Desktop/skeleton_sequence/' + str(t) + '.jpg')
-                plt.pause(0.01)
-
-
-if __name__ == '__main__':
-    import os
-    os.environ['DISPLAY'] = 'localhost:10.0'
-    data_path = "../data/ntu/xview/val_data_joint.npy"
-    label_path = "../data/ntu/xview/val_label.pkl"
-    graph = 'graph.ntu_rgb_d.Graph'
-    test(data_path, label_path, vid='S004C001P003R001A032', graph=graph, is_3d=True)
-    # data_path = "../data/kinetics/val_data.npy"
-    # label_path = "../data/kinetics/val_label.pkl"
-    # graph = 'graph.Kinetics'
-    # test(data_path, label_path, vid='UOD7oll3Kqo', graph=graph)
+    print(f'\nTotal samples: {len(feeder)}')
+    print(f'Time taken for {n_samps} sample loads: {time.time() - start:.2f} seconds')
+    print(f'Label for index {index}: {label}')
+    print(f'Data shape: {data_numpy.shape}')
+    print(f'Mask shape: {mask.shape}')

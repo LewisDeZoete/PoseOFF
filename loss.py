@@ -1,8 +1,8 @@
-import torch
+# import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from torch import linalg as LA
+# from torch import linalg as LA
 
 def masked_recon_loss(x, x_hat, mask):
     recon_loss = (F.mse_loss(x_hat, x, reduction="none") * mask).sum()\
@@ -37,3 +37,42 @@ class LabelSmoothingCrossEntropy(nn.Module):
         smooth_loss = -logprobs.mean(dim=-1)
         loss = confidence * nll_loss + self.smoothing * smooth_loss
         return loss.mean()
+
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+
+if __name__=='__main__':
+    from config.argclass import ArgClass
+    import torch
+    
+    arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml')
+    loggers = {}
+    
+    loggers['acc'] = [AverageMeter() for _ in range(10)]
+    loggers['cls_loss'] = AverageMeter()
+    loggers['auc'] = AverageMeter()
+    loggers['feature_loss'] = AverageMeter()
+    loggers['recon_loss'] = AverageMeter()
+    loggers['recon_2d_loss'] = AverageMeter()
+
+    [loggers['acc'][i].update(5) for i in range(10)]
+
+    loss_funcs = {'cls_loss': LabelSmoothingCrossEntropy(T=64), 'recon_loss': masked_recon_loss}
+
+    cls_loss = arg.lambda_1 * loss_funcs['cls_loss'](torch.randn(10, 64), torch.randint(0, 64, (10,)))

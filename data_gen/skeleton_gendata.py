@@ -62,7 +62,7 @@ start = time.time()
 # dataset or as indices for the 'unfinished' list in config
 if 'unfinished' in arg.__dict__:
     for idx in get_range(classes[arg.unfinished[arg_no]]):
-        poses, label = dataset[idx]
+        poses, label = dataset[idx] # TODO: Change these paths to reflect config paths
         path = f'data/UCF-101/pose/{list(arg.feeder_args["labels"].keys())[idx]}'.split('.')[0]  + ('.npy' if save_as_numpy else '.pt')
         if save_as_numpy:
             np.save(path, poses.numpy())

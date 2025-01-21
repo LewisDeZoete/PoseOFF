@@ -1,0 +1,36 @@
+First test run for infogcn full training
+### Libraries loaded
+### Arguments loaded
+	Output device: cuda:0
+transformer
+	Model total number of params: 661261
+	Loading weights from ./results/infogcn2/infogcn_TEST.pt
+Checkpoint file ./results/infogcn2/infogcn_TEST.pt does not contain a model state dict
+### Model created
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		test_loss
+	Resuming from checkpoint at epoch 0
+
++------------------- Job Report: 64022536 (FAILED) --------------------+
+| Memory (RAM)  [#####               ] 28.9% (578.6 MB peak / 2 GB)    |
+| CPU           [                    ]  2.4% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  0.3% (0-00:02:05 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            7                             |
+|   /fred   179.7 MB      0 B            7 K                           |
+|   OS      6 MB          0 B            819                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

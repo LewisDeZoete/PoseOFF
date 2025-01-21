@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
 from config.argclass import ArgClass
 
-config_name = './config/custom_pose/train_joint.yaml'
+config_name = './config/custom_pose/train_joint_infogcn.yaml'
 
 arg = ArgClass(arg=config_name)
 
@@ -47,8 +47,39 @@ if complete:
         yaml_data = yaml.safe_load(f_in)
 
     # Modify the data
-    yaml_data['dataloader']['preprocessed'] = True
+    yaml_data['feeder_args']['preprocessed'] = True
 
+    # TODO: Remove the MODIFIED portion if you don't need the comments anymore...
     with open(f'{config_name[:-5]}_MODIFIED.yaml', 'w') as f_out:
         # Save the modified data (it doesn't look as nice)
         yaml.dump(yaml_data, f_out, sort_keys=False)
+
+
+# Remove the TMP directory if it is empty
+if os.listdir('./TMP') == []:
+    os.rmdir('./TMP')
+else:
+    remove_annotations = []
+    # If it is not empty, get the annotations that need to be removed
+    for file in os.listdir('./TMP'):
+        with open(f'./TMP/{file}', 'r') as f:
+            list_of_files = f.readlines()
+            for line in list_of_files:
+                remove_annotations.append(line.strip())
+
+    # Remove the annotations from the ucf101_annotations.yaml file
+    with open(arg.feeder_args['label_path'], 'r') as f_in:
+        # Load the annotations data
+        annotations = yaml.safe_load(f_in)
+
+    # Remove the annotations
+    for ann in remove_annotations:
+        annotations.pop(ann)
+
+    # Save the modified annotations
+    with open(arg.feeder_args['label_path'], 'w') as f_out:
+        # Save the modified data (it doesn't look as nice)
+        yaml.dump(annotations, f_out, sort_keys=False)
+    
+    print(f'Removed {len(remove_annotations)} annotations from {arg.feeder_args["label_path"]}')
+    

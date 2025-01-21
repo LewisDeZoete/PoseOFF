@@ -28,6 +28,21 @@ arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
 classes = arg.classes
 transform_args = arg.extractor['flowpose']
 
+
+def is_null(data):
+    '''Check if the data is filled with zeros'''
+    if isinstance(data, torch.Tensor):
+        return torch.all(data == 0).item()
+    elif isinstance(data, np.ndarray):
+        return np.all(data == 0)
+    return False
+
+def log_zero_data(key):
+    '''Function to log the name of the data to a text file'''
+    class_name = key.split('/')[0] # Get the class name from the key
+    with open(f'./TMP/zero_data_{class_name}.txt', 'a') as f:
+        f.write(f'{key}\n') # Write the key to the file
+
 # Get the number of videos in the class (used to get indices of dataset)
 def get_range(class_no):
     len_class = 0
@@ -40,6 +55,7 @@ def get_range(class_no):
             len_class += 1
     return range(start_index, (start_index+len_class))
 
+
 # Get the device
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
@@ -49,39 +65,37 @@ flowPoseTransform = FlowPoseSampler(device=device, **transform_args)
 # Create the dataset object
 dataset = MultiStreamDataset(arg=arg, transforms=flowPoseTransform)
 
-# ----------------TESTING----------------
-output, labels = dataset[0]
-print(output.shape)
-print(labels)
-# --------------------------------------
 
+start = time.time()
+# Check if the indices we've been given are for the overall 
+# dataset or as indices for the 'unfinished' list in config
+if 'unfinished' in arg.__dict__:
+    for idx in get_range(classes[arg.unfinished[arg_no]]):
+        flowpose, label = dataset[idx]
+        if is_null(flowpose): # Check if the data is all zeros
+            log_zero_data(key = list(arg.feeder_args['labels'].keys())[idx])
+        path = f'{arg.feeder_args["data_paths"]["flowpose_path"]}{list(arg.feeder_args["labels"].keys())[idx]}' + ('.npy' if save_as_numpy else '.pt')
+        if save_as_numpy:
+            np.save(path, flowpose.numpy())
+        else:
+            torch.save(flowpose, path)
+    print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
 
-# start = time.time()
-# # Check if the indices we've been given are for the overall 
-# # dataset or as indices for the 'unfinished' list in config
-# if 'unfinished' in arg.__dict__:
-#     for idx in get_range(classes[arg.unfinished[arg_no]]):
-#         flowpose, label = dataset[idx]
-#         path = f'{arg.feeder_args["data_path"]["flowpose_path"]}{list(arg.feeder_args['labels'].keys())[idx]}' + ('.npy' if save_as_numpy else '.pt')
-#         if save_as_numpy:
-#             np.save(path, flowpose.numpy())
-#         else:
-#             torch.save(flowpose, path)
-#     print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
-
-# else:
-#     for idx in get_range(arg_no):
-#         flowpose, label = dataset[idx] # We're using FlowPoseSampler transform so this returns the flowpose!
-#         # Check if the folder that the videos belong in exists
-#         folder = f'{arg.feeder_args["data_path"]["flowpose_path"]}{list(arg.feeder_args['labels'].keys())[idx].split("/")[0]}/'
-#         try:
-#             # If not create the folder!
-#             os.mkdir(folder)
-#         except FileExistsError:
-#             pass
-#         path = os.path.join(folder, list(arg.feeder_args['labels'].keys())[idx].split('/')[-1] + ('.npy' if save_as_numpy else '.pt'))
-#         if save_as_numpy:
-#             np.save(path, flowpose.numpy())
-#         else:
-#             torch.save(flowpose, path)
-#     print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')
+else:
+    for idx in get_range(arg_no):
+        flowpose, label = dataset[idx] # We're using FlowPoseSampler transform so this returns the flowpose!
+        if is_null(flowpose):
+            log_zero_data(key = list(arg.feeder_args['labels'].keys())[idx])
+        # Check if the folder that the videos belong in exists
+        folder = f'{arg.feeder_args["data_paths"]["flowpose_path"]}{list(arg.feeder_args["labels"].keys())[idx].split("/")[0]}/'
+        try:
+            # If not create the folder!
+            os.mkdir(folder)
+        except FileExistsError:
+            pass
+        path = os.path.join(folder, list(arg.feeder_args['labels'].keys())[idx].split('/')[-1] + ('.npy' if save_as_numpy else '.pt'))
+        if save_as_numpy:
+            np.save(path, flowpose.numpy())
+        else:
+            torch.save(flowpose, path)
+    print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')

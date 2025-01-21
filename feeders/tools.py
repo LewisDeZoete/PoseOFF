@@ -217,7 +217,8 @@ def mirror(data_numpy, probability: float = 0.2):
 
 if __name__ == "__main__":
     data = np.load('data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy')
-    print(data.shape)
-    data = data[:, :50, ...]
-    data = auto_pading(data, 64)
-    print(data.shape)
+    C, T, V, M = data.shape
+    data = np.zeros((C, T, V, M))
+    valid_frame = data.sum(0, keepdims=True).sum(2, keepdims=True)
+    valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
+    data_numpy = valid_crop_resize(data_numpy=data, valid_frame_num=0, p_interval=[0.5, 1], window=64)
