@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as F
 
 
-def valid_crop_resize(data_numpy: np.array, valid_frame_num: int, p_interval: list, window: int):
+def valid_crop_resize(data_numpy: np.array, valid_frame_num: int, p_interval: list, window_size: int):
     # input: C,T,V,M
     C, T, V, M = data_numpy.shape
     begin = 0
@@ -33,8 +33,8 @@ def valid_crop_resize(data_numpy: np.array, valid_frame_num: int, p_interval: li
     data = torch.tensor(data,dtype=torch.float)
     data = data.permute(0, 2, 3, 1).contiguous().view(C * V * M, cropped_length)
     data = data[None, None, :, :]
-    data = F.interpolate(data, size=(C * V * M, window), mode='bilinear',align_corners=False).squeeze() # could perform both up sample and down sample
-    data = data.contiguous().view(C, V, M, window).permute(0, 3, 1, 2).contiguous().numpy()
+    data = F.interpolate(data, size=(C * V * M, window_size), mode='bilinear',align_corners=False).squeeze() # could perform both up sample and down sample
+    data = data.contiguous().view(C, V, M, window_size).permute(0, 3, 1, 2).contiguous().numpy()
 
     return data
 
@@ -64,29 +64,29 @@ def mean_subtractor(data_numpy, mean):
     return data_numpy
 
 
-def auto_pading(data_numpy, size, random_pad=False):
+def auto_pading(data_numpy, window_size=64, random_pad=False):
     C, T, V, M = data_numpy.shape
-    if T < size:
-        begin = random.randint(0, size - T) if random_pad else 0
-        data_numpy_paded = np.zeros((C, size, V, M))
+    if T < window_size:
+        begin = random.randint(0, window_size - T) if random_pad else 0
+        data_numpy_paded = np.zeros((C, window_size, V, M))
         data_numpy_paded[:, begin:begin + T, :, :] = data_numpy
         return data_numpy_paded
     else:
         return data_numpy
 
 
-def random_choose(data_numpy, size, auto_pad=True):
+def random_choose(data_numpy, window_size=64, auto_pad=True):
     C, T, V, M = data_numpy.shape
-    if T == size:
+    if T == window_size:
         return data_numpy
-    elif T < size:
+    elif T < window_size:
         if auto_pad:
-            return auto_pading(data_numpy, size, random_pad=True)
+            return auto_pading(data_numpy, window_size, random_pad=True)
         else:
             return data_numpy
     else:
-        begin = random.randint(0, T - size)
-        return data_numpy[:, begin:begin + size, :, :]
+        begin = random.randint(0, T - window_size)
+        return data_numpy[:, begin:begin + window_size, :, :]
 
 
 def random_move(data_numpy,
@@ -213,12 +213,55 @@ def mirror(data_numpy, probability: float = 0.2):
         data_numpy[3:] = flow.reshape(-1, T, V, M)  # Reshape back to original dimensions
 
     return data_numpy 
+
+
+def average_flow(data_numpy):
+    '''
+    Averages the flow vectors across the spatial dimensions.
+    Flow channel output is 2, simpy the average x and y directions.
+    '''
+    C, T, V, M = data_numpy.shape
+    W = int(((C-3) / 2) ** 0.5)
+
+    # Average flow vectors
+    flow = data_numpy[3:].reshape(2, W, W, T, V, M)  # Reshape to (2, W, W, T, V, M)
+    flow = flow.mean(axis=(1, 2))  # Average flow vectors
+    data_numpy = np.concatenate([data_numpy[:3], flow.reshape(-1, T, V, M)], axis=0)  # Reshape back to original dimensions
+
+    return data_numpy
+
+
+def absolute_flow(data_numpy, window_mean=False):
+    '''
+    Converts flow vectors to absolute values.
+    if window_mean is True, the flow vectors are averaged across the spatial dimensions.
+    '''
+    C, T, V, M = data_numpy.shape
+    W = int(((C-3) / 2) ** 0.5)
+
+    # Calculate absolute flow vectors
+    flow = data_numpy[3:].reshape(2, W, W, T, V, M)  # Reshape to (2, W, W, T, V, M)
+    flow = np.linalg.norm(flow, axis=0)  # Calculate absolute flow vectors
+    if window_mean:
+        flow = flow.mean(axis=(0, 1))  # Average flow vectors across spatial dimension
+    data_numpy = np.concatenate([data_numpy[:3], flow.reshape(-1, T, V, M)], axis=0)  # Reshape back to original dimensions
+
+    return data_numpy
+
     
 
 if __name__ == "__main__":
     data = np.load('data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy')
     C, T, V, M = data.shape
-    data = np.zeros((C, T, V, M))
+
+    # Crop temporal dimension to only include valid frames
     valid_frame = data.sum(0, keepdims=True).sum(2, keepdims=True)
     valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
-    data_numpy = valid_crop_resize(data_numpy=data, valid_frame_num=0, p_interval=[0.5, 1], window=64)
+    data = valid_crop_resize(data, valid_frame_num, p_interval=[0.95], window_size=64)
+    print(f'{data.shape} - valid_crop_resize')
+
+    for transform in [random_shift, random_choose, auto_pading, random_move, absolute_flow]:
+        data = transform(data)
+        print(f'{data.shape} - {transform.__name__}')
+
+    

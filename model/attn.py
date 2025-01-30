@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from einops import rearrange
 
 class Flow_conv(nn.Module):
     """
@@ -39,6 +40,7 @@ class Flow_conv(nn.Module):
         self.kernel_size = kernel_size
         self.original_channels = original_channels
         self.out_channels = out_channels
+        self.flow_out_channels = out_channels-original_channels
         self.flow_window = flow_window
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels=2,
@@ -51,23 +53,27 @@ class Flow_conv(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((1,1))
         )
-        self.fc = nn.Linear(32, self.out_channels)
+        self.fc = nn.Linear(32, self.flow_out_channels)
 
     def forward(self, x):
-        #(N, T, M, V, C)
-        N, T, M, V, C = x.size()
-        # x of shape (batch, 300, 2, 17, channels+2W**2)
-        flow_data = x.view(N*T*M*V, C)[:, self.original_channels:] # (N*T*M*V, 2W**2)
-        flow_data = flow_data.view(N*T*M*V, self.flow_window, self.flow_window, 2).permute(0, 3, 1, 2)
+        N, C, T, V, M = x.size()
+        # x of shape (batch, channels+2W**2, 300, 2, 17)
+        flow_data = rearrange(x, 'n c t v m -> (n t v m) c', n=N, t=T, v=V, m=M) # (N*T*M*V, C)
+        flow_data = rearrange(flow_data[:, self.original_channels:], \
+                              'skels (w h c) -> skels c w h', \
+                                w=self.flow_window,
+                                h=self.flow_window,
+                                c=2) # (N*T*M*V, W, H, 2)
+        # flow_data = flow_data.view(N*T*M*V, self.flow_window, self.flow_window, 2).permute(0, 3, 1, 2)
 
         # Apply convolutions, dropout between then flatten 
         flow_features = self.conv(flow_data)    # Apply conv
         flow_features = flow_features.view(flow_features.size(0), -1) # flatten
         flow_features = self.fc(flow_features) # Linear layer to reduce out_channels
-        flow_features = flow_features.view(N,T,M,V, -1)
+        flow_features = flow_features.view(N,self.flow_out_channels,T,V,M)
         
         # Stack the output of this cnn onto the original graph features
-        x = torch.cat((x[...,:self.original_channels], flow_features), dim=4)
+        x = torch.cat((x[:,:self.original_channels,...], flow_features), dim=1)
 
         return x
 
@@ -203,56 +209,30 @@ if __name__ == "__main__":
     graph = AdjMatrixGraph()
     A_binary = graph.A_binary
 
-    # TODO: DEBUG REMOVE
-    # node_attn = NodeAttention(in_features_skeleton=3, 
-    #                           in_features_flow=50,
-    #                           out_features=16)
-    # msgcn1 = MultiScale_GraphConv(num_scales=8, 
-    #                              in_channels=16, 
-    #                              out_channels=64, 
-    #                              A_binary=A_binary)
-    # msgcn2 = MultiScale_GraphConv(num_scales=8, 
-    #                              in_channels=64, 
-    #                              out_channels=64*2, 
-    #                              A_binary=A_binary)
-    # tempattn = TemporalAttention(feature_dim=64*2, attention_dim=16)
-    
-    # N, T, M, V, C = 16, 300, 2, 17, 53
-    # x = torch.randn(N, T, M, V, C)
-    # x = node_attn(x) # -> (N, T, M, V, 16)
-    # x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 16, T, V)
-    # x = msgcn1(x) # -> (N*M, 64, T, V)
-    # x = msgcn2(x) # -> (N*M, 64*2, T, V)
-    # x = tempattn(x) # -> (N*M, 64*2, T, V)
+    # # Example usage temporal transformer
+    # batch_size = 16
+    # num_people = 2
+    # num_frames = 300
+    # embedding_dim = 192
+    # num_classes = 101
 
-    # Example usage temporal transformer
-    batch_size = 16
-    num_people = 2
-    num_frames = 300
-    embedding_dim = 192
-    num_classes = 101
+    # model = TemporalTransformer(
+    #     d_model=embedding_dim,
+    #     nhead=8,
+    #     num_encoder_layers=4,
+    # )
 
-    model = TemporalTransformer(
-        d_model=embedding_dim,
-        nhead=8,
-        num_encoder_layers=4,
-    )
-
-    inputs = torch.randn(batch_size, num_frames, embedding_dim)  # Example input
-    outputs = model(inputs)  # Shape: (batch_size, num_classes)
-    print(outputs.shape)
+    # inputs = torch.randn(batch_size, num_frames, embedding_dim)  # Example input
+    # outputs = model(inputs)  # Shape: (batch_size, num_classes)
+    # print(outputs.shape)
 
 
     # Example usage
-    # N, T, M, V, C = 16, 300, 2, 17, 53
-    # x = torch.randn(N, T, M, V, C)
-    # flow_conv = Flow_conv(kernel_size=3, 
-    #                       flow_window = 5,
-    #                       original_channels=3, 
-    #                       out_channels=4)
-    # node_attn = NodeAttention(in_features_skeleton=3, 
-    #                           in_features_flow=50,
-    #                           out_features=16)
-    # flows = flow_conv(x)
-    # attns = node_attn(x)
-    # print(attns.shape)
+    N, T, M, V, C = 16, 300, 2, 17, 53
+    x = torch.randn(N, C, T, V, M)
+    flow_conv = Flow_conv(kernel_size=3, 
+                          flow_window = 5,
+                          original_channels=3, 
+                          out_channels=4)
+    flows = flow_conv(x)
+    print(flows.shape)

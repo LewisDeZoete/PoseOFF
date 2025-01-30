@@ -9,12 +9,14 @@ feeder_args:
   label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
   modality: flowpose
   p_interval: [0.5, 1]
-  split: train
-  random_choose: True
   random_shift: True
-  random_move: True
-  random_rot: True
+  random_choose: True
   window_size: 64
+  random_move: True
+  random_rot: False
+  average_flow: False # C=5
+  absolute_flow: 
+    window_mean: True # C=4, else C=28
 
 # TODO: Ensure this extractor section doesn't break the extractors
 # TODO: transforms are only for data_gen, move out of dataloader
@@ -38,7 +40,7 @@ model_args:
   num_point: 17
   num_person: 2
   graph: graph.yolo_pose.Graph
-  in_channels: 53
+  in_channels: 4 # NOTE: change this if you change the average/absolute flow feeder args
   num_head: 3
   ode_method: euler
   k: 8
@@ -50,32 +52,32 @@ model_args:
   dilation: 1
   SAGC_proj: True # Using self-attention graph convolution, (GCN if False)
   backbone: transformer
-  num_cls: 1 # Not sure,
+  num_cls: 10 # Number of classification heads used
 ignore_weights: []
 phase: train
 # weights: ./pretrained_models/kinetics_joint.pt
 
 optim:
-  base_lr: 0.5
+  base_lr: 0.1
   nesterov: True
-  weight_decay: 0.0005
-  # weight_decay: 0.0003
+  weight_decay: 0.0003
+  step: [50, 60]
+  gamma: 0.1
+  # weight_decay: 0.0005
   # step: [45,55,80]
-  # gamma: 0.1
-  step: [10, 45]
-  gamma: 0.90
-lambda_1: 1
-lambda_2: 0.1
-lambda_3: 0.1
+  # gamma: 0.90
+lambda_1: 1 # CLS loss (1 from paper)
+lambda_2: 0.1 # Pred/recon loss (1e-1 from paper)
+lambda_3: 0.001 # Feature loss (1e-3 from paper)
 lambda_4: 0.0
 lambda_5: 0.0
   
 
 # training
-num_epoch: 100
+num_epoch: 70
 device: 0
-batch_size: 64
-forward_batch_size: 64
+batch_size: 128
+forward_batch_size: 128
 test_batch_size: 256
 half: False
 

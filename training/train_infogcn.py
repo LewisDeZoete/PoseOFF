@@ -31,14 +31,18 @@ def run_epoch(
         'recon_2d_loss': AverageMeter object (maybe not?)
         'kl_div': AverageMeter object (maybe not?)
     """
-    model.train()
+    if prefix == "train":
+        model.train()
+    else:
+        model.eval()
 
     # AverageResults objects (work like running loss)
     log_acc = [
         AverageMeter() for _ in range(10)
     ]  # This one is a list of 10 AverageMeter objects
+    log_loss = AverageMeter() # Total loss
     log_cls_loss = AverageMeter()  # class loss
-    # loggers["auc"].reset()  # area under the curve
+    # log_auc = AverageMeter()  # AUC TODO: make an AUC logger
     log_feature_loss = AverageMeter()  # feature loss
     log_recon_loss = AverageMeter()  # reconstruction loss
     # recon_2d_loss = AverageMeter()  # 2D reconstruction loss
@@ -83,6 +87,7 @@ def run_epoch(
                 else:
                     mask_recon[i, :, :, :i, :, :] = 0.0
             mask_recon = rearrange(mask_recon, "n b c t v m -> (n b) c t v m")
+
             recon_loss = arg.lambda_2 * loss_funcs["recon_loss"](
                 x_hat, x_gt, mask_recon
             )
@@ -94,32 +99,36 @@ def run_epoch(
             z_0 = repeat(z_0, "b c t v-> n b c t v", n=N_step)
             z_hat = z_hat.view(N_step, B_, C, T, V)
             mask_feature = z_hat != 0.0
+
             feature_loss = arg.lambda_3 * loss_funcs["recon_loss"](
                 z_hat, z_0, mask_feature
-            )  # F.mse_loss(z_0, z_hat)
-
+            ) # F.mse_loss(z_0, z_hat)
+    
         # KL divergence (regularization)
         # TODO: REMOVE (kl_div is always torch.tensor(0.0))
         if arg.lambda_4:
             kl_div = arg.lambda_4 * kl_div
 
-        # Add up losses (EQ. 14 from paper)
-        loss = cls_loss + recon_loss + feature_loss + kl_div
+        if prefix == "train":
+            # Add up losses (EQ. 14 from paper)
+            loss = cls_loss + recon_loss + feature_loss + kl_div
 
-        # Backward
-        optimiser.zero_grad()
-        if arg.half:  # mixed precision -> formerly using apex amp
-            with torch.autocast(device_type="cuda") as scaled_loss:
-                scaled_loss.backward()
+            # Backward
+            optimiser.zero_grad()
+            if arg.half:  # mixed precision -> formerly using apex amp
+                with torch.autocast(device_type="cuda") as scaled_loss:
+                    scaled_loss.backward()
+            else:
+                loss.backward()
+
+            # Prevent gradient clipping
+            nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimiser.step()
         else:
-            loss.backward()
-
-        # Prevent gradient clipping
-        nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        optimiser.step()
+            loss = arg.lambda_1 * cls_loss + arg.lambda_2 * recon_loss
 
         # Update loggers
-        value, predict_label = torch.max(y_hat.data, 1)
+        _, predict_label = torch.max(y_hat.data, 1)
         for i, ratio in enumerate([(i + 1) / 10 for i in range(10)]):
             log_acc[i].update(
                 (predict_label == y.data)
@@ -128,12 +137,13 @@ def run_epoch(
                 .mean(),
                 B,
             )
+        log_loss.update(loss.data.item(), B)
         log_cls_loss.update(cls_loss.data.item(), B)
         log_feature_loss.update(feature_loss.data.item(), B)
         log_recon_loss.update(recon_loss.data.item(), B)
         # loggers['kl_div'].update(kl_div.data.item(), B)
 
-        # AUC = np.mean([results['acc'][i].avg.cpu().numpy() for i in range(10)])
+        AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
         # tbar.set_description(
         #     f"[Epoch #{epoch}] "
         #     f"AUC:{AUC:.3f}, "
@@ -143,7 +153,7 @@ def run_epoch(
         # )
 
     # Calculate area under curve from the 10 accuracy values
-    AUC = np.mean([results["acc"][i].avg.cpu().numpy() for i in range(10)])
+    AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
     # train_dict = {
     #     "train/Recon2D_loss": results['recon_loss'].avg,
     #     "train/cls_loss": results['cls_loss'].avg,
@@ -155,6 +165,7 @@ def run_epoch(
     # wandb.log(train_dict)
 
     results[prefix + "_" + "AUC"].append(AUC)
+    results[prefix + "_" + "loss"].append(loss)
     results[prefix + "_" + "cls_loss"].append(log_cls_loss.avg)
     results[prefix + "_" + "feature_loss"].append(log_feature_loss.avg)
     results[prefix + "_" + "recon_loss"].append(log_recon_loss.avg)
@@ -191,13 +202,9 @@ def train_network(
         device: the compute lodation to perform training
 
     """
-    if score_funcs is None:
-        score_funcs = {}  # Empty set
-
     to_track = ["epoch", "training_time", "train_loss", "lr"]
     if test_loader is not None:
         to_track.append("test_loss")
-        max_acc = 0  # If we have a test loader, track the best test accuracy!
     if score_funcs is not None:
         for eval_score in score_funcs:
             to_track.append("train_" + eval_score)
@@ -211,6 +218,7 @@ def train_network(
     for item in to_track:
         results[item] = []
         print(f"\t\t{item}")
+    print(results)
 
     # Place the model on the correct compute resource (CPU or GPU)
     model.to(device)
@@ -269,10 +277,8 @@ def train_network(
                     prefix="test",
                     desc="Testing",
                 )
-            # Save best results!
-            if results["train_accuracy"][-1] > max_acc:
-                max_acc = results["train_accuracy"][-1]
-            print(f"\t\t{epoch} EPOCH BEST TEST ACC: {max(results['test_accuracy'])}")
+            # TODO: AUC is not in both ms-g3d and infogcn results dict, change to accomidate
+            print(f"\t\t{epoch} EPOCH BEST TEST ACC: {max(results['test_AUC'])}")
 
         if checkpoint_file is not None:
             if epoch % checkpoint_freq == 0:
@@ -319,8 +325,10 @@ if __name__ == "__main__":
     from model import ModelLoader
     from feeders import feeder
     from torch.utils.data import DataLoader
+    from loss import LabelSmoothingCrossEntropy, masked_recon_loss
 
     arg = ArgClass("./config/custom_pose/train_joint_infogcn.yaml")
+    arg.checkpoint_file = "DELETE_ME.pt"
 
     # Model
     modelLoader = ModelLoader(arg)
@@ -334,3 +342,21 @@ if __name__ == "__main__":
     train_dataloader = DataLoader(
         train_dataset, batch_size=arg.batch_size, shuffle=True
     )
+
+    # Create the loss function(s)
+    cls_loss = LabelSmoothingCrossEntropy(T=arg.model_args["T"])
+    recon_loss = masked_recon_loss
+    loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
+
+    # TRAINING!
+    score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
+
+    results = train_network(arg,
+                            model,
+                            loss_funcs,
+                            train_dataloader,
+                            score_funcs=score_funcs,
+                            device="cpu",
+                            epochs=arg.num_epoch,
+                            checkpoint_file=arg.checkpoint_file,
+                            checkpoint_freq=arg.checkpoint_freq)

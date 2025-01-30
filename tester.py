@@ -71,14 +71,8 @@ print("### Model created")
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 
 # # Create the datasets and dataloaders
-train_dataset = feeder.Feeder(**arg.feeder_args)
-test_dataset = feeder.Feeder(
-    arg.feeder_args["data_paths"],
-    arg.feeder_args["label_path"],
-    arg.feeder_args["labels"],
-    arg.feeder_args["modality"],
-    split="test",
-)
+train_dataset = feeder.Feeder(**arg.feeder_args, split='train')
+test_dataset = feeder.Feeder(**arg.feeder_args, split="test")
 generator = torch.Generator().manual_seed(
     42
 )  # It shouldn't be random when you resume training
@@ -105,19 +99,19 @@ optimiser = optim.SGD(
     weight_decay=arg.optim["weight_decay"],
 )
 
-scheduler1 = optim.lr_scheduler.LinearLR(
-    optimiser, start_factor=0.5, total_iters=arg.optim["step"][0]
-)
-scheduler2 = optim.lr_scheduler.ConstantLR(
-    optimiser, factor=1, total_iters=arg.optim["step"][1]
-)
-scheduler3 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=arg.optim["gamma"])
-scheduler = optim.lr_scheduler.SequentialLR(
-    optimiser,
-    schedulers=[scheduler1, scheduler2, scheduler3],
-    milestones=arg.optim["step"],
-)
-# scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
+# scheduler1 = optim.lr_scheduler.LinearLR(
+#     optimiser, start_factor=0.5, total_iters=arg.optim["step"][0]
+# )
+# scheduler2 = optim.lr_scheduler.ConstantLR(
+#     optimiser, factor=1, total_iters=arg.optim["step"][1]
+# )
+# scheduler3 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=arg.optim["gamma"])
+# scheduler = optim.lr_scheduler.SequentialLR(
+#     optimiser,
+#     schedulers=[scheduler1, scheduler2, scheduler3],
+#     milestones=arg.optim["step"],
+# )
+scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
 
 # Create the loss function(s)
 cls_loss = LabelSmoothingCrossEntropy(T=arg.model_args["T"])
@@ -129,6 +123,7 @@ loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 # score_funcs = {'accuracy': accuracy_score,
 #                'confusion matrix': confusion_matrix,
 #                'classification report': classification_report}
+score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
 
 results = train_network(
     arg=arg,
@@ -136,7 +131,7 @@ results = train_network(
     loss_funcs=loss_funcs,
     train_loader=train_dataloader,
     test_loader=test_dataloader,
-    score_funcs=None, # TODO: Implement score functions for infogcn
+    score_funcs=score_funcs, # TODO: Implement score functions for infogcn
     device=device,
     epochs=arg.num_epoch,
     scheduler=scheduler,

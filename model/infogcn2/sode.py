@@ -6,6 +6,12 @@ import torch.nn.functional as F
 
 from torch import nn
 
+import sys
+import os
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+path = os.path.abspath(os.path.join(curr_dir, '..', '..'))
+sys.path.append(path)
+
 # TODO: If changing folder structure, update this import
 # from model.modules import SA_GC, TemporalEncoder, GCN
 # from model.utils import bn_init, import_class, sample_standard_gaussian,\
@@ -15,6 +21,7 @@ from model.infogcn2.modules import SA_GC, TemporalEncoder, GCN
 from model.infogcn2.utils import bn_init, import_class, sample_standard_gaussian,\
     cum_mean_pooling, cum_max_pooling, identity, max_pooling
 from model.infogcn2.encoder_decoder import Encoder_z0_RNN, RNN
+from model.attn import Flow_conv
 
 
 from einops import rearrange, repeat
@@ -101,11 +108,10 @@ class ODEFunc(nn.Module):
         return x
 
 class SODE(nn.Module):
-    # TODO: Ensure that the commented out lines are removed from the final version
     def __init__(self, num_class=60, num_point=25, num_person=2, ode_method='rk4',
                  graph=None, in_channels=3, num_head=3, k=0, base_channel=64, depth=4, device='cuda',
                  T=64, n_step=1, dilation=1, SAGC_proj=True, num_cls=10,
-                 n_sample=1, backbone='transformer'):
+                 n_sample=1, backbone='transformer', cnn=False):
         super(SODE, self).__init__()
 
         self.Graph = import_class(graph)()
@@ -116,23 +122,23 @@ class SODE(nn.Module):
             shift_idx = torch.arange(0, T, dtype=int).view(1,T,1,1)
             shift_idx = repeat(shift_idx, 'b t c v -> n b t c v', n=n_step)
             shift_idx = shift_idx - torch.arange(1, n_step+1, dtype=int).view(n_step,1,1,1,1)
-            # self.mask = torch.triu(torch.ones(n_step, T), diagonal=1).view(n_step,1,T,1,1).cuda()
             self.mask = torch.triu(torch.ones(n_step, T), diagonal=1).view(n_step,1,T,1,1).to(device)
             self.z0_prior = Normal(torch.Tensor([0.0]).to(device), torch.Tensor([1.]).to(device))
-            # self.shift_idx = shift_idx.cuda()%T
-            self.shift_idx = shift_idx%T
+            self.shift_idx = shift_idx.to(device)%T
             self.num_class = num_class
             self.num_point = num_point
             self.num_person = num_person
             self.cls_idx = [int(math.ceil(T*i/num_cls)) for i in range(num_cls+1)]
             self.cls_idx[0] = 0
             self.cls_idx[-1] = T
-            # self.zero = torch.tensor(0.0).cuda()
-            self.zero = torch.tensor(0.0)
+            self.zero = torch.tensor(0.0).to(device)
             self.n_step = n_step
-            # self.arange_n_step = torch.arange(n_step+1).cuda()
-            self.arange_n_step = torch.arange(n_step+1)
-        self.to_joint_embedding = nn.Linear(in_channels, base_channel)
+            self.arange_n_step = torch.arange(n_step+1).to(device)
+        self.cnn = cnn
+        if cnn:
+            self.flow_cnn = Flow_conv(kernel_size=3, flow_window=5, original_channels=3, out_channels=base_channel)
+        else:
+            self.to_joint_embedding = nn.Linear(in_channels, base_channel)
         self.pos_embedding = nn.Parameter(torch.randn(1, self.num_point, base_channel))
         self.temporal_encoder = TemporalEncoder(
             seq_len=T,
@@ -147,11 +153,11 @@ class SODE(nn.Module):
             SAGC_proj=SAGC_proj
         ) if backbone == "transformer" else Encoder_z0_RNN(base_channel, A, device)
         self.n_sample = n_sample
-        print(backbone)
+        print(f'\tTemporal encoder: {backbone}')
 
         method = ode_method
         # ode_func = ODEFunc(base_channel, torch.from_numpy(self.Graph.A_norm).cuda(), N=n_step, T=T).to(device)
-        ode_func = ODEFunc(base_channel, torch.from_numpy(self.Graph.A_norm), N=n_step, T=T).to(device)
+        ode_func = ODEFunc(base_channel, torch.from_numpy(self.Graph.A_norm).to(device), N=n_step, T=T).to(device)
         self.diffeq_solver = DiffeqSolver(ode_func, method=method) if method != "RNN" else \
             RNN(base_channel, A, n_step)
 
@@ -235,7 +241,7 @@ class SODE(nn.Module):
         return  torch.from_numpy(I - np.linalg.matrix_power(A_outward, k))
 
     def KL_div(self, z_mu, z_std, kl_coef=1):
-        # TODO: remove (never called, z_mu and z_std must be torch...Distribution's)
+        # TODO: remove (never called, z_mu and z_std must be torch Distribution's)
         z_distr = Normal(z_mu, z_std)
         kldiv_z0 = kl_divergence(z_distr, self.z0_prior)
         if torch.isnan(kldiv_z0).any():
@@ -247,10 +253,14 @@ class SODE(nn.Module):
 
     def forward(self, x):
         N, C, T, V, M = x.size()
-        x = rearrange(x, 'n c t v m -> (n m t) v c', n=N, m=M, v=V)
 
         # embedding
-        x = self.to_joint_embedding(x)
+        if self.cnn:
+            x = self.flow_cnn(x)
+            x = rearrange(x, 'n c t v m -> (n m t) v c', n=N, m=M, v=V)
+        else:
+            x = rearrange(x, 'n c t v m -> (n m t) v c', n=N, m=M, v=V)
+            x = self.to_joint_embedding(x)
         x = x + self.pos_embedding[:, :self.num_point]
 
         # encoding
@@ -293,30 +303,36 @@ class SODE(nn.Module):
 if __name__=='__main__':
     import sys
     sys.path.insert(0, '..')
+    from config.argclass import ArgClass
+
+    arg = ArgClass('config/custom_pose/train_joint_infogcn.yaml')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = SODE(
-            num_class=101,
-            num_point=17,
-            num_person=2,
-            graph='graph.yolo_pose.Graph',
-            in_channels=53,
-            num_head=3,
-            ode_method='euler',
-            k=8,
-            base_channel=64, # Hidden dimension
-            depth=4,
-            device = device,
-            T=64, # Maximum sequence length
-            n_step=3, # Number of ODE solver steps?
-            dilation=1,
-            SAGC_proj=True, # Using self-attention graph convolution, (GCN if False)
-            backbone='transformer',
-            num_cls=1, # Not sure, 
-        )
+    model = SODE(arg.model_args)
+
+    # model = SODE(
+    #         num_class=101,
+    #         num_point=17,
+    #         num_person=2,
+    #         graph='graph.yolo_pose.Graph',
+    #         in_channels=5,
+    #         num_head=3,
+    #         ode_method='euler',
+    #         k=8,
+    #         base_channel=64, # Hidden dimension
+    #         depth=4,
+    #         device = device,
+    #         T=64, # Maximum sequence length
+    #         n_step=3, # Number of ODE solver steps?
+    #         dilation=1,
+    #         SAGC_proj=True, # Using self-attention graph convolution, (GCN if False)
+    #         backbone='transformer',
+    #         num_cls=1, # Not sure
+    #         cnn=False
+    #     )
     model = model.to(device)
     
     # N, C, T, V, M
-    x = torch.randn((8, 53, 64, 17, 2)).to(device)
+    x = torch.randn((8, 5, 64, 17, 2)).to(device)
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)

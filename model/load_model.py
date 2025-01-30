@@ -89,7 +89,7 @@ class ModelLoader:
 
 
 if __name__=='__main__':
-    from lib.utils.objects import ArgClass
+    from config.argclass import ArgClass
     import time
     
     arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml')
@@ -104,7 +104,7 @@ if __name__=='__main__':
         start = time.time()
         b = 8
         # N, C, T, V, M
-        x = torch.randn((8, 3, 64, 17, 2)).to(modelLoader.output_device)
+        x = torch.randn((8, 5, 64, 17, 2)).to(modelLoader.output_device)
         out = skel_model(x) # tuple(y, x_hat, z_0, z_hat_shifted, self.zero)
         print(out[0].shape)
         print(f'\nOutput shape (batch size = {b}): {out[0].shape}')

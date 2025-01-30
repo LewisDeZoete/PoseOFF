@@ -1,0 +1,175 @@
+Linear embed (default) LR schedule from paper (multistep LR)
+### Libraries loaded
+feeder: feeders.feeder.Feeder
+feeder_args:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/UCF-101/pose/', 'flow_path': './data/UCF-101/flow/', 'flowpose_path': './data/UCF-101/flowpose/'}
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  modality: flowpose
+  p_interval: [0.5, 1]
+  split: train
+  random_choose: True
+  random_shift: True
+  random_move: True
+  random_rot: True
+  window_size: 64
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False}
+model: model.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  in_channels: 53
+  num_head: 3
+  ode_method: euler
+  k: 8
+  base_channel: 64
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  dilation: 1
+  SAGC_proj: True
+  backbone: transformer
+  num_cls: 1
+ignore_weights: []
+phase: train
+optim:
+  base_lr: 0.1
+  nesterov: True
+  weight_decay: 0.0003
+  step: [50, 60]
+  gamma: 0.1
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+num_epoch: 70
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/
+config: custom_pose
+limb: joint_infogcn
+run_name: infogcn_linear
+description: Linear embed (default) LR schedule from paper (multistep LR)
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 661261
+	Loading weights from ./results/infogcn2/infogcn_linear.pt
+	Checkpoint file does not yet exist
+	([Errno 2] No such file or directory: './results/infogcn2/infogcn_linear.pt')
+### Model created
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		test_loss
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+{'epoch': [], 'training_time': [], 'train_loss': [], 'lr': [], 'test_loss': [], 'train_AUC': [], 'test_AUC': [], 'train_cls_loss': [], 'test_cls_loss': [], 'train_feature_loss': [], 'test_feature_loss': [], 'train_recon_loss': [], 'test_recon_loss': []}
+	Created new checkpoint file: ./results/infogcn2/infogcn_linear.pt
+		0 EPOCH BEST TEST ACC: 0.036646969616413116
+		1 EPOCH BEST TEST ACC: 0.09573961794376373
+		2 EPOCH BEST TEST ACC: 0.12518107891082764
+		3 EPOCH BEST TEST ACC: 0.18134769797325134
+		4 EPOCH BEST TEST ACC: 0.22625811398029327
+		5 EPOCH BEST TEST ACC: 0.26649826765060425
+		6 EPOCH BEST TEST ACC: 0.3106366991996765
+		7 EPOCH BEST TEST ACC: 0.33714258670806885
+		8 EPOCH BEST TEST ACC: 0.3950343132019043
+		9 EPOCH BEST TEST ACC: 0.4356462061405182
+		10 EPOCH BEST TEST ACC: 0.48580828309059143
+		11 EPOCH BEST TEST ACC: 0.5179088711738586
+		12 EPOCH BEST TEST ACC: 0.5548799633979797
+		13 EPOCH BEST TEST ACC: 0.5798799395561218
+		14 EPOCH BEST TEST ACC: 0.6034121513366699
+		15 EPOCH BEST TEST ACC: 0.6356843113899231
+		16 EPOCH BEST TEST ACC: 0.6484369039535522
+		17 EPOCH BEST TEST ACC: 0.677621066570282
+		18 EPOCH BEST TEST ACC: 0.677621066570282
+		19 EPOCH BEST TEST ACC: 0.7212162017822266
+		20 EPOCH BEST TEST ACC: 0.7212162017822266
+		21 EPOCH BEST TEST ACC: 0.729574978351593
+		22 EPOCH BEST TEST ACC: 0.74146968126297
+		23 EPOCH BEST TEST ACC: 0.74146968126297
+		24 EPOCH BEST TEST ACC: 0.7581967711448669
+		25 EPOCH BEST TEST ACC: 0.7743138074874878
+		26 EPOCH BEST TEST ACC: 0.7743138074874878
+		27 EPOCH BEST TEST ACC: 0.7844167351722717
+		28 EPOCH BEST TEST ACC: 0.7903069257736206
+		29 EPOCH BEST TEST ACC: 0.7931281328201294
+		30 EPOCH BEST TEST ACC: 0.7947197556495667
+		31 EPOCH BEST TEST ACC: 0.8044891357421875
+		32 EPOCH BEST TEST ACC: 0.809769332408905
+		33 EPOCH BEST TEST ACC: 0.8154594302177429
+		34 EPOCH BEST TEST ACC: 0.8154594302177429
+		35 EPOCH BEST TEST ACC: 0.8175085783004761
+		36 EPOCH BEST TEST ACC: 0.8341118097305298
+		37 EPOCH BEST TEST ACC: 0.8341118097305298
+		38 EPOCH BEST TEST ACC: 0.8411837816238403
+		39 EPOCH BEST TEST ACC: 0.8431662321090698
+		40 EPOCH BEST TEST ACC: 0.8431662321090698
+		41 EPOCH BEST TEST ACC: 0.8537076115608215
+		42 EPOCH BEST TEST ACC: 0.8537076115608215
+		43 EPOCH BEST TEST ACC: 0.8537076115608215
+		44 EPOCH BEST TEST ACC: 0.8540316820144653
+		45 EPOCH BEST TEST ACC: 0.8544224500656128
+		46 EPOCH BEST TEST ACC: 0.8649161458015442
+		47 EPOCH BEST TEST ACC: 0.8649161458015442
+		48 EPOCH BEST TEST ACC: 0.8649161458015442
+		49 EPOCH BEST TEST ACC: 0.8649161458015442
+		50 EPOCH BEST TEST ACC: 0.9027354121208191
+		51 EPOCH BEST TEST ACC: 0.9080823659896851
+		52 EPOCH BEST TEST ACC: 0.9091880917549133
+		53 EPOCH BEST TEST ACC: 0.9110466241836548
+		54 EPOCH BEST TEST ACC: 0.9110466241836548
+		55 EPOCH BEST TEST ACC: 0.912743091583252
+		56 EPOCH BEST TEST ACC: 0.9148208498954773
+		57 EPOCH BEST TEST ACC: 0.9148208498954773
+		58 EPOCH BEST TEST ACC: 0.9156404733657837
+		59 EPOCH BEST TEST ACC: 0.9161742925643921
+		60 EPOCH BEST TEST ACC: 0.9182330369949341
+		61 EPOCH BEST TEST ACC: 0.9191001653671265
+		62 EPOCH BEST TEST ACC: 0.9191001653671265
+		63 EPOCH BEST TEST ACC: 0.9191001653671265
+		64 EPOCH BEST TEST ACC: 0.9191001653671265
+		65 EPOCH BEST TEST ACC: 0.9191955327987671
+		66 EPOCH BEST TEST ACC: 0.9191955327987671
+		67 EPOCH BEST TEST ACC: 0.9191955327987671
+
++------------------- Job Report: 64126593 (TIMEOUT) --------------------+
+| Memory (RAM)  [################    ] 81.6% (1.6 GB peak / 2 GB)       |
+| CPU           [###                 ] 17.8% average                    |
+| GPU           [                    ]  4.5% average                    |
+| Time          [------------------->] 100.0% (0-12:00:20 / 0-12:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write    Total IOPS                     |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   1.6 MB        0 B            10                             |
+|   /fred   2.8 TB        46.2 MB        2 M                            |
+|   /home   0 B           0 B            1                              |
+|   OS      21.9 MB       0 B            758                            |
+|                                                                       |
+| Warnings:                                                             |
+|   - CPU usage is low                                                  |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+

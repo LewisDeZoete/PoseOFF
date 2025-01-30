@@ -1,0 +1,158 @@
+CNN embedding method for flow + positional embedding, LR schedule from paper (multistep LR)
+### Libraries loaded
+feeder: feeders.feeder.Feeder
+feeder_args:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/UCF-101/pose/', 'flow_path': './data/UCF-101/flow/', 'flowpose_path': './data/UCF-101/flowpose/'}
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  modality: flowpose
+  p_interval: [0.5, 1]
+  split: train
+  random_choose: True
+  random_shift: True
+  random_move: True
+  random_rot: True
+  window_size: 64
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False}
+model: model.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  in_channels: 53
+  num_head: 3
+  ode_method: euler
+  k: 8
+  base_channel: 64
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  dilation: 1
+  SAGC_proj: True
+  backbone: transformer
+  num_cls: 1
+ignore_weights: []
+phase: train
+optim:
+  base_lr: 0.1
+  nesterov: True
+  weight_decay: 0.0003
+  step: [50, 60]
+  gamma: 0.1
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+num_epoch: 70
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/
+config: custom_pose
+limb: joint_infogcn
+run_name: infogcn_cnn
+description: CNN embedding method for flow + positional embedding, LR schedule from paper (multistep LR)
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 661261
+	Loading weights from ./results/infogcn2/infogcn_cnn.pt
+	Checkpoint file does not yet exist
+	([Errno 2] No such file or directory: './results/infogcn2/infogcn_cnn.pt')
+### Model created
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		test_loss
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+{'epoch': [], 'training_time': [], 'train_loss': [], 'lr': [], 'test_loss': [], 'train_AUC': [], 'test_AUC': [], 'train_cls_loss': [], 'test_cls_loss': [], 'train_feature_loss': [], 'test_feature_loss': [], 'train_recon_loss': [], 'test_recon_loss': []}
+	Created new checkpoint file: ./results/infogcn2/infogcn_cnn.pt
+		0 EPOCH BEST TEST ACC: 0.03460732474923134
+		1 EPOCH BEST TEST ACC: 0.0831681340932846
+		2 EPOCH BEST TEST ACC: 0.1359798014163971
+		3 EPOCH BEST TEST ACC: 0.17619138956069946
+		4 EPOCH BEST TEST ACC: 0.21956729888916016
+		5 EPOCH BEST TEST ACC: 0.25155356526374817
+		6 EPOCH BEST TEST ACC: 0.30100077390670776
+		7 EPOCH BEST TEST ACC: 0.3562714457511902
+		8 EPOCH BEST TEST ACC: 0.3932996690273285
+		9 EPOCH BEST TEST ACC: 0.44913268089294434
+		10 EPOCH BEST TEST ACC: 0.4794796109199524
+		11 EPOCH BEST TEST ACC: 0.5026972889900208
+		12 EPOCH BEST TEST ACC: 0.5615516901016235
+		13 EPOCH BEST TEST ACC: 0.5657072067260742
+		14 EPOCH BEST TEST ACC: 0.6006958484649658
+		15 EPOCH BEST TEST ACC: 0.6197865009307861
+		16 EPOCH BEST TEST ACC: 0.6537457704544067
+		17 EPOCH BEST TEST ACC: 0.6727316379547119
+		18 EPOCH BEST TEST ACC: 0.6727316379547119
+		19 EPOCH BEST TEST ACC: 0.7008768916130066
+		20 EPOCH BEST TEST ACC: 0.7052516937255859
+		21 EPOCH BEST TEST ACC: 0.7270206212997437
+		22 EPOCH BEST TEST ACC: 0.7330538034439087
+		23 EPOCH BEST TEST ACC: 0.7351029515266418
+		24 EPOCH BEST TEST ACC: 0.758854329586029
+		25 EPOCH BEST TEST ACC: 0.7691479325294495
+		26 EPOCH BEST TEST ACC: 0.7691479325294495
+		27 EPOCH BEST TEST ACC: 0.7786694765090942
+		28 EPOCH BEST TEST ACC: 0.7902116179466248
+		29 EPOCH BEST TEST ACC: 0.7902116179466248
+		30 EPOCH BEST TEST ACC: 0.7995806932449341
+		31 EPOCH BEST TEST ACC: 0.7995806932449341
+		32 EPOCH BEST TEST ACC: 0.8246091604232788
+		33 EPOCH BEST TEST ACC: 0.8246091604232788
+		34 EPOCH BEST TEST ACC: 0.830823540687561
+		35 EPOCH BEST TEST ACC: 0.8319195508956909
+		36 EPOCH BEST TEST ACC: 0.8340927362442017
+		37 EPOCH BEST TEST ACC: 0.8414888381958008
+		38 EPOCH BEST TEST ACC: 0.8436046838760376
+		39 EPOCH BEST TEST ACC: 0.8489039540290833
+		40 EPOCH BEST TEST ACC: 0.8489039540290833
+		41 EPOCH BEST TEST ACC: 0.8489039540290833
+		42 EPOCH BEST TEST ACC: 0.8531739115715027
+		43 EPOCH BEST TEST ACC: 0.8531739115715027
+		44 EPOCH BEST TEST ACC: 0.8531739115715027
+		45 EPOCH BEST TEST ACC: 0.8586828112602234
+		46 EPOCH BEST TEST ACC: 0.8615802526473999
+		47 EPOCH BEST TEST ACC: 0.8615802526473999
+		48 EPOCH BEST TEST ACC: 0.8687475919723511
+		49 EPOCH BEST TEST ACC: 0.8687475919723511
+		50 EPOCH BEST TEST ACC: 0.9051658511161804
+		51 EPOCH BEST TEST ACC: 0.9086828231811523
+		52 EPOCH BEST TEST ACC: 0.9113324880599976
+		53 EPOCH BEST TEST ACC: 0.9117995500564575
+		54 EPOCH BEST TEST ACC: 0.9127049446105957
+		55 EPOCH BEST TEST ACC: 0.9133815765380859
+		56 EPOCH BEST TEST ACC: 0.9154689908027649
+		57 EPOCH BEST TEST ACC: 0.9170511364936829
+		58 EPOCH BEST TEST ACC: 0.9176896810531616
+		59 EPOCH BEST TEST ACC: 0.9176896810531616
+		60 EPOCH BEST TEST ACC: 0.9185283780097961
+		61 EPOCH BEST TEST ACC: 0.9185283780097961
+		62 EPOCH BEST TEST ACC: 0.9196721911430359
+		63 EPOCH BEST TEST ACC: 0.9196721911430359
+		64 EPOCH BEST TEST ACC: 0.9206253290176392
+		65 EPOCH BEST TEST ACC: 0.9206253290176392
+		66 EPOCH BEST TEST ACC: 0.9206253290176392
+		67 EPOCH BEST TEST ACC: 0.9210637211799622
+		68 EPOCH BEST TEST ACC: 0.9214544296264648
+		69 EPOCH BEST TEST ACC: 0.9214544296264648
