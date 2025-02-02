@@ -27,6 +27,17 @@
             "-l", "joint_infogcn", // joint (not bone)
             "-v"
         ]
+      },
+      {
+        "name": "Python: Gendata class 0",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        "args": [
+            "-n", "0", // class 0
+            "--numpy" // save as numpy
+        ]
       }
     ]
 }

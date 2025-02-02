@@ -1,0 +1,129 @@
+Baseline InfoGCN++ Test
+### Libraries loaded
+feeder: feeders.feeder.Feeder
+feeder_args:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/UCF-101/pose/', 'flow_path': './data/UCF-101/flow/', 'flowpose_path': './data/UCF-101/flowpose/'}
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  modality: flowpose
+  p_interval: [0.5, 1]
+  random_shift: True
+  random_choose: True
+  window_size: 64
+  random_move: True
+  random_rot: False
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False}
+model: model.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  in_channels: 3
+  num_head: 3
+  ode_method: euler
+  k: 8
+  base_channel: 64
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  dilation: 1
+  SAGC_proj: True
+  backbone: transformer
+  num_cls: 10
+ignore_weights: []
+phase: train
+optim:
+  base_lr: 0.1
+  nesterov: True
+  weight_decay: 0.0003
+  step: [50, 60]
+  gamma: 0.1
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+num_epoch: 70
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/
+config: custom_pose
+limb: joint_infogcn
+run_name: infogcn_base
+description: Baseline InfoGCN++ Test
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 658061
+	Loading weights from ./results/infogcn2/infogcn_base.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+### Model created
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		test_loss
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+	Resuming from checkpoint at epoch 50
+		50 EPOCH BEST TEST ACC: 0.8773351907730103
+		51 EPOCH BEST TEST ACC: 0.8782119750976562
+		52 EPOCH BEST TEST ACC: 0.8813668489456177
+		53 EPOCH BEST TEST ACC: 0.8823103904724121
+		54 EPOCH BEST TEST ACC: 0.8825486302375793
+		55 EPOCH BEST TEST ACC: 0.8843309283256531
+		56 EPOCH BEST TEST ACC: 0.885827362537384
+		57 EPOCH BEST TEST ACC: 0.885827362537384
+		58 EPOCH BEST TEST ACC: 0.8877716064453125
+		59 EPOCH BEST TEST ACC: 0.8881815075874329
+		60 EPOCH BEST TEST ACC: 0.8891250491142273
+		61 EPOCH BEST TEST ACC: 0.8899256587028503
+		62 EPOCH BEST TEST ACC: 0.8899256587028503
+		63 EPOCH BEST TEST ACC: 0.8903926610946655
+		64 EPOCH BEST TEST ACC: 0.8903926610946655
+		65 EPOCH BEST TEST ACC: 0.8910694122314453
+		66 EPOCH BEST TEST ACC: 0.8910694122314453
+		67 EPOCH BEST TEST ACC: 0.8910694122314453
+		68 EPOCH BEST TEST ACC: 0.8910694122314453
+		69 EPOCH BEST TEST ACC: 0.8916221857070923
+
++------------------ Job Report: 64460725 (COMPLETED) ------------------+
+| Memory (RAM)  [############        ] 64.0% (1.3 GB peak / 2 GB)      |
+| CPU           [###                 ] 17.3% average                   |
+| GPU           [                    ]  4.0% average                   |
+| Time          [------>             ] 32.9% (0-03:56:40 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            7                             |
+|   /fred   820.7 GB      15.4 MB        483.7 K                       |
+|   /home   0 B           0 B            1                             |
+|   OS      3.4 MB        0 B            203                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

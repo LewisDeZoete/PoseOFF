@@ -4,8 +4,9 @@ sys.path.extend(['../'])
 from tqdm import tqdm
 import torch
 import numpy as np
-from data_gen.rotation import angle_between, rotation_matrix
-
+import decord
+from decord import VideoReader, cpu
+from rotation import angle_between, rotation_matrix
 
 
 def pre_normalization(data, zaxis=[0, 1], xaxis=[8, 4]):
@@ -115,6 +116,33 @@ def stack_frames(frames: torch.Tensor):
         frame_pairs[i, 0] = frames[i]
         frame_pairs[i, 1] = frames[i + 1]
     return frame_pairs
+
+
+def LoadVideo(video_path, max_frames=300) -> torch.tensor:
+    """ TODO: Change back to object with `__call__` method
+    Load a video from the specified path and return a tensor of frames.
+    Args:
+        video_path (str): Path to the video file.
+        max_frames (int): Maximum number of frames to load from the video.
+    Returns:
+        torch.tensor: A tensor containing the video frames in RGB format with shape (num_frames, channels, height, width).
+                      The frames are permuted to have the channel dimension as the second dimension.
+    """
+
+    decord.bridge.set_bridge("torch")
+    vr = VideoReader(video_path, ctx=cpu(0))
+    # if there's too many frames, get `max_frames` linearly spaced frames
+    if len(vr) > max_frames:
+        # output = torch.tensor(vr.get_batch(np.linspace(0, len(vr)-1, self.max_frames)).asnumpy())
+        output = vr.get_batch(np.linspace(0, len(vr) - 1, max_frames))
+    else:
+        # output = torch.tensor(vr.get_batch(np.linspace(0, len(vr)-1, len(vr))).asnumpy())
+        output = vr.get_batch(np.linspace(0, len(vr) - 1, len(vr)))
+
+    # RGB Colour format
+    output = torch.permute(output, (0, 3, 1, 2))
+
+    return output
 
 
 if __name__ == '__main__':

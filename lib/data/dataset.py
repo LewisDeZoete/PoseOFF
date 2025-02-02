@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "../..")))
 
 import torch
 from torch.utils.data import Dataset
-from lib.utils.transforms import LoadVideo
+from data_gen.preprocess import LoadVideo
 
 
 class CustomDataset(Dataset):
@@ -34,6 +34,7 @@ class CustomDataset(Dataset):
     def __getitem__(self, idx):
         item_key = list(self.labels.keys())[idx]
         item_path = f"{self.data_path}{item_key}{self.ext}"
+        print(item_path)
         label = self.labels[item_key]
 
         # If it's preprocessed, load the tensor
@@ -106,11 +107,11 @@ if __name__ == "__main__":
     import time
 
     from config.argclass import ArgClass
-    from lib.utils import FlowPoseSampler
+    from data_gen.extractors import FlowPoseSampler
     from torch.utils.data import DataLoader
     import torchvision.transforms.v2 as v2
 
-    arg = ArgClass(arg="./config/custom_pose/train_joint.yaml")
+    arg = ArgClass(arg="./config/custom_pose/train_joint_infogcn.yaml")
 
     batch_size=1
     stream='pose'
@@ -126,7 +127,7 @@ if __name__ == "__main__":
 
     # Create the single- and multi-stream datasets
     singledataset = SingleStreamDataset(arg, stream=stream,transforms=single_transforms)
-    multidataset = MultiStreamDataset(arg, flowPoseTransform)
+    multidataset = MultiStreamDataset(arg, flowPoseTransform)    
     
     # Create the dataloaders!
     singledataloader = DataLoader(singledataset, batch_size=batch_size, shuffle=True)

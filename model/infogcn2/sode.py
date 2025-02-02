@@ -308,31 +308,12 @@ if __name__=='__main__':
     arg = ArgClass('config/custom_pose/train_joint_infogcn.yaml')
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    arg.model_args['device'] = device
 
-    model = SODE(arg.model_args)
+    model = SODE(**arg.model_args)
 
-    # model = SODE(
-    #         num_class=101,
-    #         num_point=17,
-    #         num_person=2,
-    #         graph='graph.yolo_pose.Graph',
-    #         in_channels=5,
-    #         num_head=3,
-    #         ode_method='euler',
-    #         k=8,
-    #         base_channel=64, # Hidden dimension
-    #         depth=4,
-    #         device = device,
-    #         T=64, # Maximum sequence length
-    #         n_step=3, # Number of ODE solver steps?
-    #         dilation=1,
-    #         SAGC_proj=True, # Using self-attention graph convolution, (GCN if False)
-    #         backbone='transformer',
-    #         num_cls=1, # Not sure
-    #         cnn=False
-    #     )
     model = model.to(device)
     
     # N, C, T, V, M
-    x = torch.randn((8, 5, 64, 17, 2)).to(device)
+    x = torch.randn((8, 3, 64, 17, 2)).to(device)
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)

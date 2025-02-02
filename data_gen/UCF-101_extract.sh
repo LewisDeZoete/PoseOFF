@@ -4,8 +4,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=00:10:00
-#SBATCH --mem-per-cpu=2000
+#SBATCH --time=12:00:00
+#SBATCH --mem-per-cpu=24000
 
 #SBATCH --output='logs/EXTRACT/UCF-101_extract.txt'
 #SBATCH --error='logs/EXTRACT/error_UCF-101_extract.txt'
@@ -25,9 +25,9 @@ sleep 2
 source ../environment/bin/activate
 
 # Main job for each array task
-# srun python ./data_gen/skeleton_gendata.py -n $SLURM_ARRAY_TASK_ID
-# srun python ./data_gen/flow_gendata.py -n $SLURM_ARRAY_TASK_ID
-srun python ./data_gen/flowpose_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
+srun python ./data_gen/skeleton_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
+# srun python ./data_gen/flow_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
+# srun python ./data_gen/flowpose_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
 
 
 # Run validation script once all other tasks are finished

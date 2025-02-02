@@ -14,9 +14,10 @@ feeder_args:
   window_size: 64
   random_move: True
   random_rot: False
-  average_flow: False # C=5
-  absolute_flow: 
-    window_mean: True # C=4, else C=28
+  average_flow: False # C=5 if true
+  absolute_flow: False 
+  #   window_mean: True # C=4 if true, else C=28
+  no_flow: True
 
 # TODO: Ensure this extractor section doesn't break the extractors
 # TODO: transforms are only for data_gen, move out of dataloader
@@ -40,7 +41,7 @@ model_args:
   num_point: 17
   num_person: 2
   graph: graph.yolo_pose.Graph
-  in_channels: 4 # NOTE: change this if you change the average/absolute flow feeder args
+  in_channels: 3 # NOTE: change this if you change the average/absolute flow feeder args
   num_head: 3
   ode_method: euler
   k: 8

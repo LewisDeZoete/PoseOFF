@@ -17,24 +17,13 @@ class GetPoses_YOLO:
         max_frames: int = 300,
         num_joints: int = 17,
         num_people_out: int = 2,
-        resdict=False,
     ):
         self.detector = detector
         self.max_frames = max_frames
         self.num_joints = num_joints
         self.num_people_out = num_people_out
-        self.resdict = resdict
 
     def __call__(self, video) -> torch.tensor:
-        # If input is a dicitonary, we want the video to work with
-        if isinstance(video, dict):
-            video = video["rgb"]
-        # If not, it could be we just want the poses
-        else:
-            # OR we may want to output a dict but we need to create it
-            if self.resdict:
-                results = {"rgb": video}
-
         data_torch = torch.zeros(
             (
                 3,  # channels (x,y,confidence)
@@ -49,7 +38,7 @@ class GetPoses_YOLO:
 
         # Get data from yolo
         for frame in pose_results:
-            # Get the frame number that yolo outputs in the frame.path variable
+            # Get the frame number that yolo outputs in the frame.path attribute
             frame_index = int(re.findall(r"\d+", frame.path)[0])
             for m, person in enumerate(frame.keypoints):
                 # if there are more than num_people_out people, skip the rest
@@ -67,9 +56,11 @@ class GetPoses_YOLO:
                 data_torch[1, frame_index, :, m] = person.xyn[0, :, 1]
                 data_torch[2, frame_index, :, m] = person.conf[0]
 
+        # Output from yolo is (x,y,conf), normalised between 0 and 1
         # Centralisation (about zero [-0.5 : 0.5])
         data_torch[0:2] = data_torch[0:2] - 0.5
-        data_torch[1:2] = -data_torch[1:2]
+        
+        # Set x and y to zero if confidence is zero
         data_torch[0][data_torch[2] == 0] = 0
         data_torch[1][data_torch[2] == 0] = 0
 
@@ -80,13 +71,7 @@ class GetPoses_YOLO:
             data_torch[:, t, :, :] = data_torch[:, t, :, s]
         data_torch = data_torch[:, :, :, 0:2].type(torch.float32)
 
-        # If we're expecting to output a dictionary, add the new pose key
-        if self.resdict:
-            results["pose"] = data_torch
-            return results
-        # Else simply return the poses
-        else:
-            return data_torch 
+        return data_torch 
 
 
 class GetFlow:
@@ -152,11 +137,24 @@ class GetFlow:
 
 
 class FlowPoseSampler:
-    """Sample optical flow using input poses.
-    NOTE: Assumes pre-processed optical flow and poses.
-    NOTE: Utilises the MultiStreamDataset, it passes in the loaded arrays.
     """
-
+    A class to sample optical flow in windows surrounding pose keypoints.
+    Attributes:
+        device (torch.device): The device to run the computations on.
+        window_size (int): The size of the window around each pose keypoint. Default is 3.
+        threshold (float): The threshold for visibility of keypoints. Default is 0.5.
+        loop (bool): Whether to loop the graph using loop_graph function. Default is True.
+        to_cpu (bool): Whether to move the resulting tensor to CPU. Default is True.
+        norm (bool): Whether to normalize the flow magnitude using flow_mag_norm function. Default is False.
+    Methods:
+        __call__(flows, poses):
+            Samples the optical flow in windows surrounding the pose keypoints.
+            Args:
+                flows (torch.Tensor): The optical flow tensor of shape (num_frames, 2, height, width).
+                poses (torch.Tensor): The pose keypoints tensor of shape (3, num_frames, num_keypoints, num_people).
+            Returns:
+                torch.Tensor: The concatenated tensor of poses and sampled flow data.
+    """
     def __init__(self, 
                  device: torch.device, 
                  window_size: int = 3, 
@@ -224,3 +222,50 @@ class FlowPoseSampler:
         
         return flow_pose
 
+
+if __name__ == '__main__':
+    import sys
+    import os
+
+    # # add lib to path
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
+
+    from config.argclass import ArgClass
+    from ultralytics import YOLO
+    from data_gen.preprocess import LoadVideo
+    from torchvision.transforms import v2
+
+    # Get the config dict (including labels)
+    arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
+    transform_args = arg.extractor['pose']
+
+    # Get the device
+    device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
+
+    # Create the detector (YOLO pose)
+    detector = YOLO(transform_args['weights'])
+    detector.to(device)
+    # Create the pose extractor object
+    transforms = v2.Compose([
+        v2.Resize(size=(384,640)), # YOLO pose has a minimum input image size
+        v2.ToDtype(torch.float32),
+        v2.Lambda(lambda x: x/255.0), # Normalises the image to [0,1]
+        GetPoses_YOLO(detector=detector, max_frames=300, num_joints=17)
+    ])
+
+    # Load a video and extract poses
+    video_paths = [os.path.join(arg.feeder_args['data_paths']['rgb_path'],
+                          (list(arg.feeder_args['labels'].keys())[i]+'.avi')) \
+            for i in range(len(list(arg.feeder_args['labels'].keys())))]
+
+    print(video_paths[0])
+    
+    # Test pose extraction method
+    print("Testing pose extraction method...")
+    for video_path in video_paths:
+        video = LoadVideo(video_path, max_frames=300)
+        poses = transforms(video)
+        print(poses.shape)
+        print(poses[:, 0, :, :])
+        break

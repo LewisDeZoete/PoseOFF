@@ -56,6 +56,7 @@ class Feeder(Dataset):
         random_rot=False,
         average_flow=False,
         absolute_flow=False,
+        no_flow=False,
         use_mmap=False,
         vel=False,
         sort=False,
@@ -102,6 +103,7 @@ class Feeder(Dataset):
             self.random_rot = False
         self.average_flow = average_flow # Average and absolute flow must be the same for train and test
         self.absolute_flow = absolute_flow # NOTE: cannot have both average and absolute flow!
+        self.no_flow = no_flow
 
         # self.normalization = normalization TODO: REMOVE all normalization references
 
@@ -154,6 +156,8 @@ class Feeder(Dataset):
         # Apply optional transforms
         # if self.normalization:
         #     data_numpy = (data_numpy - self.mean_map) / self.std_map
+        if self.no_flow:
+            data_numpy = data_numpy[:3]
         if self.random_shift:
             data_numpy = tools.random_shift(data_numpy)
         if self.random_choose:
@@ -164,6 +168,9 @@ class Feeder(Dataset):
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
             )
+        # if self.random_rot:
+        #     data_numpy = tools.random_rot(data_numpy)
+        # TODO: Test random_rot function
         if self.average_flow:
             data_numpy = tools.average_flow(data_numpy)
         if self.absolute_flow:
@@ -186,8 +193,8 @@ if __name__ == "__main__":
 
     arg = ArgClass("./config/custom_pose/train_joint_infogcn.yaml")
 
-    # feeder = Feeder(**arg.feeder_args)
-    feeder = Feeder(**arg.feeder_args, split="test")
+    feeder = Feeder(**arg.feeder_args)
+    # feeder = Feeder(**arg.feeder_args, split="test")
     dataloader = DataLoader(feeder, batch_size=arg.batch_size, shuffle=True)
 
     start = time.time()

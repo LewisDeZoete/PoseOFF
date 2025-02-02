@@ -218,7 +218,6 @@ def train_network(
     for item in to_track:
         results[item] = []
         print(f"\t\t{item}")
-    print(results)
 
     # Place the model on the correct compute resource (CPU or GPU)
     model.to(device)
@@ -226,7 +225,8 @@ def train_network(
     # If we pass checkpoint_file, make sure it's initialised
     if checkpoint_file is not None:
         checkpoint = load_checkpoint(checkpoint_file, device)
-        start_epoch = checkpoint["epoch"]
+        results = checkpoint["results"] # Don't override the results from previous training!
+        start_epoch = checkpoint["epoch"] + 1 # We saved the checkpoint at the end of the epoch
         try:
             optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
             scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
