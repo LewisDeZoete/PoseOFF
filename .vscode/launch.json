@@ -38,6 +38,13 @@
             "-n", "0", // class 0
             "--numpy" // save as numpy
         ]
+      },
+      {
+        "name": "Python: No args",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
       }
     ]
 }

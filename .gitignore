@@ -116,3 +116,6 @@ venv.bak/
 
 # Numpy files
 *.npy
+
+# Pickle files
+*.pkl

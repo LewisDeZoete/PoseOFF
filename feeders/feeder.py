@@ -190,16 +190,22 @@ if __name__ == "__main__":
     from config.argclass import ArgClass
     import time
     from torch.utils.data import DataLoader
+    import torch
 
     arg = ArgClass("./config/custom_pose/train_joint_infogcn.yaml")
 
     feeder = Feeder(**arg.feeder_args)
     # feeder = Feeder(**arg.feeder_args, split="test")
-    dataloader = DataLoader(feeder, batch_size=arg.batch_size, shuffle=True)
+
+    dataloader = DataLoader(feeder, 
+                            batch_size=arg.batch_size,
+                            shuffle=False,
+                            pin_memory=True)
 
     start = time.time()
     for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
-        break
+        if epoch == 10:
+            break
 
     print(f"\nTotal samples: {len(feeder)}")
     print(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")

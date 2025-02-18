@@ -49,8 +49,11 @@ class Flow_conv(nn.Module):
             nn.ReLU(),
             nn.Conv2d(in_channels=16,
                       out_channels=32, 
-                      kernel_size=self.kernel_size),
+                      kernel_size=3),
             nn.ReLU(),
+            # nn.Conv2d(in_channels=32,
+            #           out_channels=64, 
+            #           kernel_size=5),
             nn.AdaptiveAvgPool2d((1,1))
         )
         self.fc = nn.Linear(32, self.flow_out_channels)
@@ -209,30 +212,19 @@ if __name__ == "__main__":
     graph = AdjMatrixGraph()
     A_binary = graph.A_binary
 
-    # # Example usage temporal transformer
-    # batch_size = 16
-    # num_people = 2
-    # num_frames = 300
-    # embedding_dim = 192
-    # num_classes = 101
-
-    # model = TemporalTransformer(
-    #     d_model=embedding_dim,
-    #     nhead=8,
-    #     num_encoder_layers=4,
-    # )
-
-    # inputs = torch.randn(batch_size, num_frames, embedding_dim)  # Example input
-    # outputs = model(inputs)  # Shape: (batch_size, num_classes)
-    # print(outputs.shape)
-
+    kernel_size = 7
+    flow_window = 9
+    original_channels = 3
+    out_channels = 4
+    
 
     # Example usage
-    N, T, M, V, C = 16, 300, 2, 17, 53
+    N, T, M, V, C = 16, 300, 2, 17, (original_channels + 2*(flow_window**2))
+    print(C)
     x = torch.randn(N, C, T, V, M)
-    flow_conv = Flow_conv(kernel_size=3, 
-                          flow_window = 5,
-                          original_channels=3, 
-                          out_channels=4)
+    flow_conv = Flow_conv(kernel_size=kernel_size,
+                          flow_window=flow_window,
+                          original_channels=original_channels, 
+                          out_channels=out_channels)
     flows = flow_conv(x)
     print(flows.shape)

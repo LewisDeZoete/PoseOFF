@@ -183,7 +183,7 @@ def train_network(
     test_loader=None,
     score_funcs=None,
     device="cpu",
-    epochs: int = 50,
+    epochs: int = 70,
     scheduler=None,
     optimiser=None,
     checkpoint_file: str = None,
@@ -211,7 +211,6 @@ def train_network(
             if test_loader is not None:
                 to_track.append("test_" + eval_score)
 
-    total_train_time = 0  # How long have we spent in the training loop?
     results = {}
     print("\tTracking:")
     # Initialize every item with an empty list
@@ -225,20 +224,22 @@ def train_network(
     # If we pass checkpoint_file, make sure it's initialised
     if checkpoint_file is not None:
         checkpoint = load_checkpoint(checkpoint_file, device)
-        results = checkpoint["results"] # Don't override the results from previous training!
         start_epoch = checkpoint["epoch"] + 1 # We saved the checkpoint at the end of the epoch
         try:
+            results = checkpoint["results"] # Don't override the results from previous training!
             optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
             scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         except KeyError:
             pass  # Only just created the checkpoint file
         del checkpoint  # might save us from OOM issues
 
-    for epoch in tqdm(range(start_epoch, epochs), desc="Epoch"):
+    # Training loop
+    # we start from the next epoch after the last checkpoint (or from 1) and go to the specified number of epochs
+    for epoch in tqdm(range(start_epoch, epochs+1), desc="Epoch"):
         model = model.train()  # Put our model in training mode
 
         # Run the training epoch
-        total_train_time += run_epoch(
+        train_time = run_epoch(
             arg=arg,
             model=model,
             optimiser=optimiser,
@@ -252,7 +253,7 @@ def train_network(
 
         # Append the post-training results to the results dictionary
         results["epoch"].append(epoch)
-        results["training_time"].append(total_train_time)
+        results["training_time"].append(train_time)
 
         # Step the scheduler after each training epoch and append lr
         if scheduler is not None:
@@ -290,12 +291,25 @@ def train_network(
 
 
 def load_checkpoint(checkpoint_file: str, device):
+    """
+    Loads a checkpoint from a specified file.
+
+    Args:
+        checkpoint_file (str): The path to the checkpoint file.
+        device: The device on which to load the checkpoint (e.g., 'cpu' or 'cuda').
+
+    Returns:
+        dict: The loaded checkpoint containing at least the 'epoch' key.
+
+    Raises:
+        FileNotFoundError: If the checkpoint file does not exist, a new checkpoint is created with 'epoch' set to 0.
+    """
     try:
         checkpoint = torch.load(checkpoint_file, map_location=device)
         print(f"\tResuming from checkpoint at epoch {checkpoint['epoch']}")
     except FileNotFoundError:
         print(f"\tCreated new checkpoint file: {checkpoint_file}")
-        checkpoint = {"epoch": 0}
+        checkpoint = {"epoch": 0} # Start from scratch, indexing starts from 1 in this case
         torch.save(checkpoint, checkpoint_file)
     return checkpoint
 

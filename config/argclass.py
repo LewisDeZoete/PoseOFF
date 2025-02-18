@@ -46,6 +46,7 @@ class ArgClass(object):
                 self.feeder_args['labels'] = yaml.safe_load(file)
         except FileNotFoundError:
             print(f"Could not file label file: '{self.feeder_args['label_path']}'")
+            print('Creating empty labels dictionary')
             self.feeder_args['labels'] = {}
         
         # Create classes dictionary

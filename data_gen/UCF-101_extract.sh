@@ -1,43 +1,22 @@
-#!/bin/bash
-#SBATCH --job-name=UCF-101_extract
-#SBATCH --job-name=UCF-101_extract
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --time=12:00:00
-#SBATCH --mem-per-cpu=24000
+modality=flowpose
 
-#SBATCH --output='logs/EXTRACT/UCF-101_extract.txt'
-#SBATCH --error='logs/EXTRACT/error_UCF-101_extract.txt'
+mkdir -p ./TMP
+python ./data_gen/UCF-101_annotations.py
+python ./data_gen/utils/extract_utils.py -m $modality # creates the incomplete_classes.txt
 
-#SBATCH --array=0-100
+# Read the number of incomplete classes
+NUM_INCOMPLETE_CLASSES=$(cat ./data_gen/num_incomplete.txt)
+echo "Number of incomplete classes: $NUM_INCOMPLETE_CLASSES"
 
-# Create a directory and refresh the annotations before the array jobs start
-if [ "$SLURM_ARRAY_TASK_ID" -eq 1 ]; then
-    mkdir -p ./TMP
-    python ./data_gen/UCF-101_annotations.py
+# Ensure NUM_INCOMPLETE_CLASSES is a valid integer
+if ! [[ "$NUM_INCOMPLETE_CLASSES" =~ ^[0-9]+$ ]]; then
+  echo "Error: NUM_INCOMPLETE_CLASSES is not a valid integer."
+  exit 1
 fi
 
-# Give time to complete the file creation
-sleep 2
+# JOB ARRAY STARTS
+# sbatch --array=0-$(($NUM_INCOMPLETE_CLASSES-1)) --export=modality=$modality ./data_gen/utils/extract.sh
+array_job_id=$(sbatch --array=0-$(($NUM_INCOMPLETE_CLASSES-1)) --export=modality=$modality ./data_gen/utils/extract.sh | awk '{print $4}')
 
-# Activate the environment
-source ../environment/bin/activate
-
-# Main job for each array task
-srun python ./data_gen/skeleton_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
-# srun python ./data_gen/flow_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
-# srun python ./data_gen/flowpose_gendata.py -n $SLURM_ARRAY_TASK_ID --numpy
-
-
-# Run validation script once all other tasks are finished
-if [ "$SLURM_ARRAY_TASK_ID" -eq 0 ]; then
-  sbatch --dependency=afterok:$SLURM_ARRAY_JOB_ID <<EOF
-#!/bin/bash
-#SBATCH --job-name=UCF-101_validation
-#SBATCH --output='logs/EXTRACT/UCF-101_validation.txt'
-
-python ./data_gen/gendata_validation.py
-rm -r ./TMP
-EOF
-fi
+# Submit the validation job with a dependency on the array job
+sbatch --dependency=afterok:$array_job_id ./data_gen/utils/validation.sh

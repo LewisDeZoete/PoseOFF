@@ -1,0 +1,124 @@
+CNN embedding flow window = 9
+### Libraries loaded
+feeder: feeders.feeder.Feeder
+feeder_args:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/UCF-101/pose/', 'flow_path': './data/UCF-101/flow/', 'flowpose_path': './data/UCF-101/flowpose/'}
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  modality: flowpose
+  p_interval: [0.5, 1]
+  random_shift: True
+  random_choose: True
+  window_size: 64
+  random_move: True
+  random_rot: False
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 9, 'threshold': 0.05, 'loop': False}
+model: model.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  in_channels: 165
+  num_head: 3
+  ode_method: euler
+  k: 8
+  base_channel: 64
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  dilation: 1
+  SAGC_proj: True
+  backbone: transformer
+  num_cls: 10
+  cnn: False
+ignore_weights: []
+phase: train
+optim:
+  base_lr: 0.1
+  nesterov: True
+  weight_decay: 0.0003
+  step: [50, 60]
+  gamma: 0.1
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+num_epoch: 70
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/
+config: custom_pose
+limb: joint_infogcn
+run_name: infogcn_cnn9
+description: CNN embedding flow window = 9
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 668429
+	Loading weights from ./results/infogcn2/infogcn_cnn9.pt
+	Checkpoint file does not yet exist
+	([Errno 2] No such file or directory: './results/infogcn2/infogcn_cnn9.pt')
+### Model created
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		test_loss
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+	Created new checkpoint file: ./results/infogcn2/infogcn_cnn9.pt
+		1 EPOCH BEST TEST ACC: 0.011380098760128021
+		2 EPOCH BEST TEST ACC: 0.02836446836590767
+		3 EPOCH BEST TEST ACC: 0.03944910317659378
+		4 EPOCH BEST TEST ACC: 0.05361228063702583
+		5 EPOCH BEST TEST ACC: 0.09609226882457733
+		6 EPOCH BEST TEST ACC: 0.11782310903072357
+		7 EPOCH BEST TEST ACC: 0.15887343883514404
+		8 EPOCH BEST TEST ACC: 0.21881432831287384
+		9 EPOCH BEST TEST ACC: 0.24250857532024384
+		10 EPOCH BEST TEST ACC: 0.27853602170944214
+		11 EPOCH BEST TEST ACC: 0.3383721113204956
+		12 EPOCH BEST TEST ACC: 0.38244375586509705
+		13 EPOCH BEST TEST ACC: 0.4523637294769287
+		14 EPOCH BEST TEST ACC: 0.48635149002075195
+
++------------------- Job Report: 65186434 (TIMEOUT) --------------------+
+| Memory (RAM)  [#######             ] 38.5% (2.3 GB peak / 5.9 GB)     |
+| CPU           [#                   ]  8.1% average                    |
+| GPU           [                    ]  0.5% average                    |
+| Time          [------------------->] 100.0% (0-12:00:13 / 0-12:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write    Total IOPS                     |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   0 B           0 B            4                              |
+|   /fred   3.6 TB        10 MB          320 K                          |
+|   /home   0 B           0 B            1                              |
+|   OS      8.9 MB        0 B            825                            |
+|                                                                       |
+| Warnings:                                                             |
+|   - Too much memory requested                                         |
+|   - CPU usage is low                                                  |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+

@@ -5,39 +5,30 @@ import os
 curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
 
-from lib.data.dataset import SingleStreamDataset
-from lib.utils.transforms import GetFlow
+from utils import LoadVideo, get_class_by_index, GetFlow
 from config.argclass import ArgClass
-import torch
-from torchvision.models.optical_flow import raft_large
-import torchvision.transforms.v2 as v2
-import time
 import argparse
+import time
+from torchvision.models.optical_flow import raft_large
+import torch
+import torchvision.transforms.v2 as v2
+import numpy as np
+
 
 parser = argparse.ArgumentParser(prog="flow_gendata")
 
 parser.add_argument('-n', dest='number',
-                    help='Class number for processing flow of a specific class')
+                    help='Class number for processing pose keypoints of a specific class')
+parser.add_argument('--numpy', action='store_true',
+                    help='Option to save data as numpy arrays')
 parsed = parser.parse_args()
-arg_no = int(parsed.number) # Get class number command line arg
+process_number = int(parsed.number) # Get class number command line arg
+save_as_numpy = parsed.numpy
 
 # Get the arg object and create the classes
 arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
 arg.extractor['preprocessed'] = False # Override this value, since this is gendata script!
-classes = arg.classes
 transform_args = arg.extractor['flow']
-
-# Get the number of videos in the class (used to get indices of dataset)
-def get_range(class_no):
-    len_class = 0
-    for i in arg.feeder_args['labels'].keys():
-        if i.split('/')[0] == list(classes.keys())[class_no]:
-            try:
-                assert start_index >= 0
-            except NameError:
-                start_index = list(arg.feeder_args['labels'].keys()).index(i)
-            len_class += 1
-    return range(start_index, (start_index+len_class))
 
 # Get the device
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
@@ -46,41 +37,54 @@ device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
 weights = torch.load(transform_args['weights'], weights_only=True, map_location=device)
 model = raft_large(progress=False)
 model.load_state_dict(weights)
-model = model.eval()
-
-transforms = [
+model = model.eval().to(device)
+transforms = v2.Compose([
+    LoadVideo(max_frames=300),
     v2.Resize(size=transform_args['imsize']),
     v2.ToImage(),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),  # map [0, 1] into [-1, 1]
     GetFlow(model=model, device=device, minibatch_size=transform_args['minibatch_size'])
-    ]
+    ])
 
-# Create the dataset object
-dataset = SingleStreamDataset(arg=arg, stream='rgb', ext='.avi', transforms=transforms)
+# Ensure the data_paths['flow_path'] exists
+try:
+    os.mkdir(arg.feeder_args['data_paths']['flow_path'])
+    print(f'Creating pose path: {arg.feeder_args["data_paths"]["flow_path"]}')
+except FileExistsError:
+    pass
 
 
+def get_flow(arg, process_number: int):
+    '''
+    Get and save the flow for a specific class
+    '''    
+    class_name, video_names = get_class_by_index(arg,
+                                                 process_number=process_number,
+                                                 modality='flow_path')
+    print('Processing:', class_name)
+    for video_name in video_names:
+        # Get the video path
+        video_path = f"{os.path.join(arg.feeder_args['data_paths']['rgb_path'], class_name, video_name)}.avi"
+        # Transform and estimate flow
+        flow = transforms(video_path)
+        # Get the path to save the estimated poses to
+        save_path = os.path.join(arg.feeder_args['data_paths']['flow_path'], # Data path
+                                 class_name, # Class folder
+                                 video_name +
+                                 ('.npy' if save_as_numpy else '.pt')) # Video name (numpy/torch)
+        if save_as_numpy:
+            np.save(save_path, flow.numpy())
+        else:
+            torch.save(flow, save_path)
+    
+    print(f'Processed {class_name} class')
+
+# ------------------------------
+#         PROCESS
+# ------------------------------
 start = time.time()
-# Check if the indices we've been given are for the overall 
-# dataset or as indices for the 'unfinished' list in config
-if 'unfinished' in arg.__dict__:
-    for idx in get_range(classes[arg.unfinished[arg_no]]):
-        flow, label = dataset[idx]
-        path = f'{arg.feeder_args["data_paths"]["flow_path"]}{list(arg.feeder_args["labels"].keys())[idx]}' + '.pt'
-        torch.save(flow, path)
 
-    print(f'\nFinished processing {arg.unfinished[arg_no]} in {time.time()-start:0.5f} seconds')
-else:
-    for idx in get_range(arg_no):
-        flow, label = dataset[idx] # We're using GetFlow transform so this returns  flow!
-        # Check if the folder that the videos belong in exists
-        folder = f'{arg.feeder_args["data_paths"]["flow_path"]}{list(arg.feeder_args["labels"].keys())[idx].split("/")[0]}/'
-        try:
-            # If not create the folder!
-            os.mkdir(folder)
-        except FileExistsError:
-            pass
-        path = os.path.join(folder, list(arg.feeder_args['labels'].keys())[idx].split('/')[-1] + '.pt')
-        torch.save(flow, path)
+get_flow(arg, process_number=process_number)
 
-    print(f'\nFinished processing {list(classes.keys())[arg_no]} in {time.time()-start:0.5f} seconds')
+print(f'Processing time: {time.time()-start:.2f}s')

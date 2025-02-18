@@ -1,0 +1,79 @@
+Total available skeletons NTU-RGB+D: 56578
+Total available skeletons NTU-RGB+D120: 57065
+56880
+Found 56578 available skeleton files.
+Processed: 1.77% (1000 / 56578)
+Processed: 3.53% (2000 / 56578)
+Processed: 5.30% (3000 / 56578)
+Processed: 7.07% (4000 / 56578)
+Processed: 8.84% (5000 / 56578)
+Processed: 10.60% (6000 / 56578)
+Processed: 12.37% (7000 / 56578)
+Processed: 14.14% (8000 / 56578)
+Processed: 15.91% (9000 / 56578)
+Processed: 17.67% (10000 / 56578)
+Processed: 19.44% (11000 / 56578)
+Processed: 21.21% (12000 / 56578)
+Processed: 22.98% (13000 / 56578)
+Processed: 24.74% (14000 / 56578)
+Processed: 26.51% (15000 / 56578)
+Processed: 28.28% (16000 / 56578)
+Processed: 30.05% (17000 / 56578)
+Processed: 31.81% (18000 / 56578)
+Processed: 33.58% (19000 / 56578)
+Processed: 35.35% (20000 / 56578)
+Processed: 37.12% (21000 / 56578)
+Processed: 38.88% (22000 / 56578)
+Processed: 40.65% (23000 / 56578)
+Processed: 42.42% (24000 / 56578)
+Processed: 44.19% (25000 / 56578)
+Processed: 45.95% (26000 / 56578)
+Processed: 47.72% (27000 / 56578)
+Processed: 49.49% (28000 / 56578)
+Processed: 51.26% (29000 / 56578)
+Processed: 53.02% (30000 / 56578)
+Processed: 54.79% (31000 / 56578)
+Processed: 56.56% (32000 / 56578)
+Processed: 58.33% (33000 / 56578)
+Processed: 60.09% (34000 / 56578)
+Processed: 61.86% (35000 / 56578)
+Processed: 63.63% (36000 / 56578)
+Processed: 65.40% (37000 / 56578)
+Processed: 67.16% (38000 / 56578)
+Processed: 68.93% (39000 / 56578)
+Processed: 70.70% (40000 / 56578)
+Processed: 72.47% (41000 / 56578)
+Processed: 74.23% (42000 / 56578)
+Processed: 76.00% (43000 / 56578)
+Processed: 77.77% (44000 / 56578)
+Processed: 79.54% (45000 / 56578)
+Processed: 81.30% (46000 / 56578)
+Processed: 83.07% (47000 / 56578)
+Processed: 84.84% (48000 / 56578)
+Processed: 86.61% (49000 / 56578)
+Processed: 88.37% (50000 / 56578)
+Processed: 90.14% (51000 / 56578)
+Processed: 91.91% (52000 / 56578)
+Processed: 93.68% (53000 / 56578)
+Processed: 95.44% (54000 / 56578)
+Processed: 97.21% (55000 / 56578)
+Processed: 98.98% (56000 / 56578)
+Saved raw bodies data into ./data/ntu/raw_data/raw_skes_data.pkl
+Total frames: 4773093
+
++------------------ Job Report: 65269305 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 11.7% (2.8 GB peak / 24 GB)     |
+| CPU           [##                  ] 12.3% average                   |
+| Time          [---->               ] 23.9% (0-00:57:22 / 0-04:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.9 MB        0 B            26                            |
+|   /fred   13.4 GB       490.3 KB       109.1 K                       |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -30,6 +30,10 @@ for class_number, class_name in enumerate(classes):
     for video in videos:
         annotations[os.path.join(class_name, video[:-4])] = class_number
 
+print(f'Labels created for {len(annotations)} videos')
+
 # Save the annotations to a yaml file (in arg.dataloader['label_path'])
 with open(arg.feeder_args['label_path'], 'w') as yaml_file:
     yaml.dump(annotations, yaml_file)
+
+print(f'Annotations saved to {arg.feeder_args["label_path"]}')
