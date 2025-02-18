@@ -1,8 +1,0 @@
-v_CliffDiving_g10_c06
-v_CliffDiving_g12_c03
-v_CliffDiving_g13_c01
-v_CliffDiving_g18_c06
-v_CliffDiving_g19_c04
-v_CliffDiving_g19_c05
-v_CliffDiving_g19_c06
-v_CliffDiving_g20_c07

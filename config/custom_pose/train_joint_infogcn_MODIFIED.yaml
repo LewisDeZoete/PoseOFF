@@ -1,0 +1,78 @@
+feeder: feeders.feeder.Feeder
+feeder_args:
+  data_paths:
+    rgb_path: ../Datasets/UCF-101/
+    pose_path: ./data/UCF-101/pose/
+    flow_path: ./data/UCF-101/flow/
+    flowpose_path: ./data/UCF-101/flowpose/
+  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+  modality: flowpose
+  p_interval:
+  - 0.5
+  - 1
+  random_shift: true
+  random_choose: true
+  window_size: 64
+  random_move: true
+  random_rot: false
+  average_flow: true
+  absolute_flow: false
+  no_flow: false
+  preprocessed: true
+extractor:
+  preprocessed: true
+  pose:
+    weights: pretrained_models/yolo11x-pose.pt
+  flow:
+    weights: pretrained_models/raft_large.pt
+    imsize:
+    - 240
+    - 320
+    minibatch_size: 16
+  flowpose:
+    window_size: 5
+    threshold: 0.05
+    loop: false
+model: model.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 2
+  embed_channels: 64
+  num_head: 3
+  ode_method: euler
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  SAGC_proj: true
+  num_cls: 10
+  n_sample: 1
+  backbone: transformer
+  cnn: false
+ignore_weights: []
+phase: train
+optim:
+  base_lr: 0.1
+  nesterov: true
+  weight_decay: 0.0003
+  step:
+  - 50
+  - 60
+  gamma: 0.1
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+num_epoch: 70
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 256
+half: false
+checkpoint_freq: 10
+save_location: ./results/infogcn2/

@@ -8,10 +8,10 @@ flowpose: []
 	0 classes are incomplete
 Removed 205 annotations from ../Datasets/UCF-101/ucf101_annotations.yaml
 
-+------------------ Job Report: 65186102 (COMPLETED) ------------------+
++------------------ Job Report: 65270602 (COMPLETED) ------------------+
 | Memory (RAM)  No data available                                      |
-| CPU           [####                ] 22.2% average                   |
-| Time          [>                   ]  1.5% (0-00:00:09 / 0-00:10:00) |
+| CPU           [#####               ] 25.0% average                   |
+| Time          [>                   ]  1.3% (0-00:00:08 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   No data available                                                  |

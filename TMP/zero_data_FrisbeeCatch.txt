@@ -1,7 +1,0 @@
-v_FrisbeeCatch_g06_c01
-v_FrisbeeCatch_g09_c02
-v_FrisbeeCatch_g09_c03
-v_FrisbeeCatch_g12_c03
-v_FrisbeeCatch_g16_c02
-v_FrisbeeCatch_g16_c05
-v_FrisbeeCatch_g19_c03

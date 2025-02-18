@@ -1,9 +1,0 @@
-v_HorseRace_g01_c04
-v_HorseRace_g04_c01
-v_HorseRace_g04_c02
-v_HorseRace_g07_c01
-v_HorseRace_g07_c04
-v_HorseRace_g07_c06
-v_HorseRace_g14_c03
-v_HorseRace_g17_c05
-v_HorseRace_g22_c01
