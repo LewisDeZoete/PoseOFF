@@ -31,6 +31,20 @@ def loop_graph(data):
 
 
 def flow_mag_norm(data_numpy, flow_window=5):
+    """
+    Normalize the flow vectors in the given numpy array.
+
+    Parameters:
+    data_numpy (numpy.ndarray): Input data array with shape (C, T, V, M).
+                                C is the number of channels.
+                                T is the number of frames.
+                                V is the number of joints.
+                                M is the number of people.
+    flow_window (int, optional): The window size for the flow calculation. Default is 5.
+
+    Returns:
+    numpy.ndarray: The input data array with normalized flow vectors.
+    """
     C,T,V,M = data_numpy.shape
     flow = data_numpy[3:,...]
     flow = np.reshape(flow, (2, flow_window, flow_window, T,V,M)) # (2,5,5,300,17,2)

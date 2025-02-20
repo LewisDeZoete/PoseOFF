@@ -1,38 +1,38 @@
-# name: Format Python Code
+name: Format Python Code
 
-# on: 
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches:
-#       - main
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-# jobs:
-#   format:
-#     runs-on: ubuntu-latest
+jobs:
+  format:
+    runs-on: ubuntu-latest
 
-#     steps:
-#     - name: Checkout repository
-#       uses: actions/checkout@v2
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-#     - name: Set up Python
-#       uses: actions/setup-python@v2
-#       with:
-#         python-version: '3.x'  # Specify the Python version you need
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9.21'  # Specify the Python version you need
 
-#     - name: Install Ruff
-#       run: pip install ruff
+    - name: Install Ruff
+      run: pip install ruff
 
-#     - name: Run Ruff to format code
-#       run: ruff --fix .
+    - name: Run Ruff to format code
+      run: ruff --fix .
 
-#     - name: Commit and push changes
-#       run: |
-#         git config --global user.name 'github-actions[bot]'
-#         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-#         git add .
-#         git commit -m 'Format Python code with Ruff' || echo "No changes to commit"
-#         git push
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add .
+        git commit -m 'Format Python code with Ruff' || echo "No changes to commit"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

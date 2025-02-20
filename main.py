@@ -80,8 +80,8 @@ train_idx, test_idx = torch.utils.data.random_split(
 )
 train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
 test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
-train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=True, pin_memory=True)
-test_dataloader = DataLoader(test_dataset, batch_size=arg.batch_size, shuffle=True, pin_memory=True)
+train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=True)
+test_dataloader = DataLoader(test_dataset, batch_size=arg.batch_size, shuffle=True)
 
 # Get the parameters to optimise
 param_groups = {"params": []}

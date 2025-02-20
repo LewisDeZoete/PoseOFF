@@ -33,36 +33,37 @@ transforms = v2.Compose([
     GetFlow(model=model, device=device, minibatch_size=transform_args['flow']['minibatch_size'])
     ])
 
+transform_args['flowpose']['norm'] = False
+transform_args['flowpose']['match_pose'] = False
+transform_args['flowpose']['ntu'] = True
+
 # Create the FlowPoseSampler transform object
-flowPoseTransform = FlowPoseSampler(**transform_args)
+flowPoseTransform = FlowPoseSampler(**transform_args['flowpose'])
 
 def get_raw_flowpose_data():
-    skes_name = np.loadtxt(skes_name_file, dtype=str)
-    num_files = skes_name.size
+    skes_names = np.loadtxt(skes_name_file, dtype=str)
+    num_files = skes_names.size
     print('Found %d available skeleton files.' % num_files)
     # Assuming we've already processed all the pose data
-    with open(raw_data_file, 'rb') as fr:  # load raw skeletons data
-        raw_skes_data = pickle.load(fr)
+    with open(denoised_skes_data_file, 'rb') as fr:  # load raw skeletons data
+        denoised_skes_data = pickle.load(fr)
 
-
-    # Get the skeleton data
-    for (idx, bodies_data) in enumerate(raw_skes_data):
-        ske_name = bodies_data['name']
-        num_bodies = len(bodies_data['data'])
-        if num_bodies == 1:
-            num_frames = bodies_data['num_frames']
-            body_data = list(bodies_data['data'].values())[0]
-            joints, colors = body_data['joints'], body_data['colors']
-        else:
-            # TODO: handle multiple bodies
-            pass
-
+    for ske_number, ske_name in enumerate(skes_names):
+        print(ske_name)
+        # Get the flow data
         rgb_name = os.path.join(rgb_path, ske_name + '_rgb.avi')
         flow_data = transforms(rgb_name)
-        flow_data = flowPoseTransform(flow_data, colors)
+
+        # Get the pose data
+        colors = denoised_skes_data[ske_number]
+        colors = colors.transpose(3, 0, 2, 1)
+
+        # Get the flowpose data
+        flowpose_data = flowPoseTransform(flow_data, colors)
 
         break
 
+    return flowpose_data
 
 if __name__ == '__main__':
     save_path = './data/ntu'
@@ -74,7 +75,8 @@ if __name__ == '__main__':
 
     rgb_path = '../Datasets/NTU_RGBD/nturgb+d_rgb/'
     skes_name_file = os.path.join(stat_path, 'ntu_rgbd-available.txt')
-    raw_data_file = os.path.join(save_path, 'raw_data', 'raw_skes_data.pkl')
+    denoised_skes_data_file = os.path.join(save_path, 'denoised_data', 'raw_denoised_colors.pkl')
     
-    get_raw_flowpose_data()
+    flowpose_data = get_raw_flowpose_data()
+    print(flowpose_data.shape)
 

@@ -3,13 +3,14 @@ import os
 
 # # add lib to path
 curr_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "..")))
 
 import matplotlib.pyplot as plt
 import torch
 import numpy as np
 import cv2
 from config.argclass import ArgClass
+
 # import decord
 from decord import VideoReader, cpu
 from data_gen.utils.extractors import FlowPoseSampler
@@ -92,7 +93,6 @@ from einops import rearrange
 #         continue
 #     draw_flow_vectors(flows[keypoint_number], frame, int(keypoint[0]), int(keypoint[1]), window_size)
 #     cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), 1, 255, -1)
-    
 
 
 # plt.imshow(frame, cmap='gray')
@@ -106,17 +106,17 @@ from einops import rearrange
 # def draw_flow_arrows(vector_field, img):
 #     """
 #     Draws arrows pointing in the direction of the flow for a given vector field on an RGB image.
-    
+
 #     Parameters:
 #     vector_field (numpy.ndarray): A numpy array of shape (2, 240, 320) representing the flow vectors.
 #     img (numpy.ndarray): An RGB image of shape (240, 320, 3).
 #     """
 #     u = vector_field[0]
 #     v = vector_field[1]
-    
+
 #     # Create a grid of coordinates
 #     x, y = np.meshgrid(np.arange(u.shape[1]), np.arange(v.shape[0]))
-    
+
 #     plt.figure(figsize=(10, 10))
 #     # plt.imshow(img)  # Display the RGB image
 #     plt.quiver(x, y, u, v, color='r', scale=1, scale_units='xy', angles='xy')
@@ -144,14 +144,14 @@ def draw_skeleton_on_frame(video_path, skeleton, frame_index=0):
     """
     # Open the video file
     cap = cv2.VideoCapture(video_path)
-    
+
     # Check if video opened successfully
     if not cap.isOpened():
         print("Error: Could not open video.")
         return None
-    
+
     # Get the skeleton for corresponding frame
-    skeleton_frame = skeleton[frame_index]
+    skeleton_frame = skeleton[:, frame_index, ...]
 
     # Set the frame position
     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
@@ -163,9 +163,17 @@ def draw_skeleton_on_frame(video_path, skeleton, frame_index=0):
         return None
 
     # Draw the skeleton keypoints on the frame
-    for keypoint in skeleton_frame:
-        x, y = int(keypoint[0]), int(keypoint[1])
-        cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)  # Draw a green circle for each keypoint
+    for person_num, person in enumerate(skeleton_frame.transpose(2, 0, 1)):
+        for keypoint in person.transpose(1, 0):
+            x, y = int(keypoint[0]), int(keypoint[1])
+            if person_num == 0:
+                cv2.circle(
+                    frame, (x, y), 5, (0, 255, 0), -1
+                )  # Draw a green circle for each keypoint
+            else:
+                cv2.circle(
+                    frame, (x, y), 5, (255, 0, 0), -1
+                )  # Draw a green circle for each keypoint
 
     # Release the video capture object
     cap.release()
@@ -173,67 +181,75 @@ def draw_skeleton_on_frame(video_path, skeleton, frame_index=0):
     return frame
 
 
-# Using the first video
-video_name = 'S001C003P008R001A050'
+# Using video with two subjects
+video_name = "S001C003P008R001A050" # A good one!
+# video_name = "S001C001P001R001A026"
+video_name = "S002C003P014R002A055"
 
 # Load the names of the skeleton files
-skes_name = np.loadtxt('./data/ntu/statistics/ntu_rgbd-available.txt', dtype=str)
+skes_name = np.loadtxt("./data/ntu/statistics/ntu_rgbd-available.txt", dtype=str)
 ske_number = list(skes_name).index(video_name)
 
 # Example usage
-video_path = f'../Datasets/NTU_RGBD/nturgb+d_rgb/{video_name}_rgb.avi'
-pose_path = './data/ntu/raw_data/raw_skes_data.pkl'
-with open(pose_path, 'rb') as f:
+video_path = f"../Datasets/NTU_RGBD/nturgb+d_rgb/{video_name}_rgb.avi"
+pose_path = "./data/ntu/raw_data/raw_skes_data.pkl"
+pose_denoised_path = "./data/ntu/denoised_data/raw_denoised_colors.pkl"
+
+with open(pose_path, "rb") as f:
     raw_skes_data = pickle.load(f)
+with open(pose_denoised_path, "rb") as f:
+    denoised_skes_data = pickle.load(f)
+
+print(len(raw_skes_data))
+print(len(denoised_skes_data))
 
 # Get the skeleton data
-for (idx, bodies_data) in enumerate(raw_skes_data):
+for idx, bodies_data in enumerate(raw_skes_data):
     if idx == ske_number:
-        ske_name = bodies_data['name']
-        num_bodies = len(bodies_data['data'])
-        num_frames = bodies_data['num_frames']
-        if num_bodies == 1:
-            body_data = list(bodies_data['data'].values())[0]
-            joints, colors = body_data['joints'], body_data['colors']
-        else:
-            # TODO: handle multiple bodies
-            joints = np.zeros((num_frames, 150), dtype=np.float32)
-            colors = np.ones((num_frames, 2, 25, 2), dtype=np.float32) * np.nan
+        ske_name = bodies_data["name"]
+        num_bodies = len(bodies_data["data"])
+        num_frames = bodies_data["num_frames"]
 
-            print(bodies_data[0])
-            bodyID, actor1 = list(bodies_data)[0]  # the 1st actor with largest motion
-            start1, end1 = actor1['interval'][0], actor1['interval'][-1]
-            joints[start1:end1 + 1, :75] = actor1['joints'].reshape(-1, 75)
-            colors[start1:end1 + 1, 0] = actor1['colors']
-            actor1_info = '{:^17}\t{}\t{:^8}\n'.format('Actor1', 'Interval', 'Motion') + \
-                      '{}\t{:^8}\t{:f}\n'.format(bodyID, str([start1, end1]), actor1['motion'])
-            del bodies_data[0]
+        print(f"Skeleton file name: {ske_name}")
+        print(f"Number of bodies: {num_bodies}")
+        print(f"Number of frames: {num_frames}")
 
-            actor2_info = '{:^17}\t{}\t{:^8}\n'.format('Actor2', 'Interval', 'Motion')
-            start2, end2 = [0, 0]  # initial interval for actor2 (virtual)
+        # # figure out steps in their denoising process
+        # bodies_data, noise_info = denoising_bodies_data(bodies_data)
+        bodies_data = bodies_data["data"]
 
-            while len(bodies_data) > 0:
-                bodyID, actor = bodies_data[0]
-                start, end = actor['interval'][0], actor['interval'][-1]
-                if min(end1, end) - max(start1, start) <= 0:  # no overlap with actor1
-                    joints[start:end + 1, :75] = actor['joints'].reshape(-1, 75)
-                    colors[start:end + 1, 0] = actor['colors']
-                    actor1_info += '{}\t{:^8}\t{:f}\n'.format(bodyID, str([start, end]), actor['motion'])
-                    # Update the interval of actor1
-                    start1 = min(start, start1)
-                    end1 = max(end, end1)
-                elif min(end2, end) - max(start2, start) <= 0:  # no overlap with actor2
-                    joints[start:end + 1, 75:] = actor['joints'].reshape(-1, 75)
-                    colors[start:end + 1, 1] = actor['colors']
-                    actor2_info += '{}\t{:^8}\t{:f}\n'.format(bodyID, str([start, end]), actor['motion'])
-                    # Update the interval of actor2
-                    start2 = min(start, start2)
-                    end2 = max(end, end2)
-                del bodies_data[0]
+        # stacked_poses = np.stack(
+        #     [body_data["colors"] for body_data in bodies_data.values()], axis=-1
+        # )
+        for body_name, body_data in bodies_data.items():
+            colors = body_data["colors"]
+            print(f"Single person shape: {colors.shape}")
+            print("\t(num_frames, num_keypoints, num_channels)")
+            
 
-        print(colors.shape)
-        colors = rearrange(colors, 't v c -> c t v')
+        # print(f"Stacked poses shape: {stacked_poses.shape}")
+        # print("\t(num_frames, num_keypoints, num_channels, num_people)")
+        # # (channels, num_frames, num_keypoints, num_people)
+        # # This is the shape my flowpose sampler takes...
+        # # rearrange(stacked_poses, 't v c m -> c t v m')
+        # stacked_poses = stacked_poses.transpose(2, 0, 1, 3)
+        # print(f"Stacked poses shape (post transpose): {stacked_poses.shape}")
+        # print("\t(num_channels, num_frames, num_keypoints, num_people)")
 
-# Draw the skeleton on the frame
-frame_with_skeleton = draw_skeleton_on_frame(video_path, colors, frame_index=0)
-cv2.imwrite('skeleton.png', frame_with_skeleton)
+denoised = denoised_skes_data[ske_number]
+denoised = denoised.transpose(3, 0, 2, 1)
+print(denoised.shape)
+
+# # Draw the skeleton on the frame
+# frame_with_skeleton = draw_skeleton_on_frame(video_path, stacked_poses, frame_index=25)
+# cv2.imwrite("skeleton_from_raw.png", frame_with_skeleton)
+frame_with_skeleton = draw_skeleton_on_frame(video_path, denoised, frame_index=40)
+cv2.imwrite("skeleton_from_denoised.png", frame_with_skeleton)
+
+
+# flow = np.random.rand(50, 2, 240, 320)
+# flowPoseSampler = FlowPoseSampler(
+#     window_size=3, threshold=0.5, loop=False, norm=False, match_pose=False, ntu=True
+# )
+
+# Get the flow data

@@ -40,17 +40,17 @@ def run_epoch(
     log_acc = [
         AverageMeter() for _ in range(10)
     ]  # This one is a list of 10 AverageMeter objects
-    log_loss = AverageMeter() # Total loss
+    log_loss = AverageMeter()  # Total loss
     log_cls_loss = AverageMeter()  # class loss
     # log_auc = AverageMeter()  # AUC TODO: make an AUC logger
     log_feature_loss = AverageMeter()  # feature loss
     log_recon_loss = AverageMeter()  # reconstruction loss
     # recon_2d_loss = AverageMeter()  # 2D reconstruction loss
 
-    tbar = tqdm(data_loader, dynamic_ncols=True, desc=desc)
+    # tbar = tqdm(data_loader, dynamic_ncols=True, desc=desc)
 
     start = time.time()
-    for x, y, mask, index in tbar:
+    for x, y, mask, index in data_loader:
         cls_loss, recon_loss, feature_loss = (
             torch.tensor(0.0),
             torch.tensor(0.0),
@@ -102,8 +102,8 @@ def run_epoch(
 
             feature_loss = arg.lambda_3 * loss_funcs["recon_loss"](
                 z_hat, z_0, mask_feature
-            ) # F.mse_loss(z_0, z_hat)
-    
+            )  # F.mse_loss(z_0, z_hat)
+
         # KL divergence (regularization)
         # TODO: REMOVE (kl_div is always torch.tensor(0.0))
         if arg.lambda_4:
@@ -224,9 +224,13 @@ def train_network(
     # If we pass checkpoint_file, make sure it's initialised
     if checkpoint_file is not None:
         checkpoint = load_checkpoint(checkpoint_file, device)
-        start_epoch = checkpoint["epoch"] + 1 # We saved the checkpoint at the end of the epoch
+        start_epoch = (
+            checkpoint["epoch"] + 1
+        )  # We saved the checkpoint at the end of the epoch
         try:
-            results = checkpoint["results"] # Don't override the results from previous training!
+            results = checkpoint[
+                "results"
+            ]  # Don't override the results from previous training!
             optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
             scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         except KeyError:
@@ -235,7 +239,7 @@ def train_network(
 
     # Training loop
     # we start from the next epoch after the last checkpoint (or from 1) and go to the specified number of epochs
-    for epoch in tqdm(range(start_epoch, epochs+1), desc="Epoch"):
+    for epoch in tqdm(range(start_epoch, epochs + 1), desc="Epoch"):
         model = model.train()  # Put our model in training mode
 
         # Run the training epoch
@@ -267,7 +271,7 @@ def train_network(
         if test_loader is not None:
             model = model.eval()
             with torch.no_grad():
-                run_epoch(
+                test_time = run_epoch(
                     arg=arg,
                     model=model,
                     optimiser=optimiser,
@@ -280,6 +284,8 @@ def train_network(
                 )
             # TODO: AUC is not in both ms-g3d and infogcn results dict, change to accomidate
             print(f"\t\t{epoch} EPOCH BEST TEST ACC: {max(results['test_AUC'])}")
+            print(f"\t\t\tTrain time: {train_time:.2f} seconds")
+            print(f"\t\t\tTest time: {test_time:.2f} seconds")
 
         if checkpoint_file is not None:
             if epoch % checkpoint_freq == 0:
@@ -309,7 +315,9 @@ def load_checkpoint(checkpoint_file: str, device):
         print(f"\tResuming from checkpoint at epoch {checkpoint['epoch']}")
     except FileNotFoundError:
         print(f"\tCreated new checkpoint file: {checkpoint_file}")
-        checkpoint = {"epoch": 0} # Start from scratch, indexing starts from 1 in this case
+        checkpoint = {
+            "epoch": 0
+        }  # Start from scratch, indexing starts from 1 in this case
         torch.save(checkpoint, checkpoint_file)
     return checkpoint
 
@@ -365,12 +373,14 @@ if __name__ == "__main__":
     # TRAINING!
     score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
 
-    results = train_network(arg,
-                            model,
-                            loss_funcs,
-                            train_dataloader,
-                            score_funcs=score_funcs,
-                            device="cpu",
-                            epochs=arg.num_epoch,
-                            checkpoint_file=arg.checkpoint_file,
-                            checkpoint_freq=arg.checkpoint_freq)
+    results = train_network(
+        arg,
+        model,
+        loss_funcs,
+        train_dataloader,
+        score_funcs=score_funcs,
+        device="cpu",
+        epochs=arg.num_epoch,
+        checkpoint_file=arg.checkpoint_file,
+        checkpoint_freq=arg.checkpoint_freq,
+    )

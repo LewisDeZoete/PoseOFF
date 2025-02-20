@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 from einops import rearrange
+from einops.layers.torch import Rearrange
 
 class Flow_conv(nn.Module):
     """
@@ -26,12 +27,11 @@ class Flow_conv(nn.Module):
         forward(x):
             Forward pass of the module. Takes input tensor `x` of shape (N, T, M, V, C) and returns a tensor of the same shape with additional flow features concatenated.
             Args:
-                x (torch.Tensor): Input tensor of shape (N, T, M, V, C).
+                x (torch.Tensor): Input tensor of shape (N, C, T, V, M).
             Returns:
                 torch.Tensor: Output tensor of shape (N, T, M, V, C + out_channels - original_channels).
     """
     def __init__(self, kernel_size, flow_window=5, original_channels=3, out_channels=4):
-        
         super(Flow_conv, self).__init__()
 
         # 3D conv for learning the flow windows
@@ -59,24 +59,26 @@ class Flow_conv(nn.Module):
         self.fc = nn.Linear(32, self.flow_out_channels)
 
     def forward(self, x):
-        N, C, T, V, M = x.size()
-        # x of shape (batch, channels+2W**2, 300, 2, 17)
-        flow_data = rearrange(x, 'n c t v m -> (n t v m) c', n=N, t=T, v=V, m=M) # (N*T*M*V, C)
+        A, V, C = x.size() # A=N*M*T
+        # x of shape ((batch, 2, 300), 17, pose_channels+2W**2)
+        # x = rearrange(x, "n c t v m -> (n m t) v c")
+        flow_data = rearrange(x, 'A v c -> (A v) c', A=A, v=V) # (N*M*T*V, C)
         flow_data = rearrange(flow_data[:, self.original_channels:], \
                               'skels (w h c) -> skels c w h', \
                                 w=self.flow_window,
                                 h=self.flow_window,
-                                c=2) # (N*T*M*V, W, H, 2)
-        # flow_data = flow_data.view(N*T*M*V, self.flow_window, self.flow_window, 2).permute(0, 3, 1, 2)
+                                c=2) # (N*M*T*V, W, H, 2)
 
         # Apply convolutions, dropout between then flatten 
         flow_features = self.conv(flow_data)    # Apply conv
         flow_features = flow_features.view(flow_features.size(0), -1) # flatten
         flow_features = self.fc(flow_features) # Linear layer to reduce out_channels
-        flow_features = flow_features.view(N,self.flow_out_channels,T,V,M)
+        # flow_features = flow_features.view(N,self.flow_out_channels,T,V,M)
+        flow_features = rearrange(flow_features, '(A v) c -> (A) v c', A=A, v=V)
         
         # Stack the output of this cnn onto the original graph features
-        x = torch.cat((x[:,:self.original_channels,...], flow_features), dim=1)
+        # x = torch.cat((x[:,:self.original_channels,...], flow_features), dim=1)
+        x = torch.cat((x[:,:,:self.original_channels], flow_features), dim=-1)
 
         return x
 
@@ -212,19 +214,33 @@ if __name__ == "__main__":
     graph = AdjMatrixGraph()
     A_binary = graph.A_binary
 
-    kernel_size = 7
-    flow_window = 9
+    kernel_size = 3
+    flow_window = 5
     original_channels = 3
-    out_channels = 4
+    embed_channels = 64
     
-
     # Example usage
-    N, T, M, V, C = 16, 300, 2, 17, (original_channels + 2*(flow_window**2))
+    N, C, T, V, M = 16, (original_channels + 2*(flow_window**2)), 300, 17, 2 
     print(C)
     x = torch.randn(N, C, T, V, M)
-    flow_conv = Flow_conv(kernel_size=kernel_size,
-                          flow_window=flow_window,
-                          original_channels=original_channels, 
-                          out_channels=out_channels)
-    flows = flow_conv(x)
+    x = rearrange(x,  "n c t v m -> (n m t) v c")
+
+    lin = nn.Linear(original_channels+2*(flow_window**2), 64)
+    
+    flow = nn.Sequential(
+                Flow_conv(
+                kernel_size=3,
+                flow_window=flow_window, # flow_window = sqrt(flow_channels/2)
+                original_channels=original_channels,
+                out_channels=embed_channels),
+                nn.ReLU(),
+                nn.Linear(embed_channels, embed_channels),
+            )
+    # flow_conv = Flow_conv(kernel_size=kernel_size,
+    #                       flow_window=flow_window,
+    #                       original_channels=original_channels, 
+    #                       out_channels=embed_channels)
+    flows = flow(x)
+    lins = lin(x)
     print(flows.shape)
+    print(lins.shape)

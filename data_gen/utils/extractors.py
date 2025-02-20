@@ -162,6 +162,109 @@ class FlowPoseSampler:
                  threshold: float = 0.5, 
                  loop: bool = True,
                  norm: bool = False,
+                 match_pose: bool = True,
+                 ntu: bool = False):
+        self.window_size = window_size  # Window size about pose keypoint
+        self.half_k = self.window_size // 2  # Half the window size
+        self.threshold = threshold
+        if loop:
+            self.loop_graph = loop_graph
+        if norm:
+            self.norm = flow_mag_norm
+        if match_pose:
+            self.pose_match = pose_match
+        self.ntu = ntu
+
+    def __call__(self, flows, poses):
+        """
+        Samples the optical flow in windows surrounding the pose keypoints.
+        Returns array of shape:
+            (num_pose_channels+(window_size**2)*2,
+            frames, 
+            keypoints, 
+            num_people)
+        """
+        if isinstance(flows, torch.Tensor):
+            flows = flows.cpu().numpy()
+        if isinstance(poses, torch.Tensor):
+            poses = poses.cpu().numpy()
+        
+        num_frames, _, height, width = flows.shape
+        num_keypoints = poses.shape[2]*poses.shape[3]
+        
+        if hasattr(self, 'pose_match'):
+            poses = self.pose_match(poses)
+
+        if self.ntu: # If poses have confidence values (i.e. from YOLO, not NTU)...
+            # Get pose keypoints
+            pose_points = ((poses[:2, ...]).reshape(2, poses.shape[1], num_keypoints)
+                        * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
+        else:
+            # Get pose keypoints
+            pose_points = ((poses[:2, ...] + 0.5).reshape(2, poses.shape[1], num_keypoints)
+                        * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
+            vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
+
+        # Prepare tensor to stack flow windows
+        stacker = np.zeros((self.window_size**2*2, poses.shape[1], num_keypoints))
+
+        # Create a grid of valid indices (filter out points close to the image border)
+        if self.ntu: # No visibility mask, NTU doesn't return conf values for keypoints
+            valid_indices = ((pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
+                             (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
+        else: 
+            valid_indices = (vis.reshape(poses.shape[1], num_keypoints) & 
+                             (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
+                             (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
+                        
+        # Loop through the frames and sample flow in window around each valid keypoint
+        for i in range(num_frames):
+            flow = flows[i]
+            for keypoint_num in range(num_keypoints):
+                if valid_indices[i+1, keypoint_num]:
+                    x, y = pose_points[0, i+1, keypoint_num], pose_points[1, i+1, keypoint_num]
+                    # Get the window of optical flow and calculate mean directly
+                    flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
+                    
+                    stacker[:, i+1, keypoint_num] = flow_window.flatten()
+        
+        # Concatenate poses with computed flow
+        flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
+        
+        # If we pass loop_graph = True, then loop the graph using this function!
+        if hasattr(self, 'loop_graph'):
+            flow_pose = self.loop_graph(flow_pose)
+        
+        if hasattr(self, 'norm'):
+            flow_pose = self.norm(flow_pose, flow_window=self.window_size)
+        
+        return flow_pose
+
+
+class FlowPoseSampler_backup:
+    """
+    A class to sample optical flow in windows surrounding pose keypoints.
+    Attributes:
+        device (torch.device): The device to run the computations on.
+        window_size (int): The size of the window around each pose keypoint. Default is 3.
+        threshold (float): The threshold for visibility of keypoints. Default is 0.5.
+        loop (bool): Whether to loop the graph using loop_graph function. Default is True.
+        to_cpu (bool): Whether to move the resulting tensor to CPU. Default is True.
+        norm (bool): Whether to normalize the flow magnitude using flow_mag_norm function. Default is False.
+    Methods:
+        __call__(flows, poses):
+            Samples the optical flow in windows surrounding the pose keypoints.
+            Args:
+                flows (torch.Tensor/np.array): The optical flow tensor of shape (num_frames, 2, height, width).
+                poses (torch.Tensor): The pose keypoints tensor of shape (3, num_frames, num_keypoints, num_people).
+            Returns:
+                torch.Tensor: The concatenated tensor of poses and sampled flow data.
+    """
+    def __init__(self, 
+                 window_size: int = 3, 
+                 threshold: float = 0.5, 
+                 loop: bool = True,
+                 norm: bool = False,
                  match_pose: bool = True):
         self.window_size = window_size  # Window size about pose keypoint
         self.half_k = self.window_size // 2  # Half the window size

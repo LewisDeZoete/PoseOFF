@@ -13,4 +13,5 @@
 source ../environment/bin/activate
 
 # Main job for each array task
-srun python ./data_gen/infogcn-NTU/get_raw_skes_data.py
+# srun python ./data_gen/infogcn-NTU/get_raw_skes_data.py
+srun python ./data_gen/infogcn-NTU/get_raw_denoised_data.py

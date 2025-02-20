@@ -33,6 +33,7 @@ from model.attn import Flow_conv
 
 
 from einops import rearrange, repeat
+from einops.layers.torch import Rearrange
 from torchdiffeq import odeint as odeint
 # @misc{torchdiffeq,
 # 	author={Chen, Ricky T. Q.},
@@ -178,16 +179,20 @@ class SODE(nn.Module):
             self.zero = torch.tensor(0.0).to(device)
             self.n_step = n_step
             self.arange_n_step = torch.arange(n_step + 1).to(device)
-        self.cnn = cnn
         if cnn:
-            self.flow_cnn = Flow_conv(
-                kernel_size=7,
+            assert flow_channels > 2 # Could be a better assertion here...
+            self.to_joint_embedding = nn.Sequential(
+                Flow_conv(
+                kernel_size=3,
                 flow_window=int(math.sqrt(flow_channels/2)), # flow_window = sqrt(flow_channels/2)
-                original_channels=3,
-                out_channels=embed_channels,
+                original_channels=pose_channels,
+                out_channels=embed_channels),
+                nn.ReLU(),
+                nn.Linear(embed_channels, embed_channels)
             )
         else:
             self.to_joint_embedding = nn.Linear(pose_channels+flow_channels, embed_channels)
+            # self.to_joint_embedding = nn.Linear(pose_channels+flow_channels, embed_channels)
         self.pos_embedding = nn.Parameter(torch.randn(1, self.num_point, embed_channels))
         self.temporal_encoder = (
             TemporalEncoder(
@@ -324,13 +329,16 @@ class SODE(nn.Module):
     def forward(self, x):
         N, C, T, V, M = x.size()
 
-        # embedding
-        if self.cnn:
-            x = self.flow_cnn(x)
-            x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
-        else:
-            x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
-            x = self.to_joint_embedding(x)
+        x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
+        x = self.to_joint_embedding(x)
+
+        # # embedding
+        # if self.cnn:
+        #     x = self.flow_cnn(x)
+        #     x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
+        # else:
+        #     x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
+        #     x = self.to_joint_embedding(x)
         x = x + self.pos_embedding[:, : self.num_point]
 
         # encoding

@@ -119,3 +119,6 @@ venv.bak/
 
 # Pickle files
 *.pkl
+
+# NTU datafiles
+actors_info/
