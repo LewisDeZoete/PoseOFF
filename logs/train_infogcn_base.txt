@@ -94,3 +94,12 @@ verbose: True
 		2 EPOCH BEST TEST ACC: 0.015659552067518234
 			Train time: 113.64 seconds
 			Test time: 105.65 seconds
+		3 EPOCH BEST TEST ACC: 0.02799275889992714
+			Train time: 112.39 seconds
+			Test time: 107.79 seconds
+		4 EPOCH BEST TEST ACC: 0.032805949449539185
+			Train time: 109.34 seconds
+			Test time: 106.92 seconds
+		5 EPOCH BEST TEST ACC: 0.050486087799072266
+			Train time: 111.88 seconds
+			Test time: 107.04 seconds
