@@ -28,7 +28,7 @@ parser.add_argument(
     help="network phase [train, test] (default=test)",
 )
 parser.add_argument(
-    "-l", dest="limb", default="joint", help="limb [joint, bone] (default=joint)"
+    "-m", dest="model_type", default="base", help="model type [base, cnn, avg, abs] (default=base)"
 )
 parser.add_argument(
     "-r",
@@ -67,10 +67,10 @@ skel_model = modelLoader.model
 print("### Model created")
 
 # Get the correct device (since arg.device is simply an int, we want a torch.device)
-device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
+device = torch.device(arg.device if torch.cuda.is_available() else "cpu")
 
 # # Create the datasets and dataloaders
-train_dataset = feeder.Feeder(**arg.feeder_args, split='train')
+train_dataset = feeder.Feeder(**arg.feeder_args, split="train")
 test_dataset = feeder.Feeder(**arg.feeder_args, split="test")
 generator = torch.Generator().manual_seed(
     42
@@ -80,8 +80,20 @@ train_idx, test_idx = torch.utils.data.random_split(
 )
 train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
 test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
-train_dataloader = DataLoader(train_dataset, batch_size=arg.batch_size, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=arg.batch_size, shuffle=True)
+train_dataloader = DataLoader(
+    train_dataset,
+    batch_size=arg.batch_size,
+    num_workers=4,
+    shuffle=True,
+    pin_memory=True,
+)
+test_dataloader = DataLoader(
+    test_dataset,
+    batch_size=arg.batch_size,
+    num_workers=4,
+    shuffle=True,
+    pin_memory=True,
+)
 
 # Get the parameters to optimise
 param_groups = {"params": []}
@@ -110,7 +122,9 @@ optimiser = optim.SGD(
 #     schedulers=[scheduler1, scheduler2, scheduler3],
 #     milestones=arg.optim["step"],
 # )
-scheduler = optim.lr_scheduler.MultiStepLR(optimiser, milestones=arg.optim['step'], gamma=arg.optim['gamma'])
+scheduler = optim.lr_scheduler.MultiStepLR(
+    optimiser, milestones=arg.optim["step"], gamma=arg.optim["gamma"]
+)
 
 # Create the loss function(s)
 cls_loss = LabelSmoothingCrossEntropy(T=arg.model_args["T"])
@@ -130,7 +144,7 @@ results = train_network(
     loss_funcs=loss_funcs,
     train_loader=train_dataloader,
     test_loader=test_dataloader,
-    score_funcs=score_funcs, # TODO: Implement score functions for infogcn
+    score_funcs=score_funcs,  # TODO: Implement score functions for infogcn
     device=device,
     epochs=arg.num_epoch,
     scheduler=scheduler,

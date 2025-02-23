@@ -180,20 +180,23 @@ class SODE(nn.Module):
             self.n_step = n_step
             self.arange_n_step = torch.arange(n_step + 1).to(device)
         if cnn:
-            assert flow_channels > 2 # Could be a better assertion here...
-            self.to_joint_embedding = nn.Sequential(
-                Flow_conv(
+            assert flow_channels > 2  # Could be a better assertion here...
+            self.to_joint_embedding = Flow_conv(
                 kernel_size=3,
-                flow_window=int(math.sqrt(flow_channels/2)), # flow_window = sqrt(flow_channels/2)
+                flow_window=int(
+                    math.sqrt(flow_channels / 2)
+                ),  # flow_window = sqrt(flow_channels/2)
                 original_channels=pose_channels,
-                out_channels=embed_channels),
-                nn.ReLU(),
-                nn.Linear(embed_channels, embed_channels)
+                out_channels=embed_channels,
             )
         else:
-            self.to_joint_embedding = nn.Linear(pose_channels+flow_channels, embed_channels)
+            self.to_joint_embedding = nn.Linear(
+                pose_channels + flow_channels, embed_channels
+            )
             # self.to_joint_embedding = nn.Linear(pose_channels+flow_channels, embed_channels)
-        self.pos_embedding = nn.Parameter(torch.randn(1, self.num_point, embed_channels))
+        self.pos_embedding = nn.Parameter(
+            torch.randn(1, self.num_point, embed_channels)
+        )
         self.temporal_encoder = (
             TemporalEncoder(
                 seq_len=T,
@@ -215,7 +218,10 @@ class SODE(nn.Module):
 
         method = ode_method
         ode_func = ODEFunc(
-            embed_channels, torch.from_numpy(self.Graph.A_norm).to(device), N=n_step, T=T
+            embed_channels,
+            torch.from_numpy(self.Graph.A_norm).to(device),
+            N=n_step,
+            T=T,
         ).to(device)
         self.diffeq_solver = (
             DiffeqSolver(ode_func, method=method)
@@ -329,16 +335,11 @@ class SODE(nn.Module):
     def forward(self, x):
         N, C, T, V, M = x.size()
 
+        # Joint embedding
         x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
         x = self.to_joint_embedding(x)
 
-        # # embedding
-        # if self.cnn:
-        #     x = self.flow_cnn(x)
-        #     x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
-        # else:
-        #     x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
-        #     x = self.to_joint_embedding(x)
+        # Add positional embedding
         x = x + self.pos_embedding[:, : self.num_point]
 
         # encoding
@@ -392,16 +393,21 @@ if __name__ == "__main__":
     sys.path.insert(0, "..")
     from config.argclass import ArgClass
 
-    arg = ArgClass("config/custom_pose/train_joint_infogcn.yaml")
+    model_type = 'cnn'
+
+    arg = ArgClass(f"config/custom_pose/train_{model_type}.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
 
     model = SODE(**arg.model_args)
-
     model = model.to(device)
 
     # N, C, T, V, M
-    C = arg.model_args['flow_channels'] + arg.model_args['pose_channels']
+    C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
+    print(f"Model: {model_type}")
+    print(f"Input channels: {C}\n")
+
     x = torch.randn((8, C, 64, 17, 2)).to(device)
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
+    print(f'y_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}')

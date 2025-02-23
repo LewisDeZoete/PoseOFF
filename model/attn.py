@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 from einops import rearrange
-from einops.layers.torch import Rearrange
 
 class Flow_conv(nn.Module):
     """
@@ -51,9 +50,6 @@ class Flow_conv(nn.Module):
                       out_channels=32, 
                       kernel_size=3),
             nn.ReLU(),
-            # nn.Conv2d(in_channels=32,
-            #           out_channels=64, 
-            #           kernel_size=5),
             nn.AdaptiveAvgPool2d((1,1))
         )
         self.fc = nn.Linear(32, self.flow_out_channels)
@@ -221,26 +217,27 @@ if __name__ == "__main__":
     
     # Example usage
     N, C, T, V, M = 16, (original_channels + 2*(flow_window**2)), 300, 17, 2 
-    print(C)
+    print(f'Total input channels: {C}')
+    
+    # Dummy data
     x = torch.randn(N, C, T, V, M)
     x = rearrange(x,  "n c t v m -> (n m t) v c")
 
+    # Define two potential joint embedding methods
     lin = nn.Linear(original_channels+2*(flow_window**2), 64)
+    flow = Flow_conv(
+            kernel_size=3,
+            flow_window=flow_window, # flow_window = sqrt(flow_channels/2)
+            original_channels=original_channels,
+            out_channels=embed_channels)
     
-    flow = nn.Sequential(
-                Flow_conv(
-                kernel_size=3,
-                flow_window=flow_window, # flow_window = sqrt(flow_channels/2)
-                original_channels=original_channels,
-                out_channels=embed_channels),
-                nn.ReLU(),
-                nn.Linear(embed_channels, embed_channels),
-            )
-    # flow_conv = Flow_conv(kernel_size=kernel_size,
-    #                       flow_window=flow_window,
-    #                       original_channels=original_channels, 
-    #                       out_channels=embed_channels)
+    # Pass data to joint embeddings
     flows = flow(x)
     lins = lin(x)
-    print(flows.shape)
-    print(lins.shape)
+
+    # Dummy positional embedding (1, V, embed_channels)
+    pos_embedding = torch.randn(1, V, embed_channels)
+    
+    print(f'Expected output shape: ({N*M*T}, {V}, {embed_channels})')
+    print(f'Flow embeddings: {(flows+pos_embedding[:, :V]).shape}')
+    print(f'Linear embeddings: {(lins+pos_embedding[:, :V]).shape}')

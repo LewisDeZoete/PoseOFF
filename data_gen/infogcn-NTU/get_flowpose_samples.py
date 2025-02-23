@@ -1,9 +1,10 @@
 import sys
 import os
+import os.path as osp
 
 # # add lib to path
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '../..')))
+curr_dir = osp.dirname(osp.abspath(__file__))
+sys.path.insert(0, osp.abspath(osp.join(curr_dir, '../..')))
 
 from data_gen.utils import LoadVideo, get_class_by_index, GetFlow, FlowPoseSampler
 from config.argclass import ArgClass
@@ -44,39 +45,47 @@ def get_raw_flowpose_data():
     skes_names = np.loadtxt(skes_name_file, dtype=str)
     num_files = skes_names.size
     print('Found %d available skeleton files.' % num_files)
+
+    flowpose_data = []
+
     # Assuming we've already processed all the pose data
     with open(denoised_skes_data_file, 'rb') as fr:  # load raw skeletons data
         denoised_skes_data = pickle.load(fr)
 
     for ske_number, ske_name in enumerate(skes_names):
-        print(ske_name)
         # Get the flow data
-        rgb_name = os.path.join(rgb_path, ske_name + '_rgb.avi')
+        rgb_name = osp.join(rgb_path, ske_name + '_rgb.avi')
         flow_data = transforms(rgb_name)
 
         # Get the pose data
-        colors = denoised_skes_data[ske_number]
-        colors = colors.transpose(3, 0, 2, 1)
+        poses = denoised_skes_data[ske_number]
+        poses = poses.transpose(3, 0, 2, 1)
+        # TODO: ensure poses are in the same range as the flow data!
+        # Right now, they're in the range (1920, 1080), flow is (320,240)
 
         # Get the flowpose data
-        flowpose_data = flowPoseTransform(flow_data, colors)
+        flowpose_data.append(flowPoseTransform(flow_data, poses))
+        break # DEBUG: remove this line
 
-        break
-
-    return flowpose_data
+    flowpose_pkl = osp.join(save_path, 'flowpose_data.pkl')
+    with open(flowpose_pkl, 'wb') as f:
+        pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
+    # return flowpose_data
 
 if __name__ == '__main__':
-    save_path = './data/ntu'
+    root_path = './data/ntu'
+    save_path = osp.join(root_path, 'flowpose_data')
 
-    stat_path = os.path.join(save_path, 'statistics')
-    flowpose_path = os.path.join(save_path, 'flowpose_data')
-    if not os.path.exists(flowpose_path):
-        os.makedirs(flowpose_path)
+    # Create the directories if they don't exist
+    if not osp.exists(save_path):
+        os.makedirs(save_path)    
 
+    # Define paths
+    stat_path = osp.join(root_path, 'statistics')
     rgb_path = '../Datasets/NTU_RGBD/nturgb+d_rgb/'
-    skes_name_file = os.path.join(stat_path, 'ntu_rgbd-available.txt')
-    denoised_skes_data_file = os.path.join(save_path, 'denoised_data', 'raw_denoised_colors.pkl')
+    skes_name_file = osp.join(stat_path, 'ntu_rgbd-available.txt')
+    denoised_skes_data_file = osp.join(root_path, 'denoised_data', 'raw_denoised_colors.pkl')
     
-    flowpose_data = get_raw_flowpose_data()
-    print(flowpose_data.shape)
+    # Generate the data
+    get_raw_flowpose_data()
 

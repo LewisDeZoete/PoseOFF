@@ -1,0 +1,55 @@
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 658125
+	Loading weights from DELETE_ME.pt
+	Checkpoint file does not yet exist
+	([Errno 2] No such file or directory: 'DELETE_ME.pt')
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		train_AUC
+		train_cls_loss
+		train_feature_loss
+		train_recon_loss
+	Created new checkpoint file: DELETE_ME.pt
+         591881 function calls (504184 primitive calls) in 185.265 seconds
+
+   Ordered by: cumulative time
+   List reduced from 816 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  185.265  185.265 /fred/oz141/ldezoete/MS-G3D/./training/train_infogcn.py:180(train_network)
+        1    0.635    0.635  185.203  185.203 /fred/oz141/ldezoete/MS-G3D/./training/train_infogcn.py:16(run_epoch)
+       55    0.000    0.000  115.239    2.095 /usr/lib64/python3.9/threading.py:280(wait)
+      406  115.239    0.284  115.239    0.284 {method 'acquire' of '_thread.lock' objects}
+       53    0.001    0.000  114.587    2.162 /fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:626(__next__)
+       53    0.001    0.000  114.549    2.161 /fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:1299(_next_data)
+       52    0.000    0.000  114.350    2.199 /fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:1266(_get_data)
+       62    0.000    0.000  114.349    1.844 /fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:1120(_try_get_data)
+       62    0.001    0.000  114.348    1.844 /usr/lib64/python3.9/queue.py:154(get)
+ 9568/104    0.041    0.000   32.567    0.313 /fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/modules/module.py:1528(_wrapped_call_impl)
+
+
+
++------------------ Job Report: 65324669 (COMPLETED) ------------------+
+| Memory (RAM)  [########            ] 43.0% (1.7 GB peak / 3.9 GB)    |
+| CPU           [#####               ] 27.1% average                   |
+| GPU           [######              ] 32.9% average                   |
+| Time          [-->                 ] 11.5% (0-00:04:37 / 0-00:40:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   716 KB        0 B            5                             |
+|   /fred   49.6 GB       1.8 KB         43.6 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      6.2 MB        0 B            846                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

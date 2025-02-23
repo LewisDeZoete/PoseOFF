@@ -13,7 +13,7 @@ class ArgClass(object):
         # as an argparse object
         if isinstance(arg, argparse.Namespace):
             # Get arg file
-            with open(f'./config/{arg.config}/{arg.phase}_{arg.limb}.yaml', 'r') as file:
+            with open(f'./config/{arg.config}/{arg.phase}_{arg.model_type}.yaml', 'r') as file:
                 in_dict = yaml.safe_load(file)
             # Also add the attributes in parser to the arg class
             for key in arg.__dict__:

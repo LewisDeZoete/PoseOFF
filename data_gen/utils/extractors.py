@@ -61,6 +61,7 @@ class GetPoses_YOLO:
         # Output from yolo is (x,y,conf), normalised between 0 and 1
         # Centralisation (about zero [-0.5 : 0.5])
         data_torch[0:2] = data_torch[0:2] - 0.5
+        data_torch[1:2] = -data_torch[1:2]
         
         # Set x and y to zero if confidence is zero
         data_torch[0][data_torch[2] == 0] = 0
@@ -153,13 +154,13 @@ class FlowPoseSampler:
             Samples the optical flow in windows surrounding the pose keypoints.
             Args:
                 flows (torch.Tensor/np.array): The optical flow tensor of shape (num_frames, 2, height, width).
-                poses (torch.Tensor): The pose keypoints tensor of shape (3, num_frames, num_keypoints, num_people).
+                poses (torch.Tensor): The pose keypoints tensor of shape (channels, num_frames, num_keypoints, num_people).
             Returns:
                 torch.Tensor: The concatenated tensor of poses and sampled flow data.
     """
     def __init__(self, 
                  window_size: int = 3, 
-                 threshold: float = 0.5, 
+                 threshold: float = 0.05, 
                  loop: bool = True,
                  norm: bool = False,
                  match_pose: bool = True,
@@ -195,7 +196,7 @@ class FlowPoseSampler:
         if hasattr(self, 'pose_match'):
             poses = self.pose_match(poses)
 
-        if self.ntu: # If poses have confidence values (i.e. from YOLO, not NTU)...
+        if self.ntu: # NTU does not return confidence values for keypoints
             # Get pose keypoints
             pose_points = ((poses[:2, ...]).reshape(2, poses.shape[1], num_keypoints)
                         * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)

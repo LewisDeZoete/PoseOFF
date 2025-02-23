@@ -348,6 +348,7 @@ if __name__ == "__main__":
     from feeders import feeder
     from torch.utils.data import DataLoader
     from loss import LabelSmoothingCrossEntropy, masked_recon_loss
+    import torch.optim as optim
 
     arg = ArgClass("./config/custom_pose/train_joint_infogcn.yaml")
     arg.checkpoint_file = "DELETE_ME.pt"
@@ -356,13 +357,29 @@ if __name__ == "__main__":
     modelLoader = ModelLoader(arg)
     model = modelLoader.model
 
-    # optimiser
-    # optimiser = optim.SGD()
+    # Get the parameters to optimise
+    param_groups = {"params": []}
+    for name, params in modelLoader.model.named_parameters():
+        param_groups["params"].append(params)
+    params = list({"other": param_groups}.values())
+
+    # Create the optimiser
+    optimiser = optim.SGD(
+        params,
+        lr=arg.optim["base_lr"],
+        momentum=0.9,
+        nesterov=arg.optim["nesterov"],
+        weight_decay=arg.optim["weight_decay"],
+    )
 
     # Dataset and dataloader
     train_dataset = feeder.Feeder(**arg.feeder_args)
     train_dataloader = DataLoader(
-        train_dataset, batch_size=arg.batch_size, shuffle=True
+        train_dataset,
+        batch_size=arg.batch_size,
+        num_workers=8,
+        shuffle=True,
+        pin_memory=True,
     )
 
     # Create the loss function(s)
@@ -370,8 +387,11 @@ if __name__ == "__main__":
     recon_loss = masked_recon_loss
     loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 
-    # TRAINING!
+    # Score functions for tracking
     score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
+
+    # Get the device (cuda or cpu)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results = train_network(
         arg,
@@ -379,8 +399,9 @@ if __name__ == "__main__":
         loss_funcs,
         train_dataloader,
         score_funcs=score_funcs,
-        device="cpu",
-        epochs=arg.num_epoch,
+        device=device,
+        epochs=1,
+        optimiser=optimiser,
         checkpoint_file=arg.checkpoint_file,
         checkpoint_freq=arg.checkpoint_freq,
     )
