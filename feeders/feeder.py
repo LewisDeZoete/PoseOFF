@@ -62,25 +62,6 @@ class Feeder(Dataset):
         sort=False,
         A=None,
     ):
-        """
-        Initialize the feeder.
-        Args:
-            data_paths (dict): Dictionary containing paths to data files.
-            label_path (str): Path to the label file.
-            labels (list): List of labels.
-            modality (str): Modality of the data (e.g., 'rgb', 'depth').
-            p_interval (list, optional): Probability interval for sampling valid_crop_resize. Defaults to [0.95].
-            split (str, optional): Dataset split ('train', 'val', 'test'). Defaults to 'train'.
-            random_choose (bool, optional): Whether to randomly choose frames. Defaults to False.
-            random_shift (bool, optional): Whether to randomly shift frames. Defaults to False.
-            random_move (bool, optional): Whether to randomly move frames. Defaults to False.
-            random_rot (bool, optional): Whether to randomly rotate frames. Defaults to False.
-            window_size (int, optional): Size of the window for sampling frames. Defaults to 64.
-            use_mmap (bool, optional): Whether to use memory-mapped files. Defaults to False.
-            vel (bool, optional): Whether to use velocity information. Defaults to False.
-            sort (bool, optional): Whether to sort the data. Defaults to False.
-            A (optional): Adjacency matrix. Defaults to None.
-        """
         self.data_paths = data_paths
         self.data_path = self.data_paths[f"{modality}_path"]
         self.label_path = label_path

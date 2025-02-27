@@ -1,0 +1,26 @@
+name: Run Custom Script
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Run custom script
+      run: |
+        for file in ./logs/train_infogcn*; do
+          if grep -q "70 EPOCH BEST TEST ACC:" "$file"; then
+            echo "$(head -n 1 "$file")"
+            grep "70 EPOCH BEST TEST ACC:" "$file" | awk '{print "    " $0}'
+          fi
+        done

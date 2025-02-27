@@ -49,7 +49,7 @@ model_args:
   T: 64 # Maximum sequence length
   n_step: 3 # Number of ODE solver steps
   SAGC_proj: True # Using self-attention graph convolution, (GCN if False)
-  num_cls: 10 # Number of classification heads used
+  num_cls: 1 # Number of classification heads used
   n_sample: 1
   backbone: transformer
   cnn: True
@@ -76,7 +76,7 @@ lambda_5: 0.0
 # training
 num_epoch: 70
 device: 0
-batch_size: 256
+batch_size: 128
 forward_batch_size: 128
 test_batch_size: 256
 half: False

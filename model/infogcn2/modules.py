@@ -276,9 +276,9 @@ class TemporalEncoder(nn.Module):
             module.weight.data.fill_(1.0)
 
     def forward(self, x):
-        """ ??? Not correct?
-        in : b t c h w
-        out : b t c h w
+        """
+        in : NM C T V
+        out : NM C T V
         """
         B, C, T, V = x.shape
         x = rearrange(x, 'b c t v -> (b v) t c')

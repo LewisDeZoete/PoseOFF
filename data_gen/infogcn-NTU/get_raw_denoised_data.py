@@ -246,6 +246,7 @@ def remove_missing_frames(ske_name, joints, colors):
     num_bodies = colors.shape[1]  # 1 or 2
 
     if num_bodies == 2:  # DEBUG
+        # Identify missing frames per actor
         missing_indices_1 = np.where(joints[:, :75].sum(axis=1) == 0)[0]
         missing_indices_2 = np.where(joints[:, 75:].sum(axis=1) == 0)[0]
         cnt1 = len(missing_indices_1)

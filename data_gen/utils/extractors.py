@@ -157,6 +157,7 @@ class FlowPoseSampler:
                 poses (torch.Tensor): The pose keypoints tensor of shape (channels, num_frames, num_keypoints, num_people).
             Returns:
                 torch.Tensor: The concatenated tensor of poses and sampled flow data.
+                    NOTE: The first frame of poses is discarded given it does not yet contain optical flow.
     """
     def __init__(self, 
                  window_size: int = 3, 
@@ -191,43 +192,48 @@ class FlowPoseSampler:
             poses = poses.cpu().numpy()
         
         num_frames, _, height, width = flows.shape
-        num_keypoints = poses.shape[2]*poses.shape[3]
+        channels, num_pose_frames, num_keypoints, num_people = poses.shape
+        total_keypoints = num_keypoints*num_people
         
         if hasattr(self, 'pose_match'):
             poses = self.pose_match(poses)
 
         if self.ntu: # NTU does not return confidence values for keypoints
-            # Get pose keypoints
-            pose_points = ((poses[:2, ...]).reshape(2, poses.shape[1], num_keypoints)
-                        * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
+            # Scale pose keypoints to image size
+            pose_points = np.nan_to_num(poses, nan=0)
+            pose_points = (pose_points.reshape(2, num_pose_frames, total_keypoints)
+                        * np.array([(width - 1)/1920, (height - 1)/1080]).reshape(2, 1, 1)).astype(int)
+            # NTU keypoints need to be scaled [-0.5, 0.5]
+            poses[0] = poses[0]/1920-0.5
+            poses[1] = poses[1]/1080-0.5
         else:
-            # Get pose keypoints
-            pose_points = ((poses[:2, ...] + 0.5).reshape(2, poses.shape[1], num_keypoints)
+            # Get and scale YOLO pose keypoints
+            pose_points = ((poses[:2, ...] + 0.5).reshape(2, num_pose_frames, total_keypoints)
                         * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
             vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
 
         # Prepare tensor to stack flow windows
-        stacker = np.zeros((self.window_size**2*2, poses.shape[1], num_keypoints))
+        stacker = np.zeros((self.window_size**2*2, num_pose_frames, total_keypoints))
 
         # Create a grid of valid indices (filter out points close to the image border)
         if self.ntu: # No visibility mask, NTU doesn't return conf values for keypoints
             valid_indices = ((pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
                              (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
         else: 
-            valid_indices = (vis.reshape(poses.shape[1], num_keypoints) & 
+            valid_indices = (vis.reshape(num_pose_frames, total_keypoints) & 
                              (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
                              (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
                         
         # Loop through the frames and sample flow in window around each valid keypoint
-        for i in range(num_frames):
-            flow = flows[i]
-            for keypoint_num in range(num_keypoints):
-                if valid_indices[i+1, keypoint_num]:
-                    x, y = pose_points[0, i+1, keypoint_num], pose_points[1, i+1, keypoint_num]
+        for frame_no in range(num_frames):
+            flow = flows[frame_no]
+            for keypoint_num in range(total_keypoints):
+                if valid_indices[frame_no+1, keypoint_num]:
+                    x, y = pose_points[0, frame_no+1, keypoint_num], pose_points[1, frame_no+1, keypoint_num]
                     # Get the window of optical flow and calculate mean directly
                     flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
                     
-                    stacker[:, i+1, keypoint_num] = flow_window.flatten()
+                    stacker[:, frame_no+1, keypoint_num] = flow_window.flatten()
         
         # Concatenate poses with computed flow
         flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
@@ -345,7 +351,7 @@ if __name__ == '__main__':
     from config.argclass import ArgClass
     from data_gen.utils.extract_utils import extract_data
 
-    arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
+    arg = ArgClass(arg='./config/custom_pose/train_base.yaml')
 
     flowposeSampler = FlowPoseSampler(device=torch.device('cpu'), norm=True)
     extract_data(arg, 0, flowposeSampler, 'flowpose', save_as_numpy=True, debug=True)
