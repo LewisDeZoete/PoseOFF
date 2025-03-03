@@ -1,29 +1,353 @@
 Found 56578 available skeleton files.
-Pre remove drop frame flow_data shape: torch.Size([131, 2, 240, 320])
-Frames dropped for S001C002P001R002A059: 32
-Pre remove drop frame flow_data shape: torch.Size([99, 2, 240, 320])
-Poses shape: (2, 100, 25, 2)
-Pre remove drop frame flow_data shape: torch.Size([97, 2, 240, 320])
-Frames dropped for S001C002P001R002A060: 11
-Pre remove drop frame flow_data shape: torch.Size([87, 2, 240, 320])
-Poses shape: (2, 87, 25, 2)
-Error processing S001C002P001R002A060
 
-+------------------ Job Report: 65495961 (COMPLETED) ------------------+
-| Memory (RAM)  [######              ] 33.7% (2.7 GB peak / 8 GB)      |
-| CPU           [########            ] 42.4% average                   |
-| Time          [->                  ]  5.8% (0-00:03:30 / 0-01:00:00) |
+Processed -900-99 in 134.52 seconds
+Processed -800-199 in 120.87 seconds
+Processed -700-299 in 131.98 seconds
+Processed -600-399 in 125.10 seconds
+Processed -500-499 in 112.90 seconds
+Processed -400-599 in 98.19 seconds
+Processed -300-699 in 112.94 seconds
+Processed -200-799 in 111.79 seconds
+Processed -100-899 in 109.09 seconds
+Processed 0-999 in 122.01 seconds
+Frames dropped for S001C002P001R002A059: 32
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S001C002P001R002A060: 11
+Processed 100-1099 in 128.85 seconds
+Processed 200-1199 in 122.51 seconds
+Processed 300-1299 in 138.84 seconds
+Frames dropped for S001C002P004R001A055: 42
+Processed 400-1399 in 119.36 seconds
+Frames dropped for S001C002P004R002A055: 32
+Processed 500-1499 in 99.03 seconds
+Processed 600-1599 in 156.71 seconds
+Processed 700-1699 in 140.69 seconds
+Processed 800-1799 in 136.38 seconds
+Processed 900-1899 in 144.58 seconds
+Frames dropped for S001C002P008R002A060: 6
+Frames dropped for S001C003P001R001A055: 6
+Processed 1000-1999 in 189.38 seconds
+Processed 1100-2099 in 160.69 seconds
+Processed 1200-2199 in 182.50 seconds
+Frames dropped for S001C003P003R002A011: 34
+	Frame 0 in skip list, add blank frame to poses
+Processed 1300-2299 in 200.33 seconds
+Frames dropped for S001C003P004R002A009: 25
+Processed 1400-2399 in 154.73 seconds
+Processed 1500-2499 in 137.65 seconds
+Processed 1600-2599 in 148.97 seconds
+Processed 1700-2699 in 143.50 seconds
+Processed 1800-2799 in 144.06 seconds
+Processed 1900-2899 in 156.47 seconds
+Processed 2000-2999 in 165.10 seconds
+Processed 2100-3099 in 151.56 seconds
+Processed 2200-3199 in 135.49 seconds
+Processed 2300-3299 in 129.16 seconds
+Processed 2400-3399 in 155.31 seconds
+Processed 2500-3499 in 137.12 seconds
+Processed 2600-3599 in 152.91 seconds
+Processed 2700-3699 in 154.00 seconds
+Frames dropped for S002C001P012R002A059: 27
+	Frame 0 in skip list, add blank frame to poses
+Processed 2800-3799 in 132.11 seconds
+Frames dropped for S002C001P014R001A055: 7
+Processed 2900-3899 in 138.88 seconds
+Processed 3000-3999 in 154.41 seconds
+Processed 3100-4099 in 157.14 seconds
+Frames dropped for S002C002P007R002A055: 29
+Processed 3200-4199 in 131.58 seconds
+Processed 3300-4299 in 131.88 seconds
+Frames dropped for S002C002P009R001A055: 43
+Processed 3400-4399 in 146.58 seconds
+Frames dropped for S002C002P010R001A001: 5
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S002C002P010R001A055: 7
+Processed 3500-4499 in 137.52 seconds
+Processed 3600-4599 in 160.08 seconds
+Processed 3700-4699 in 146.05 seconds
+Frames dropped for S002C002P012R001A042: 4
+Processed 3800-4799 in 141.10 seconds
+Processed 3900-4899 in 142.16 seconds
+Frames dropped for S002C002P014R001A055: 9
+Processed 4000-4999 in 158.95 seconds
+Processed 4100-5099 in 148.75 seconds
+Processed 4200-5199 in 136.58 seconds
+Processed 4300-5299 in 143.95 seconds
+Processed 4400-5399 in 130.30 seconds
+Processed 4500-5499 in 138.44 seconds
+Processed 4600-5599 in 151.40 seconds
+Frames dropped for S002C003P011R001A055: 47
+Processed 4700-5699 in 120.10 seconds
+Processed 4800-5799 in 116.66 seconds
+Processed 4900-5899 in 121.85 seconds
+Processed 5000-5999 in 109.87 seconds
+Frames dropped for S002C003P014R001A055: 25
+Processed 5100-6099 in 112.83 seconds
+Frames dropped for S002C003P014R002A055: 26
+Processed 5200-6199 in 109.96 seconds
+Frames dropped for S003C001P001R002A059: 26
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C001P002R001A059: 52
+	Frame 0 in skip list, add blank frame to poses
+Processed 5300-6299 in 107.52 seconds
+Processed 5400-6399 in 110.68 seconds
+Processed 5500-6499 in 115.82 seconds
+Frames dropped for S003C001P008R001A059: 40
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C001P008R001A060: 6
+Frames dropped for S003C001P008R002A060: 18
+Processed 5600-6599 in 115.46 seconds
+Processed 5700-6699 in 107.33 seconds
+Processed 5800-6799 in 104.98 seconds
+Processed 5900-6899 in 109.12 seconds
+Processed 6000-6999 in 118.37 seconds
+Processed 6100-7099 in 166.42 seconds
+Frames dropped for S003C001P019R001A059: 39
+	Frame 0 in skip list, add blank frame to poses
+Processed 6200-7199 in 153.02 seconds
+Processed 6300-7299 in 151.06 seconds
+Frames dropped for S003C002P002R001A059: 38
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C002P002R002A017: 5
+Processed 6400-7399 in 154.05 seconds
+Frames dropped for S003C002P007R001A059: 44
+	Frame 0 in skip list, add blank frame to poses
+Processed 6500-7499 in 164.02 seconds
+Frames dropped for S003C002P008R001A008: 24
+	Frame 0 in skip list, add blank frame to poses
+Processed 6600-7599 in 155.21 seconds
+Frames dropped for S003C002P008R001A059: 38
+	Frame 0 in skip list, add blank frame to poses
+Processed 6700-7699 in 175.34 seconds
+Frames dropped for S003C002P015R002A055: 24
+Processed 6800-7799 in 154.29 seconds
+Processed 6900-7899 in 146.61 seconds
+Frames dropped for S003C002P017R001A055: 29
+Processed 7000-7999 in 173.12 seconds
+Processed 7100-8099 in 169.82 seconds
+Frames dropped for S003C002P019R001A055: 26
+Processed 7200-8199 in 165.20 seconds
+Processed 7300-8299 in 168.71 seconds
+Processed 7400-8399 in 142.16 seconds
+Frames dropped for S003C003P002R001A059: 1
+Processed 7500-8499 in 107.65 seconds
+Processed 7600-8599 in 117.65 seconds
+Processed 7700-8699 in 117.73 seconds
+Processed 7800-8799 in 116.85 seconds
+Frames dropped for S003C003P015R001A059: 1
+Processed 7900-8899 in 104.51 seconds
+Frames dropped for S003C003P016R002A012: 45
+	Frame 0 in skip list, add blank frame to poses
+Processed 8000-8999 in 114.42 seconds
+Processed 8100-9099 in 109.97 seconds
+Processed 8200-9199 in 121.35 seconds
+Frames dropped for S003C003P019R001A055: 25
+Processed 8300-9299 in 122.77 seconds
+Processed 8400-9399 in 116.93 seconds
+Processed 8500-9499 in 126.27 seconds
+Processed 8600-9599 in 125.70 seconds
+Processed 8700-9699 in 124.87 seconds
+Processed 8800-9799 in 136.86 seconds
+Frames dropped for S004C002P003R001A059: 40
+	Frame 0 in skip list, add blank frame to poses
+Processed 8900-9899 in 122.59 seconds
+Processed 9000-9999 in 119.51 seconds
+Frames dropped for S004C002P008R001A010: 31
+	Frame 0 in skip list, add blank frame to poses
+Processed 9100-10099 in 129.46 seconds
+Processed 9200-10199 in 138.87 seconds
+Frames dropped for S004C002P020R001A060: 5
+Processed 9300-10299 in 125.82 seconds
+Frames dropped for S004C003P003R001A059: 28
+	Frame 0 in skip list, add blank frame to poses
+Processed 9400-10399 in 125.84 seconds
+Processed 9500-10499 in 126.17 seconds
+Processed 9600-10599 in 123.46 seconds
+Processed 9700-10699 in 137.93 seconds
+Processed 9800-10799 in 125.86 seconds
+Frames dropped for S005C001P004R001A059: 55
+	Frame 0 in skip list, add blank frame to poses
+Processed 9900-10899 in 108.08 seconds
+Processed 10000-10999 in 109.54 seconds
+Processed 10100-11099 in 99.53 seconds
+Processed 10200-11199 in 95.47 seconds
+Frames dropped for S005C001P015R002A042: 6
+Processed 10300-11299 in 105.21 seconds
+Frames dropped for S005C001P016R002A042: 30
+Processed 10400-11399 in 111.29 seconds
+Processed 10500-11499 in 98.82 seconds
+Processed 10600-11599 in 112.16 seconds
+Processed 10700-11699 in 123.32 seconds
+Frames dropped for S005C002P004R001A059: 51
+Processed 10800-11799 in 119.17 seconds
+Processed 10900-11899 in 115.64 seconds
+Frames dropped for S005C002P010R002A055: 6
+Processed 11000-11999 in 102.59 seconds
+Frames dropped for S005C002P013R002A055: 1
+Processed 11100-12099 in 95.55 seconds
+Processed 11200-12199 in 98.41 seconds
+Frames dropped for S005C002P016R001A008: 16
+Processed 11300-12299 in 114.53 seconds
+Processed 11400-12399 in 104.59 seconds
+Processed 11500-12499 in 107.58 seconds
+Processed 11600-12599 in 121.36 seconds
+Frames dropped for S005C002P021R001A055: 32
+Processed 11700-12699 in 131.86 seconds
+Frames dropped for S005C003P004R001A059: 61
+	Frame 0 in skip list, add blank frame to poses
+Processed 11800-12799 in 106.58 seconds
+Processed 11900-12899 in 117.89 seconds
+Processed 12000-12999 in 101.70 seconds
+Frames dropped for S005C003P015R001A055: 13
+Processed 12100-13099 in 91.75 seconds
+Processed 12200-13199 in 108.29 seconds
+Frames dropped for S005C003P016R002A008: 15
+Frames dropped for S005C003P016R002A020: 44
+	Frame 0 in skip list, add blank frame to poses
+Processed 12300-13299 in 107.51 seconds
+Processed 12400-13399 in 95.25 seconds
+Processed 12500-13499 in 110.13 seconds
+Frames dropped for S005C003P021R001A055: 32
+Processed 12600-13599 in 118.11 seconds
+Frames dropped for S005C003P021R002A055: 13
+Processed 12700-13699 in 110.97 seconds
+Processed 12800-13799 in 111.41 seconds
+Processed 12900-13899 in 115.48 seconds
+Frames dropped for S006C001P008R001A059: 39
+	Frame 0 in skip list, add blank frame to poses
+Processed 13000-13999 in 118.92 seconds
+Processed 13100-14099 in 102.56 seconds
+Frames dropped for S006C001P016R001A008: 6
+	Frame 0 in skip list, add blank frame to poses
+Processed 13200-14199 in 113.41 seconds
+Frames dropped for S006C001P017R001A060: 7
+Processed 13300-14299 in 108.31 seconds
+Processed 13400-14399 in 122.28 seconds
+Processed 13500-14499 in 128.51 seconds
+Processed 13600-14599 in 142.92 seconds
+Frames dropped for S006C001P023R001A055: 35
+Processed 13700-14699 in 129.86 seconds
+Processed 13800-14799 in 119.28 seconds
+Processed 13900-14899 in 109.42 seconds
+Frames dropped for S006C002P007R001A007: 19
+	Frame 0 in skip list, add blank frame to poses
+Processed 14000-14999 in 115.31 seconds
+Frames dropped for S006C002P007R001A060: 6
+Frames dropped for S006C002P007R002A014: 31
+Processed 14100-15099 in 124.70 seconds
+Frames dropped for S006C002P008R001A060: 14
+Frames dropped for S006C002P008R002A059: 48
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C002P008R002A060: 20
+Processed 14200-15199 in 128.91 seconds
+Processed 14300-15299 in 108.72 seconds
+Frames dropped for S006C002P016R001A008: 9
+Frames dropped for S006C002P016R001A042: 7
+Processed 14400-15399 in 119.42 seconds
+Processed 14500-15499 in 107.04 seconds
+Processed 14600-15599 in 126.54 seconds
+Processed 14700-15699 in 133.31 seconds
+Frames dropped for S006C002P022R002A059: 32
+	Frame 0 in skip list, add blank frame to poses
+Processed 14800-15799 in 135.67 seconds
+Frames dropped for S006C002P023R001A014: 68
+	Frame 0 in skip list, add blank frame to poses
+Processed 14900-15899 in 128.00 seconds
+Processed 15000-15999 in 120.95 seconds
+Processed 15100-16099 in 113.42 seconds
+Frames dropped for S006C003P007R001A014: 28
+Processed 15200-16199 in 118.98 seconds
+Frames dropped for S006C003P008R001A014: 13
+Processed 15300-16299 in 127.89 seconds
+Frames dropped for S006C003P008R001A059: 51
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C003P008R001A060: 5
+Processed 15400-16399 in 137.44 seconds
+Processed 15500-16499 in 103.80 seconds
+Processed 15600-16599 in 119.31 seconds
+Processed 15700-16699 in 104.75 seconds
+Frames dropped for S006C003P019R001A059: 38
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C003P019R001A060: 16
+Processed 15800-16799 in 127.09 seconds
+Frames dropped for S006C003P019R002A050: 18
+	Frame 0 in skip list, add blank frame to poses
+Processed 15900-16899 in 136.46 seconds
+Frames dropped for S006C003P022R001A059: 66
+	Frame 0 in skip list, add blank frame to poses
+Processed 16000-16999 in 132.92 seconds
+Frames dropped for S006C003P023R001A060: 5
+Processed 16100-17099 in 116.10 seconds
+Processed 16200-17199 in 120.44 seconds
+Frames dropped for S006C003P024R002A055: 24
+Processed 16300-17299 in 108.55 seconds
+Processed 16400-17399 in 111.18 seconds
+Processed 16500-17499 in 120.94 seconds
+Processed 16600-17599 in 121.62 seconds
+Frames dropped for S007C001P015R001A055: 10
+Processed 16700-17699 in 104.42 seconds
+Processed 16800-17799 in 109.32 seconds
+Processed 16900-17899 in 116.31 seconds
+Frames dropped for S007C001P018R001A014: 33
+Processed 17000-17999 in 123.48 seconds
+Processed 17100-18099 in 134.52 seconds
+Processed 17200-18199 in 126.57 seconds
+Processed 17300-18299 in 122.29 seconds
+Frames dropped for S007C001P026R002A001: 23
+	Frame 0 in skip list, add blank frame to poses
+Processed 17400-18399 in 140.25 seconds
+Processed 17500-18499 in 134.68 seconds
+Processed 17600-18599 in 120.15 seconds
+Processed 17700-18699 in 124.95 seconds
+Frames dropped for S007C002P007R001A014: 68
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S007C002P007R001A020: 17
+	Frame 0 in skip list, add blank frame to poses
+Processed 17800-18799 in 135.34 seconds
+Processed 17900-18899 in 128.76 seconds
+Frames dropped for S007C002P008R001A050: 18
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S007C002P008R001A060: 1
+Processed 18000-18999 in 148.96 seconds
+Processed 18100-19099 in 129.73 seconds
+Processed 18200-19199 in 132.22 seconds
+Processed 18300-19299 in 137.29 seconds
+Processed 18400-19399 in 142.30 seconds
+Processed 18500-19499 in 134.36 seconds
+Frames dropped for S007C002P019R001A055: 36
+Processed 18600-19599 in 131.08 seconds
+Processed 18700-19699 in 113.19 seconds
+Processed 18800-19799 in 126.02 seconds
+Processed 18900-19899 in 117.74 seconds
+Processed 19000-19999 in 120.34 seconds
+Processed 19100-20099 in 115.16 seconds
+Processed 19200-20199 in 113.32 seconds
+Frames dropped for S007C003P007R002A002: 8
+	Frame 0 in skip list, add blank frame to poses
+Processed 19300-20299 in 126.95 seconds
+Frames dropped for S007C003P008R001A060: 9
+Processed 19400-20399 in 131.36 seconds
+Frames dropped for S007C003P015R001A055: 20
+Processed 19500-20499 in 116.14 seconds
+Processed 19600-20599 in 114.61 seconds
+Processed 19700-20699 in 117.07 seconds
+Processed 19800-20799 in 114.19 seconds
+
++------------------- Job Report: 65564829 (FAILED) --------------------+
+| Memory (RAM)  [##################  ] 91.6% (22 GB peak / 24 GB)      |
+| CPU           [###############     ] 78.2% average                   |
+| GPU           [###                 ] 19.2% average                   |
+| Time          [------->            ] 37.0% (0-07:24:00 / 0-20:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   2.8 MB        0 B            26                            |
-|   /fred   1.3 GB        38 B           5.6 K                         |
+|   /apps   0 B           0 B            6                             |
+|   /fred   49.3 GB       556.3 KB       64.9 K                        |
 |   /home   0 B           0 B            1                             |
-|   OS      1.5 MB        0 B            271                           |
+|   OS      476 KB        0 B            70                            |
 |                                                                      |
 | Warnings:                                                            |
-|   - Too much memory requested                                        |
-|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+

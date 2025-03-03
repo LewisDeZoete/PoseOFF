@@ -7,7 +7,6 @@ import os.path as osp
 import numpy as np
 import pickle
 import logging
-# import h5py
 from sklearn.model_selection import train_test_split
 from utils import create_aligned_dataset
 
@@ -174,23 +173,6 @@ def split_dataset(skes_joints, label, performer, camera, evaluation, save_path):
     save_name = 'NTU60_%s.npz' % evaluation
     np.savez(save_name, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
 
-    # Save data into a .h5 file
-    # h5file = h5py.File(osp.join(save_path, 'NTU_%s.h5' % (evaluation)), 'w')
-    # Training set
-    # h5file.create_dataset('x', data=skes_joints[train_indices])
-    # train_one_hot_labels = one_hot_vector(train_labels)
-    # h5file.create_dataset('y', data=train_one_hot_labels)
-    # Validation set
-    # h5file.create_dataset('valid_x', data=skes_joints[val_indices])
-    # val_one_hot_labels = one_hot_vector(val_labels)
-    # h5file.create_dataset('valid_y', data=val_one_hot_labels)
-    # Test set
-    # h5file.create_dataset('test_x', data=skes_joints[test_indices])
-    # test_one_hot_labels = one_hot_vector(test_labels)
-    # h5file.create_dataset('test_y', data=test_one_hot_labels)
-
-    # h5file.close()
-
 
 def get_indices(performer, camera, evaluation='CS'):
     test_indices = np.empty(0)
@@ -227,12 +209,12 @@ def get_indices(performer, camera, evaluation='CS'):
 
 
 if __name__ == '__main__':
-    camera = np.loadtxt(camera_file, dtype=np.int)  # camera id: 1, 2, 3
-    performer = np.loadtxt(performer_file, dtype=np.int)  # subject id: 1~40
-    label = np.loadtxt(label_file, dtype=np.int) - 1  # action label: 0~59
+    camera = np.loadtxt(camera_file, dtype=int)  # camera id: 1, 2, 3
+    performer = np.loadtxt(performer_file, dtype=int)  # subject id: 1~40
+    label = np.loadtxt(label_file, dtype=int) - 1  # action label: 0~59
 
-    frames_cnt = np.loadtxt(frames_file, dtype=np.int)  # frames_cnt
-    skes_name = np.loadtxt(skes_name_file, dtype=np.string_)
+    frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
+    skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
 
     with open(raw_skes_joints_pkl, 'rb') as fr:
         skes_joints = pickle.load(fr)  # a list

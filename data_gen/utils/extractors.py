@@ -153,10 +153,11 @@ class FlowPoseSampler:
         __call__(flows, poses):
             Samples the optical flow in windows surrounding the pose keypoints.
             Args:
-                flows (torch.Tensor/np.array): The optical flow tensor of shape (num_frames, 2, height, width).
+                flows (torch.Tensor/np.array): The optical flow tensor of shape (num_frames-1, 2, height, width).
                 poses (torch.Tensor): The pose keypoints tensor of shape (channels, num_frames, num_keypoints, num_people).
             Returns:
                 torch.Tensor: The concatenated tensor of poses and sampled flow data.
+                    shape: (num_pose_channels+(window_size**2)*2, frames-1, keypoints, num_people)
                     NOTE: The first frame of poses is discarded given it does not yet contain optical flow.
     """
     def __init__(self, 
@@ -191,6 +192,10 @@ class FlowPoseSampler:
         if isinstance(poses, torch.Tensor):
             poses = poses.cpu().numpy()
         
+        # Remove first frame of poses (no flow data)
+        poses = poses[:, 1:, :, :]
+
+        # Get the shape of the input tensors
         num_frames, _, height, width = flows.shape
         channels, num_pose_frames, num_keypoints, num_people = poses.shape
         total_keypoints = num_keypoints*num_people
@@ -225,15 +230,14 @@ class FlowPoseSampler:
                              (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
                         
         # Loop through the frames and sample flow in window around each valid keypoint
-        for frame_no in range(num_frames):
-            flow = flows[frame_no]
+        for frame_no, flow in enumerate(flows):
             for keypoint_num in range(total_keypoints):
-                if valid_indices[frame_no+1, keypoint_num]:
-                    x, y = pose_points[0, frame_no+1, keypoint_num], pose_points[1, frame_no+1, keypoint_num]
+                if valid_indices[frame_no, keypoint_num]:
+                    x, y = pose_points[0, frame_no, keypoint_num], pose_points[1, frame_no, keypoint_num]
                     # Get the window of optical flow and calculate mean directly
                     flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
                     
-                    stacker[:, frame_no+1, keypoint_num] = flow_window.flatten()
+                    stacker[:, frame_no, keypoint_num] = flow_window.flatten()
         
         # Concatenate poses with computed flow
         flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)

@@ -48,7 +48,7 @@ def remove_frame_drops(flow_data, frames_drop_list):
     Remove the frame drops from the flow data.
     """
     # Convert the list to a set for efficient membership testing
-    skip_set = set(frames_drop_list)
+    skip_set = set(frame-1 for frame in frames_drop_list if frame > 0)
 
     # Create a boolean mask indicating which frames to keep
     mask = np.array([i not in skip_set for i in range(flow_data.shape[0])])
@@ -60,7 +60,7 @@ def remove_frame_drops(flow_data, frames_drop_list):
 def get_raw_flowpose_data():
     skes_names = np.loadtxt(skes_name_file, dtype=str)
     num_files = skes_names.size
-    print('Found %d available skeleton files.' % num_files, flush=True)
+    print('Found %d available skeleton files.\n' % num_files, flush=True)
 
     flowpose_data = []
 
@@ -73,8 +73,8 @@ def get_raw_flowpose_data():
         frames_drop_skes = pickle.load(fr)
 
     start = time.time()
-    for ske_number, ske_name in enumerate(skes_names[1000:]):
-        ske_number += 1000
+    for ske_number, ske_name in enumerate(skes_names[40000:]):
+        ske_number += 40000
         # Get the flow data
         rgb_name = osp.join(rgb_path, ske_name + '_rgb.avi')
         flow_data = transforms(rgb_name)
@@ -83,25 +83,25 @@ def get_raw_flowpose_data():
         poses = denoised_skes_data[ske_number]
         poses = poses.transpose(3, 0, 2, 1)
 
-                # Remove the frame drops from flow_data
+        # Remove the frame drops from flow_data
         if ske_name in frames_drop_skes:
-            # BUG: Frame_drop_skes[ske_name] has values from 0-last frame, but flow_data has values from 1-last frame
+        # BUG: Frame_drop_skes[ske_name] has values from 0-last frame, but flow_data has values from 1-last frame
             flow_data = remove_frame_drops(flow_data, frames_drop_skes[ske_name])
-            print(f'Frames dropped for {ske_name}: {len(frames_drop_skes[ske_name])}', flush=True)
+            print(f'\tFrames dropped for {ske_name}: {len(frames_drop_skes[ske_name])}', flush=True)
+            if 0 in frames_drop_skes[ske_name]:
+                print('\t\tFrame 0 in skip list, add blank frame to poses', flush=True)
+                C, _, V, M = poses.shape
+                poses = np.concatenate([np.zeros((C, 1, V, M)), poses], axis=1)
 
-        try:
-            # Get the flowpose data
-            flowpose_data.append(flowPoseTransform(flow_data, poses))
-        except IndexError:
-            print(f'Error processing {ske_name}', flush=True)
-            break
+        # Get the flowpose data!
+        flowpose_data.append(flowPoseTransform(flow_data, poses))
 
         if (ske_number+1) % 1000 == 0:
             print(f'Processed {ske_number-999}-{ske_number} in {time.time()-start:0.2f} seconds', flush=True)
             start = time.time()
 
     # Save the data
-    flowpose_pkl = osp.join(save_path, 'flowpose_data.pkl')
+    flowpose_pkl = osp.join(save_path, 'flowpose_data_40k-56k.pkl')
     with open(flowpose_pkl, 'wb') as f:
         pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
     

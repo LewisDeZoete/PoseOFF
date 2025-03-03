@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=NTU_flowpose_extract
+#SBATCH --job-name=NTU_flowpose_extract_40k-56k
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --time=1:00:00
-#SBATCH --mem-per-cpu=8g
+#SBATCH --time=8:30:00
+#SBATCH --mem-per-cpu=24g
 
-#SBATCH --output='logs/EXTRACT/NTU_flowpose_extract.txt'
-#SBATCH --error='logs/EXTRACT/error_NTU_flowpose_extract.txt'
+#SBATCH --output='logs/EXTRACT/NTU_flowpose_extract_40k-56k.txt'
+#SBATCH --error='logs/EXTRACT/error_NTU_flowpose_extract_40k-56k.txt'
 
 # Activate the environment
 source ../environment/bin/activate

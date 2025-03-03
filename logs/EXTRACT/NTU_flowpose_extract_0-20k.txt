@@ -1,0 +1,161 @@
+Found 56578 available skeleton files.
+
+Processed 0-999 in 1064.19 seconds
+Frames dropped for S001C002P001R002A059: 32
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S001C002P001R002A060: 11
+Frames dropped for S001C002P004R001A055: 42
+Frames dropped for S001C002P004R002A055: 32
+Frames dropped for S001C002P008R002A060: 6
+Frames dropped for S001C003P001R001A055: 6
+Processed 1000-1999 in 1062.22 seconds
+Frames dropped for S001C003P003R002A011: 34
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S001C003P004R002A009: 25
+Processed 2000-2999 in 1053.38 seconds
+Frames dropped for S002C001P012R002A059: 27
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S002C001P014R001A055: 7
+Processed 3000-3999 in 1063.34 seconds
+Frames dropped for S002C002P007R002A055: 29
+Frames dropped for S002C002P009R001A055: 43
+Frames dropped for S002C002P010R001A001: 5
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S002C002P010R001A055: 7
+Frames dropped for S002C002P012R001A042: 4
+Frames dropped for S002C002P014R001A055: 9
+Processed 4000-4999 in 1074.55 seconds
+Frames dropped for S002C003P011R001A055: 47
+Processed 5000-5999 in 1059.91 seconds
+Frames dropped for S002C003P014R001A055: 25
+Frames dropped for S002C003P014R002A055: 26
+Frames dropped for S003C001P001R002A059: 26
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C001P002R001A059: 52
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C001P008R001A059: 40
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C001P008R001A060: 6
+Frames dropped for S003C001P008R002A060: 18
+Processed 6000-6999 in 995.69 seconds
+Frames dropped for S003C001P019R001A059: 39
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C002P002R001A059: 38
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C002P002R002A017: 5
+Frames dropped for S003C002P007R001A059: 44
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C002P008R001A008: 24
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C002P008R001A059: 38
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S003C002P015R002A055: 24
+Frames dropped for S003C002P017R001A055: 29
+Processed 7000-7999 in 1017.95 seconds
+Frames dropped for S003C002P019R001A055: 26
+Frames dropped for S003C003P002R001A059: 1
+Frames dropped for S003C003P015R001A059: 1
+Frames dropped for S003C003P016R002A012: 45
+	Frame 0 in skip list, add blank frame to poses
+Processed 8000-8999 in 1019.39 seconds
+Frames dropped for S003C003P019R001A055: 25
+Frames dropped for S004C002P003R001A059: 40
+	Frame 0 in skip list, add blank frame to poses
+Processed 9000-9999 in 1109.82 seconds
+Frames dropped for S004C002P008R001A010: 31
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S004C002P020R001A060: 5
+Frames dropped for S004C003P003R001A059: 28
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S005C001P004R001A059: 55
+	Frame 0 in skip list, add blank frame to poses
+Processed 10000-10999 in 1123.68 seconds
+Frames dropped for S005C001P015R002A042: 6
+Frames dropped for S005C001P016R002A042: 30
+Frames dropped for S005C002P004R001A059: 51
+Frames dropped for S005C002P010R002A055: 6
+Processed 11000-11999 in 968.28 seconds
+Frames dropped for S005C002P013R002A055: 1
+Frames dropped for S005C002P016R001A008: 16
+Frames dropped for S005C002P021R001A055: 32
+Frames dropped for S005C003P004R001A059: 61
+	Frame 0 in skip list, add blank frame to poses
+Processed 12000-12999 in 980.16 seconds
+Frames dropped for S005C003P015R001A055: 13
+Frames dropped for S005C003P016R002A008: 15
+Frames dropped for S005C003P016R002A020: 44
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S005C003P021R001A055: 32
+Frames dropped for S005C003P021R002A055: 13
+Frames dropped for S006C001P008R001A059: 39
+	Frame 0 in skip list, add blank frame to poses
+Processed 13000-13999 in 1025.96 seconds
+Frames dropped for S006C001P016R001A008: 6
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C001P017R001A060: 7
+Frames dropped for S006C001P023R001A055: 35
+Frames dropped for S006C002P007R001A007: 19
+	Frame 0 in skip list, add blank frame to poses
+Processed 14000-14999 in 1069.63 seconds
+Frames dropped for S006C002P007R001A060: 6
+Frames dropped for S006C002P007R002A014: 31
+Frames dropped for S006C002P008R001A060: 14
+Frames dropped for S006C002P008R002A059: 48
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C002P008R002A060: 20
+Frames dropped for S006C002P016R001A008: 9
+Frames dropped for S006C002P016R001A042: 7
+Frames dropped for S006C002P022R002A059: 32
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C002P023R001A014: 68
+	Frame 0 in skip list, add blank frame to poses
+Processed 15000-15999 in 1076.70 seconds
+Frames dropped for S006C003P007R001A014: 28
+Frames dropped for S006C003P008R001A014: 13
+Frames dropped for S006C003P008R001A059: 51
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C003P008R001A060: 5
+Frames dropped for S006C003P019R001A059: 38
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C003P019R001A060: 16
+Frames dropped for S006C003P019R002A050: 18
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S006C003P022R001A059: 66
+	Frame 0 in skip list, add blank frame to poses
+Processed 16000-16999 in 1084.93 seconds
+Frames dropped for S006C003P023R001A060: 5
+Frames dropped for S006C003P024R002A055: 24
+Frames dropped for S007C001P015R001A055: 10
+Frames dropped for S007C001P018R001A014: 33
+Processed 17000-17999 in 1021.50 seconds
+Frames dropped for S007C001P026R002A001: 23
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S007C002P007R001A014: 68
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S007C002P007R001A020: 17
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S007C002P008R001A050: 18
+	Frame 0 in skip list, add blank frame to poses
+Frames dropped for S007C002P008R001A060: 1
+Processed 18000-18999 in 1033.68 seconds
+Frames dropped for S007C002P019R001A055: 36
+Processed 19000-19999 in 1017.64 seconds
+
++------------------ Job Report: 65625429 (COMPLETED) ------------------+
+| Memory (RAM)  [################### ] 97.2% (23.3 GB peak / 24 GB)    |
+| CPU           [#################   ] 85.2% average                   |
+| GPU           [#####               ] 27.8% average                   |
+| Time          [------------->      ] 68.6% (0-05:49:59 / 0-08:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   7.9 MB        0 B            22                            |
+|   /fred   46.8 GB       1.1 GB         60.9 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      148 KB        0 B            21                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
