@@ -294,7 +294,7 @@ if __name__ == "__main__":
     import time
 
     # Get the config file and use the model arguments defined within
-    arg = ArgClass('config/custom_pose/train_joint.yaml')
+    arg = ArgClass('config/ucf101/train_joint.yaml')
     attmodel = testModel(**arg.model_args) # Initialise the model
     mainmodel = Model(**arg.model_args)
 

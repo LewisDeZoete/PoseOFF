@@ -171,9 +171,8 @@ if __name__ == "__main__":
     from config.argclass import ArgClass
     import time
     from torch.utils.data import DataLoader
-    import torch
 
-    arg = ArgClass("./config/custom_pose/train_joint_infogcn.yaml")
+    arg = ArgClass("./config/ucf101/train_joint_infogcn.yaml")
 
     feeder = Feeder(**arg.feeder_args)
     # feeder = Feeder(**arg.feeder_args, split="test")

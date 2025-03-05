@@ -1,0 +1,17 @@
+
++------------------ Job Report: 65691129 (COMPLETED) ------------------+
+| Memory (RAM)  [########            ] 41.6% (26.6 GB peak / 64 GB)    |
+| CPU           [################    ] 84.8% average                   |
+| Time          [---->               ] 23.7% (0-00:07:07 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
+|   /fred   4 KB          28.5 GB                 20                   |
+|   OS      8 KB          0 B                      2                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

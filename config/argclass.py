@@ -57,8 +57,8 @@ class ArgClass(object):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', dest='config', default='custom_pose',
-                        help='config dictionary location (default=custom_pose)')
+    parser.add_argument('-c', dest='config', default='ucf101',
+                        help='config dictionary location (default=ucf101)')
     parser.add_argument('-p', dest='phase', default='test',
                         help='network phase [train, test] (default=test)')
     parser.add_argument('-l', dest='limb', default='joint',

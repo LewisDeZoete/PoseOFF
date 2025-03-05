@@ -51,7 +51,7 @@ from einops import rearrange
 #     cv2.arrowedLine(frame, (start_x, start_y), (int(start_x+flow[0]), int(start_y+flow[1])), (0, 255, 0), 1, tipLength=0.1)
 
 
-# arg = ArgClass(arg='./config/custom_pose/train_base.yaml')
+# arg = ArgClass(arg='./config/ucf101/train_base.yaml')
 # rgb_path = arg.feeder_args['data_paths']['rgb_path']
 # flow_path = arg.feeder_args['data_paths']['flow_path']
 # pose_path = arg.feeder_args['data_paths']['pose_path']

@@ -355,45 +355,7 @@ if __name__ == '__main__':
     from config.argclass import ArgClass
     from data_gen.utils.extract_utils import extract_data
 
-    arg = ArgClass(arg='./config/custom_pose/train_base.yaml')
+    arg = ArgClass(arg='./config/ucf101/train_base.yaml')
 
     flowposeSampler = FlowPoseSampler(device=torch.device('cpu'), norm=True)
     extract_data(arg, 0, flowposeSampler, 'flowpose', save_as_numpy=True, debug=True)
-    
-    # from ultralytics import YOLO
-    # from preprocess import LoadVideo
-    # from torchvision.transforms import v2
-
-    # # Get the config dict (including labels)
-    # arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
-    # transform_args = arg.extractor['pose']
-
-    # # Get the device
-    # device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')
-
-    # # Create the detector (YOLO pose)
-    # detector = YOLO(transform_args['weights'])
-    # detector.to(device)
-    # # Create the pose extractor object
-    # transforms = v2.Compose([
-    #     v2.Resize(size=(384,640)), # YOLO pose has a minimum input image size
-    #     v2.ToDtype(torch.float32),
-    #     v2.Lambda(lambda x: x/255.0), # Normalises the image to [0,1]
-    #     GetPoses_YOLO(detector=detector, max_frames=300, num_joints=17)
-    # ])
-
-    # # Load a video and extract poses
-    # video_paths = [os.path.join(arg.feeder_args['data_paths']['rgb_path'],
-    #                       (list(arg.feeder_args['labels'].keys())[i]+'.avi')) \
-    #         for i in range(len(list(arg.feeder_args['labels'].keys())))]
-
-    # print(video_paths[0])
-    
-    # # Test pose extraction method
-    # print("Testing pose extraction method...")
-    # for video_path in video_paths:
-    #     video = LoadVideo(video_path, max_frames=300)
-    #     poses = transforms(video)
-    #     print(poses.shape)
-    #     print(poses[:, 0, :, :])
-    #     break

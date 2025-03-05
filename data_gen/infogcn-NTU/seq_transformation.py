@@ -1,34 +1,50 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import sys
-sys.path.append(['../..'])
 import os
 import os.path as osp
+
+# # add lib to path
+curr_dir = osp.dirname(osp.abspath(__file__))
+sys.path.insert(0, osp.abspath(osp.join(curr_dir, '../..')))
+
 import numpy as np
 import pickle
-import logging
-from sklearn.model_selection import train_test_split
-from utils import create_aligned_dataset
+# import logging
+# from sklearn.model_selection import train_test_split
+from data_gen.utils import create_aligned_dataset
 
-root_path = './'
+root_path = './data/ntu'
+save_path = osp.join(root_path, 'aligned_data')
 stat_path = osp.join(root_path, 'statistics')
-setup_file = osp.join(stat_path, 'setup.txt')
-camera_file = osp.join(stat_path, 'camera.txt')
-performer_file = osp.join(stat_path, 'performer.txt')
-replication_file = osp.join(stat_path, 'replication.txt')
-label_file = osp.join(stat_path, 'label.txt')
-skes_name_file = osp.join(stat_path, 'skes_available_name.txt')
+# setup_file = osp.join(stat_path, 'setup.txt')
+# camera_file = osp.join(stat_path, 'camera.txt')
+# performer_file = osp.join(stat_path, 'performer.txt')
+# replication_file = osp.join(stat_path, 'replication.txt')
+# label_file = osp.join(stat_path, 'label.txt')
+skes_name_file = osp.join(stat_path, 'ntu_rgbd-available.txt')
 
 denoised_path = osp.join(root_path, 'denoised_data')
 raw_skes_joints_pkl = osp.join(denoised_path, 'raw_denoised_joints.pkl')
 frames_file = osp.join(denoised_path, 'frames_cnt.txt')
 
-save_path = './'
-
-
 if not osp.exists(save_path):
     os.mkdir(save_path)
 
+def get_details(skes_name):
+    details: dict = {} # Create and populate details dict
+    for key in ['Setup', 'Camera', 'Performer', 'Replication', 'Label', 'Frame_cnt']:
+        details[key] = np.array([], dtype=int)
+    # Get the details from the file names
+    for number, name in enumerate(skes_name):
+        details['Setup'] = np.append(details['Setup'], int(name.split('S')[1][:3]))
+        details['Camera'] = np.append(details['Camera'], int(name.split('C')[1][:3]))
+        details['Performer'] = np.append(details['Performer'], int(name.split('P')[1][:3]))
+        details['Replication'] = np.append(details['Replication'], int(name.split('R')[1][:3]))
+        details['Label'] = np.append(details['Label'], int(name.split('A')[1][:3])-1)
+        details['Frame_cnt'] = np.append(details['Frame_cnt'], int(frames_cnt[number]))
+    
+    return details
 
 def remove_nan_frames(ske_name, ske_joints, nan_logger):
     num_frames = ske_joints.shape[0]
@@ -78,40 +94,39 @@ def seq_translation(skes_joints):
     return skes_joints
 
 
-def frame_translation(skes_joints, skes_name, frames_cnt):
-    nan_logger = logging.getLogger('nan_skes')
-    nan_logger.setLevel(logging.INFO)
-    nan_logger.addHandler(logging.FileHandler("./nan_frames.log"))
-    nan_logger.info('{}\t{}\t{}'.format('Skeleton', 'Frame', 'Joints'))
+# def frame_translation(skes_joints, skes_name, frames_cnt):
+#     nan_logger = logging.getLogger('nan_skes')
+#     nan_logger.setLevel(logging.INFO)
+#     nan_logger.addHandler(logging.FileHandler("./nan_frames.log"))
+#     nan_logger.info('{}\t{}\t{}'.format('Skeleton', 'Frame', 'Joints'))
 
-    for idx, ske_joints in enumerate(skes_joints):
-        num_frames = ske_joints.shape[0]
-        # Calculate the distance between spine base (joint-1) and spine (joint-21)
-        j1 = ske_joints[:, 0:3]
-        j21 = ske_joints[:, 60:63]
-        dist = np.sqrt(((j1 - j21) ** 2).sum(axis=1))
+#     for idx, ske_joints in enumerate(skes_joints):
+#         num_frames = ske_joints.shape[0]
+#         # Calculate the distance between spine base (joint-1) and spine (joint-21)
+#         j1 = ske_joints[:, 0:3]
+#         j21 = ske_joints[:, 60:63]
+#         dist = np.sqrt(((j1 - j21) ** 2).sum(axis=1))
 
-        for f in range(num_frames):
-            origin = ske_joints[f, 3:6]  # new origin: middle of the spine (joint-2)
-            if (ske_joints[f, 75:] == 0).all():
-                ske_joints[f, :75] = (ske_joints[f, :75] - np.tile(origin, 25)) / \
-                                      dist[f] + np.tile(origin, 25)
-            else:
-                ske_joints[f] = (ske_joints[f] - np.tile(origin, 50)) / \
-                                 dist[f] + np.tile(origin, 50)
+#         for f in range(num_frames):
+#             origin = ske_joints[f, 3:6]  # new origin: middle of the spine (joint-2)
+#             if (ske_joints[f, 75:] == 0).all():
+#                 ske_joints[f, :75] = (ske_joints[f, :75] - np.tile(origin, 25)) / \
+#                                       dist[f] + np.tile(origin, 25)
+#             else:
+#                 ske_joints[f] = (ske_joints[f] - np.tile(origin, 50)) / \
+#                                  dist[f] + np.tile(origin, 50)
 
-        ske_name = skes_name[idx]
-        ske_joints = remove_nan_frames(ske_name, ske_joints, nan_logger)
-        frames_cnt[idx] = num_frames  # update valid number of frames
-        skes_joints[idx] = ske_joints
+#         ske_name = skes_name[idx]
+#         ske_joints = remove_nan_frames(ske_name, ske_joints, nan_logger)
+#         frames_cnt[idx] = num_frames  # update valid number of frames
+#         skes_joints[idx] = ske_joints
 
-    return skes_joints, frames_cnt
+#     return skes_joints, frames_cnt
 
 
 def align_frames(skes_joints, frames_cnt):
     """
     Align all sequences with the same frame length.
-
     """
     num_skes = len(skes_joints)
     max_num_frames = frames_cnt.max()  # 300
@@ -138,40 +153,38 @@ def one_hot_vector(labels):
     return labels_vector
 
 
-def split_train_val(train_indices, method='sklearn', ratio=0.05):
-    """
-    Get validation set by splitting data randomly from training set with two methods.
-    In fact, I thought these two methods are equal as they got the same performance.
+# def split_train_val(train_indices, method='sklearn', ratio=0.05):
+#     """
+#     Get validation set by splitting data randomly from training set with two methods.
+#     In fact, I thought these two methods are equal as they got the same performance.
 
-    """
-    if method == 'sklearn':
-        return train_test_split(train_indices, test_size=ratio, random_state=10000)
-    else:
-        np.random.seed(10000)
-        np.random.shuffle(train_indices)
-        val_num_skes = int(np.ceil(0.05 * len(train_indices)))
-        val_indices = train_indices[:val_num_skes]
-        train_indices = train_indices[val_num_skes:]
-        return train_indices, val_indices
+#     """
+#     if method == 'sklearn':
+#         return train_test_split(train_indices, test_size=ratio, random_state=10000)
+#     else:
+#         np.random.seed(10000)
+#         np.random.shuffle(train_indices)
+#         val_num_skes = int(np.ceil(0.05 * len(train_indices)))
+#         val_indices = train_indices[:val_num_skes]
+#         train_indices = train_indices[val_num_skes:]
+#         return train_indices, val_indices
 
 
-def split_dataset(skes_joints, label, performer, camera, evaluation, save_path):
-    train_indices, test_indices = get_indices(performer, camera, evaluation)
-    m = 'sklearn'  # 'sklearn' or 'numpy'
-    # Select validation set from training set
-    # train_indices, val_indices = split_train_val(train_indices, m)
+def split_dataset(skes_joints, details, evaluation, save_path):
+    train_indices, test_indices = get_indices(details['Performer'], details['Camera'], evaluation)
 
     # Save labels and num_frames for each sequence of each data set
-    train_labels = label[train_indices]
-    test_labels = label[test_indices]
+    train_labels = details['Label'][train_indices]
+    test_labels = details['Label'][test_indices]
 
     train_x = skes_joints[train_indices]
     train_y = one_hot_vector(train_labels)
     test_x = skes_joints[test_indices]
     test_y = one_hot_vector(test_labels)
 
-    save_name = 'NTU60_%s.npz' % evaluation
+    save_name = osp.join(save_path, 'NTU60_%s.npz' % evaluation)
     np.savez(save_name, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
+
 
 
 def get_indices(performer, camera, evaluation='CS'):
@@ -187,35 +200,37 @@ def get_indices(performer, camera, evaluation='CS'):
         # Get indices of test data
         for idx in test_ids:
             temp = np.where(performer == idx)[0]  # 0-based index
-            test_indices = np.hstack((test_indices, temp)).astype(np.int)
+            test_indices = np.hstack((test_indices, temp)).astype(int)
 
         # Get indices of training data
         for train_id in train_ids:
             temp = np.where(performer == train_id)[0]  # 0-based index
-            train_indices = np.hstack((train_indices, temp)).astype(np.int)
+            train_indices = np.hstack((train_indices, temp)).astype(int)
     else:  # Cross View (Camera IDs)
         train_ids = [2, 3]
         test_ids = 1
         # Get indices of test data
         temp = np.where(camera == test_ids)[0]  # 0-based index
-        test_indices = np.hstack((test_indices, temp)).astype(np.int)
+        test_indices = np.hstack((test_indices, temp)).astype(int)
 
         # Get indices of training data
         for train_id in train_ids:
             temp = np.where(camera == train_id)[0]  # 0-based index
-            train_indices = np.hstack((train_indices, temp)).astype(np.int)
+            train_indices = np.hstack((train_indices, temp)).astype(int)
 
     return train_indices, test_indices
 
 
 if __name__ == '__main__':
-    camera = np.loadtxt(camera_file, dtype=int)  # camera id: 1, 2, 3
-    performer = np.loadtxt(performer_file, dtype=int)  # subject id: 1~40
-    label = np.loadtxt(label_file, dtype=int) - 1  # action label: 0~59
+    # camera = np.loadtxt(camera_file, dtype=int)  # camera id: 1, 2, 3
+    # performer = np.loadtxt(performer_file, dtype=int)  # subject id: 1~40
+    # label = np.loadtxt(label_file, dtype=int) - 1  # action label: 0~59
 
     frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
     skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
 
+    details = get_details(skes_name)
+    
     with open(raw_skes_joints_pkl, 'rb') as fr:
         skes_joints = pickle.load(fr)  # a list
 
@@ -225,6 +240,10 @@ if __name__ == '__main__':
 
     evaluations = ['CS', 'CV']
     for evaluation in evaluations:
-        split_dataset(skes_joints, label, performer, camera, evaluation, save_path)
+        split_dataset(skes_joints, details, evaluation, save_path)
+    
+    # Create the file list containing the files output by `split_dataset`
+    file_list = [osp.join(save_path, 'NTU60_CS.npz'), osp.join(save_path, 'NTU60_CV.npz')]
 
-    create_aligned_dataset(file_list=['NTU60_CS.npz', 'NTU60_CV.npz'])
+    # Create the aligned dataset
+    create_aligned_dataset(file_list=file_list)

@@ -350,7 +350,7 @@ if __name__ == "__main__":
     from loss import LabelSmoothingCrossEntropy, masked_recon_loss
     import torch.optim as optim
 
-    arg = ArgClass("./config/custom_pose/train_joint_infogcn.yaml")
+    arg = ArgClass("./config/ucf101/train_joint_infogcn.yaml")
     arg.checkpoint_file = "DELETE_ME.pt"
 
     # Model

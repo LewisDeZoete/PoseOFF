@@ -183,7 +183,7 @@ if __name__ == "__main__":
     parsed = parser.parse_args()
 
     # Create ArgClass object
-    arg = ArgClass(arg="./config/custom_pose/train_joint_infogcn.yaml")
+    arg = ArgClass(arg="./config/ucf101/train_joint_infogcn.yaml")
 
     # Ensure the modality folder exists
     try:

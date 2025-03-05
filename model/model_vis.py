@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from config import ArgClass
 from model import ModelLoader
 
-arg = ArgClass('config/custom_pose/train_joint_infogcn.yaml')
+arg = ArgClass('config/ucf101/train_joint_infogcn.yaml')
 arg.checkpoint_file = 'results/infogcn2/infogcn_abs_window_mean_flow.pt'
 # arg.checkpoint_file = 'results/infogcn2/infogcn_average_flow.pt'
 

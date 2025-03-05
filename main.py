@@ -18,8 +18,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-c",
     dest="config",
-    default="custom_pose",
-    help="config dictionary location (default=custom_pose)",
+    default="ucf101",
+    help="config dictionary location (default=ucf101)",
 )
 parser.add_argument(
     "-p",

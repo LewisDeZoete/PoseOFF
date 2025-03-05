@@ -10,7 +10,7 @@ import yaml
 from config.argclass import ArgClass
 
 # Get the arg class
-arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
+arg = ArgClass(arg='./config/ucf101/train_joint_infogcn.yaml')
 
 annotations = {} # temporary annotations dictionary
 

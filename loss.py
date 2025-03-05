@@ -61,7 +61,7 @@ if __name__=='__main__':
     from config.argclass import ArgClass
     import torch
     
-    arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml')
+    arg = ArgClass('./config/ucf101/train_joint_infogcn.yaml')
     loggers = {}
     
     loggers['acc'] = [AverageMeter() for _ in range(10)]

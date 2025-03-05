@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '../..')))
 
 from config.argclass import ArgClass
 
-config_name = './config/custom_pose/train_joint_infogcn.yaml'
+config_name = './config/ucf101/train_joint_infogcn.yaml'
 
 arg = ArgClass(arg=config_name)
 

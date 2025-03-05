@@ -92,7 +92,7 @@ if __name__=='__main__':
     from config.argclass import ArgClass
     import time
     
-    arg = ArgClass('./config/custom_pose/train_joint_infogcn.yaml')
+    arg = ArgClass('./config/ucf101/train_joint_infogcn.yaml')
     # arg.checkpoint_file = 'results/ms-g3d_flow/flowpose-cnn_k5_t0.05.pt'
     arg.checkpoint_file = 'results/ms-g3d_flow/TMP.pt'
 

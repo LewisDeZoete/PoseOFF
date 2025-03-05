@@ -102,3 +102,89 @@ def pose_match(data):
     data_numpy = data[:, :, :, rank]
 
     return data_numpy
+
+
+def align_skeleton(data):
+    """
+    Aligns the skeleton data by transforming each sample to a new coordinate system.
+
+    Parameters:
+    data (numpy.ndarray): A 5-dimensional array with shape (N, C, T, V, M) where:
+        N - Number of samples
+        C - Number of channels (e.g., x, y, z coordinates)
+        T - Number of time steps
+        V - Number of joints/vertices
+        M - Number of people in the frame
+
+    Returns:
+    numpy.ndarray: A 5-dimensional array with the same shape as the input, containing the transformed skeleton data.
+    """
+    N, C, T, V, M = data.shape
+    trans_data = np.zeros_like(data)
+    for i in range(N):
+        for p in range(M):
+            sample = data[i][..., p]
+            # if np.all((sample[:,0,:] == 0)):
+                # continue
+            d = sample[:,0,1:2]
+            v1 = sample[:,0,1]-sample[:,0,0]
+            if np.linalg.norm(v1) <= 0.0:
+                continue
+            v1 = v1/np.linalg.norm(v1)
+            v2_ = sample[:,0,12]-sample[:,0,16]
+            proj_v2_v1 = np.dot(v1.T,v2_)*v1/np.linalg.norm(v1)
+            v2 = v2_-np.squeeze(proj_v2_v1)
+            v2 = v2/(np.linalg.norm(v2))
+            v3 = np.cross(v2,v1)/(np.linalg.norm(np.cross(v2,v1)))
+            v1 = np.reshape(v1,(3,1))
+            v2 = np.reshape(v2,(3,1))
+            v3 = np.reshape(v3,(3,1))
+
+            R = np.hstack([v2,v3,v1])
+            for t in range(T):
+                trans_sample = (np.linalg.inv(R))@(sample[:,t,:]) # -d
+                trans_data[i, :, t, :, p] = trans_sample
+    return trans_data
+
+
+def create_aligned_dataset(file_list=['data/ntu/NTU60_CS.npz', 'data/ntu/NTU60_CV.npz']):
+    """
+    Create an aligned dataset from the given list of .npz files.
+
+    This function loads the original dataset from the specified .npz files,
+    processes the data to align the skeletons, and saves the aligned dataset
+    back to new .npz files with '_aligned' appended to the original filenames.
+
+    Parameters:
+    file_list (list of str): List of file paths to the .npz files containing the original datasets.
+                             Default is ['data/ntu/NTU60_CS.npz', 'data/ntu/NTU60_CV.npz'].
+
+    The function expects the .npz files to contain the following keys:
+    - 'x_train': Training data
+    - 'y_train': Training labels
+    - 'x_test': Testing data
+    - 'y_test': Testing labels
+
+    The aligned datasets are saved with the following keys:
+    - 'x_train': Aligned training data
+    - 'y_train': Training labels (unchanged)
+    - 'x_test': Aligned testing data
+    - 'y_test': Testing labels (unchanged)
+    """
+    for file in file_list:
+        org_data = np.load(file)
+        splits = ['x_train', 'x_test']
+        aligned_set = {}
+        for split in splits:
+            data = org_data[split]
+            N, T, _ = data.shape
+            data = data.reshape((N, T, 2, 25, 3)).transpose(0, 4, 1, 3, 2)
+            aligned_data = align_skeleton(data)
+            aligned_data = aligned_data.transpose(0, 2, 4, 3, 1).reshape(N, T, -1)
+            aligned_set[split] = aligned_data
+
+        np.savez(file.replace('.npz', '_aligned.npz'),
+                 x_train=aligned_set['x_train'],
+                 y_train=org_data['y_train'],
+                 x_test=aligned_set['x_test'],
+                 y_test=org_data['y_test'])

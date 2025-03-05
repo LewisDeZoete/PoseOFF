@@ -26,7 +26,7 @@ process_number = int(parsed.number) # Get class number command line arg
 save_as_numpy = parsed.numpy
 
 # Get the arg object and create the classes
-arg = ArgClass(arg='./config/custom_pose/train_joint_infogcn.yaml')
+arg = ArgClass(arg='./config/ucf101/train_joint_infogcn.yaml')
 arg.extractor['preprocessed'] = False # Override this value, since this is gendata script!
 transform_args = arg.extractor['flow']
 

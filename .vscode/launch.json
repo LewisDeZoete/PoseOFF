@@ -9,7 +9,7 @@
         "program": "${file}",
         "console": "integratedTerminal",
         "args": [
-            "-c", "custom_pose", // Custom pose configs
+            "-c", "ucf101", // Custom pose configs
             "-p", "train", // train set
             "-l", "joint", // joint (not bone)
             "-v"
@@ -22,7 +22,7 @@
         "program": "${file}",
         "console": "integratedTerminal",
         "args": [
-            "-c", "custom_pose", // Custom pose configs
+            "-c", "ucf101", // Custom pose configs
             "-p", "train", // train set
             "-l", "joint_infogcn", // joint (not bone)
             "-v"
