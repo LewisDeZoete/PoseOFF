@@ -9,6 +9,7 @@ import logging
 root_path = './data/ntu'
 raw_data_file = osp.join(root_path, 'raw_data', 'raw_skes_data.pkl')
 save_path = osp.join(root_path, 'denoised_data')
+stat_path = osp.join(save_path, 'statistics')
 
 if not osp.exists(save_path):
     os.mkdir(save_path)
@@ -427,7 +428,7 @@ def get_raw_denoised_data():
         pickle.dump(raw_denoised_colors, f, pickle.HIGHEST_PROTOCOL)
 
     frames_cnt = np.array(frames_cnt, dtype=int)
-    np.savetxt(osp.join(save_path, 'frames_cnt.txt'), frames_cnt, fmt='%d')
+    np.savetxt(osp.join(stat_path, 'frames_cnt.txt'), frames_cnt, fmt='%d')
 
     print('Saved raw denoised positions of {} frames into {}'.format(np.sum(frames_cnt),
                                                                      raw_skes_joints_pkl))

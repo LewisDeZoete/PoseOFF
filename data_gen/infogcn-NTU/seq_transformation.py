@@ -10,23 +10,24 @@ sys.path.insert(0, osp.abspath(osp.join(curr_dir, '../..')))
 
 import numpy as np
 import pickle
+import yaml
 # import logging
 # from sklearn.model_selection import train_test_split
 from data_gen.utils import create_aligned_dataset
 
+# Paths
 root_path = './data/ntu'
 save_path = osp.join(root_path, 'aligned_data')
 stat_path = osp.join(root_path, 'statistics')
-# setup_file = osp.join(stat_path, 'setup.txt')
-# camera_file = osp.join(stat_path, 'camera.txt')
-# performer_file = osp.join(stat_path, 'performer.txt')
-# replication_file = osp.join(stat_path, 'replication.txt')
-# label_file = osp.join(stat_path, 'label.txt')
+# Info files and folders
 skes_name_file = osp.join(stat_path, 'ntu_rgbd-available.txt')
-
+frames_file = osp.join(stat_path, 'frames_cnt.txt')
 denoised_path = osp.join(root_path, 'denoised_data')
+flow_path = osp.join(root_path, 'flow_data')
+# Files
 raw_skes_joints_pkl = osp.join(denoised_path, 'raw_denoised_joints.pkl')
-frames_file = osp.join(denoised_path, 'frames_cnt.txt')
+raw_flow_joints_pkl = osp.join(flow_path, 'flow_data.pkl')
+raw_flowpose_pkl = osp.join(flow_path, 'raw_flowpose_data.pkl')
 
 if not osp.exists(save_path):
     os.mkdir(save_path)
@@ -59,7 +60,28 @@ def remove_nan_frames(ske_name, ske_joints, nan_logger):
 
     return ske_joints[valid_frames]
 
-def seq_translation(skes_joints):
+
+def seq_translation(skes_joints, flow_joints=None):
+    """
+    Translates the sequence of skeleton joints to a new origin based on the first non-zero frame of the first actor.
+
+    Parameters:
+    skes_joints (list: numpy.ndarray): list of length N containing numpy arrays of shape 
+                                       (T, M*V*C) 
+                                       T is the number of frames, 
+                                       M is the number of actors (1 or 2),
+                                       V is the number of joints, 
+                                       C is the number of coordinates per joint.
+    flow_joints (list: numpy.ndarray): list of length N containing numpy arrays of shape
+                                       (T-1, M*V*C)
+                                       T is the number of frames,
+                                       M is the number of actors (1 or 2),
+                                       V is the number of joints,
+                                       C is the flow data per joint ((flow_window**2)*2).
+
+    Returns:
+    numpy.ndarray: The translated sequence of skeleton joints with the same shape as the input.
+    """
     for idx, ske_joints in enumerate(skes_joints):
         num_frames = ske_joints.shape[0]
         num_bodies = 1 if ske_joints.shape[1] == 75 else 2
@@ -75,6 +97,7 @@ def seq_translation(skes_joints):
                 break
             i += 1
 
+        # Set joint 2 (core) as new origin
         origin = np.copy(ske_joints[i, 3:6])  # new origin: joint-2
 
         for f in range(num_frames):
@@ -83,106 +106,79 @@ def seq_translation(skes_joints):
             else:  # for 2 actors
                 ske_joints[f] -= np.tile(origin, 50)
 
+        # TODO: VERY IMPORTANT HERE, Make sure missing frames corresponds to correct
+        #       Indices in flow data (Should be [missing_frames] - 1 excluding 0)
         if (num_bodies == 2) and (cnt1 > 0):
             ske_joints[missing_frames_1, :75] = np.zeros((cnt1, 75), dtype=np.float32)
+            if flow_joints is not None: # Flow data covers frames 2 through T
+                skip_set1 = [frame_no-1 for frame_no in missing_frames_1 if frame_no > 0]
+                flow_joints[idx][skip_set1, :1250] = np.zeros((len(skip_set1), 1250), dtype=np.float32)
 
         if (num_bodies == 2) and (cnt2 > 0):
             ske_joints[missing_frames_2, 75:] = np.zeros((cnt2, 75), dtype=np.float32)
+            if flow_joints is not None: # Flow data covers frames 2 through T
+                skip_set2 = [frame_no-1 for frame_no in missing_frames_2 if frame_no > 0]
+                flow_joints[idx][skip_set2, 1250:] = np.zeros((len(skip_set2), 1250), dtype=np.float32)
 
         skes_joints[idx] = ske_joints  # Update
 
     return skes_joints
 
 
-# def frame_translation(skes_joints, skes_name, frames_cnt):
-#     nan_logger = logging.getLogger('nan_skes')
-#     nan_logger.setLevel(logging.INFO)
-#     nan_logger.addHandler(logging.FileHandler("./nan_frames.log"))
-#     nan_logger.info('{}\t{}\t{}'.format('Skeleton', 'Frame', 'Joints'))
-
-#     for idx, ske_joints in enumerate(skes_joints):
-#         num_frames = ske_joints.shape[0]
-#         # Calculate the distance between spine base (joint-1) and spine (joint-21)
-#         j1 = ske_joints[:, 0:3]
-#         j21 = ske_joints[:, 60:63]
-#         dist = np.sqrt(((j1 - j21) ** 2).sum(axis=1))
-
-#         for f in range(num_frames):
-#             origin = ske_joints[f, 3:6]  # new origin: middle of the spine (joint-2)
-#             if (ske_joints[f, 75:] == 0).all():
-#                 ske_joints[f, :75] = (ske_joints[f, :75] - np.tile(origin, 25)) / \
-#                                       dist[f] + np.tile(origin, 25)
-#             else:
-#                 ske_joints[f] = (ske_joints[f] - np.tile(origin, 50)) / \
-#                                  dist[f] + np.tile(origin, 50)
-
-#         ske_name = skes_name[idx]
-#         ske_joints = remove_nan_frames(ske_name, ske_joints, nan_logger)
-#         frames_cnt[idx] = num_frames  # update valid number of frames
-#         skes_joints[idx] = ske_joints
-
-#     return skes_joints, frames_cnt
-
-
-def align_frames(skes_joints, frames_cnt):
+def align_frames(joints, frames_cnt, MVC=150):
     """
-    Align all sequences with the same frame length.
+    Align all sequences with the same frame length. 
+        multiplied by the number of joints and the number of channels.
+    
+    Parameters:
+    joints (list: numpy.ndarray): List length N containing arrays of chape (T, MVC).
+                            N is the number of sequences.
+                            T is the number of frames.
+                            MVC is the number of joints and the number of channels.
+    frames_cnt (numpy.ndarray): The number of frames for each sequence.
+    MVC (int, optional): The number of joints and the number of channels. Default is 150.
     """
-    num_skes = len(skes_joints)
+    num_skes = len(joints)
     max_num_frames = frames_cnt.max()  # 300
-    aligned_skes_joints = np.zeros((num_skes, max_num_frames, 150), dtype=np.float32)
+    aligned_joints = np.zeros((num_skes, max_num_frames, MVC), dtype=np.float32)
 
-    for idx, ske_joints in enumerate(skes_joints):
-        num_frames = ske_joints.shape[0]
-        num_bodies = 1 if ske_joints.shape[1] == 75 else 2
+    for idx, video in enumerate(joints):
+        num_frames = video.shape[0]
+        num_bodies = 1 if video.shape[1] == int(MVC/2) else 2
         if num_bodies == 1:
-            aligned_skes_joints[idx, :num_frames] = np.hstack((ske_joints,
-                                                               np.zeros_like(ske_joints)))
+            aligned_joints[idx, :num_frames] = np.hstack((video,
+                                                          np.zeros_like(video)))
         else:
-            aligned_skes_joints[idx, :num_frames] = ske_joints
+            aligned_joints[idx, :num_frames] = video
 
-    return aligned_skes_joints
+    return aligned_joints
 
 
 def one_hot_vector(labels):
     num_skes = len(labels)
     labels_vector = np.zeros((num_skes, 60))
-    for idx, l in enumerate(labels):
-        labels_vector[idx, l] = 1
+    for idx, label in enumerate(labels):
+        labels_vector[idx, label] = 1
 
     return labels_vector
 
 
-# def split_train_val(train_indices, method='sklearn', ratio=0.05):
-#     """
-#     Get validation set by splitting data randomly from training set with two methods.
-#     In fact, I thought these two methods are equal as they got the same performance.
-
-#     """
-#     if method == 'sklearn':
-#         return train_test_split(train_indices, test_size=ratio, random_state=10000)
-#     else:
-#         np.random.seed(10000)
-#         np.random.shuffle(train_indices)
-#         val_num_skes = int(np.ceil(0.05 * len(train_indices)))
-#         val_indices = train_indices[:val_num_skes]
-#         train_indices = train_indices[val_num_skes:]
-#         return train_indices, val_indices
-
-
-def split_dataset(skes_joints, details, evaluation, save_path):
-    train_indices, test_indices = get_indices(details['Performer'], details['Camera'], evaluation)
+def split_dataset(joints, details, evaluation, save_path, data_type='pose'):
+    train_indices, test_indices = get_indices(
+        details['Performer'], 
+        details['Camera'], 
+        evaluation)
 
     # Save labels and num_frames for each sequence of each data set
     train_labels = details['Label'][train_indices]
     test_labels = details['Label'][test_indices]
 
-    train_x = skes_joints[train_indices]
+    train_x = joints[train_indices]
     train_y = one_hot_vector(train_labels)
-    test_x = skes_joints[test_indices]
+    test_x = joints[test_indices]
     test_y = one_hot_vector(test_labels)
 
-    save_name = osp.join(save_path, 'NTU60_%s.npz' % evaluation)
+    save_name = osp.join(save_path, f'NTU60_{evaluation}-{data_type}.npz')
     np.savez(save_name, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
 
 
@@ -221,29 +217,92 @@ def get_indices(performer, camera, evaluation='CS'):
     return train_indices, test_indices
 
 
+def concat_flowpose(skes_joints, flow_joints):
+    """
+    Concatenate the flow data to the pose data to create the flowpose data.
+    NOTE: First frame of skeleton data is removed and sequence is shifted by 1 frame.
+    """
+    N, T, MVC = skes_joints.shape
+    # Remove the first frame of the skeleton data (add a zero frame at the end)
+    skes_joints = np.concatenate((skes_joints[:, 1:, :], np.zeros((N, 1, MVC))), axis=1)
+    skes_joints = skes_joints.reshape((N, T, 2, 25, 3))
+    flow_joints = flow_joints.reshape((N, T, 2, 25, 50)) # Assuming flow window = 5
+
+    new_flow_joints = np.empty((N, T, 2, 25, 53), dtype=np.float32)
+    new_flow_joints[:,:,:,:, :3] = skes_joints
+    new_flow_joints[:,:,:,:, 3:] = flow_joints
+    new_flow_joints = new_flow_joints.reshape((N, T, -1))
+
+    return new_flow_joints
+
+
 if __name__ == '__main__':
-    # camera = np.loadtxt(camera_file, dtype=int)  # camera id: 1, 2, 3
-    # performer = np.loadtxt(performer_file, dtype=int)  # subject id: 1~40
-    # label = np.loadtxt(label_file, dtype=int) - 1  # action label: 0~59
+    import argparse
+    parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
+    parser.add_argument('--flow', action='store_true', help='If passed, add flow to the pose array') 
+    parser.add_argument('--realign', action='store_true', help='Reprocess the aligned data (store_true)')
+    args = parser.parse_args()
 
-    frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
-    skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
+    if args.realign:
+        # Load data statistics
+        frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
+        skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
+        details = get_details(skes_name)
 
-    details = get_details(skes_name)
+        # Create the annotations file for ntu-rgbd
+        annotations = {}
+        for idx, ske_name in enumerate(skes_name):
+            annotations[ske_name] = int(details['Label'][idx])
+        with open(osp.join(stat_path, 'ntu-rgbd-annotations.yaml'), 'w') as file:
+            yaml.dump(annotations, file)
+        
+        # Load the raw data
+        with open(raw_skes_joints_pkl, 'rb') as fr:
+            skes_joints = pickle.load(fr)  # a list
+        # Also load the flow if we pass the argument!
+        if args.flow:
+            with open(raw_flow_joints_pkl, 'rb') as fr:
+                flow_joints = pickle.load(fr)
+            print(f'Flow joints dtype: {flow_joints[0].dtype}', flush=True)
+        else:
+            flow_joints = None
+        print(f'Loaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences', flush=True)
+
+        # Translates the sequence to a new origin first non-zero frame of the first actor
+        skes_joints = seq_translation(skes_joints, flow_joints)
+
+        # Aligned to the same frame length
+        skes_joints = align_frames(skes_joints, frames_cnt)
+        if args.flow:
+            flow_joints = align_frames(flow_joints, frames_cnt, MVC=2500)
+            print(f'Full flow sequence shape: {flow_joints.shape}', flush=True)
+            print(f'Full skeleton sequence shape: {skes_joints.shape}', flush=True)
+            flow_joints = concat_flowpose(skes_joints, flow_joints)
+            print(f'Full flowpose sequence shape: {flow_joints.shape}', flush=True)
+            with open(raw_flowpose_pkl, 'wb') as f:
+                pickle.dump(flow_joints, f, pickle.HIGHEST_PROTOCOL)
+        
+        print(f'Flowpose approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
+        # Generate train-test splits and save the data
+        evaluations = ['CS', 'CV']
+        file_list = []
+        for evaluation in evaluations:
+            split_dataset(skes_joints, details, evaluation, save_path, data_type='pose')
+            print(f'Saved pose {evaluation}', flush=True)
+            file_list.append(osp.join(save_path, f'NTU60_{evaluation}-pose.npz'))
+            # If flow arg is passed, also split the flowpose dataset
+            if args.flow:
+                split_dataset(flow_joints, details, evaluation, save_path, data_type='flowpose')
+                print(f'Saved flowpose {evaluation}', flush=True)
+                file_list.append(osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz'))
     
-    with open(raw_skes_joints_pkl, 'rb') as fr:
-        skes_joints = pickle.load(fr)  # a list
-
-    skes_joints = seq_translation(skes_joints)
-
-    skes_joints = align_frames(skes_joints, frames_cnt)  # aligned to the same frame length
-
-    evaluations = ['CS', 'CV']
-    for evaluation in evaluations:
-        split_dataset(skes_joints, details, evaluation, save_path)
-    
-    # Create the file list containing the files output by `split_dataset`
-    file_list = [osp.join(save_path, 'NTU60_CS.npz'), osp.join(save_path, 'NTU60_CV.npz')]
+    else:
+        file_list = []
+        file_list += [osp.join(save_path, f'NTU60_{evaluation}-pose.npz') for evaluation in ['CS', 'CV']]
+        if args.flow:
+            file_list += [osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz') for evaluation in ['CS', 'CV']]
+        print(file_list, flush=True)
 
     # Create the aligned dataset
     create_aligned_dataset(file_list=file_list)
+    print('Aligned datasets created successfully!', flush=True)

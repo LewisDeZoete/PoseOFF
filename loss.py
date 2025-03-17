@@ -56,12 +56,11 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
-
 if __name__=='__main__':
     from config.argclass import ArgClass
     import torch
     
-    arg = ArgClass('./config/ucf101/train_joint_infogcn.yaml')
+    arg = ArgClass('./config/ucf101/train_base.yaml')
     loggers = {}
     
     loggers['acc'] = [AverageMeter() for _ in range(10)]

@@ -17,3 +17,9 @@ sbatch data_gen/UCF-101_extract.sh
 ```
 
 Depending on whether you're extracting optical flow or poses, this may take a few hours. 
+
+TODO: Make sure this section makes sense. Is there a better way to go about doing it?
+NOTE: You must add this folder to your PYTHONPATH
+```
+export PYTHONPATH="${PYTHONPATH}:/path/to/this/folder/MS-G3D"
+```

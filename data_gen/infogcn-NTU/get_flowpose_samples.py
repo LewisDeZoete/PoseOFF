@@ -11,6 +11,7 @@ from config.argclass import ArgClass
 import torch
 from torchvision.models.optical_flow import raft_large
 import torchvision.transforms.v2 as v2
+from einops import rearrange
 import numpy as np
 import pickle
 import time
@@ -93,8 +94,10 @@ def get_raw_flowpose_data():
                 C, _, V, M = poses.shape
                 poses = np.concatenate([np.zeros((C, 1, V, M)), poses], axis=1)
 
-        # Get the flowpose data!
-        flowpose_data.append(flowPoseTransform(flow_data, poses))
+        # NOTE: Flowpose data shape is (C, T, V, M)
+        # Reshaping to (T, (M V C)) for sequence transform
+        flowpose = flowPoseTransform(flow_data, poses) # Get the flowpose data!
+        flowpose_data.append(rearrange(flowpose, 'C T V M -> T (M V C)', C=C, T=flowpose.shape[1], V=V, M=M))
 
         if (ske_number+1) % 1000 == 0:
             print(f'Processed {ske_number-999}-{ske_number} in {time.time()-start:0.2f} seconds', flush=True)
@@ -106,6 +109,8 @@ def get_raw_flowpose_data():
         pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
     
 if __name__ == '__main__':
+    # TODO: This file should be extracting flow only
+    # Flowpose should be concatenated and transformed during seq_transform
     root_path = './data/ntu'
     save_path = osp.join(root_path, 'flowpose_data')
 
