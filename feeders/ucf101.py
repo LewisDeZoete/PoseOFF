@@ -49,8 +49,8 @@ class Feeder(Dataset):
         modality,
         split="train",
         p_interval=[0.95],
-        random_shift=False,
         random_choose=False,
+        random_shift=False,
         window_size=64,
         random_move=False,
         random_rot=False,
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     import time
     from torch.utils.data import DataLoader
 
-    arg = ArgClass("./config/ucf101/train_joint_infogcn.yaml")
+    arg = ArgClass("./config/ucf101/train_base.yaml")
 
     feeder = Feeder(**arg.feeder_args)
     # feeder = Feeder(**arg.feeder_args, split="test")

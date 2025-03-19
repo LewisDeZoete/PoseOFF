@@ -12,6 +12,32 @@ import torch.nn.functional as F
 def valid_crop_resize(
     data_numpy: np.array, valid_frame_num: int, p_interval: list, window_size: int
 ):
+    """
+    Perform cropping and resizing on the input data.
+    This function processes a 4D numpy array representing video data with dimensions
+    (C, T, V, M), where:
+        - C: Number of channels
+        - T: Number of frames (temporal dimension)
+        - V: Number of joints (spatial dimension)
+        - M: Number of bodies (e.g., multiple people)
+    The function crops the temporal dimension based on a specified interval and 
+    resizes the data to a fixed window size.
+    Args:
+        data_numpy (np.array): Input data with shape (C, T, V, M).
+        valid_frame_num (int): Number of valid frames in the input data.
+        p_interval (list): Interval for cropping. If it contains one value, 
+            center cropping is performed. If it contains two values, random cropping 
+            is performed within the range [p_interval[0], p_interval[1]].
+        window_size (int): Target size for the temporal dimension after resizing.
+    Returns:
+        np.array: Processed data with shape (C, window_size, V, M).
+    Notes:
+        - If `p_interval` contains one value, the function performs center cropping.
+        - If `p_interval` contains two values, the function performs random cropping 
+          with constraints on the cropped length (minimum of 64 frames).
+        - Resizing is performed using bilinear interpolation, which can handle both 
+          up-sampling and down-sampling.
+    """
     # input: C,T,V,M
     C, T, V, M = data_numpy.shape
     begin = 0
@@ -353,15 +379,13 @@ def random_rot(data_numpy, theta=0.3):
     keypoints = data_torch[:C]
     flow_vectors = data_torch[C:]
 
-    # Permute and reshape keypoints
-    keypoints = keypoints.permute(1, 0, 2, 3).contiguous().view(T, C, V*M)
-    
     # Create rotation matrix
     rot = torch.zeros(3).uniform_(-theta, theta)
     rot = torch.stack([rot, ] * T, dim=0)
     rot = _rot(rot)  # Assuming _rot is a function that creates a rotation matrix
 
     # Rotate keypoints
+    keypoints = keypoints.permute(1, 0, 2, 3).contiguous().view(T, C, V*M)
     keypoints = torch.matmul(rot, keypoints)
     keypoints = keypoints.view(T, C, V, M).permute(1, 0, 2, 3).contiguous()
     

@@ -1,24 +1,17 @@
-['./data/ntu/aligned_data/NTU60_CS-pose.npz', './data/ntu/aligned_data/NTU60_CV-pose.npz', './data/ntu/aligned_data/NTU60_CS-flowpose.npz', './data/ntu/aligned_data/NTU60_CV-flowpose.npz']
-KeysView(NpzFile './data/ntu/aligned_data/NTU60_CS-pose.npz' with keys: x_train, y_train, x_test, y_test)
-KeysView(NpzFile './data/ntu/aligned_data/NTU60_CV-pose.npz' with keys: x_train, y_train, x_test, y_test)
-KeysView(NpzFile './data/ntu/aligned_data/NTU60_CS-flowpose.npz' with keys: x_train, y_train, x_test, y_test)
-(40091, 300, 2650)
-(16487, 300, 2650)
-KeysView(NpzFile './data/ntu/aligned_data/NTU60_CV-flowpose.npz' with keys: x_train, y_train, x_test, y_test)
-(37646, 300, 2650)
-(18932, 300, 2650)
-Aligned datasets created successfully!
+./data/ntu/aligned_data/MINI_CS_flowpose
+./data/ntu/aligned_data/MINI_CV_flowpose
 
-+------------------ Job Report: 65981560 (COMPLETED) ------------------+
-| Memory (RAM)  [##################  ] 90.2% (405.8 GB peak / 450 GB)  |
-| CPU           [######              ] 32.0% average                   |
-| Time          [------------>       ] 64.8% (0-01:17:48 / 0-02:00:00) |
++------------------ Job Report: 66018293 (COMPLETED) ------------------+
+| Memory (RAM)  [############        ] 64.4% (160.9 GB peak / 250 GB)  |
+| CPU           [#######             ] 39.4% average                   |
+| Time          [------------>       ] 64.7% (0-00:12:56 / 0-00:20:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   495.8 MB      0 B                     27                   |
-|   /fred   691.1 GB      340.3 GB                31                   |
+|   /apps   215.4 MB      0 B                      8                   |
+|   /fred   339.7 GB      728 MB                 549                   |
+|   OS      256.1 MB      0 B                    303                   |
 |                                                                      |
 | Warnings:                                                            |
 |   - CPU usage is low                                                 |

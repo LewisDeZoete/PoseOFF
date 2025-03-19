@@ -345,7 +345,7 @@ def save_checkpoint(
 if __name__ == "__main__":
     from config.argclass import ArgClass
     from model import ModelLoader
-    from feeders import feeder
+    from feeders import ucf101
     from torch.utils.data import DataLoader
     from loss import LabelSmoothingCrossEntropy, masked_recon_loss
     import torch.optim as optim
@@ -373,7 +373,7 @@ if __name__ == "__main__":
     )
 
     # Dataset and dataloader
-    train_dataset = feeder.Feeder(**arg.feeder_args)
+    train_dataset = ucf101.Feeder(**arg.feeder_args)
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=arg.batch_size,

@@ -51,8 +51,15 @@ class ArgClass(object):
         
         # Create classes dictionary
         self.classes = {}
-        for elem, key in enumerate(dict.fromkeys(key.split('_')[1] for key in self.feeder_args['labels'].keys())):
+        for elem, key in enumerate(dict.fromkeys(key.split('_')[-1] for key in self.feeder_args['labels'].keys())):
             self.classes[key] = elem
+    
+    def import_class(self, name):
+        components = name.split('.')
+        mod = __import__(components[0])
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod
 
 
 if __name__=='__main__':
@@ -61,16 +68,14 @@ if __name__=='__main__':
                         help='config dictionary location (default=ucf101)')
     parser.add_argument('-p', dest='phase', default='test',
                         help='network phase [train, test] (default=test)')
-    parser.add_argument('-l', dest='limb', default='joint',
-                        help='limb [joint, bone] (default=joint)')
+    parser.add_argument( "-m", dest="model_type", 
+                        default="base", help="model type [base, cnn, avg, abs] (default=base)")
     parser.add_argument('-s', dest='save_name', default='',
                         help='name to save the results dictionary as after training')
     parsed = parser.parse_args()
     
-    results = {}
-    results['name'] = parsed.save_name
-    results['epoch'] = [0,1,2]
-    results['total_time'] = [0.1, 0.9, 0.5]
+    arg = ArgClass(parsed)   
+    feeder = arg.import_class(arg.feeder)
+    train_dataset = feeder(**arg.feeder_args, split='train')
+    test_dataset = feeder(**arg.feeder_args, split='test')
     
-    with open(f'./{parsed.save_name}.yaml', 'w') as outfile:
-        yaml.safe_dump(results, outfile, default_flow_style=False, sort_keys=False)

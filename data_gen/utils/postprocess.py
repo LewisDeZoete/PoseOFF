@@ -151,7 +151,7 @@ def align_skeleton(data):
 
 
 def create_aligned_dataset(
-    file_list=["data/ntu/NTU60_CS.npz", "data/ntu/NTU60_CV.npz"]
+    file_list=["data/ntu/NTU60_CS-pose.npz", "data/ntu/NTU60_CV-pose.npz"]
 ):
     """
     Create an aligned dataset from the given list of .npz files.
@@ -180,10 +180,8 @@ def create_aligned_dataset(
     """
     for file in file_list:
         org_data = np.load(file)
-        print(org_data.keys()) #DEBUG
         splits = ["x_train", "x_test"]
         aligned_set = {}
-        # TODO: Concatenate the flow with pose after saving the aligned skels
         if 'flowpose' in file:
             for split in splits:
                 data = org_data[split]

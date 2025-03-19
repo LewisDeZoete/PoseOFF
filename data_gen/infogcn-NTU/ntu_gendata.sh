@@ -3,8 +3,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=2:00:00
-#SBATCH --mem-per-cpu=450g
+#SBATCH --time=00:20:00
+#SBATCH --mem-per-cpu=250g
 
 #SBATCH --output='logs/EXTRACT/NTU_flowpose_seq_transform.txt'
 #SBATCH --error='logs/EXTRACT/error_NTU_flowpose_seq_transform.txt'
@@ -18,5 +18,8 @@ source ../environment/bin/activate
 # # ~ 8.5 hours, 25g if processing 20000 each time
 # srun python ./data_gen/infogcn-NTU/get_flowpose_samples.py 
 
-# Align sequences ~ 2 hours, 450g memory
-srun python ./data_gen/infogcn-NTU/seq_transformation.py --flow
+# # Align sequences ~ 2 hours, 450g memory
+# srun python ./data_gen/infogcn-NTU/seq_transformation.py --flow
+
+# # TMP
+srun python ./data_gen/infogcn-NTU/DEBUG.py

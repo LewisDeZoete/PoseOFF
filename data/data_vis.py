@@ -6,15 +6,15 @@ curr_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "..")))
 
 import matplotlib.pyplot as plt
-import torch
+# import torch
 import numpy as np
 import cv2
-from config.argclass import ArgClass
+# from config.argclass import ArgClass
 
-# import decord
-from decord import VideoReader, cpu
-from data_gen.utils.extractors import FlowPoseSampler
-import pickle
+# # import decord
+# from decord import VideoReader, cpu
+# from data_gen.utils.extractors import FlowPoseSampler
+# import pickle
 from einops import rearrange
 
 # # ----------------- #
@@ -218,80 +218,55 @@ from einops import rearrange
 # NTU-RGB+D Flowpose Visualisation
 # ----------------------------------
 
-frame_number = 10
+flowpose_file = os.path.join('./data/ntu', 'aligned_data', 'MINI_CS_flowpose.npz')
+flowpose_data = np.load(flowpose_file, allow_pickle=True)['x_train'] # (120, 300, 2650)
 
-# Load the names of the skeleton files
-skes_names = np.loadtxt("./data/ntu/statistics/ntu_rgbd-available.txt", dtype=str)
+# Get a single frame
+data = flowpose_data[0,0] # (2*25*C)
+data = rearrange(data, '(M V C) -> M V C', M=2, V=25, C=53)
 
-video_path = f"../Datasets/NTU_RGBD/nturgb+d_rgb/{skes_names[0]}_rgb.avi"
+# Get the pose and flow data
+person = data[0] # (25, 53)
+poses = person[:, :3] # (25, 3)
+flows = rearrange(person[:, 3:], 'K (C W H) -> K C W H',K=25,C=2, W=5, H=5) # (25, 2, 5, 5)
 
-from torchvision.transforms import v2
-from data_gen.utils import LoadVideo
-transforms = v2.Compose([
-    LoadVideo(max_frames=300),
-    v2.Resize(size=(540, 960)),
-    v2.ToImage(),
-    v2.ToDtype(torch.float32, scale=True),
-    v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5])])
+frame = np.zeros((240, 320))
 
-rgb_data = transforms(video_path)
-frame = rgb_data[frame_number]
-plt.imshow(frame.permute(1,2,0), cmap='gray')
+def draw_flow_vectors(flow_data, frame, start_x, start_y):
+    """
+    Draws a group of optical flow vectors on the image.
+
+    Parameters:
+    flow_data (numpy.ndarray): The optical flow data.
+    frame (numpy.ndarray): The image frame.
+    start_x (int): The starting x-coordinate for the 5x5 region.
+    start_y (int): The starting y-coordinate for the 5x5 region.
+    size (int): The size of the region (default is 5).
+    """
+    # for i in range(int(-size/2), int(size/2)):
+    #     for j in range(int(-size/2), int(size/2)):
+    #         x = start_x + i
+    #         y = start_y + j
+    #         # if x < flow_data.shape[2] and y < flow_data.shape[1]:
+    #         flow_vector = flow_data[:, j, i]
+    #         end_x = int(x + flow_vector[0])
+    #         end_y = int(y + flow_vector[1])
+    #         cv2.arrowedLine(frame, (end_x, end_y), (x, y), (0, 255, 0), 1, tipLength=0.1)
+    flow = np.mean(flow_data, axis=(1,2))
+    cv2.arrowedLine(frame, (start_x, start_y), (int(start_x+flow[0]), int(start_y+flow[1])), (0, 255, 0), 5, tipLength=1)
+
+# Draw the skeleton keypoints on the frame
+for keypoint_number, keypoint in enumerate(poses):
+    keypoint[0] = (keypoint[0]+0.5)*319
+    keypoint[1] = (keypoint[1]+0.5)*239
+    if 0 in keypoint:
+        continue
+    draw_flow_vectors(flows[keypoint_number],
+                      frame, 
+                      int(keypoint[0]), 
+                      int(keypoint[1]))
+    cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), 1, 255, -1)
+
+
+plt.imshow(frame, cmap='gray')
 plt.savefig('NTU_flowpose.png')
-
-
-
-# flowpose_pkl = os.path.join('./data/ntu', 'flowpose_data', 'flowpose_data.pkl')
-# with open(flowpose_pkl, 'rb') as f:
-#     flowpose_data = pickle.load(f)
-
-# # Get the flowpose data
-# flow_pose = flowpose_data[0] # (52, T, 25, M)
-# # RGB data
-# rgb_data = VideoReader(video_path, ctx=cpu(0))
-# frame = rgb_data[frame_number].asnumpy()
-# # Pose data (from flowpose)
-# pose = flow_pose[:2,...] # (2, T, 25, M)
-# pose = pose[:,frame_number,:,0].transpose(1,0) # (25, 2), just taking person 0
-# pose[:,0] = pose[:, 0]
-# pose[:,1] = pose[:, 1]
-# print(pose.max(), pose.min())
-# # Flow data (from flowpose)
-# flow = flow_pose[2:,frame_number,:,0].transpose(1,0).reshape((25,2,5,5))
-
-# def draw_flow_vectors(flow_data, frame, start_x, start_y):
-#     """
-#     Draws a group of optical flow vectors on the image.
-
-#     Parameters:
-#     flow_data (numpy.ndarray): The optical flow data.
-#     frame (numpy.ndarray): The image frame.
-#     start_x (int): The starting x-coordinate for the 5x5 region.
-#     start_y (int): The starting y-coordinate for the 5x5 region.
-#     size (int): The size of the region (default is 5).
-#     """
-#     # for i in range(int(-size/2), int(size/2)):
-#     #     for j in range(int(-size/2), int(size/2)):
-#     #         x = start_x + i
-#     #         y = start_y + j
-#     #         # if x < flow_data.shape[2] and y < flow_data.shape[1]:
-#     #         flow_vector = flow_data[:, j, i]
-#     #         end_x = int(x + flow_vector[0])
-#     #         end_y = int(y + flow_vector[1])
-#     #         cv2.arrowedLine(frame, (end_x, end_y), (x, y), (0, 255, 0), 1, tipLength=0.1)
-#     flow = np.mean(flow_data, axis=(1,2))
-#     cv2.arrowedLine(frame, (start_x, start_y), (int(start_x+flow[0]), int(start_y+flow[1])), (0, 255, 0), 5, tipLength=1)
-
-# # Draw the skeleton keypoints on the frame
-# for keypoint_number, keypoint in enumerate(pose):
-#     if 0 in keypoint:
-#         continue
-#     draw_flow_vectors(flow[keypoint_number],
-#                       frame, 
-#                       int(keypoint[0]), 
-#                       int(keypoint[1]))
-#     cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), 1, 255, -1)
-
-
-# plt.imshow(frame, cmap='gray')
-# plt.savefig('NTU_flowpose.png')

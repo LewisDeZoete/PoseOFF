@@ -5,7 +5,6 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from model import ModelLoader
-from feeders import feeder
 from config.argclass import ArgClass
 
 from training.train_infogcn import train_network
@@ -70,8 +69,10 @@ print("### Model created")
 device = torch.device(arg.device if torch.cuda.is_available() else "cpu")
 
 # # Create the datasets and dataloaders
-train_dataset = feeder.Feeder(**arg.feeder_args, split="train")
-test_dataset = feeder.Feeder(**arg.feeder_args, split="test")
+feeder_class = arg.import_class(arg.feeder)
+train_dataset = feeder_class(**arg.feeder_args, split="train")
+test_dataset = feeder_class(**arg.feeder_args, split="test")
+
 generator = torch.Generator().manual_seed(
     42
 )  # It shouldn't be random when you resume training
@@ -137,6 +138,7 @@ loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 #                'confusion matrix': confusion_matrix,
 #                'classification report': classification_report}
 score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
+
 
 results = train_network(
     arg=arg,

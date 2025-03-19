@@ -393,9 +393,11 @@ if __name__ == "__main__":
     sys.path.insert(0, "..")
     from config.argclass import ArgClass
 
-    model_type = 'cnn'
+    model_type = 'base'
+    dataset = 'nturgbd-'
+    val_method = 'cross-subject'
 
-    arg = ArgClass(f"config/ucf101/train_{model_type}.yaml")
+    arg = ArgClass(f"config/{dataset}{val_method}/train_{model_type}.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
@@ -405,9 +407,10 @@ if __name__ == "__main__":
 
     # N, C, T, V, M
     C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
+    V = arg.model_args["num_point"]
     print(f"Model: {model_type}")
     print(f"Input channels: {C}\n")
 
-    x = torch.randn((8, C, 64, 17, 2)).to(device)
+    x = torch.randn((8, C, 64, V, 2)).to(device)
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
     print(f'y_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}')

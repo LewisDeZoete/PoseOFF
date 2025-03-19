@@ -1,8 +1,7 @@
 # Feeder
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
-  data_path: ./data/ntu/aligned_data/NTU60_CS-pose_aligned.npz
-  # data_path: ./data/ntu/aligned_data/MINI_CS_flowpose.npz
+  data_path: ./data/ntu/aligned_data/NTU60_CS-flowpose_aligned.npz
   label_path: ./data/ntu/statistics/ntu-rgbd-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: True
@@ -10,10 +9,10 @@ feeder_args:
   window_size: 64
   random_move: True
   random_rot: True
-  average_flow: False # model_args.flow_channels = 2
+  average_flow: True # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
-  no_flow: True
+  no_flow: False
 
 extractor:
   preprocessed: True
@@ -36,7 +35,7 @@ model_args:
   num_person: 2
   graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 0 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
+  flow_channels: 2
   embed_channels: 64
   num_head: 3
   ode_method: euler

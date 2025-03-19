@@ -3,8 +3,7 @@ sys.path.insert(0, '')
 
 import torch
 from collections import OrderedDict
-from lib.utils.model_utils import count_params, import_class
-from model.infogcn2.utils import LayerCompare
+from model.infogcn2.utils import LayerCompare, count_params, import_class
 
 class ModelLoader:
     def __init__(self, arg):

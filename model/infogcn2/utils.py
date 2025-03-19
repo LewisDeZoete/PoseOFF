@@ -55,7 +55,6 @@ def count_params(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-# TODO: Find all instances of this function!
 def LayerCompare(dict1, dict2):
     """
     Compare the shapes of tensors in two dictionaries with the same keys.
