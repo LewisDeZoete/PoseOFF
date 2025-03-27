@@ -1,19 +1,19 @@
-./data/ntu/aligned_data/MINI_CS_flowpose
-./data/ntu/aligned_data/MINI_CV_flowpose
+(300, 2650)
 
-+------------------ Job Report: 66018293 (COMPLETED) ------------------+
-| Memory (RAM)  [############        ] 64.4% (160.9 GB peak / 250 GB)  |
-| CPU           [#######             ] 39.4% average                   |
-| Time          [------------>       ] 64.7% (0-00:12:56 / 0-00:20:00) |
++------------------ Job Report: 66183766 (COMPLETED) ------------------+
+| Memory (RAM)  [########            ] 44.5% (111.3 GB peak / 250 GB)  |
+| CPU           [#####               ] 29.9% average                   |
+| Time          [----------->        ] 56.3% (0-00:05:38 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   215.4 MB      0 B                      8                   |
-|   /fred   339.7 GB      728 MB                 549                   |
-|   OS      256.1 MB      0 B                    303                   |
+|   /apps   716 KB        0 B                      6                   |
+|   /fred   98.5 GB       0 B                      5                   |
+|   OS      0 B           0 B                      2                   |
 |                                                                      |
 | Warnings:                                                            |
+|   - Too much memory requested                                        |
 |   - CPU usage is low                                                 |
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+

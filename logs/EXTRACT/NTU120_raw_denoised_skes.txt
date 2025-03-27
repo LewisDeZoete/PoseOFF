@@ -1,0 +1,79 @@
+Processing raw denoised skeletons for ntu120 dataset...
+Found 57367 available skeleton sequences.
+Processed: 1.74% (1000 / 57367), Missing count: 2
+Processed: 3.49% (2000 / 57367), Missing count: 3
+Processed: 5.23% (3000 / 57367), Missing count: 3
+Processed: 6.97% (4000 / 57367), Missing count: 4
+Processed: 8.72% (5000 / 57367), Missing count: 6
+Processed: 10.46% (6000 / 57367), Missing count: 6
+Processed: 12.20% (7000 / 57367), Missing count: 6
+Processed: 13.95% (8000 / 57367), Missing count: 6
+Processed: 15.69% (9000 / 57367), Missing count: 6
+Processed: 17.43% (10000 / 57367), Missing count: 6
+Processed: 19.17% (11000 / 57367), Missing count: 6
+Processed: 20.92% (12000 / 57367), Missing count: 6
+Processed: 22.66% (13000 / 57367), Missing count: 6
+Processed: 24.40% (14000 / 57367), Missing count: 6
+Processed: 26.15% (15000 / 57367), Missing count: 6
+Processed: 27.89% (16000 / 57367), Missing count: 6
+Processed: 29.63% (17000 / 57367), Missing count: 6
+Processed: 31.38% (18000 / 57367), Missing count: 6
+Processed: 33.12% (19000 / 57367), Missing count: 6
+Processed: 34.86% (20000 / 57367), Missing count: 6
+Processed: 36.61% (21000 / 57367), Missing count: 6
+Processed: 38.35% (22000 / 57367), Missing count: 6
+Processed: 40.09% (23000 / 57367), Missing count: 6
+Processed: 41.84% (24000 / 57367), Missing count: 6
+Processed: 43.58% (25000 / 57367), Missing count: 7
+Processed: 45.32% (26000 / 57367), Missing count: 7
+Processed: 47.07% (27000 / 57367), Missing count: 7
+Processed: 48.81% (28000 / 57367), Missing count: 7
+Processed: 50.55% (29000 / 57367), Missing count: 7
+Processed: 52.29% (30000 / 57367), Missing count: 7
+Processed: 54.04% (31000 / 57367), Missing count: 7
+Processed: 55.78% (32000 / 57367), Missing count: 10
+Processed: 57.52% (33000 / 57367), Missing count: 10
+Processed: 59.27% (34000 / 57367), Missing count: 11
+Processed: 61.01% (35000 / 57367), Missing count: 11
+Processed: 62.75% (36000 / 57367), Missing count: 11
+Processed: 64.50% (37000 / 57367), Missing count: 11
+Processed: 66.24% (38000 / 57367), Missing count: 11
+Processed: 67.98% (39000 / 57367), Missing count: 14
+Processed: 69.73% (40000 / 57367), Missing count: 15
+Processed: 71.47% (41000 / 57367), Missing count: 17
+Processed: 73.21% (42000 / 57367), Missing count: 19
+Processed: 74.96% (43000 / 57367), Missing count: 19
+Processed: 76.70% (44000 / 57367), Missing count: 20
+Processed: 78.44% (45000 / 57367), Missing count: 20
+Processed: 80.19% (46000 / 57367), Missing count: 20
+Processed: 81.93% (47000 / 57367), Missing count: 20
+Processed: 83.67% (48000 / 57367), Missing count: 20
+Processed: 85.41% (49000 / 57367), Missing count: 20
+Processed: 87.16% (50000 / 57367), Missing count: 20
+Processed: 88.90% (51000 / 57367), Missing count: 20
+Processed: 90.64% (52000 / 57367), Missing count: 20
+Processed: 92.39% (53000 / 57367), Missing count: 20
+Processed: 94.13% (54000 / 57367), Missing count: 20
+Processed: 95.87% (55000 / 57367), Missing count: 20
+Processed: 97.62% (56000 / 57367), Missing count: 20
+Processed: 99.36% (57000 / 57367), Missing count: 21
+Saved raw denoised positions of 3367344 frames into ./data/ntu120/denoised_data/raw_denoised_joints.pkl
+Found 21 files that have missing data
+
++------------------ Job Report: 66450318 (COMPLETED) ------------------+
+| Memory (RAM)  [####                ] 20.8% (4.2 GB peak / 20 GB)     |
+| CPU           [                    ]  3.6% average                   |
+| Time          [->                  ]  7.4% (0-00:08:55 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   112 KB        4.6 MB         64.7 K                        |
+|   OS      0 B           0 B            87                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

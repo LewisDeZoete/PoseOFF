@@ -1,0 +1,109 @@
+nturgbd-cross-view avg
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_path: ./data/ntu/aligned_data/NTU60_CV-flowpose_aligned.npz
+  label_path: ./data/ntu/statistics/ntu-rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: True
+  absolute_flow: False
+  no_flow: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False}
+model: model.infogcn2.sode.SODE
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 2
+  embed_channels: 64
+  num_head: 3
+  ode_method: euler
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  SAGC_proj: True
+  num_cls: 10
+  n_sample: 1
+  backbone: transformer
+  cnn: False
+ignore_weights: []
+phase: train
+optim:
+  base_lr: 0.1
+  nesterov: True
+  weight_decay: 0.0003
+  step: [50, 60]
+  gamma: 0.1
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+num_epoch: 70
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/nturgbd/CV/
+config: nturgbd-cross-view
+model_type: avg
+run_name: nturgbd_CV_avg
+description: nturgbd-cross-view avg
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 613875
+	Loading weights from ./results/nturgbd/CV/nturgbd_CV_avg.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+### Model created
+	Tracking:
+		epoch
+		training_time
+		train_loss
+		lr
+		test_loss
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+	Resuming from checkpoint at epoch 70
+
++------------------ Job Report: 66221418 (COMPLETED) ------------------+
+| Memory (RAM)  [#################   ] 86.4% (215.9 GB peak / 250 GB)  |
+| CPU           [#####               ] 29.0% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  2.1% (0-00:10:04 / 0-08:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   716 KB        0 B            5                             |
+|   /fred   168.3 GB      3.1 KB         7.6 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      49.2 MB       0 B            832                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

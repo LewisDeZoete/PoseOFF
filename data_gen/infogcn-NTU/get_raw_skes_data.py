@@ -131,7 +131,7 @@ def get_raw_skes_data():
 
     with open(save_data_pkl, 'wb') as fw:
         pickle.dump(raw_skes_data, fw, pickle.HIGHEST_PROTOCOL)
-    np.savetxt(osp.join(save_path, 'raw_data', 'frames_cnt.txt'), frames_cnt, fmt='%d')
+    np.savetxt(osp.join(root_path, 'raw_data', 'frames_cnt.txt'), frames_cnt, fmt='%d')
 
     print('Saved raw bodies data into %s' % save_data_pkl)
     print('Total frames: %d' % np.sum(frames_cnt))
@@ -139,28 +139,40 @@ def get_raw_skes_data():
     with open(frames_drop_pkl, 'wb') as fw:
         pickle.dump(frames_drop_skes, fw, pickle.HIGHEST_PROTOCOL)
 
-if __name__ == '__main__':
-    save_path = './data/ntu'
 
-    skes_path = '../Datasets/NTU_RGBD/nturgb+d_skeletons'
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
+    parser.add_argument(
+        '--dataset', 
+        dest='dataset', 
+        default='ntu',
+        help='Dataset, either ntu or ntu120 (default=ntu)')
+    args = parser.parse_args()
+    dataset = args.dataset
+
+    print(f'Processing raw skeletons for {dataset} dataset...')
+    root_path = f'./data/{dataset}'
+
+    skes_path = '../Datasets/NTU_RGBD{0}/nturgb+d_skeletons{0}'.format(
+        '120' if dataset == 'ntu120' else '')
     print(len(list(os.listdir(skes_path))))
-    stat_path = osp.join(save_path, 'statistics')
-    if not osp.exists('./data/ntu/raw_data'):
-        os.makedirs('./data/ntu/raw_data')
+    stat_path = osp.join(root_path, 'statistics')
+    if not osp.exists(f'./data/{dataset}/raw_data'):
+        os.makedirs(f'./data/{dataset}/raw_data')
 
     # Skeleton name file, raw data pickle and frame drop file
-    skes_name_file = osp.join(stat_path, 'ntu_rgbd-available.txt')
-    # skes_name_file = osp.join(stat_path, 'skes_available_name.txt')
-    save_data_pkl = osp.join(save_path, 'raw_data', 'raw_skes_data.pkl')
-    frames_drop_pkl = osp.join(save_path, 'raw_data', 'frames_drop_skes.pkl')
+    skes_name_file = osp.join(stat_path, 'ntu_rgbd{0}-available.txt'.format(
+        '120' if dataset == 'ntu120' else ''))
+    save_data_pkl = osp.join(root_path, 'raw_data', 'raw_skes_data.pkl')
+    frames_drop_pkl = osp.join(root_path, 'raw_data', 'frames_drop_skes.pkl')
 
     frames_drop_logger = logging.getLogger('frames_drop')
     frames_drop_logger.setLevel(logging.INFO)
-    frames_drop_logger.addHandler(logging.FileHandler(osp.join(save_path, 'raw_data', 'frames_drop.log')))
+    frames_drop_logger.addHandler(logging.FileHandler(osp.join(root_path, 'raw_data', 'frames_drop.log')))
     frames_drop_skes = dict()
 
     get_raw_skes_data()
 
     with open(frames_drop_pkl, 'wb') as fw:
         pickle.dump(frames_drop_skes, fw, pickle.HIGHEST_PROTOCOL)
-        

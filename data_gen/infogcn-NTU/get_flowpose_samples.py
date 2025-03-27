@@ -16,7 +16,7 @@ import numpy as np
 import pickle
 import time
 
-arg = ArgClass(arg='./config/custom_pose/train_base.yaml')
+arg = ArgClass(arg='./config/nturgbd-cross-subject/train_base.yaml')
 transform_args = arg.extractor
 
 # Get the device
@@ -65,7 +65,7 @@ def get_raw_flowpose_data():
 
     flowpose_data = []
 
-    # Assuming we've already processed all the pose data
+    # Assuming we've already denoised all the pose data
     with open(denoised_skes_data_file, 'rb') as fr:  # load raw skeletons data
         denoised_skes_data = pickle.load(fr)
     
@@ -74,7 +74,7 @@ def get_raw_flowpose_data():
         frames_drop_skes = pickle.load(fr)
 
     start = time.time()
-    for ske_number, ske_name in enumerate(skes_names[40000:]):
+    for ske_number, ske_name in enumerate(skes_names[40000:40001]):
         ske_number += 40000
         # Get the flow data
         rgb_name = osp.join(rgb_path, ske_name + '_rgb.avi')
@@ -107,11 +107,24 @@ def get_raw_flowpose_data():
     flowpose_pkl = osp.join(save_path, 'flowpose_data_40k-56k.pkl')
     with open(flowpose_pkl, 'wb') as f:
         pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
+
     
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
+    parser.add_argument(
+        '--dataset', 
+        dest='dataset', 
+        default='ntu',
+        help='Dataset, either `ntu` or `ntu120` (default=ntu)')
+    args = parser.parse_args()
+    dataset = args.dataset
+
+    print(f'Processing flowpose samples for {dataset} dataset...', flush=True)
+    root_path = f'./data/{dataset}'
+
     # TODO: This file should be extracting flow only
     # Flowpose should be concatenated and transformed during seq_transform
-    root_path = './data/ntu'
     save_path = osp.join(root_path, 'flowpose_data')
 
     # Create the directories if they don't exist
@@ -125,6 +138,46 @@ if __name__ == '__main__':
     denoised_skes_data_file = osp.join(root_path, 'denoised_data', 'raw_denoised_colors.pkl')
     frames_drop_file = osp.join(root_path, 'raw_data', 'frames_drop_skes.pkl')
     
-    # Generate the data
-    get_raw_flowpose_data()
+    # # Generate the data
+    # get_raw_flowpose_data()
 
+    # ------------------------------------------------------------
+    video_name = "S001C003P008R001A050"
+
+    get_vid_trans = v2.Compose([
+        LoadVideo(max_frames=300),
+        # v2.Resize(size=transform_args['flow']['imsize']),
+        # v2.Resize(size=[520,960])
+        ])
+    get_flow_trans = v2.Compose([
+        v2.ToImage(),
+        v2.ToDtype(torch.float32, scale=True),
+        v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),  # map [0, 1] into [-1, 1]
+        GetFlow(model=model, device=device, minibatch_size=2)
+        ])
+
+    # Assuming we've already denoised all the pose data
+    with open(denoised_skes_data_file, 'rb') as fr:  # load raw skeletons data
+        denoised_skes_data = pickle.load(fr)
+
+    skes_names = np.loadtxt("./data/ntu/statistics/ntu_rgbd-available.txt", dtype=str)
+    ske_number = list(skes_names).index(video_name)
+    print(f'Video name: {video_name}\nSkeleton number:{ske_number}')
+
+    rgb_name = osp.join(rgb_path, video_name + '_rgb.avi')
+    rgb_data = get_vid_trans(rgb_name)
+    flow_data = get_flow_trans(rgb_data)
+
+    # Get the pose data
+    pose_data = denoised_skes_data[ske_number]
+    pose_data = pose_data.transpose(3, 0, 2, 1)
+
+    # Save the temp data
+    save_path = './data/visualisations'
+    print('Saving...')
+    print(f'RGB data shape: {rgb_data.shape}')
+    print(f'Flow data shape: {flow_data.shape}')
+    print(f'Pose data shape: {pose_data.shape}')
+    torch.save(rgb_data, osp.join(save_path, 'RGB_full-S001C003P008R001A050.pt'))
+    torch.save(flow_data, osp.join(save_path, 'FLOW_full-S001C003P008R001A050.pt'))
+    np.save(osp.join(save_path, 'POSE_full-S001C003P008R001A050.pt'), pose_data)

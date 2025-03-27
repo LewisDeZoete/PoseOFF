@@ -77,4 +77,4 @@ test_batch_size: 256
 half: False
 
 checkpoint_freq: 10 # how often to save the model and training state
-save_location: ./results/nturgbd/ # where to save the checkpoints
+save_location: ./results/nturgbd/CS/ # where to save the checkpoints

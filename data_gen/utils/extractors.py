@@ -147,8 +147,9 @@ class FlowPoseSampler:
         window_size (int): The size of the window around each pose keypoint. Default is 3.
         threshold (float): The threshold for visibility of keypoints. Default is 0.5.
         loop (bool): Whether to loop the graph using loop_graph function. Default is True.
-        to_cpu (bool): Whether to move the resulting tensor to CPU. Default is True.
         norm (bool): Whether to normalize the flow magnitude using flow_mag_norm function. Default is False.
+        match_pose (bool): Whether to match the pose keypoints using pose_match function. Default is True.
+        ntu (bool): Whether the pose keypoints are from NTU dataset. Default is False.
     Methods:
         __call__(flows, poses):
             Samples the optical flow in windows surrounding the pose keypoints.
@@ -156,8 +157,9 @@ class FlowPoseSampler:
                 flows (torch.Tensor/np.array): The optical flow tensor of shape (num_frames-1, 2, height, width).
                 poses (torch.Tensor): The pose keypoints tensor of shape (channels, num_frames, num_keypoints, num_people).
             Returns:
-                torch.Tensor: The concatenated tensor of poses and sampled flow data.
-                    shape: (num_pose_channels+(window_size**2)*2, frames-1, keypoints, num_people)
+                torch.Tensor: Tensor of flow windows (optionally concat poses+flow).
+                    (ntu=False) shape: (num_pose_channels+(window_size**2)*2, frames-1, keypoints, num_people)
+                    (ntu=True) shape: ((window_size**2)*2, frames-1, keypoints, num_people)
                     NOTE: The first frame of poses is discarded given it does not yet contain optical flow.
     """
     def __init__(self, 
@@ -234,13 +236,19 @@ class FlowPoseSampler:
             for keypoint_num in range(total_keypoints):
                 if valid_indices[frame_no, keypoint_num]:
                     x, y = pose_points[0, frame_no, keypoint_num], pose_points[1, frame_no, keypoint_num]
-                    # Get the window of optical flow and calculate mean directly
+                    # Get the window of optical flow
                     flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
                     
                     stacker[:, frame_no, keypoint_num] = flow_window.flatten()
         
-        # Concatenate poses with computed flow
-        flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
+        if self.ntu:
+            # NOTE: NTU does not return keypoint x,y,z coordinates
+            print(stacker.shape)
+            flow_pose = stacker.reshape(stacker.shape[0], *poses.shape[1:])
+            print(flow_pose.shape)
+        else:
+            # Concatenate poses with computed flow
+            flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
         
         # If we pass loop_graph = True, then loop the graph using this function!
         if hasattr(self, 'loop_graph'):
@@ -353,9 +361,14 @@ if __name__ == '__main__':
     sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '../...')))
 
     from config.argclass import ArgClass
-    from data_gen.utils.extract_utils import extract_data
+    # NOTE: extract_data is for testing ucf101
+    # from data_gen.utils.extract_utils import extract_data 
 
-    arg = ArgClass(arg='./config/ucf101/train_base.yaml')
+    arg = ArgClass(arg='./config/nturgbd-cross-subject/train_base.yaml')
+    # arg = ArgClass(arg='./config/ucf101/train_base.yaml')
 
     flowposeSampler = FlowPoseSampler(device=torch.device('cpu'), norm=True)
-    extract_data(arg, 0, flowposeSampler, 'flowpose', save_as_numpy=True, debug=True)
+    # extract_data(arg, 0, flowposeSampler, 'flowpose', save_as_numpy=True, debug=True)
+
+    
+

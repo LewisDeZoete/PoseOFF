@@ -5,11 +5,23 @@ import os.path as osp
 import numpy as np
 import pickle
 import logging
+import argparse
 
-root_path = './data/ntu'
+parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
+parser.add_argument(
+    '--dataset', 
+    dest='dataset', 
+    default='ntu',
+    help='Dataset, either ntu or ntu120 (default=ntu)')
+args = parser.parse_args()
+dataset = args.dataset
+
+print(f'Processing raw denoised skeletons for {dataset} dataset...')
+
+root_path = f'./data/{dataset}'
 raw_data_file = osp.join(root_path, 'raw_data', 'raw_skes_data.pkl')
 save_path = osp.join(root_path, 'denoised_data')
-stat_path = osp.join(save_path, 'statistics')
+stat_path = osp.join(root_path, 'statistics')
 
 if not osp.exists(save_path):
     os.mkdir(save_path)
@@ -21,6 +33,7 @@ if not osp.exists(rgb_ske_path):
 actors_info_dir = osp.join(save_path, 'actors_info')
 if not osp.exists(actors_info_dir):
     os.mkdir(actors_info_dir)
+
 
 missing_count = 0
 noise_len_thres = 11
@@ -396,7 +409,6 @@ def get_raw_denoised_data():
 
     for (idx, bodies_data) in enumerate(raw_skes_data):
         ske_name = bodies_data['name']
-        print('Processing %s' % ske_name)
         num_bodies = len(bodies_data['data'])
 
         if num_bodies == 1:  # only 1 actor
@@ -434,5 +446,7 @@ def get_raw_denoised_data():
                                                                      raw_skes_joints_pkl))
     print('Found %d files that have missing data' % missing_count)
 
+
 if __name__ == '__main__':
+    
     get_raw_denoised_data()

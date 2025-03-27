@@ -1,7 +1,7 @@
 # Feeder
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
-  data_path: ./data/ntu/aligned_data/NTU60_CS-flowpose_aligned.npz
+  data_path: ./data/ntu/aligned_data/NTU60_CV-flowpose_aligned.npz
   label_path: ./data/ntu/statistics/ntu-rgbd-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: True
@@ -77,4 +77,4 @@ test_batch_size: 256
 half: False
 
 checkpoint_freq: 10 # how often to save the model and training state
-save_location: ./results/nturgbd/CS/ # where to save the checkpoints
+save_location: ./results/nturgbd/CV/ # where to save the checkpoints

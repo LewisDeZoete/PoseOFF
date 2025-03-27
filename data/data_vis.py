@@ -1,9 +1,9 @@
 import sys
-import os
+import os.path as osp
 
 # # add lib to path
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "..")))
+curr_dir = osp.dirname(osp.abspath(__file__))
+sys.path.insert(0, osp.abspath(osp.join(curr_dir, "..")))
 
 import matplotlib.pyplot as plt
 # import torch
@@ -14,7 +14,7 @@ import cv2
 # # import decord
 # from decord import VideoReader, cpu
 # from data_gen.utils.extractors import FlowPoseSampler
-# import pickle
+import pickle
 from einops import rearrange
 
 # # ----------------- #
@@ -134,7 +134,7 @@ from einops import rearrange
 # # ----------------------------------
 # # NTU-RGB+D Skeleton Visualization
 # # ----------------------------------
-# def draw_skeleton_on_frame(video_path, skeleton, frame_index=0):
+# def draw_skeleton_on_frame(video_path, poses, frame_index=0):
 #     """
 #     Draws skeleton keypoints onto a frame of the video.
 
@@ -155,7 +155,7 @@ from einops import rearrange
 #         return None
 
 #     # Get the skeleton for corresponding frame
-#     skeleton_frame = skeleton[:, frame_index, ...]
+#     pose_frame = poses[:, frame_index, ...]
 
 #     # Set the frame position
 #     cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
@@ -166,10 +166,10 @@ from einops import rearrange
 #         print("Error: Could not read frame.")
 #         return None
     
-#     frame = np.zeros(frame.shape)
+#     # frame = np.zeros(frame.shape)
 
 #     # Draw the skeleton keypoints on the frame
-#     for person_num, person in enumerate(skeleton_frame.transpose(2, 0, 1)):
+#     for person_num, person in enumerate(pose_frame.transpose(2, 0, 1)):
 #         for keypoint in person.transpose(1, 0):
 #             x, y = int(keypoint[0]), int(keypoint[1])
 #             if person_num == 0:
@@ -187,7 +187,56 @@ from einops import rearrange
 #     return frame
 
 
+# def draw_flow_windows(frame, flows, poses, frame_index=0):
+#     """
+#     Draws a group of optical flow vectors on the image.
+
+#     Parameters:
+#     flow_data (numpy.ndarray): The optical flow data.
+#     frame (numpy.ndarray): The image frame.
+#     start_x (int): The starting x-coordinate for the 5x5 region.
+#     start_y (int): The starting y-coordinate for the 5x5 region.
+#     size (int): The size of the region (default is 5).
+#     """
+#     # for i in range(int(-size/2), int(size/2)):
+#     #     for j in range(int(-size/2), int(size/2)):
+#     #         x = start_x + i
+#     #         y = start_y + j
+#     #         # if x < flow_data.shape[2] and y < flow_data.shape[1]:
+#     #         flow_vector = flow_data[:, j, i]
+#     #         end_x = int(x + flow_vector[0])
+#     #         end_y = int(y + flow_vector[1])
+#     #         cv2.arrowedLine(frame, (end_x, end_y), (x, y), (0, 255, 0), 1, tipLength=0.1)
+#     # poses = rearrange(flowpose[:2, frame_index], 'C V M -> (V M) C', C=2, V=25, M=2)
+#     skeleton_frame = poses[:, frame_index] # C V M
+#     flows = rearrange(flows[:, frame_index], 'C V M -> V M C', C=50, V=25, M=2)
+#     flows = np.mean(flows.reshape(2, 25, 2, 5, 5), axis=(3,4))*10
+
+#     frame_copy = frame.copy()
+#     for person_num, person in enumerate(skeleton_frame.transpose(2, 0, 1)):
+#         for keypoint_num, keypoint in enumerate(person.transpose(1, 0)):
+#             x, y = int(keypoint[0]), int(keypoint[1])
+#             if 0 in keypoint:
+#                 continue
+#             if person_num == 0:
+#                 cv2.arrowedLine(frame_copy, 
+#                                 (x, y), 
+#                                 (int(x+flows[person_num,keypoint_num,0]), int(y+flows[person_num,keypoint_num,1])), 
+#                                 (0, 255, 0), 
+#                                 5, 
+#                                 tipLength=1)
+#             else:
+#                 cv2.arrowedLine(frame_copy,
+#                                 (x, y), 
+#                                 (int(x+flows[person_num,keypoint_num,0]), int(y+flows[person_num,keypoint_num,1])), 
+#                                 (255, 0, 0), 
+#                                 5, 
+#                                 tipLength=1)
+#     return frame_copy
+
+
 # # Using video with two subjects
+# # video_name = "S001C001P001R001A001" # First video
 # video_name = "S001C003P008R001A050" # A good one!
 # # video_name = "S001C003P002R001A032"
 # # video_name = "S002C003P014R002A055"
@@ -195,78 +244,191 @@ from einops import rearrange
 # # Load the names of the skeleton files
 # skes_names = np.loadtxt("./data/ntu/statistics/ntu_rgbd-available.txt", dtype=str)
 # ske_number = list(skes_names).index(video_name)
+# print(ske_number)
 
 # # Example usage
 # video_path = f"../Datasets/NTU_RGBD/nturgb+d_rgb/{video_name}_rgb.avi"
 # pose_path = "./data/ntu/raw_data/raw_skes_data.pkl"
 # pose_denoised_path = "./data/ntu/denoised_data/raw_denoised_colors.pkl"
+# flowpose_path = 'data/ntu/S001C003P008R001A050_flowpose.npy'
 
 # with open(pose_denoised_path, "rb") as f:
 #     denoised_skes_data = pickle.load(f)
 
+# # Get the specific denoised skeleton
 # denoised = denoised_skes_data[ske_number]
-# denoised = denoised.transpose(3, 0, 2, 1)
+# denoised = denoised.transpose(3, 0, 2, 1) # C T V M
+
+# # Load the temporary flowpose path
+# # NOTE: This was found by getting the index of the skeleton video within the skes_names
+# # Then finding the specific index within the train or test set using the: 
+# # get_indices() function from seq_transformation.py, then extracting that specific array
+# # from the flowpose_aligned.npz
+# flowpose = np.load(flowpose_path)
+# flowpose = flowpose.reshape(300, 2, 25, 53)
+# flows = flowpose.transpose(3, 0, 2, 1)[3:, :denoised.shape[1],...] # C T V M
+
 # print('(C, T, V, M)')
-# print(denoised.shape)
+# print(f'Denoised skeletons: {denoised.shape}')
+# print(f'Flow: {flows.shape}')
 
 # # # Draw the skeleton on the frame
 # frame_with_skeleton = draw_skeleton_on_frame(video_path, denoised, frame_index=40)
+# frame_with_flowpose = draw_flow_windows(frame_with_skeleton, flows, denoised, frame_index=40)
 # cv2.imwrite("skeleton_from_denoised.png", frame_with_skeleton)
+# cv2.imwrite("skeleton_from_flowpose.png", frame_with_flowpose)
+
+
+# # ----------------------------------
+# # NTU-RGB+D Flowpose Visualisation
+# # ----------------------------------
+
+# flowpose_file = os.path.join('./data/ntu', 'aligned_data', 'MINI_CS_flowpose.npz')
+# flowpose_data = np.load(flowpose_file, allow_pickle=True)['x_train'] # (120, 300, 2650)
+
+# # Get a single frame
+# data = flowpose_data[0,0] # (2*25*C)
+# data = rearrange(data, '(M V C) -> M V C', M=2, V=25, C=53)
+
+# # Get the pose and flow data
+# person = data[0] # (25, 53)
+# poses = person[:, :3] # (25, 3)
+# flows = rearrange(person[:, 3:], 'K (C W H) -> K C W H',K=25,C=2, W=5, H=5) # (25, 2, 5, 5)
+
+# frame = np.zeros((240, 320))
+
+# def draw_flow_vectors(flow_data, frame, start_x, start_y):
+#     """
+#     Draws a group of optical flow vectors on the image.
+
+#     Parameters:
+#     flow_data (numpy.ndarray): The optical flow data.
+#     frame (numpy.ndarray): The image frame.
+#     start_x (int): The starting x-coordinate for the 5x5 region.
+#     start_y (int): The starting y-coordinate for the 5x5 region.
+#     size (int): The size of the region (default is 5).
+#     """
+#     # for i in range(int(-size/2), int(size/2)):
+#     #     for j in range(int(-size/2), int(size/2)):
+#     #         x = start_x + i
+#     #         y = start_y + j
+#     #         # if x < flow_data.shape[2] and y < flow_data.shape[1]:
+#     #         flow_vector = flow_data[:, j, i]
+#     #         end_x = int(x + flow_vector[0])
+#     #         end_y = int(y + flow_vector[1])
+#     #         cv2.arrowedLine(frame, (end_x, end_y), (x, y), (0, 255, 0), 1, tipLength=0.1)
+#     flow = np.mean(flow_data, axis=(1,2))
+#     cv2.arrowedLine(frame, (start_x, start_y), (int(start_x+flow[0]), int(start_y+flow[1])), (0, 255, 0), 5, tipLength=1)
+
+# # Draw the skeleton keypoints on the frame
+# for keypoint_number, keypoint in enumerate(poses):
+#     keypoint[0] = (keypoint[0]+0.5)*319
+#     keypoint[1] = (keypoint[1]+0.5)*239
+#     if 0 in keypoint:
+#         continue
+#     draw_flow_vectors(flows[keypoint_number],
+#                       frame, 
+#                       int(keypoint[0]), 
+#                       int(keypoint[1]))
+#     cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), 1, 255, -1)
+
+
+# plt.imshow(frame, cmap='gray')
+# plt.savefig('NTU_flowpose.png')
 
 
 # ----------------------------------
-# NTU-RGB+D Flowpose Visualisation
-# ----------------------------------
+# NTU-RGB+D Flow visualisation
+# ---------------------------------- 
+import cv2
+from torchvision.utils import flow_to_image
+# Filepaths for the three videos
+root_path = './data/visualisations/RAW'
 
-flowpose_file = os.path.join('./data/ntu', 'aligned_data', 'MINI_CS_flowpose.npz')
-flowpose_data = np.load(flowpose_file, allow_pickle=True)['x_train'] # (120, 300, 2650)
+flow_full = np.load(osp.join(root_path, 'FLOW_full-S001C003P008R001A050.npy'))
+flow_small = np.load(osp.join(root_path, 'FLOW_small-S001C003P008R001A050.npy'))
 
-# Get a single frame
-data = flowpose_data[0,0] # (2*25*C)
-data = rearrange(data, '(M V C) -> M V C', M=2, V=25, C=53)
+rgb_full = np.load(osp.join(root_path, 'RGB_full-S001C003P008R001A050.npy'))[1:]
+rgb_small = np.load(osp.join(root_path, 'RGB_small-S001C003P008R001A050.npy'))[1:]
 
-# Get the pose and flow data
-person = data[0] # (25, 53)
-poses = person[:, :3] # (25, 3)
-flows = rearrange(person[:, 3:], 'K (C W H) -> K C W H',K=25,C=2, W=5, H=5) # (25, 2, 5, 5)
+poses = np.load(osp.join(root_path,'POSE_small-S001C003P008R001A050.npy'))
+poses = poses[:,1:] # C, T-1, V, M
+C, T, V, M = poses.shape
+poses = rearrange(poses, 'C T V M -> T (M V) C', C=C, T=T, V=V, M=M)
 
-frame = np.zeros((240, 320))
-
-def draw_flow_vectors(flow_data, frame, start_x, start_y):
-    """
-    Draws a group of optical flow vectors on the image.
-
-    Parameters:
-    flow_data (numpy.ndarray): The optical flow data.
-    frame (numpy.ndarray): The image frame.
-    start_x (int): The starting x-coordinate for the 5x5 region.
-    start_y (int): The starting y-coordinate for the 5x5 region.
-    size (int): The size of the region (default is 5).
-    """
-    # for i in range(int(-size/2), int(size/2)):
-    #     for j in range(int(-size/2), int(size/2)):
-    #         x = start_x + i
-    #         y = start_y + j
-    #         # if x < flow_data.shape[2] and y < flow_data.shape[1]:
-    #         flow_vector = flow_data[:, j, i]
-    #         end_x = int(x + flow_vector[0])
-    #         end_y = int(y + flow_vector[1])
-    #         cv2.arrowedLine(frame, (end_x, end_y), (x, y), (0, 255, 0), 1, tipLength=0.1)
-    flow = np.mean(flow_data, axis=(1,2))
-    cv2.arrowedLine(frame, (start_x, start_y), (int(start_x+flow[0]), int(start_y+flow[1])), (0, 255, 0), 5, tipLength=1)
-
-# Draw the skeleton keypoints on the frame
-for keypoint_number, keypoint in enumerate(poses):
-    keypoint[0] = (keypoint[0]+0.5)*319
-    keypoint[1] = (keypoint[1]+0.5)*239
-    if 0 in keypoint:
-        continue
-    draw_flow_vectors(flows[keypoint_number],
-                      frame, 
-                      int(keypoint[0]), 
-                      int(keypoint[1]))
-    cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), 1, 255, -1)
+videos_full = [flow_full, rgb_full]
+videos_small = [flow_small, rgb_small]
 
 
-plt.imshow(frame, cmap='gray')
-plt.savefig('NTU_flowpose.png')
+def get_frame_count(video):
+    """Get the total number of frames in a video."""
+    return video.shape[0]
+
+def flow2image(flow_frame):
+    x, y = flow_frame[:,:,0], flow_frame[:,:,1]
+    hsv = np.zeros((flow_frame.shape[0], flow_frame.shape[1], 3), dtype = np.uint8)
+    ma, an = cv2.cartToPolar(x, y, angleInDegrees=True)
+    hsv[..., 0] = (an / 2).astype(np.uint8)
+    hsv[..., 1] = (cv2.normalize(ma, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)).astype(np.uint8)
+    hsv[..., 2] = 255
+    img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    return img
+
+def draw_skel(frame, pose): # Poses shape: (M V) C
+    if frame.shape[1] < 500:
+        pose[:,0] = pose[:,0]*(319/1919)
+        pose[:,1] = pose[:,1]*(239/1079)
+        circ_params = {'radius': 2, 'color':(0,0,255), 'thickness':2}
+    # Draw the skeleton keypoints on the frame
+    for keypoint in pose:
+        if 0 in keypoint:
+            continue
+        cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), 5, (0,0,255), 4)
+
+
+def display_videos(videos):
+    print('Viewport opening...')
+    # Initialize variables
+    current_video_index = 0
+    current_frame_index = 0
+    for no, vid in enumerate(videos):
+        videos[no] = np.transpose(vid, (0,2,3,1)) # TCHW -> THWC
+    show_skel = False
+    while True:
+        print(current_frame_index)
+        # print(current_frame_index)
+        # Get the current frame from the current video
+        frame = videos[current_video_index][current_frame_index]
+
+        # If the video is not RGB (e.g., flow or pose), normalize and convert to RGB
+        if frame.shape[-1] != 3:  # Channels-first format
+            # frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+            frame = flow2image(frame)
+        else:
+            frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_BGR2RGB)
+        
+        # If show_skel is toggled on, display skeleton 
+        if show_skel:
+            draw_skel(frame, pose=poses[current_frame_index])
+
+        # Display the frame
+        cv2.imshow("Video Player", frame.astype(np.uint8))
+        key = cv2.waitKey(0) & 0xFF  # Wait for a key press
+
+        if key == ord('q'):  # Quit
+            break
+        elif key == ord('l'):  # Next frame
+            if current_frame_index < get_frame_count(videos[current_video_index]) - 1:
+                current_frame_index += 1
+        elif key == ord('j'):  # Previous frame
+            if current_frame_index > 0:
+                current_frame_index -= 1
+        elif key == ord('i'):  # Switch video
+            current_video_index = (current_video_index + 1) % len(videos)
+            print(f"Switched to video {current_video_index + 1}")
+        elif key == ord('k'):
+            show_skel = not show_skel
+
+    cv2.destroyAllWindows()
+
+display_videos(videos_small)
