@@ -23,3 +23,36 @@ NOTE: You must add this folder to your PYTHONPATH
 ```
 export PYTHONPATH="${PYTHONPATH}:/path/to/this/folder/MS-G3D"
 ```
+
+## NTU RGB+D / NTU RGB+D120 Extract
+For each dataset, the following files will need to be run in this order:
+| File | Time | Memory | CUDA |
+| --- | --- | --- | --- |
+| `get_raw_skes_data.py` | 1.5 hours | 10g? | ❌ |
+| `get_raw_denoised_data.py` | 20 minutes | 6g | ❌ |
+| `get_flowpose_samples.py` (0-20000,20000-40000,40000-60000) | 8.5 hours | 25g | ✔ |
+| the code block below (to combine each extraction) | 10 minutes | 75g | ❌ |
+| `seq_transformation.py` | 2 hours | 450g? | ❌ |
+
+```python
+dataset = 'ntu120'
+data_path = f'./data/{dataset}/flow_data'
+files = os.listdir(data_path)
+files.sort()
+
+flow_data = []
+
+# Iterate over the files
+for file in files:
+    print(f'Appending {file}')
+    with open(osp.join(in_path,file), 'rb') as fr:  # load raw skeletons data
+        data = pickle.load(fr)
+    
+    for sample in data:
+        flow_data.append(sample)
+    print(f'Flow data samples: {len(flow_data)}')
+
+
+with open(osp.join(data_path, 'flow_data.pkl'), 'wb') as f:
+    pickle.dump(flow_data, f, pickle.HIGHEST_PROTOCOL)
+```

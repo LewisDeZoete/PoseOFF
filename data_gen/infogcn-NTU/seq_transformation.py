@@ -1,29 +1,30 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License.
+# # Copyright (c) Microsoft Corporation. All rights reserved.
+# # Licensed under the MIT License.
 import sys
 import os
 import os.path as osp
-
-# # add lib to path
-curr_dir = osp.dirname(osp.abspath(__file__))
-sys.path.insert(0, osp.abspath(osp.join(curr_dir, '../..')))
-
 import numpy as np
 import pickle
 import yaml
-# import logging
-# from sklearn.model_selection import train_test_split
 from data_gen.utils import create_aligned_dataset
+import argparse
+
+parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
+parser.add_argument('--dataset',dest='dataset', default='ntu', help='Dataset, either `ntu` or `ntu120` (default=ntu)')
+parser.add_argument('--flow', action='store_true', help='If passed, add flow to the pose array') 
+parser.add_argument('--realign', action='store_true', help='Reprocess the aligned data (store_true)')
+args = parser.parse_args()
+dataset = args.dataset
 
 # Paths
-root_path = './data/ntu'
+root_path = f'./data/{dataset}'
 save_path = osp.join(root_path, 'aligned_data')
 stat_path = osp.join(root_path, 'statistics')
-# Info files and folders
-skes_name_file = osp.join(stat_path, 'ntu_rgbd-available.txt')
-frames_file = osp.join(stat_path, 'frames_cnt.txt')
 denoised_path = osp.join(root_path, 'denoised_data')
 flow_path = osp.join(root_path, 'flow_data')
+# Info files and folders
+skes_name_file = osp.join(stat_path, f'ntu_rgbd{120 if dataset == "ntu120" else ""}-available.txt')
+frames_file = osp.join(stat_path, 'frames_cnt.txt')
 # Files
 raw_skes_joints_pkl = osp.join(denoised_path, 'raw_denoised_joints.pkl')
 raw_flow_joints_pkl = osp.join(flow_path, 'flow_data.pkl')
@@ -31,6 +32,7 @@ raw_flowpose_pkl = osp.join(flow_path, 'raw_flowpose_data.pkl')
 
 if not osp.exists(save_path):
     os.mkdir(save_path)
+
 
 def get_details(skes_name):
     details: dict = {} # Create and populate details dict
@@ -166,7 +168,8 @@ def one_hot_vector(labels):
 def split_dataset(joints, details, evaluation, save_path, data_type='pose'):
     train_indices, test_indices = get_indices(
         details['Performer'], 
-        details['Camera'], 
+        details['Camera'],
+        details['Setup'],
         evaluation)
 
     # Save labels and num_frames for each sequence of each data set
@@ -183,7 +186,7 @@ def split_dataset(joints, details, evaluation, save_path, data_type='pose'):
 
 
 
-def get_indices(performer, camera, evaluation='CS'):
+def get_indices(performer, camera, setup, evaluation='CS'):
     test_indices = np.empty(0)
     train_indices = np.empty(0)
 
@@ -202,7 +205,23 @@ def get_indices(performer, camera, evaluation='CS'):
         for train_id in train_ids:
             temp = np.where(performer == train_id)[0]  # 0-based index
             train_indices = np.hstack((train_indices, temp)).astype(int)
-    else:  # Cross View (Camera IDs)
+    elif evaluation == 'CSub': # Cross Subject (NTU120)
+        train_ids = [1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28,
+                     31, 34, 35, 38, 45, 46, 47, 49, 50, 52, 53, 54, 55, 56, 57,
+                     58, 59, 70, 74, 78, 80, 81, 82, 83, 84, 85, 86, 89, 91, 92,
+                     93, 94, 95, 97, 98, 100, 103]
+        test_ids = [i for i in range(1, 107) if i not in train_ids]
+
+        # Get indices of test data
+        for idx in test_ids:
+            temp = np.where(performer == idx)[0]  # 0-based index
+            test_indices = np.hstack((test_indices, temp)).astype(int)
+
+        # Get indices of training data
+        for train_id in train_ids:
+            temp = np.where(performer == train_id)[0]  # 0-based index
+            train_indices = np.hstack((train_indices, temp)).astype(int)
+    elif evaluation == 'CV':  # Cross View (Camera IDs)
         train_ids = [2, 3]
         test_ids = 1
         # Get indices of test data
@@ -214,6 +233,19 @@ def get_indices(performer, camera, evaluation='CS'):
             temp = np.where(camera == train_id)[0]  # 0-based index
             train_indices = np.hstack((train_indices, temp)).astype(int)
 
+    elif evaluation == 'CSet': # Cross Setup (NTU120)
+        train_ids = [i for i in range(1, 33) if i % 2 == 0]  # Even setup
+        test_ids = [i for i in range(1, 33) if i % 2 == 1]  # Odd setup
+
+        # Get indices of test data
+        for test_id in test_ids:
+            temp = np.where(setup == test_id)[0]  # 0-based index
+            test_indices = np.hstack((test_indices, temp)).astype(int)
+
+        # Get indices of training data
+        for train_id in train_ids:
+            temp = np.where(setup == train_id)[0]  # 0-based index
+            train_indices = np.hstack((train_indices, temp)).astype(int)
     return train_indices, test_indices
 
 
@@ -237,72 +269,92 @@ def concat_flowpose(skes_joints, flow_joints):
 
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
-    parser.add_argument('--flow', action='store_true', help='If passed, add flow to the pose array') 
-    parser.add_argument('--realign', action='store_true', help='Reprocess the aligned data (store_true)')
-    args = parser.parse_args()
+    evaluations = ['CS', 'CV'] if dataset == 'ntu' else ['CSub', 'CSet']
 
+    # Load data statistics
+    frames_cnt = np.loadtxt('./data/ntu/statistics/frames_cnt.txt', dtype=int)
+    skes_name = np.loadtxt('./data/ntu/statistics/ntu_rgbd-available.txt', dtype=str)
+    if dataset=='ntu120':
+        frames_cnt = np.hstack((frames_cnt, np.loadtxt(frames_file, dtype=int)))
+        skes_name = np.hstack((skes_name, np.loadtxt(skes_name_file, dtype=str)))
+    details = get_details(skes_name)
+
+    print(f'Dataset: {dataset}')
     if args.realign:
-        # Load data statistics
-        frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
-        skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
-        details = get_details(skes_name)
+        print('Realigning dataset')
+    if args.flow:
+        print('Processing optical flow data\n')
 
-        # Create the annotations file for ntu-rgbd
-        annotations = {}
-        for idx, ske_name in enumerate(skes_name):
-            annotations[ske_name] = int(details['Label'][idx])
-        with open(osp.join(stat_path, 'ntu-rgbd-annotations.yaml'), 'w') as file:
-            yaml.dump(annotations, file)
+    for evaluation in evaluations:
+        train_indices, test_indices = get_indices(
+            details['Performer'], 
+            details['Camera'], 
+            details['Setup'],
+            evaluation)
+        print(f'\tTrain indices length: {len(train_indices)}')
+        print(f'\tTest indices length: {len(test_indices)}')
+        print(f'Total skes names: {len(skes_name)}\n')
+
+    # # If this realign=True, align the flow and pose data and save it
+    # if args.realign:
+    #     # Load data statistics
+    #     frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
+    #     skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
+    #     details = get_details(skes_name)
+    #     # # Create (or recreate) the annotations file for the dataset
+    #     # # TODO: Do I need to create these annotations here, or earlier?
+    #     # annotations = {}
+    #     # for idx, ske_name in enumerate(skes_name):
+    #     #     annotations[ske_name] = int(details['Label'][idx])
+    #     # with open(osp.join(stat_path, 'ntu-rgbd-annotations.yaml'), 'w') as file:
+    #     #     yaml.dump(annotations, file)
         
-        # Load the raw data
-        with open(raw_skes_joints_pkl, 'rb') as fr:
-            skes_joints = pickle.load(fr)  # a list
-        # Also load the flow if we pass the argument!
-        if args.flow:
-            with open(raw_flow_joints_pkl, 'rb') as fr:
-                flow_joints = pickle.load(fr)
-            print(f'Flow joints dtype: {flow_joints[0].dtype}', flush=True)
-        else:
-            flow_joints = None
-        print(f'Loaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences', flush=True)
+    #     # Load the raw data
+    #     with open(raw_skes_joints_pkl, 'rb') as fr:
+    #         skes_joints = pickle.load(fr)  # a list
+    #     # Also load the flow if we pass the argument!
+    #     if args.flow:
+    #         with open(raw_flow_joints_pkl, 'rb') as fr:
+    #             flow_joints = pickle.load(fr)
+    #         print(f'Flow joints dtype: {flow_joints[0].dtype}', flush=True)
+    #     else:
+    #         flow_joints = None
+    #     print(f'Loaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences', flush=True)
 
-        # Translates the sequence to a new origin first non-zero frame of the first actor
-        skes_joints = seq_translation(skes_joints, flow_joints)
+    #     # Translates the sequence to a new origin first non-zero frame of the first actor
+    #     skes_joints = seq_translation(skes_joints, flow_joints)
 
-        # Aligned to the same frame length
-        skes_joints = align_frames(skes_joints, frames_cnt)
-        if args.flow:
-            flow_joints = align_frames(flow_joints, frames_cnt, MVC=2500)
-            print(f'Full flow sequence shape: {flow_joints.shape}', flush=True)
-            print(f'Full skeleton sequence shape: {skes_joints.shape}', flush=True)
-            flow_joints = concat_flowpose(skes_joints, flow_joints)
-            print(f'Full flowpose sequence shape: {flow_joints.shape}', flush=True)
-            with open(raw_flowpose_pkl, 'wb') as f:
-                pickle.dump(flow_joints, f, pickle.HIGHEST_PROTOCOL)
+    #     # Aligned to the same frame length
+    #     skes_joints = align_frames(skes_joints, frames_cnt)
+    #     if args.flow:
+    #         flow_joints = align_frames(flow_joints, frames_cnt, MVC=2500)
+    #         print(f'Full flow sequence shape: {flow_joints.shape}', flush=True)
+    #         print(f'Full skeleton sequence shape: {skes_joints.shape}', flush=True)
+    #         flow_joints = concat_flowpose(skes_joints, flow_joints)
+    #         print(f'Full flowpose sequence shape: {flow_joints.shape}', flush=True)
+    #         with open(raw_flowpose_pkl, 'wb') as f:
+    #             pickle.dump(flow_joints, f, pickle.HIGHEST_PROTOCOL)
         
-        print(f'Flowpose approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
-        # Generate train-test splits and save the data
-        evaluations = ['CS', 'CV']
-        file_list = []
-        for evaluation in evaluations:
-            split_dataset(skes_joints, details, evaluation, save_path, data_type='pose')
-            print(f'Saved pose {evaluation}', flush=True)
-            file_list.append(osp.join(save_path, f'NTU60_{evaluation}-pose.npz'))
-            # If flow arg is passed, also split the flowpose dataset
-            if args.flow:
-                split_dataset(flow_joints, details, evaluation, save_path, data_type='flowpose')
-                print(f'Saved flowpose {evaluation}', flush=True)
-                file_list.append(osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz'))
+    #     print(f'Flowpose approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
+    #     # Generate train-test splits and save the data
+    #     file_list = []
+    #     for evaluation in evaluations:
+    #         split_dataset(skes_joints, details, evaluation, save_path, data_type='pose')
+    #         print(f'Saved pose {evaluation}', flush=True)
+    #         file_list.append(osp.join(save_path, f'NTU60_{evaluation}-pose.npz'))
+    #         # If flow arg is passed, also split the flowpose dataset
+    #         if args.flow:
+    #             split_dataset(flow_joints, details, evaluation, save_path, data_type='flowpose')
+    #             print(f'Saved flowpose {evaluation}', flush=True)
+    #             file_list.append(osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz'))
     
-    else:
-        file_list = []
-        file_list += [osp.join(save_path, f'NTU60_{evaluation}-pose.npz') for evaluation in ['CS', 'CV']]
-        if args.flow:
-            file_list += [osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz') for evaluation in ['CS', 'CV']]
-        print(file_list, flush=True)
+    # else:
+    #     file_list = []
+    #     file_list += [osp.join(save_path, f'NTU60_{evaluation}-pose.npz') for evaluation in evaluations]
+    #     if args.flow:
+    #         file_list += [osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz') for evaluation in evaluations]
+    #     print(file_list, flush=True)
 
-    # Create the aligned dataset
-    create_aligned_dataset(file_list=file_list)
-    print('Aligned datasets created successfully!', flush=True)
+    # # Create the aligned dataset
+    # create_aligned_dataset(file_list=file_list)
+    # print('Aligned datasets created successfully!', flush=True)

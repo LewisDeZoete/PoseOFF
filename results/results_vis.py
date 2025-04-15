@@ -1,14 +1,23 @@
 import matplotlib.pyplot as plt
 import torch
 import numpy as np
+import os.path as osp
 
-dataset = 'nturgbd'
-evaluation = 'CV'
+# dataset = 'nturgbd'
+# evaluation = 'CS'
+dataset = 'ucf101'
+evaluation = ''
 
-checkpoint_base_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_base.pt'
-checkpoint_abs_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_abs.pt'
-checkpoint_avg_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_avg.pt'
-checkpoint_cnn_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_cnn.pt'
+if dataset == 'ucf101':
+    checkpoint_base_path = f'results/{dataset}/infogcn_base.pt'
+    checkpoint_abs_path = f'results/{dataset}/infogcn_abs.pt'
+    checkpoint_avg_path = f'results/{dataset}/infogcn_avg.pt'
+    checkpoint_cnn_path = f'results/{dataset}/infogcn_cnn.pt'
+else:
+    checkpoint_base_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_base.pt'
+    checkpoint_abs_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_abs.pt'
+    checkpoint_avg_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_avg.pt'
+    checkpoint_cnn_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_cnn.pt'
 checkpoint_base = torch.load(checkpoint_base_path, map_location='cpu')
 checkpoint_abs = torch.load(checkpoint_abs_path, map_location='cpu')
 checkpoint_avg = torch.load(checkpoint_avg_path, map_location='cpu')
@@ -24,8 +33,15 @@ x = results_base['epoch']
 
 # Evaluation string and Dataset string dictionaries for plot titles
 eval_str_dict = {'CS': 'Cross Subject', 'CV': 'Cross View'}
-dataset_str_dict = {'nturgbd': 'NTU RGB+D', 'nturgbd120': 'NTU RGB+D 120'}
-print(f'Plotting results for {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]} evaluation')
+dataset_str_dict = {'nturgbd': 'NTU RGB+D', 'nturgbd120': 'NTU RGB+D 120', 'ucf101':'UCF-101'}
+if dataset == 'ucf101':
+    fig_title = f'{dataset_str_dict[dataset]}'
+    save_root = f'results/plots/{dataset}/'
+    print(f'Plotting results for {dataset_str_dict[dataset]}')
+else:
+    fig_title = f'{dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}'
+    save_root = f'results/plots/{dataset}-{evaluation}/'
+    print(f'Plotting results for {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]} evaluation')
 
 # # ------------------------------
 # #   Loss comparison graphing
@@ -33,42 +49,41 @@ print(f'Plotting results for {dataset_str_dict[dataset]} - {eval_str_dict[evalua
 
 # # Plot the results
 # fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(25,7))
-# fig.suptitle(f'Loss Comparison - {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}', fontsize=30)
+# fig.suptitle(f'Loss Comparison - {fig_title}', fontsize=30)
 # for ax in (ax1, ax2, ax3):
 #     ax.tick_params(axis='both', which='major', labelsize=20)
 #     ax.set_xlabel('Epoch', fontsize=20)
 # ax1.set_ylabel('Loss', fontsize=20)
 
 # # Plot class loss
-# ax1.title.set_text('Classification Loss', )
+# ax1.set_title('Classification Loss', fontsize = 25)
 # ax1.plot(x, results_base['train_cls_loss'], label='Base', color='tab:olive')
-# ax1.plot(x, results_abs['train_cls_loss'], label='Flow magnitude averaged', color='tab:green')
-# ax1.plot(x, results_avg['train_cls_loss'], label='Average flow direction (x,y)', color='tab:pink')
-# ax1.plot(x, results_cnn['train_cls_loss'], label='CNN', color='tab:blue')
+# ax1.plot(x, results_abs['train_cls_loss'], label='Absolute flow', color='tab:green')
+# ax1.plot(x, results_avg['train_cls_loss'], label='Average flow', color='tab:pink')
+# ax1.plot(x, results_cnn['train_cls_loss'], label='CNN learning', color='tab:blue')
 # ax1.legend()
 
 # # Plot feature loss
-# ax2.title.set_text('Feature Loss')
+# ax2.set_title('Feature Loss', fontsize = 25)
 # ax2.plot(x, results_base['train_feature_loss'], label='Base', color='tab:olive')
-# ax2.plot(x, results_abs['train_feature_loss'], label='Flow magnitude averaged', color='tab:green')
-# ax2.plot(x, results_avg['train_feature_loss'], label='Average flow direction (x,y)', color='tab:pink')
+# ax2.plot(x, results_abs['train_feature_loss'], label='Absolute flow', color='tab:green')
+# ax2.plot(x, results_avg['train_feature_loss'], label='Average flow', color='tab:pink')
 # ax2.plot(x, results_cnn['train_feature_loss'], label='CNN', color='tab:blue')
 
 # # Plot reconstruction loss
-# ax3.title.set_text('Reconstruction Loss')
+# ax3.set_title('Reconstruction Loss', fontsize = 25)
 # ax3.plot(x, results_base['train_recon_loss'], label='Base', color='tab:olive')
-# ax3.plot(x, results_abs['train_recon_loss'], label='Flow magnitude averaged', color='tab:green')
-# ax3.plot(x, results_avg['train_recon_loss'], label='Average flow direction (x,y)', color='tab:pink')
+# ax3.plot(x, results_abs['train_recon_loss'], label='Average flow', color='tab:green')
+# ax3.plot(x, results_avg['train_recon_loss'], label='Average flow', color='tab:pink')
 # ax3.plot(x, results_cnn['train_recon_loss'], label='CNN', color='tab:blue')
 
 # plt.tight_layout()
-# plt.savefig(f'results/plots/{dataset}-{evaluation}/loss/Loss_comparison.png')
+# plt.savefig(osp.join(save_root,'loss_comparison/Loss_comparison.png'))
 
 
 # ------------------------------
 #   Accuracy comparison graphing
 # ------------------------------
-
 
 # Convert results to percentage
 def to_percentage(result):
@@ -76,34 +91,39 @@ def to_percentage(result):
 
 # Plot the results
 fig, (ax1,ax2) = plt.subplots(1,2, figsize=(20,8))
-fig.suptitle(f'Accuracy Comparison - {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}', fontsize=30)
+fig.suptitle(f'Accuracy Comparison - {fig_title}', fontsize=30)
 for ax in (ax1, ax2):
     ax.tick_params(axis='both', which='major', labelsize=20)
     ax.set_xlabel('Epoch', fontsize=20)
     ax.set_ylim(0, 100) # 0-100% accuracy
-    ax.set_xlim(0, 70)  # 0-60 epochs
+    ax.set_xlim(0, 70)  # 0-70 epochs
     ax.axvline(x=50, color='black', linestyle='--', alpha=0.2, label='LR=0.01')  # Epoch 40
     ax.axvline(x=60, color='black', linestyle='--', alpha=0.2, label='LR=0.001')  # Epoch 40
     # ax.set_xscale('log')
-ax1.set_ylabel('Area Under Curve (Accuracy %)', fontsize=20)
+ax1.set_ylabel('Classification Accuracy %', fontsize=20)
 
-# Plot train AUC
+# Plot train Accuracy
 ax1.plot(x, to_percentage(results_base['train_AUC']), label='Base', color='tab:olive')
-ax1.plot(x, to_percentage(results_abs['train_AUC']), label='Flow magnitude averaged', color='tab:green')
-ax1.plot(x, to_percentage(results_avg['train_AUC']), label='Average flow direction (x,y)', color='tab:pink')
+ax1.plot(x, to_percentage(results_abs['train_AUC']), label='Absolute flow', color='tab:green')
+ax1.plot(x, to_percentage(results_avg['train_AUC']), label='Average flow', color='tab:pink')
 ax1.plot(x, to_percentage(results_cnn['train_AUC']), label='CNN', color='tab:blue')
-ax1.set_title('Train AUC', fontsize=25)
+ax1.set_title('Train accuracy', fontsize=25)
 ax1.legend()
 
-# Plot test AUC
+# Plot test Accuracy
 ax2.plot(x, to_percentage(results_base['test_AUC']), label='Base', color='tab:olive')
-ax2.plot(x, to_percentage(results_abs['test_AUC']), label='Flow magnitude averaged', color='tab:green')
-ax2.plot(x, to_percentage(results_avg['test_AUC']), label='Average flow direction (x,y)', color='tab:pink')
+ax2.plot(x, to_percentage(results_abs['test_AUC']), label='Absolute flow', color='tab:green')
+ax2.plot(x, to_percentage(results_avg['test_AUC']), label='Average flow', color='tab:pink')
 ax2.plot(x, to_percentage(results_cnn['test_AUC']), label='CNN', color='tab:blue')
-ax2.set_title('Test AUC', fontsize=22)
+ax2.set_title('Test accuracy', fontsize=25)
 
-plt.savefig(f'results/plots/{dataset}-{evaluation}/accuracy/AUC_comparison.png')
+for name, results in {'Base': results_base, 
+                      'Absolute': results_abs, 
+                      'Average': results_avg, 
+                      'CNN': results_cnn}.items():
+    print(f"{name}: {max(to_percentage(results['test_AUC'])):.2f}%")
 
+plt.savefig(osp.join(save_root,'accuracy/Acc_comparison.png'))
 
 # # ------------------------------
 # #   Individual loss graphing
@@ -130,8 +150,8 @@ plt.savefig(f'results/plots/{dataset}-{evaluation}/accuracy/AUC_comparison.png')
 # for statistic in statistics:
 #     # Plot each statistic's loss with comparison to base
 #     fig, ax = plt.subplots( figsize=(10, 10))
-#     # ax.set_title('Classification loss - Base comparison\nTrain', fontsize=20)
-#     ax.set_title(f'{statistic_str_dict[statistic]} - Base comparison (Train)\n{dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}', fontsize=20)
+#     # ax.set_title(f'{statistic_str_dict[statistic]} - Base comparison (Train)\n{dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}', fontsize=20)
+#     ax.set_title(f'{statistic_str_dict[statistic]} - Base comparison (Train)\n{dataset_str_dict[dataset]}', fontsize=20) # UCF101
 #     ax.tick_params(axis='both', which='major', labelsize=15)
 #     ax.set_xlabel('Epoch', fontsize=15)
 #     ax.set_ylabel('Loss', fontsize=15)
@@ -151,7 +171,8 @@ plt.savefig(f'results/plots/{dataset}-{evaluation}/accuracy/AUC_comparison.png')
 #     "\nLoss=$\\frac{\\text{Model loss} - \\text{Base model loss}}{\\text{Base model loss}}$"
 #     fig.text(.5, .03, caption, ha='center', fontsize=10)
 
-#     plt.savefig(f'results/plots/{dataset}-{evaluation}/loss_comparisons/{statistic}-base_comparison.png')
+#     # plt.savefig(f'results/plots/{dataset}-{evaluation}/loss_individual/{statistic}-base_comparison.png')
+#     plt.savefig(f'results/plots/{dataset}/loss_individual/{statistic}-base_comparison.png')
 
 
 # # ------------------------------

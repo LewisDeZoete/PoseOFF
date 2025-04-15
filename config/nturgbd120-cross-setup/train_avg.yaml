@@ -1,26 +1,20 @@
 # Feeder
-feeder: feeders.feeder.Feeder
+feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
-  data_path: ./data/UCF-101/flowpose/
-  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
-  modality: flowpose
+  data_path: ./data/ntu120/aligned_data/NTU120_CS-flowpose_aligned.npz
+  label_path: ./data/ntu120/statistics/ntu-rgbd120-annotations.yaml
   p_interval: [0.5, 1]
-  random_shift: True
   random_choose: True
+  random_shift: True
   window_size: 64
   random_move: True
   random_rot: True
-  average_flow: False
-  absolute_flow: 
-    window_mean: True # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
+  average_flow: True # model_args.flow_channels = 2
+  absolute_flow: False
+    # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: False
 
 extractor:
-  data_paths:
-    rgb_path: ../Datasets/UCF-101/
-    pose_path: ./data/UCF-101/pose/
-    flow_path: ./data/UCF-101/flow/
-    flowpose_path: ./data/UCF-101/flowpose/
   preprocessed: True
   pose: 
     weights: pretrained_models/yolo11x-pose.pt
@@ -36,12 +30,12 @@ extractor:
 # model
 model: model.infogcn2.sode.SODE
 model_args:
-  num_class: 101
-  num_point: 17
+  num_class: 60
+  num_point: 25
   num_person: 2
-  graph: graph.yolo_pose.Graph
+  graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 1 
+  flow_channels: 2
   embed_channels: 64
   num_head: 3
   ode_method: euler
@@ -83,4 +77,4 @@ test_batch_size: 256
 half: False
 
 checkpoint_freq: 10 # how often to save the model and training state
-save_location: ./results/infogcn2/ # where to save the checkpoints
+save_location: ./results/nturgbd120/CSet/ # where to save the checkpoints

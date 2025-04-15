@@ -5,23 +5,42 @@ import pickle
 from einops import rearrange
 import yaml
 
-root_path = './data/ntu'
-save_path = osp.join(root_path, 'aligned_data')
-stat_path = osp.join(root_path, 'statistics')
+in_path = './data/ntu120/flowpose_data'
+out_path = './data/ntu120/flow_data'
+files = os.listdir('./data/ntu120/flowpose_data')
+files.sort()
 
-with open(osp.join(stat_path, 'ntu_rgbd-available.txt'), 'r') as f:
-    skes_names = f.read().splitlines()
+flow_data = []
 
-with open(osp.join(stat_path, 'frames_cnt.txt'), 'r') as f:
-    frames_cnt = f.read().splitlines()
+# Iterate over the files
+for file in files:
+    print(f'Appending {file}')
+    with open(osp.join(in_path,file), 'rb') as fr:  # load raw skeletons data
+        data = pickle.load(fr)
+    
+    for sample in data:
+        flow_data.append(sample)
+    print(f'Flow data samples: {len(flow_data)}')
 
-file_paths = [osp.join(save_path, f'NTU60_{evaluation}-flowpose_aligned.npz') for evaluation in ['CS', 'CV']]
 
-file = osp.join(save_path, 'NTU60_CV-flowpose_aligned.npz')
-org_data = np.load(file)
-chosen_video = org_data['x_train'][19730]
-print(chosen_video.shape)
-np.save('S001C003P008R001A050_flowpose.npy', chosen_video)
+with open(osp.join(out_path, 'flow_data.pkl'), 'wb') as f:
+    pickle.dump(flow_data, f, pickle.HIGHEST_PROTOCOL)
+
+
+
+# root_path = './data/ntu120'
+# save_path = osp.join(root_path, 'aligned_data')
+# stat_path = osp.join(root_path, 'statistics')
+
+# with open(osp.join(stat_path, 'ntu_rgbd120-available.txt'), 'r') as f:
+#     skes_names = f.read().splitlines()
+
+# class_dict = {}
+# for name in skes_names:
+#     class_dict[name] = int(name[-3:])
+
+# with open(osp.join(stat_path, 'ntu_rgbd120-annotations.yaml'), 'w') as f:
+#     yaml.dump(class_dict, f)
 
 # for file in file_paths:
 #     # print(osp.join(save_path, f"MINI_{file.split('_')[2].split('-')[0]}_flowpose"))

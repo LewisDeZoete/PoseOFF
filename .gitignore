@@ -1,9 +1,3 @@
-# Created by .ignore support plugin (hsz.mobi)
-
-.idea/
-runs/
-work_dir/
-
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -108,7 +102,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# ignore .skeleton files
+# .skeleton files
 *.skeleton
 
 # Pytorch checkpoint files
@@ -123,3 +117,6 @@ venv.bak/
 
 # NTU datafiles
 actors_info/
+
+# plots images (can always be regenerated)
+*/plots

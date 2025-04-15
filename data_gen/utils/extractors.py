@@ -168,7 +168,8 @@ class FlowPoseSampler:
                  loop: bool = True,
                  norm: bool = False,
                  match_pose: bool = True,
-                 ntu: bool = False):
+                 ntu: bool = False,
+                 debug_vis: bool = False):
         self.window_size = window_size  # Window size about pose keypoint
         self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
@@ -179,6 +180,7 @@ class FlowPoseSampler:
         if match_pose:
             self.pose_match = pose_match
         self.ntu = ntu
+        self.debug_vis = debug_vis
 
     def __call__(self, flows, poses):
         """
@@ -241,11 +243,9 @@ class FlowPoseSampler:
                     
                     stacker[:, frame_no, keypoint_num] = flow_window.flatten()
         
-        if self.ntu:
+        if self.ntu and not self.debug_vis:
             # NOTE: NTU does not return keypoint x,y,z coordinates
-            print(stacker.shape)
             flow_pose = stacker.reshape(stacker.shape[0], *poses.shape[1:])
-            print(flow_pose.shape)
         else:
             # Concatenate poses with computed flow
             flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)

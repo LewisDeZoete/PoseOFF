@@ -16,6 +16,8 @@ parser.add_argument(
 args = parser.parse_args()
 dataset = args.dataset
 
+assert dataset in ['ntu', 'ntu120'] # Make sure the dataset variable is correct!
+
 print(f'Processing raw denoised skeletons for {dataset} dataset...')
 
 root_path = f'./data/{dataset}'

@@ -12,11 +12,11 @@ from feeders import tools
 
 class Feeder(Dataset):
     """
+    TODO: Based on `split` input, split the data based on the 3 train/test splits outlined in the .txt files in the dataset folder
     Feeder class for loading and processing dataset.
 
     Attributes:
-        data_paths (dict): Dictionary containing paths to data files.
-        data_path (str): Path to the specific modality data.
+        data_path (str): Path to flowpose data.
         label_path (str): Path to the label file.
         labels (dict): Dictionary containing the labels of the dataset.
         split (str): Indicates whether the dataset is for training or testing.
@@ -43,27 +43,27 @@ class Feeder(Dataset):
 
     def __init__(
         self,
-        data_paths,
-        label_path,
-        labels,
-        modality,
+        data_path,
+        label_path=None,
+        labels=None,
         split="train",
-        p_interval=[0.95],
         random_choose=False,
         random_shift=False,
-        window_size=64,
         random_move=False,
         random_rot=False,
+        p_interval=[0.95],
+        window_size=64,
         average_flow=False,
         absolute_flow=False,
         no_flow=False,
+        normalisation=False,
         use_mmap=False,
         vel=False,
         sort=False,
         A=None,
     ):
-        self.data_paths = data_paths
-        self.data_path = self.data_paths[f"{modality}_path"]
+        self.data_path = data_path
+        # self.data_path = self.data_paths[f"{modality}_path"]
         self.label_path = label_path
         self.labels = labels
         if split not in ["train", "val", "test"]:
@@ -184,8 +184,8 @@ if __name__ == "__main__":
 
     start = time.time()
     for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
-        if epoch == 10:
-            break
+        break
+            
 
     print(f"\nTotal samples: {len(feeder)}")
     print(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")

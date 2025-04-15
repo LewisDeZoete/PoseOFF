@@ -143,6 +143,7 @@ def run_epoch(
         log_recon_loss.update(recon_loss.data.item(), B)
         # loggers['kl_div'].update(kl_div.data.item(), B)
 
+        # TODO: RENAME AUC it the average classification accuracy over the 10 cls_heads of SODE
         AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
         # tbar.set_description(
         #     f"[Epoch #{epoch}] "

@@ -1,0 +1,165 @@
+Could not file label file: './data/ntu120/statistics/ntu-rgbd120-annotations.yaml'
+Creating empty labels dictionary
+Processing flowpose samples for ntu120 dataset...
+Found 57367 available skeleton files.
+
+	Frames dropped for S029C003P008R002A113: 13
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P041R001A094: 15
+	Frames dropped for S029C003P043R001A093: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P043R001A094: 7
+	Frames dropped for S029C003P043R001A095: 10
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P043R001A101: 59
+	Frames dropped for S029C003P043R001A104: 34
+	Frames dropped for S029C003P043R001A116: 4
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P044R001A065: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P044R002A109: 7
+	Frames dropped for S029C003P048R001A077: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P048R001A084: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P048R002A077: 22
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P048R002A093: 38
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P049R001A063: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P049R001A064: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P049R002A120: 21
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P051R001A101: 13
+	Frames dropped for S029C003P051R002A119: 42
+	Frames dropped for S029C003P074R002A108: 15
+	Frames dropped for S029C003P074R002A114: 6
+	Frames dropped for S029C003P074R002A116: 67
+		Frame 0 in skip list, add blank frame to poses
+Processed 40000-40999 in 1219.93 seconds
+	Frames dropped for S029C003P075R001A092: 23
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P075R001A119: 40
+	Frames dropped for S029C003P075R002A108: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P075R002A116: 41
+	Frames dropped for S029C003P080R001A078: 9
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P080R001A085: 6
+	Frames dropped for S029C003P080R001A089: 4
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P080R001A117: 23
+	Frames dropped for S029C003P088R001A066: 20
+	Frames dropped for S029C003P088R001A080: 13
+	Frames dropped for S029C003P088R002A066: 39
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P089R001A076: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P089R001A081: 47
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P089R001A109: 33
+	Frames dropped for S029C003P090R002A080: 31
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P090R002A117: 4
+	Frames dropped for S030C001P041R001A092: 1
+Processed 41000-41999 in 1139.49 seconds
+	Frames dropped for S030C001P043R002A092: 46
+	Frames dropped for S030C001P075R001A114: 10
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S030C001P088R001A092: 35
+Processed 42000-42999 in 816.98 seconds
+	Frames dropped for S030C001P093R001A119: 10
+	Frames dropped for S030C001P095R001A114: 11
+	Frames dropped for S030C001P096R001A092: 23
+Processed 43000-43999 in 922.10 seconds
+	Frames dropped for S030C002P041R002A119: 36
+	Frames dropped for S030C002P067R002A119: 24
+	Frames dropped for S030C002P075R001A119: 31
+	Frames dropped for S030C002P081R002A119: 16
+Processed 44000-44999 in 951.12 seconds
+	Frames dropped for S030C002P088R001A092: 19
+	Frames dropped for S030C002P092R002A119: 20
+	Frames dropped for S030C002P093R002A114: 4
+	Frames dropped for S030C002P095R002A119: 14
+Processed 45000-45999 in 948.40 seconds
+	Frames dropped for S030C003P041R001A092: 46
+	Frames dropped for S030C003P041R001A114: 31
+	Frames dropped for S030C003P041R001A119: 46
+	Frames dropped for S030C003P044R002A066: 41
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S030C003P044R002A073: 27
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S030C003P048R002A108: 23
+	Frames dropped for S030C003P067R002A087: 35
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S030C003P076R001A117: 17
+Processed 46000-46999 in 1205.12 seconds
+	Frames dropped for S030C003P088R001A119: 6
+	Frames dropped for S030C003P093R001A119: 49
+	Frames dropped for S030C003P094R001A119: 14
+	Frames dropped for S030C003P095R001A119: 46
+	Frames dropped for S030C003P096R001A092: 14
+Processed 47000-47999 in 1184.82 seconds
+	Frames dropped for S031C001P067R002A069: 6
+Processed 48000-48999 in 876.04 seconds
+	Frames dropped for S031C001P101R001A092: 23
+Processed 49000-49999 in 886.12 seconds
+	Frames dropped for S031C002P008R002A119: 7
+	Frames dropped for S031C002P042R001A092: 25
+	Frames dropped for S031C002P051R001A119: 19
+Processed 50000-50999 in 843.05 seconds
+	Frames dropped for S031C002P082R002A116: 4
+	Frames dropped for S031C002P096R001A119: 16
+Processed 51000-51999 in 928.41 seconds
+	Frames dropped for S031C003P042R001A119: 16
+	Frames dropped for S031C003P042R002A119: 17
+	Frames dropped for S031C003P042R002A120: 36
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S031C003P043R001A092: 41
+	Frames dropped for S031C003P067R001A062: 23
+	Frames dropped for S031C003P082R001A061: 28
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S031C003P082R001A114: 9
+	Frames dropped for S031C003P082R002A087: 83
+		Frame 0 in skip list, add blank frame to poses
+Processed 52000-52999 in 842.43 seconds
+	Frames dropped for S031C003P099R002A108: 27
+Processed 53000-53999 in 1010.16 seconds
+Processed 54000-54999 in 878.75 seconds
+	Frames dropped for S032C002P041R001A076: 37
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S032C002P041R001A082: 47
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S032C002P067R001A082: 13
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S032C002P104R001A119: 11
+	Frames dropped for S032C002P104R002A119: 17
+Processed 55000-55999 in 891.72 seconds
+	Frames dropped for S032C003P041R001A094: 7
+	Frames dropped for S032C003P044R002A082: 3
+		Frame 0 in skip list, add blank frame to poses
+Processed 56000-56999 in 1151.17 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flowpose_data
+
++------------------ Job Report: 66650908 (COMPLETED) ------------------+
+| Memory (RAM)  [###########         ] 58.3% (14.6 GB peak / 25 GB)    |
+| CPU           [############        ] 62.4% average                   |
+| GPU           [###                 ] 17.5% average                   |
+| Time          [----------->        ] 56.8% (0-04:49:31 / 0-08:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   7.4 MB        0 B            13                            |
+|   /fred   32.2 GB       11.4 GB        57.8 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      3.4 MB        0 B            510                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

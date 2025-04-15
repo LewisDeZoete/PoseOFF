@@ -79,6 +79,7 @@ generator = torch.Generator().manual_seed(
 train_idx, test_idx = torch.utils.data.random_split(
     range(len(train_dataset)), [0.8, 0.2], generator=generator
 )
+# TODO: Remove these subsets! See UCF-101 feeder for it's todo.
 train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
 test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
 train_dataloader = DataLoader(
