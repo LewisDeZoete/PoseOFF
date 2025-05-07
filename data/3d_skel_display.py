@@ -11,6 +11,7 @@ import os
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from PIL import Image
 
 
 trunk_joints = [0, 1, 20, 2, 3]
@@ -172,16 +173,22 @@ class Draw3DSkeleton(object):
 
 			# Save the plot as an image
 			save_path = os.path.join(self.save_path, f"frame_{frame_idx}.png")
-			plt.savefig(save_path)
+			plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+			# plt.close(fig)
+
+			# Crop the saved image
+			with Image.open(save_path) as img:
+				cropped_img = img.crop((100, 100, img.width - 100, img.height - 100))  # Adjust crop box as needed
+				cropped_img.save(save_path)  # Overwrite the original image
 			print(f"\t-- Processed frame {frame_idx} - {save_path}")
 
 
 if __name__ == '__main__':
 	# 26 - hopping, 42 - staggering, 31 - point at something, 24 - kicking
-	skel_name = 'S009C003P019R001A026.skeleton' # Hopping (-70, 90) rotation
+	# skel_name = 'S009C003P019R001A026.skeleton' # Hopping (-70, 90) rotation
 	skel_name = 'S009C001P019R001A024.skeleton'
 	rotation = {'x_rotation': -90, 'y_rotation': 150}
-	sk = Draw3DSkeleton(f"../Datasets/NTU_RGBD/nturgb+d_skeletons/{skel_name}", './TMP', **rotation)
+	sk = Draw3DSkeleton(f"../Datasets/NTU_RGBD/nturgb+d_skeletons/{skel_name}", './data/visualisations/skeletons', **rotation)
 	
 	# Define frames to process and save
 	frames_to_save = [0,10,20,30,40,50]

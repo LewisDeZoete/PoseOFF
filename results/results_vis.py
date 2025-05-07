@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import torch
-import numpy as np
+# import numpy as np
+import os
 import os.path as osp
 
 # dataset = 'nturgbd'
-# evaluation = 'CS'
+# evaluation = 'CV'
 dataset = 'ucf101'
 evaluation = ''
 
@@ -31,16 +32,20 @@ results_cnn = checkpoint_cnn['results']
 # Get the epochs as the x-axis
 x = results_base['epoch']
 
+# Plot root path
+plot_root = 'results/plots/'
+os.makedirs(plot_root, exist_ok=True) # Make dir if it doesn't exist
+
 # Evaluation string and Dataset string dictionaries for plot titles
 eval_str_dict = {'CS': 'Cross Subject', 'CV': 'Cross View'}
 dataset_str_dict = {'nturgbd': 'NTU RGB+D', 'nturgbd120': 'NTU RGB+D 120', 'ucf101':'UCF-101'}
 if dataset == 'ucf101':
     fig_title = f'{dataset_str_dict[dataset]}'
-    save_root = f'results/plots/{dataset}/'
+    save_root = osp.join(plot_root,f'{dataset}')
     print(f'Plotting results for {dataset_str_dict[dataset]}')
 else:
     fig_title = f'{dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}'
-    save_root = f'results/plots/{dataset}-{evaluation}/'
+    save_root = osp.join(plot_root, f'{dataset}-{evaluation}/')
     print(f'Plotting results for {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]} evaluation')
 
 # # ------------------------------
@@ -97,10 +102,10 @@ for ax in (ax1, ax2):
     ax.set_xlabel('Epoch', fontsize=20)
     ax.set_ylim(0, 100) # 0-100% accuracy
     ax.set_xlim(0, 70)  # 0-70 epochs
-    ax.axvline(x=50, color='black', linestyle='--', alpha=0.2, label='LR=0.01')  # Epoch 40
-    ax.axvline(x=60, color='black', linestyle='--', alpha=0.2, label='LR=0.001')  # Epoch 40
+    ax.axvline(x=50, color='black', linestyle='--', alpha=0.2) # Epoch 50
+    ax.axvline(x=60, color='black', linestyle='--', alpha=0.2) # Epoch 60
     # ax.set_xscale('log')
-ax1.set_ylabel('Classification Accuracy %', fontsize=20)
+ax1.set_ylabel('Classification accuracy %', fontsize=20)
 
 # Plot train Accuracy
 ax1.plot(x, to_percentage(results_base['train_AUC']), label='Base', color='tab:olive')
@@ -108,7 +113,7 @@ ax1.plot(x, to_percentage(results_abs['train_AUC']), label='Absolute flow', colo
 ax1.plot(x, to_percentage(results_avg['train_AUC']), label='Average flow', color='tab:pink')
 ax1.plot(x, to_percentage(results_cnn['train_AUC']), label='CNN', color='tab:blue')
 ax1.set_title('Train accuracy', fontsize=25)
-ax1.legend()
+ax1.legend(loc=4, prop={'size':20})
 
 # Plot test Accuracy
 ax2.plot(x, to_percentage(results_base['test_AUC']), label='Base', color='tab:olive')
@@ -123,7 +128,7 @@ for name, results in {'Base': results_base,
                       'CNN': results_cnn}.items():
     print(f"{name}: {max(to_percentage(results['test_AUC'])):.2f}%")
 
-plt.savefig(osp.join(save_root,'accuracy/Acc_comparison.png'))
+plt.savefig(osp.join(save_root,'accuracy/Acc_comparison_simple.png'))
 
 # # ------------------------------
 # #   Individual loss graphing

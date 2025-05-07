@@ -120,3 +120,7 @@ actors_info/
 
 # plots images (can always be regenerated)
 */plots
+
+# Videos (can always be regenerated)
+*.mp4
+*.avi

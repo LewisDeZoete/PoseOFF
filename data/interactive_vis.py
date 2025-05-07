@@ -16,9 +16,17 @@ parser.add_argument(
     default="small",
     help="extracted size - small or full (default=small)",
 )
+parser.add_argument(
+    "--live",
+    dest="live",
+    action="store_true",
+    help="extracted size - small or full (default=small)",
+)
 args = parser.parse_args()
 
 assert args.size in ['small', 'full'], '--size argument must be either `small` or `full`'
+# Optionally show live display or save to file
+live = True if args.live else False
 
 # Root path for data
 root_path = "./data/visualisations/RAW"
@@ -52,13 +60,14 @@ def get_frame_count(video):
     return video.shape[0]
 
 
-def draw_flowpose(flowpose_frame, frame):
-    for keypoint in flowpose_frame:
-        flow_window = rearrange(keypoint[2:], '(C H W) -> H W C', C=2, H=5, W=5)
+def draw_flowpose(flowpose_frame, pose_frame, frame, window_size=5):
+    k = window_size // 2
+    flowpose_frame = rearrange(flowpose_frame, 'MV (C H W) -> MV H W C', C=2, H=window_size, W=window_size)
+    for keypoint_num, flow_window in enumerate(flowpose_frame):
         img = flow2image(flow_window)
-        centre = [int((keypoint[1]+0.5)*frame.shape[0]),
-                  int((keypoint[0]+0.5)*frame.shape[1])]
-        frame[centre[0]-2:centre[0]+3, centre[1]-2:centre[1]+3] = img
+        centre = [int(pose_frame[keypoint_num][1]), 
+                  int(pose_frame[keypoint_num][0])]
+        frame[centre[0]-k:centre[0]+k+1, centre[1]-k:centre[1]+k+1] = img
     return frame
 
 
@@ -76,6 +85,7 @@ def flow2image(flow_frame):
 
 
 def draw_skel(frame, pose):  # Poses shape: (M V) C
+    frame = frame.copy()
     pose_local = pose.copy()
     circ_params = {"radius": 5, "color": (0, 0, 255), "thickness": 4}
     if frame.shape[1] < 500:
@@ -87,55 +97,66 @@ def draw_skel(frame, pose):  # Poses shape: (M V) C
         if 0 in keypoint:
             continue
         cv2.circle(frame, (int(keypoint[0]), int(keypoint[1])), **circ_params)
+    return frame
         
 
 def flow_pose_sample(flows, poses, window_size=5):
     """
     Samples the optical flow in windows surrounding the pose keypoints.
+    flows: (T C H W)
+    poses: (T (M V) C)
     Returns array of shape:
-        (num_pose_channels+(window_size**2)*2,
+        ((window_size**2)*2,
         frames, 
         keypoints, 
         num_people)
     """
     half_k=window_size//2
-    # Remove first frame of poses (no flow data)
-    poses = poses[:, 1:, :, :]
 
     # Get the shape of the input tensors
     num_frames, _, height, width = flows.shape
-    channels, num_pose_frames, num_keypoints, num_people = poses.shape
-    total_keypoints = num_keypoints*num_people
+    num_pose_frames, keypoints, channels = poses.shape
 
-    # Scale pose keypoints to image size
-    pose_points = np.nan_to_num(poses, nan=0)
-    pose_points = (pose_points.reshape(2, num_pose_frames, total_keypoints)
-                * np.array([(width - 1)/1920, (height - 1)/1080]).reshape(2, 1, 1)).astype(int)
-    # NTU keypoints need to be scaled [-0.5, 0.5]
-    poses[0] = poses[0]/1920-0.5
-    poses[1] = poses[1]/1080-0.5
+    # The keypoints are already scaled
+    pose_points = np.nan_to_num(poses, nan=0).astype(int)
 
     # Prepare tensor to stack flow windows
-    stacker = np.zeros((window_size**2*2, num_pose_frames, total_keypoints))
+    stacker = np.zeros((num_pose_frames, keypoints, window_size**2*2,))
+    print(stacker.shape)
 
     # Create a grid of valid indices (filter out points close to the image border)
-    valid_indices = ((pose_points[0, :, :] >= half_k) & (pose_points[0, :, :] < width - half_k) & 
-                        (pose_points[1, :, :] >= half_k) & (pose_points[1, :, :] < height - half_k))
+    valid_indices = ((pose_points[:, :, 0] >= half_k) & (pose_points[:, :, 0] < width - half_k) & 
+                        (pose_points[:, :, 1] >= half_k) & (pose_points[:, :, 1] < height - half_k))
                     
     # Loop through the frames and sample flow in window around each valid keypoint
     for frame_no, flow in enumerate(flows):
-        for keypoint_num in range(total_keypoints):
+        for keypoint_num in range(keypoints):
             if valid_indices[frame_no, keypoint_num]:
-                x, y = pose_points[0, frame_no, keypoint_num], pose_points[1, frame_no, keypoint_num]
+                x, y = pose_points[frame_no, keypoint_num, 0], pose_points[frame_no, keypoint_num, 1]
                 # Get the window of optical flow
                 flow_window = flow[:, y - half_k : y + half_k + 1, x - half_k : x + half_k + 1]
                 
-                stacker[:, frame_no, keypoint_num] = flow_window.flatten()
+                
+                stacker[frame_no, keypoint_num, :] = flow_window.flatten()
     
-    # NOTE: NTU does not return keypoint x,y,z coordinates
-    flow_pose = stacker.reshape(stacker.shape[0], *poses.shape[1:])
+    return stacker
+
+def generate_sample_points(center, dilation=1):
+    """
+    Generate a 5x5 grid of points around a center coordinate with a given dilation.
     
-    return flow_pose
+    Args:
+        center (tuple): The center coordinate (x, y).
+        dilation (int): The spacing between points in the grid.
+    
+    Returns:
+        numpy.ndarray: An array of shape (25, 2) containing the coordinates of the points.
+    """
+    x, y = center
+    offsets = np.arange(-2, 3) * dilation  # Generate offsets: [-2, -1, 0, 1, 2] scaled by dilation
+    grid_x, grid_y = np.meshgrid(offsets, offsets)  # Create a 5x5 grid of offsets
+    points = np.stack([grid_x.ravel() + x, grid_y.ravel() + y], axis=-1)  # Add offsets to center
+    return points
 
 
 def display_videos(videos):
@@ -201,4 +222,63 @@ def display_videos(videos):
     cv2.destroyAllWindows()
 
 
-display_videos(videos)
+def write_videos(videos):
+    size = (videos[0].shape[2], videos[0].shape[1])
+    flow_video = cv2.VideoWriter('data/visualisations/videos/flow_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size)
+    flow_skel_video = cv2.VideoWriter('data/visualisations/videos/flow_skels_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size)
+
+    RGB_video = cv2.VideoWriter('data/visualisations/videos/RGB_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size)
+    RGB_skel_video = cv2.VideoWriter('data/visualisations/videos/RGB_skels_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
+                         10, size)
+    
+    flowpose_video = cv2.VideoWriter('data/visualisations/videos/flowpose_video.avi', cv2.VideoWriter_fourcc(*'MJPG'),
+                         10, size)
+    current_frame_index = 0
+    flowpose = flow_pose_sample(flow_full, poses, window_size=19) # T, MV, C
+    while True:
+        # Get the flow and RGB frames
+        flow_frame = videos[0][current_frame_index]
+        RGB_frame = videos[1][current_frame_index]
+
+        # frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+        flow_frame = flow2image(flow_frame)
+        RGB_frame = cv2.cvtColor(RGB_frame.astype(np.uint8), cv2.COLOR_BGR2RGB)
+
+        # Write normal videos
+        flow_video.write(flow_frame.astype(np.uint8))
+        RGB_video.write(RGB_frame.astype(np.uint8))
+
+        # Draw skeletons
+        flow_skel_frame = draw_skel(flow_frame, pose=poses[current_frame_index])
+        RGB_skel_frame = draw_skel(RGB_frame, pose=poses[current_frame_index])
+
+        # Write skeleton videos
+        flow_skel_video.write(flow_skel_frame.astype(np.uint8))
+        RGB_skel_video.write(RGB_skel_frame.astype(np.uint8))
+
+        # Draw flowpose
+        flowpose_frame = draw_flowpose(flowpose_frame=flowpose[current_frame_index],
+                                       pose_frame=poses[current_frame_index],
+                                       frame=flow_frame,
+                                       window_size=19)
+        flowpose_video.write(flowpose_frame.astype(np.uint8))
+        
+        current_frame_index += 1
+        if current_frame_index >= get_frame_count(videos[0]):
+            break
+    
+    flow_video.release()
+    flow_skel_video.release()
+    RGB_video.release()
+    RGB_skel_video.release()
+    flowpose_video.release()
+
+
+
+if live:
+    display_videos(videos)
+else:
+    write_videos(videos)

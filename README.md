@@ -6,14 +6,14 @@ First, prepare for optical flow and pose extraction:
 
 Next, create the annotations dictionary, that will be
 ```
-python data_gen/UCF-101_annotations.py
+python data_gen/ucf101/UCF-101_annotations.py
 ```
 
 Uncomment the appropriate line in [the extraction file](data_gen/UCF-101_extract.sh). Optical flow and pose extraction must precede flowpose extraction.
 
-From the root directory, run batch the extraction file.
+From the root directory, sbatch the extraction file.
 ```
-sbatch data_gen/UCF-101_extract.sh
+bash data_gen/ucf101/UCF-101_extract.sh
 ```
 
 Depending on whether you're extracting optical flow or poses, this may take a few hours. 

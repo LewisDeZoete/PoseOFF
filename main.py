@@ -73,15 +73,15 @@ feeder_class = arg.import_class(arg.feeder)
 train_dataset = feeder_class(**arg.feeder_args, split="train")
 test_dataset = feeder_class(**arg.feeder_args, split="test")
 
-generator = torch.Generator().manual_seed(
-    42
-)  # It shouldn't be random when you resume training
-train_idx, test_idx = torch.utils.data.random_split(
-    range(len(train_dataset)), [0.8, 0.2], generator=generator
-)
-# TODO: Remove these subsets! See UCF-101 feeder for it's todo.
-train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
-test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
+# generator = torch.Generator().manual_seed(
+#     42
+# )  # It shouldn't be random when you resume training
+# train_idx, test_idx = torch.utils.data.random_split(
+#     range(len(train_dataset)), [0.8, 0.2], generator=generator
+# )
+# # TODO: Remove these subsets! See UCF-101 feeder for it's todo.
+# train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
+# test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
 train_dataloader = DataLoader(
     train_dataset,
     batch_size=arg.batch_size,

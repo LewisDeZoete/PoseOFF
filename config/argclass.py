@@ -76,6 +76,5 @@ if __name__=='__main__':
     
     arg = ArgClass(parsed)   
     feeder = arg.import_class(arg.feeder)
-    train_dataset = feeder(**arg.feeder_args, split='train')
-    test_dataset = feeder(**arg.feeder_args, split='test')
+    print(arg.feeder_args['data_paths'])
     
