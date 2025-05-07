@@ -1,10 +1,3 @@
-import sys
-import os
-
-# # add lib to path
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "..")))
-
 import numpy as np
 from torch.utils.data import Dataset
 from feeders import tools
@@ -14,9 +7,13 @@ class Feeder(Dataset):
     """
     TODO: Based on `split` input, split the data based on the 3 train/test splits outlined in the .txt files in the dataset folder
     Feeder class for loading and processing dataset.
+    NOTE: If you're finding issues with this feeder, it might be caused by 
+    the renaming of folders and videos, and to keep consistencies 
+    in naming (eg. HandstandPushups -> HandStandPushups, HandstandWalking etc.)
 
     Attributes:
         data_path (str): Path to flowpose data.
+        eval (int): evaluation benchmark split (ucf101 comes with 3, labeeled 1,2 & 3)
         label_path (str): Path to the label file.
         labels (dict): Dictionary containing the labels of the dataset.
         split (str): Indicates whether the dataset is for training or testing.
@@ -43,7 +40,8 @@ class Feeder(Dataset):
 
     def __init__(
         self,
-        data_path,
+        data_paths,
+        eval=None,
         label_path=None,
         labels=None,
         split="train",
@@ -51,23 +49,24 @@ class Feeder(Dataset):
         random_shift=False,
         random_move=False,
         random_rot=False,
-        p_interval=[0.95],
+        p_interval=1,
         window_size=64,
         average_flow=False,
         absolute_flow=False,
         no_flow=False,
-        normalisation=False,
+        # normalisation=False,
         use_mmap=False,
         vel=False,
         sort=False,
         A=None,
     ):
-        self.data_path = data_path
-        # self.data_path = self.data_paths[f"{modality}_path"]
-        self.label_path = label_path
-        self.labels = labels
-        if split not in ["train", "val", "test"]:
-            raise ValueError("split must be 'train', 'val', or 'test'")
+        self.eval = eval
+        self.data_path = data_paths[eval]
+        # self.label_path = label_path
+        # self.labels = labels
+        self.split = split
+        if split not in ["train", "test"]:
+            raise ValueError("split must be 'train' or 'test'")
         if split == "train":
             self.p_interval = p_interval
             self.random_shift = random_shift
@@ -83,19 +82,45 @@ class Feeder(Dataset):
             self.random_move = False
             self.random_rot = False
         self.average_flow = average_flow # Average and absolute flow must be the same for train and test
-        self.absolute_flow = absolute_flow # NOTE: cannot have both average and absolute flow!
+        self.absolute_flow = (
+            absolute_flow # NOTE: cannot have both average and absolute flow!
+        )
         self.no_flow = no_flow
-
-        # self.normalization = normalization TODO: REMOVE all normalization references
-
         self.use_mmap = use_mmap
         self.vel = vel
         self.A = A
+        self.load_data()
         if sort:
             self.get_n_per_class()
             self.sort()
-        # if normalization:
-        #     self.get_mean_map()
+
+    def load_data(self):
+        # data: N T (MVC)
+        npz_data = np.load(self.data_path)
+        if self.split == "train":
+            self.data = npz_data["x_train"]
+            self.labels = np.argmax(npz_data["y_train"], axis=-1)
+        elif self.split == "test":
+            self.data = npz_data["x_test"]
+            self.labels = np.argmax(npz_data["y_test"], axis=-1)
+        else:
+            raise NotImplementedError("data split only supports train/test")
+        nan_out = np.isnan(self.data.mean(-1).mean(-1)) == False
+        self.data = self.data[nan_out]
+        self.labels = self.labels[nan_out]
+        # self.sample_name = [self.split + '_' + str(i) for i in range(len(self.data))]
+        N, T, _ = self.data.shape
+        C = (
+            53 if self.data.shape[-1] > 150 else 3
+        )  # If the dataset doesn't have flow, this is false
+        if self.A is not None:
+            self.data = self.data.reshape((N * T * 2, 17, C))
+            self.data = np.array(self.A) @ self.data
+        self.data = self.data.reshape(N, T, 2, 17, C).transpose(
+            0, 4, 1, 3, 2
+        )  # N C T V M
+        if self.no_flow:  # If no flow argument is passed, take first three channels
+            self.data = self.data[:, :3, ...]
 
     def get_n_per_class(self):
         self.n_per_cls = np.zeros(len(self.labels), dtype=int)
@@ -108,12 +133,6 @@ class Feeder(Dataset):
         self.data = self.data[sorted_idx]
         self.labels = self.labels[sorted_idx]
 
-    # def get_mean_map(self):
-    #     data = self.data
-    #     N, C, T, V, M = data.shape
-    #     self.mean_map = data.mean(axis=2, keepdims=True).mean(axis=4, keepdims=True).mean(axis=0)
-    #     self.std_map = data.transpose((0, 2, 4, 1, 3)).reshape((N * T * M, C * V)).std(axis=0).reshape((C, 1, V, 1))
-
     def __len__(self):
         return len(self.labels)
 
@@ -121,12 +140,10 @@ class Feeder(Dataset):
         return self
 
     def __getitem__(self, index):
-        # NOTE: here we assume that we're working with preprocessed (flowpose) data
-        item_key = list(self.labels.keys())[index]
-        item_path = f"{self.data_path}{item_key}.npy"
-        label = self.labels[item_key]
+        data_numpy = self.data[index]
+        label = self.labels[index]
+        data_numpy = np.array(data_numpy)
 
-        data_numpy = np.load(item_path)
         valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
         valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
         # # reshape Tx(MVC) to CTVM
@@ -135,10 +152,6 @@ class Feeder(Dataset):
         )
         mask = abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0
         # Apply optional transforms
-        # if self.normalization:
-        #     data_numpy = (data_numpy - self.mean_map) / self.std_map
-        if self.no_flow:
-            data_numpy = data_numpy[:3]
         if self.random_shift:
             data_numpy = tools.random_shift(data_numpy)
         if self.random_choose:
@@ -149,16 +162,14 @@ class Feeder(Dataset):
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
             )
-        # if self.random_rot:
+        # if self.random_rot: TODO: Fix and test for flowpose data
         #     data_numpy = tools.random_rot(data_numpy)
-        # TODO: Test random_rot function
         if self.average_flow:
             data_numpy = tools.average_flow(data_numpy)
         if self.absolute_flow:
             data_numpy = tools.absolute_flow(
                 data_numpy, window_mean=self.absolute_flow["window_mean"]
             )
-
         return data_numpy, label, mask, index
 
     def top_k(self, score, top_k):
@@ -172,22 +183,33 @@ if __name__ == "__main__":
     import time
     from torch.utils.data import DataLoader
 
-    arg = ArgClass("./config/ucf101/train_base.yaml")
+    # srun --mem-per-cpu=30G python feeders/ucf101.py
 
-    feeder = Feeder(**arg.feeder_args)
-    # feeder = Feeder(**arg.feeder_args, split="test")
+    embed =  'cnn'
+    arg = ArgClass(f"./config/ucf101/train_{embed}.yaml")
+    arg.feeder_args['eval'] = 1
 
-    dataloader = DataLoader(feeder, 
+    train_feeder = Feeder(**arg.feeder_args, split="train")
+    test_feeder = Feeder(**arg.feeder_args, split="test")
+    
+    dataloader = DataLoader(train_feeder, 
                             batch_size=arg.batch_size,
                             shuffle=False,
                             pin_memory=True)
 
     start = time.time()
     for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
-        break
-            
+        if epoch == 10:
+            break
 
-    print(f"\nTotal samples: {len(feeder)}")
+    # Print the shapes of the data and mask
+    # and the first two frames of the first two persons
+    print(f"\nTotal samples: {len(train_feeder)}")
     print(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
-    print(f"Data shape: {data_numpy.shape}")
+    print(f"Data shape: {data_numpy.shape}") # (60, 3/53, 64, 25, 2)
     print(f"Mask shape: {mask.shape}")
+
+    print(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
+    print(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
+    print(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
+    print(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")

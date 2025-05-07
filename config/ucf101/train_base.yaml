@@ -1,7 +1,10 @@
 # Feeder
-feeder: feeders.feeder.Feeder
+feeder: feeders.ucf101.Feeder
 feeder_args:
-  data_path: ./data/UCF-101/flowpose/
+  data_paths: 
+    1: ./data/UCF-101/flowpose/ucf101_01.npz
+    2: ./data/UCF-101/flowpose/ucf101_02.npz
+    3: ./data/UCF-101/flowpose/ucf101_03.npz
   label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
   p_interval: [0.5, 1]
   random_shift: True
@@ -15,12 +18,11 @@ feeder_args:
   no_flow: True
 
 extractor:
-  data_paths: 
+  data_paths:
     rgb_path: ../Datasets/UCF-101/
     pose_path: ./data/UCF-101/pose/
     flow_path: ./data/UCF-101/flow/
     flowpose_path: ./data/UCF-101/flowpose/
-  preprocessed: True
   pose: 
     weights: pretrained_models/yolo11x-pose.pt
   flow:
