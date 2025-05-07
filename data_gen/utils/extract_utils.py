@@ -15,13 +15,9 @@ def create_class_folder(arg, class_name: str, modality: str):
     Returns:
         None
     """
-    folder = os.path.join(arg.feeder_args["data_paths"][f"{modality}_path"], class_name)
-    try:
-        os.mkdir(folder)
-        print("\tCreating folder:", folder)
-    except FileExistsError:
-        # print('Folder already exists')
-        pass
+    folder = os.path.join(arg.extractor["data_paths"][f"{modality}_path"], class_name)
+    os.makedirs(folder, exist_ok=True)
+    print("\tAttempting to create folder:", folder)
 
 
 def get_incomplete(arg, modality: str):
@@ -45,17 +41,14 @@ def get_incomplete(arg, modality: str):
         processed_videos = {
             i.split(".")[0]
             for i in os.listdir(
-                f"{arg.feeder_args['data_paths'][f'{modality}_path']}/{class_name}"
+                f"{arg.extractor['data_paths'][f'{modality}_path']}/{class_name}"
             )
         }
         incomplete_videos = set(class_videos) - processed_videos
         if incomplete_videos:
             incomplete[class_name] = sorted(list(incomplete_videos))
     
-    with open("./data_gen/num_incomplete.txt", "w") as f:
-        f.write(str(len(incomplete)))
-
-    with open("./data_gen/incomplete_classes.txt", "w") as f:
+    with open("./data_gen/ucf101/incomplete_classes.txt", "w") as f:
         for class_name, video_names in incomplete.items():
             video_names=','.join(video_names)
             f.write(f"{class_name}:{video_names}\n")
@@ -63,7 +56,7 @@ def get_incomplete(arg, modality: str):
     return incomplete
 
 
-def get_class_by_index(arg, process_number: int, modality: str):
+def get_class_by_index(process_number: int):
     """
     Retrieve the class name and video names by the given process number.
     Args:
@@ -75,8 +68,7 @@ def get_class_by_index(arg, process_number: int, modality: str):
     Raises:
         IndexError: If the process_number is out of range of the incomplete list.
     """
-    # incomplete = list(get_incomplete(arg, modality).items())
-    with open('./data_gen/incomplete_classes.txt', 'r') as f:
+    with open('./data_gen/ucf101/incomplete_classes.txt', 'r') as f:
         incomplete = {}
         for line in f.readlines():
             line = line.strip()
@@ -94,7 +86,7 @@ def is_null(data):
     """Check if the data is filled with zeros"""
     if isinstance(data, torch.Tensor):
         return torch.all(data == 0).item()
-    elif isinstance(data, np.ndarray):
+    if isinstance(data, np.ndarray):
         return np.all(data == 0)
     return False
 
@@ -109,9 +101,8 @@ def extract_data(
     arg,
     process_number: int,
     transforms,
-    modality,
-    save_as_numpy: bool = True,
-    debug=False,
+    modality: str,
+    debug: bool = False
 ):
     """
     Extracts data for a given class and processes it using specified transforms.
@@ -125,25 +116,24 @@ def extract_data(
     Returns:
         None
     """
-    class_name, video_names = get_class_by_index(
-        arg, process_number=process_number, modality=modality
-    )
+    class_name, video_names = get_class_by_index(process_number=process_number)
     print("Processing:", class_name)
+    print("\tTotal videos:", len(video_names))
 
     for video_name in video_names:
         if modality == "flowpose":
             # TODO: Change this implementation to default to numpy
             poses = np.load(
-                f"{arg.feeder_args['data_paths']['pose_path']}/{class_name}/{video_name}.npy"
+                f"{arg.extractor['data_paths']['pose_path']}/{class_name}/{video_name}.npy"
             )
             flows = torch.load(
-                f"{arg.feeder_args['data_paths']['flow_path']}/{class_name}/{video_name}.pt",
+                f"{arg.extractor['data_paths']['flow_path']}/{class_name}/{video_name}.pt",
                 map_location="cpu",
             )
             data = transforms(flows, poses)
         else:
             # Get the video path
-            video_path = f"{os.path.join(arg.feeder_args['data_paths']['rgb_path'], class_name, video_name)}.avi"
+            video_path = f"{os.path.join(arg.extractor['data_paths']['rgb_path'], class_name, video_name)}.avi"
             # Transform and estimate poses
             data = transforms(video_path)
         if is_null(data):  # Check if the data is all zeros
@@ -151,27 +141,22 @@ def extract_data(
 
         # Get the path to save the estimated poses to
         save_path = os.path.join(
-            arg.feeder_args["data_paths"][f'{modality}_path'],  # Data path
+            arg.extractor["data_paths"][f'{modality}_path'],  # Data path
             class_name,  # Class folder
-            video_name + (".npy" if save_as_numpy else ".pt"),
-        )  # Video name (numpy/torch)
-        if debug: # TODO: Remove this
+            video_name + ".npy")
+        if debug:
+            print(f"Modality: {modality}")
+            print(f"Data shape: {data.shape}")
+            print(f"Data type: {type(data)}")
+            print(f"Saving {video_name} to {save_path}")
             break
-        if save_as_numpy:
-            np.save(save_path, data)
-        else:
-            torch.save(data, save_path)
+        # Save the data
+        np.save(save_path, data)
 
     print(f"Processed {class_name} class")
 
 
 if __name__ == "__main__":
-    import sys
-
-    # # add lib to path
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, "../..")))
-
     from config.argclass import ArgClass
     import argparse
 
@@ -183,13 +168,10 @@ if __name__ == "__main__":
     parsed = parser.parse_args()
 
     # Create ArgClass object
-    arg = ArgClass(arg="./config/ucf101/train_joint_infogcn.yaml")
+    arg = ArgClass(arg="./config/ucf101/train_base.yaml")
 
     # Ensure the modality folder exists
-    try:
-        os.mkdir(arg.feeder_args["data_paths"][f"{parsed.modality}_path"])
-    except FileExistsError:
-        pass
+    os.makedirs(arg.extractor["data_paths"][f"{parsed.modality}_path"], exist_ok=True)
 
     # Get the incomplete classes (also creates folders if they're empty)
     incomplete = get_incomplete(arg, parsed.modality)

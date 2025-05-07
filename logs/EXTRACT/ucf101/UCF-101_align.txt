@@ -1,0 +1,28 @@
+Combined data shape: (13115, 300, 1802)
+Combined data size: 28359.876144 MB
+Processing evaluations...
+	Processed evaluation 1.
+		Saved to: ./data/UCF-101/flowpose/processed/ucf101_01.
+	Processed evaluation 2.
+		Saved to: ./data/UCF-101/flowpose/processed/ucf101_02.
+	Processed evaluation 3.
+		Saved to: ./data/UCF-101/flowpose/processed/ucf101_03.
+Completed processing all evaluations.
+
++------------------- Job Report: 277415 (COMPLETED) -------------------+
+| Memory (RAM)  [####                ] 21.2% (52.9 GB peak / 250 GB)   |
+| CPU           [#                   ]  6.3% average                   |
+| Time          [------->            ] 36.6% (0-00:21:56 / 0-01:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   2.5 MB        0 B            5                             |
+|   /fred   52.9 GB       71.2 GB        42.7 K                        |
+|   OS      6.7 MB        0 B            383                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

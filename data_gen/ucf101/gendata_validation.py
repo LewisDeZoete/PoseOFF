@@ -1,14 +1,8 @@
-import sys
 import os
 import yaml
-
-# # add lib to path
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '../..')))
-
 from config.argclass import ArgClass
 
-config_name = './config/ucf101/train_joint_infogcn.yaml'
+config_name = './config/ucf101/train_base.yaml'
 
 arg = ArgClass(arg=config_name)
 
@@ -42,19 +36,6 @@ for key, val in incomplete.items():
     if len(val) != 0:
         complete = False
 
-# If there are no incomplete classes, change the config file to reflect that
-if complete:
-    with open(config_name, 'r') as f_in:
-        # Load the original data
-        yaml_data = yaml.safe_load(f_in)
-
-    # Modify the data
-    yaml_data['feeder_args']['preprocessed'] = True
-
-    # TODO: Remove the MODIFIED portion if you don't need the comments anymore...
-    with open(f'{config_name[:-5]}_MODIFIED.yaml', 'w') as f_out:
-        # Save the modified data (it doesn't look as nice)
-        yaml.dump(yaml_data, f_out, sort_keys=False)
 
 try:
     # Remove the TMP directory if it is empty

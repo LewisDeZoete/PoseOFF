@@ -1,8 +1,20 @@
 import torch
 import numpy as np
 import re
-from .preprocess import stack_frames
-from .postprocess import loop_graph, flow_mag_norm, pose_match
+from data_gen.utils.preprocess import stack_frames
+from data_gen.utils.postprocess import loop_graph, flow_mag_norm, pose_match
+
+
+class ToNumpy:
+    def __call__(self, tensor):
+        """
+        Converts a tensor to a numpy array.
+        Args:
+            tensor (torch.Tensor): The input tensor to convert.
+        Returns:
+            np.ndarray: The converted numpy array.
+        """
+        return tensor.detach().cpu().numpy() if isinstance(tensor, torch.Tensor) else tensor
 
 
 class GetPoses_YOLO:
@@ -16,27 +28,27 @@ class GetPoses_YOLO:
     def __init__(
         self,
         detector,
-        max_frames: int = 300,
         num_joints: int = 17,
         num_people_out: int = 2,
     ):
         self.detector = detector
-        self.max_frames = max_frames
         self.num_joints = num_joints
         self.num_people_out = num_people_out
 
     def __call__(self, video) -> torch.tensor:
+        # Get pose results
+        pose_results = self.detector(video, verbose=False)
+
+        num_frames = len(pose_results)
+        
         data_torch = torch.zeros(
             (
                 3,  # channels (x,y,confidence)
-                self.max_frames,  # total_frames
+                num_frames,  # total_frames
                 self.num_joints,  # number of joints
                 self.num_people_out,
             )
         )  # max number of people output
-
-        # Get pose results
-        pose_results = self.detector(video, verbose=False)
 
         # Get data from yolo
         for frame in pose_results:
@@ -150,6 +162,7 @@ class FlowPoseSampler:
         norm (bool): Whether to normalize the flow magnitude using flow_mag_norm function. Default is False.
         match_pose (bool): Whether to match the pose keypoints using pose_match function. Default is True.
         ntu (bool): Whether the pose keypoints are from NTU dataset. Default is False.
+        dilation (int): The dilation factor for sampling points around keypoints. Default is 1.
     Methods:
         __call__(flows, poses):
             Samples the optical flow in windows surrounding the pose keypoints.
@@ -158,9 +171,6 @@ class FlowPoseSampler:
                 poses (torch.Tensor): The pose keypoints tensor of shape (channels, num_frames, num_keypoints, num_people).
             Returns:
                 torch.Tensor: Tensor of flow windows (optionally concat poses+flow).
-                    (ntu=False) shape: (num_pose_channels+(window_size**2)*2, frames-1, keypoints, num_people)
-                    (ntu=True) shape: ((window_size**2)*2, frames-1, keypoints, num_people)
-                    NOTE: The first frame of poses is discarded given it does not yet contain optical flow.
     """
     def __init__(self, 
                  window_size: int = 3, 
@@ -169,10 +179,12 @@ class FlowPoseSampler:
                  norm: bool = False,
                  match_pose: bool = True,
                  ntu: bool = False,
+                 dilation: int = 1,
                  debug_vis: bool = False):
         self.window_size = window_size  # Window size about pose keypoint
         self.half_k = self.window_size // 2  # Half the window size
         self.threshold = threshold
+        self.dilation = dilation  # Dilation factor for sampling
         if loop:
             self.loop_graph = loop_graph
         if norm:
@@ -200,57 +212,52 @@ class FlowPoseSampler:
         poses = poses[:, 1:, :, :]
 
         # Get the shape of the input tensors
-        num_frames, _, height, width = flows.shape
+        num_flow_frames, _, height, width = flows.shape
         channels, num_pose_frames, num_keypoints, num_people = poses.shape
-        total_keypoints = num_keypoints*num_people
+        total_keypoints = num_keypoints * num_people
         
         if hasattr(self, 'pose_match'):
             poses = self.pose_match(poses)
 
-        if self.ntu: # NTU does not return confidence values for keypoints
-            # Scale pose keypoints to image size
+        if self.ntu:  # NTU does not return confidence values for keypoints
             pose_points = np.nan_to_num(poses, nan=0)
             pose_points = (pose_points.reshape(2, num_pose_frames, total_keypoints)
                         * np.array([(width - 1)/1920, (height - 1)/1080]).reshape(2, 1, 1)).astype(int)
-            # NTU keypoints need to be scaled [-0.5, 0.5]
             poses[0] = poses[0]/1920-0.5
             poses[1] = poses[1]/1080-0.5
         else:
-            # Get and scale YOLO pose keypoints
             pose_points = ((poses[:2, ...] + 0.5).reshape(2, num_pose_frames, total_keypoints)
                         * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
             vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
 
-        # Prepare tensor to stack flow windows
         stacker = np.zeros((self.window_size**2*2, num_pose_frames, total_keypoints))
 
-        # Create a grid of valid indices (filter out points close to the image border)
-        if self.ntu: # No visibility mask, NTU doesn't return conf values for keypoints
-            valid_indices = ((pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
-                             (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
-        else: 
+        if self.ntu:
+            valid_indices = ((pose_points[0, :, :] >= self.half_k * self.dilation) & 
+                             (pose_points[0, :, :] < width - self.half_k * self.dilation) & 
+                             (pose_points[1, :, :] >= self.half_k * self.dilation) & 
+                             (pose_points[1, :, :] < height - self.half_k * self.dilation))
+        else:
             valid_indices = (vis.reshape(num_pose_frames, total_keypoints) & 
-                             (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
-                             (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
+                             (pose_points[0, :, :] >= self.half_k * self.dilation) & 
+                             (pose_points[0, :, :] < width - self.half_k * self.dilation) & 
+                             (pose_points[1, :, :] >= self.half_k * self.dilation) & 
+                             (pose_points[1, :, :] < height - self.half_k * self.dilation))
                         
-        # Loop through the frames and sample flow in window around each valid keypoint
         for frame_no, flow in enumerate(flows):
             for keypoint_num in range(total_keypoints):
                 if valid_indices[frame_no, keypoint_num]:
                     x, y = pose_points[0, frame_no, keypoint_num], pose_points[1, frame_no, keypoint_num]
-                    # Get the window of optical flow
-                    flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
-                    
+                    flow_window = flow[:, 
+                                       y - self.half_k * self.dilation : y + self.half_k * self.dilation + 1 : self.dilation, 
+                                       x - self.half_k * self.dilation : x + self.half_k * self.dilation + 1 : self.dilation]
                     stacker[:, frame_no, keypoint_num] = flow_window.flatten()
         
         if self.ntu and not self.debug_vis:
-            # NOTE: NTU does not return keypoint x,y,z coordinates
             flow_pose = stacker.reshape(stacker.shape[0], *poses.shape[1:])
         else:
-            # Concatenate poses with computed flow
             flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
         
-        # If we pass loop_graph = True, then loop the graph using this function!
         if hasattr(self, 'loop_graph'):
             flow_pose = self.loop_graph(flow_pose)
         
@@ -260,40 +267,6 @@ class FlowPoseSampler:
         return flow_pose
 
 
-class FlowPoseSampler_backup:
-    """
-    A class to sample optical flow in windows surrounding pose keypoints.
-    Attributes:
-        device (torch.device): The device to run the computations on.
-        window_size (int): The size of the window around each pose keypoint. Default is 3.
-        threshold (float): The threshold for visibility of keypoints. Default is 0.5.
-        loop (bool): Whether to loop the graph using loop_graph function. Default is True.
-        to_cpu (bool): Whether to move the resulting tensor to CPU. Default is True.
-        norm (bool): Whether to normalize the flow magnitude using flow_mag_norm function. Default is False.
-    Methods:
-        __call__(flows, poses):
-            Samples the optical flow in windows surrounding the pose keypoints.
-            Args:
-                flows (torch.Tensor/np.array): The optical flow tensor of shape (num_frames, 2, height, width).
-                poses (torch.Tensor): The pose keypoints tensor of shape (3, num_frames, num_keypoints, num_people).
-            Returns:
-                torch.Tensor: The concatenated tensor of poses and sampled flow data.
-    """
-    def __init__(self, 
-                 window_size: int = 3, 
-                 threshold: float = 0.5, 
-                 loop: bool = True,
-                 norm: bool = False,
-                 match_pose: bool = True):
-        self.window_size = window_size  # Window size about pose keypoint
-        self.half_k = self.window_size // 2  # Half the window size
-        self.threshold = threshold
-        if loop:
-            self.loop_graph = loop_graph
-        if norm:
-            self.norm = flow_mag_norm
-        if match_pose:
-            self.pose_match = pose_match
 
     def __call__(self, flows, poses):
         """
@@ -353,19 +326,13 @@ class FlowPoseSampler_backup:
 
 
 if __name__ == '__main__':
-    import sys
-    import os
-
-    # # add lib to path
-    curr_dir = os.path.dirname(os.path.abspath(__file__))
-    sys.path.insert(0, os.path.abspath(os.path.join(curr_dir, '../...')))
-
+    import os.path as osp
     from config.argclass import ArgClass
     # NOTE: extract_data is for testing ucf101
     # from data_gen.utils.extract_utils import extract_data 
 
-    arg = ArgClass(arg='./config/nturgbd-cross-subject/train_base.yaml')
-    # arg = ArgClass(arg='./config/ucf101/train_base.yaml')
+    # arg = ArgClass(arg='./config/nturgbd-cross-subject/train_base.yaml')
+    arg = ArgClass(arg='./config/ucf101/train_base.yaml')
 
     flowposeSampler = FlowPoseSampler(device=torch.device('cpu'), norm=True)
     # extract_data(arg, 0, flowposeSampler, 'flowpose', save_as_numpy=True, debug=True)
