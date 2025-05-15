@@ -3,12 +3,10 @@ import torch.nn as nn
 import math
 import numpy as np
 import time
+import os
 from einops import rearrange, repeat
 from tqdm import tqdm
-import sys
-
-sys.path.extend(["./"])
-from loss import AverageMeter
+from .loss import AverageMeter
 
 
 def run_epoch(
@@ -143,7 +141,6 @@ def run_epoch(
         log_recon_loss.update(recon_loss.data.item(), B)
         # loggers['kl_div'].update(kl_div.data.item(), B)
 
-        # TODO: RENAME AUC it the average classification accuracy over the 10 cls_heads of SODE
         AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
         # tbar.set_description(
         #     f"[Epoch #{epoch}] "
@@ -165,6 +162,7 @@ def run_epoch(
     # train_dict.update({f"train/ACC_{(i + 1) / 10}": results['acc'][i].avg for i in range(10)})
     # wandb.log(train_dict)
 
+    results[prefix + "_" + "ACC"].append({f"ACC_{(i+1)/10}":log_acc[i].avg for i in range(10)})
     results[prefix + "_" + "AUC"].append(AUC)
     results[prefix + "_" + "loss"].append(loss)
     results[prefix + "_" + "cls_loss"].append(log_cls_loss.avg)
@@ -189,6 +187,7 @@ def train_network(
     optimiser=None,
     checkpoint_file: str = None,
     checkpoint_freq: int = 10,
+    verbose: bool = False,
 ):
     """
     Train simple neural networks
@@ -203,8 +202,9 @@ def train_network(
         device: the compute lodation to perform training
 
     """
-    to_track = ["epoch", "training_time", "train_loss", "lr"]
+    to_track = ["epoch", "train_time", "train_loss", "lr"]
     if test_loader is not None:
+        to_track.append("test_time")
         to_track.append("test_loss")
     if score_funcs is not None:
         for eval_score in score_funcs:
@@ -224,7 +224,7 @@ def train_network(
 
     # If we pass checkpoint_file, make sure it's initialised
     if checkpoint_file is not None:
-        checkpoint = load_checkpoint(checkpoint_file, device)
+        checkpoint = load_checkpoint(checkpoint_file, device, verbose)
         start_epoch = (
             checkpoint["epoch"] + 1
         )  # We saved the checkpoint at the end of the epoch
@@ -258,7 +258,7 @@ def train_network(
 
         # Append the post-training results to the results dictionary
         results["epoch"].append(epoch)
-        results["training_time"].append(train_time)
+        results["train_time"].append(train_time)
 
         # Step the scheduler after each training epoch and append lr
         if scheduler is not None:
@@ -283,7 +283,9 @@ def train_network(
                     prefix="test",
                     desc="Testing",
                 )
-            # TODO: AUC is not in both ms-g3d and infogcn results dict, change to accomidate
+            
+            results["test_time"].append(test_time)
+            # Print the results
             print(f"\t\t{epoch} EPOCH BEST TEST ACC: {max(results['test_AUC'])}")
             print(f"\t\t\tTrain time: {train_time:.2f} seconds")
             print(f"\t\t\tTest time: {test_time:.2f} seconds")
@@ -297,7 +299,7 @@ def train_network(
     return results
 
 
-def load_checkpoint(checkpoint_file: str, device):
+def load_checkpoint(checkpoint_file: str, device, verbose: bool=False):
     """
     Loads a checkpoint from a specified file.
 
@@ -314,12 +316,26 @@ def load_checkpoint(checkpoint_file: str, device):
     try:
         checkpoint = torch.load(checkpoint_file, map_location=device)
         print(f"\tResuming from checkpoint at epoch {checkpoint['epoch']}")
+
+        # Print previous results, it's easier for comparisons
+        results = checkpoint['results']
+        if verbose:
+            for i in range(len(results['epoch'])):
+                print(f"\t\t{i+1} EPOCH BEST TEST ACC: {results['test_AUC'][i]}")
+                print(f"\t\t\tTrain time: {results['train_time'][i]:.2f} seconds")
+                print(f"\t\t\tTest time: {results['test_time'][i]:.2f} seconds")
     except FileNotFoundError:
+        os.makedirs( # Create the folders in the case that they don't exist...
+            os.path.dirname(checkpoint_file),
+            exist_ok=True
+        )
         print(f"\tCreated new checkpoint file: {checkpoint_file}")
         checkpoint = {
             "epoch": 0
         }  # Start from scratch, indexing starts from 1 in this case
         torch.save(checkpoint, checkpoint_file)
+    except KeyError as e:
+        print(f'Key {e} did not match... this may cause errors during training')
     return checkpoint
 
 
@@ -348,7 +364,7 @@ if __name__ == "__main__":
     from model import ModelLoader
     from feeders import ucf101
     from torch.utils.data import DataLoader
-    from loss import LabelSmoothingCrossEntropy, masked_recon_loss
+    from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
     import torch.optim as optim
 
     arg = ArgClass("./config/ucf101/train_joint_infogcn.yaml")
