@@ -1,6 +1,4 @@
 import torch
-
-# import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
@@ -8,9 +6,10 @@ from model import ModelLoader
 from config.argclass import ArgClass
 
 from training.train_infogcn import train_network
-from loss import LabelSmoothingCrossEntropy, masked_recon_loss
+from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
 # from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
+import os.path as osp
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -24,10 +23,19 @@ parser.add_argument(
     "-p",
     dest="phase",
     default="train",
-    help="network phase [train, test] (default=test)",
+    help="network phase [train, test] (default=train)",
 )
 parser.add_argument(
-    "-m", dest="model_type", default="base", help="model type [base, cnn, avg, abs] (default=base)"
+    "-m", 
+    dest="model_type", 
+    default="base", 
+    help="model type [base, cnn, avg, abs] (default=base)"
+)
+parser.add_argument(
+    "-e",
+    dest="evaluation",
+    help="Evaluation benchmark used for specific dataset \
+        (eg. 1-3 for ucf101, CV/CS for NTU_RGB+D)"
 )
 parser.add_argument(
     "-r",
@@ -46,14 +54,15 @@ parser.add_argument(
 )
 parsed = parser.parse_args()
 
-print(parsed.description)
 print("### Libraries loaded")
 # Pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
 arg = ArgClass(arg=parsed, verbose=parsed.verbose)
 
 # Define checkpoint file
 if arg.run_name != "":
-    arg.checkpoint_file = f"{arg.save_location}{arg.run_name}.pt"
+    arg.checkpoint_file = osp.join(arg.save_location,
+                                   arg.evaluation,
+                                   arg.run_name + '.pt')
 
 print("### Arguments loaded")
 
@@ -70,18 +79,9 @@ device = torch.device(arg.device if torch.cuda.is_available() else "cpu")
 
 # # Create the datasets and dataloaders
 feeder_class = arg.import_class(arg.feeder)
-train_dataset = feeder_class(**arg.feeder_args, split="train")
-test_dataset = feeder_class(**arg.feeder_args, split="test")
+train_dataset = feeder_class(**arg.feeder_args, eval=arg.evaluation, split="train")
+test_dataset = feeder_class(**arg.feeder_args,eval=arg.evaluation, split="test")
 
-# generator = torch.Generator().manual_seed(
-#     42
-# )  # It shouldn't be random when you resume training
-# train_idx, test_idx = torch.utils.data.random_split(
-#     range(len(train_dataset)), [0.8, 0.2], generator=generator
-# )
-# # TODO: Remove these subsets! See UCF-101 feeder for it's todo.
-# train_dataset = torch.utils.data.Subset(train_dataset, train_idx)
-# test_dataset = torch.utils.data.Subset(test_dataset, test_idx)
 train_dataloader = DataLoader(
     train_dataset,
     batch_size=arg.batch_size,
@@ -138,7 +138,7 @@ loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 # score_funcs = {'accuracy': accuracy_score,
 #                'confusion matrix': confusion_matrix,
 #                'classification report': classification_report}
-score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
+score_funcs = ["ACC", "AUC", "cls_loss", "feature_loss", "recon_loss"]
 
 
 results = train_network(
@@ -154,6 +154,7 @@ results = train_network(
     optimiser=optimiser,
     checkpoint_file=arg.checkpoint_file,
     checkpoint_freq=arg.checkpoint_freq,
+    verbose=arg.verbose,
 )
 
 

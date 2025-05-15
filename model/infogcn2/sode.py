@@ -388,16 +388,12 @@ class SODE(nn.Module):
 
 
 if __name__ == "__main__":
-    import sys
-
-    sys.path.insert(0, "..")
     from config.argclass import ArgClass
 
-    model_type = 'base'
-    dataset = 'nturgbd-'
-    val_method = 'cross-subject'
+    model_type = 'cnn'
+    dataset = 'nturgbd'
 
-    arg = ArgClass(f"config/{dataset}{val_method}/train_{model_type}.yaml")
+    arg = ArgClass(f"config/{dataset}/train_{model_type}.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device

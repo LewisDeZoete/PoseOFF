@@ -60,8 +60,8 @@ class Feeder(Dataset):
         sort=False,
         A=None,
     ):
-        self.eval = eval
-        self.data_path = data_paths[eval]
+        self.eval = int(eval)
+        self.data_path = data_paths[self.eval]
         # self.label_path = label_path
         # self.labels = labels
         self.split = split
@@ -183,14 +183,14 @@ if __name__ == "__main__":
     import time
     from torch.utils.data import DataLoader
 
-    # srun --mem-per-cpu=30G python feeders/ucf101.py
+    # srun --mem-per-cpu=40G python feeders/ucf101.py
 
-    embed =  'cnn'
+    embed =  'base'
     arg = ArgClass(f"./config/ucf101/train_{embed}.yaml")
-    arg.feeder_args['eval'] = 1
+    arg.evaluation = 1
 
-    train_feeder = Feeder(**arg.feeder_args, split="train")
-    test_feeder = Feeder(**arg.feeder_args, split="test")
+    train_feeder = Feeder(**arg.feeder_args, eval=arg.evaluation, split="train")
+    test_feeder = Feeder(**arg.feeder_args, eval=arg.evaluation, split="test")
     
     dataloader = DataLoader(train_feeder, 
                             batch_size=arg.batch_size,
