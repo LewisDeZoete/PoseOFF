@@ -40,7 +40,7 @@ model_args:
   num_person: 2
   graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 0 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
+  flow_channels: 2 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
   ode_method: euler
@@ -82,4 +82,4 @@ test_batch_size: 256
 half: False
 
 checkpoint_freq: 10 # how often to save the model and training state
-save_location: ./results/nturgbd/CS/ # where to save the checkpoints
+save_location: ./results/nturgbd/ # where to save the checkpoints
