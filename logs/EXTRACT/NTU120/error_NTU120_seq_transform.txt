@@ -1,0 +1,2 @@
+/fred/oz141/ldezoete/MS-G3D/data_gen/utils/postprocess.py:140: RuntimeWarning: invalid value encountered in divide
+  v2 = v2 / (np.linalg.norm(v2))

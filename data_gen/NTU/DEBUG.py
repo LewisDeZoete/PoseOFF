@@ -22,7 +22,7 @@ for file in files:
         flow_data.append(sample)
     print(f'Flow data samples: {len(flow_data)}')
 
-
+# Save the data
 with open(osp.join(out_path, 'flow_data.pkl'), 'wb') as f:
     pickle.dump(flow_data, f, pickle.HIGHEST_PROTOCOL)
 

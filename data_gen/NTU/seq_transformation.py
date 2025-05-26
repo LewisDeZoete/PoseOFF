@@ -10,9 +10,16 @@ from data_gen.utils import create_aligned_dataset
 import argparse
 
 parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
-parser.add_argument('--dataset',dest='dataset', default='ntu', help='Dataset, either `ntu` or `ntu120` (default=ntu)')
-parser.add_argument('--flow', action='store_true', help='If passed, add flow to the pose array') 
-parser.add_argument('--realign', action='store_true', help='Reprocess the aligned data (store_true)')
+parser.add_argument('--dataset', 
+                    dest='dataset', 
+                    default='ntu', 
+                    help='Dataset, either `ntu` or `ntu120` (default=ntu)')
+parser.add_argument('--flow', 
+                    action='store_true', 
+                    help='If passed, add flow to the pose array') 
+parser.add_argument('--realign', 
+                    action='store_true', 
+                    help='Reprocess the aligned data (store_true)')
 args = parser.parse_args()
 dataset = args.dataset
 
@@ -33,8 +40,7 @@ raw_flowpose_pkl = osp.join(flow_path, 'raw_flowpose_data.pkl')
 if not osp.exists(save_path):
     os.mkdir(save_path)
 
-
-def get_details(skes_name):
+def get_details(skes_name, frames_cnt):
     details: dict = {} # Create and populate details dict
     for key in ['Setup', 'Camera', 'Performer', 'Replication', 'Label', 'Frame_cnt']:
         details[key] = np.array([], dtype=int)
@@ -158,7 +164,7 @@ def align_frames(joints, frames_cnt, MVC=150):
 
 def one_hot_vector(labels):
     num_skes = len(labels)
-    labels_vector = np.zeros((num_skes, 60))
+    labels_vector = np.zeros((num_skes, labels.max()+1))
     for idx, label in enumerate(labels):
         labels_vector[idx, label] = 1
 
@@ -181,7 +187,7 @@ def split_dataset(joints, details, evaluation, save_path, data_type='pose'):
     test_x = joints[test_indices]
     test_y = one_hot_vector(test_labels)
 
-    save_name = osp.join(save_path, f'NTU60_{evaluation}-{data_type}.npz')
+    save_name = osp.join(save_path, f'NTU{120 if dataset == "ntu120" else 60}_{evaluation}-{data_type}.npz')
     np.savez(save_name, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
 
 
@@ -277,7 +283,8 @@ if __name__ == '__main__':
     if dataset=='ntu120':
         frames_cnt = np.hstack((frames_cnt, np.loadtxt(frames_file, dtype=int)))
         skes_name = np.hstack((skes_name, np.loadtxt(skes_name_file, dtype=str)))
-    details = get_details(skes_name)
+    details = get_details(skes_name, frames_cnt)
+
 
     print(f'Dataset: {dataset}')
     if args.realign:
@@ -297,28 +304,29 @@ if __name__ == '__main__':
 
     # If this realign=True, align the flow and pose data and save it
     if args.realign:
-        # Load data statistics
-        frames_cnt = np.loadtxt(frames_file, dtype=int)  # frames_cnt
-        skes_name = np.loadtxt(skes_name_file, dtype=str) # skeleton names
-        details = get_details(skes_name)
-        # # Create (or recreate) the annotations file for the dataset
-        # # TODO: Do I need to create these annotations here, or earlier?
-        # annotations = {}
-        # for idx, ske_name in enumerate(skes_name):
-        #     annotations[ske_name] = int(details['Label'][idx])
-        # with open(osp.join(stat_path, 'ntu-rgbd-annotations.yaml'), 'w') as file:
-        #     yaml.dump(annotations, file)
-        
-        # Load the raw data
-        with open(raw_skes_joints_pkl, 'rb') as fr:
-            skes_joints = pickle.load(fr)  # a list
-        # Also load the flow if we pass the argument!
+        # Load the ntu skeleton data regardless of the dataset
+        with open('./data/ntu/denoised_data/raw_denoised_joints.pkl', 'rb') as fr:
+            skes_joints = pickle.load(fr)
         if args.flow:
-            with open(raw_flow_joints_pkl, 'rb') as fr:
+            with open('./data/ntu/flow_data/flow_data.pkl', 'rb') as fr:
                 flow_joints = pickle.load(fr)
             print(f'Flow joints dtype: {flow_joints[0].dtype}', flush=True)
         else:
             flow_joints = None
+
+        if dataset == 'ntu120':
+            # Load the raw data
+            with open(raw_skes_joints_pkl, 'rb') as fr:
+                for skel in pickle.load(fr):
+                    skes_joints.append(skel)
+            # Also load the flow if we pass the argument!
+            if args.flow:
+                with open(raw_flow_joints_pkl, 'rb') as fr:
+                    for skel in pickle.load(fr):
+                        flow_joints.append(skel)
+                print(f'Flow joints dtype: {flow_joints[0].dtype}', flush=True)
+            else:
+                flow_joints = None
         print(f'Loaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences', flush=True)
 
         # Translates the sequence to a new origin first non-zero frame of the first actor
@@ -341,18 +349,20 @@ if __name__ == '__main__':
         for evaluation in evaluations:
             split_dataset(skes_joints, details, evaluation, save_path, data_type='pose')
             print(f'Saved pose {evaluation}', flush=True)
-            file_list.append(osp.join(save_path, f'NTU60_{evaluation}-pose.npz'))
+            file_list.append(osp.join(save_path, f'NTU{120 if dataset == "ntu120" else 60}'\
+                                      f'_{evaluation}-pose.npz'))
             # If flow arg is passed, also split the flowpose dataset
             if args.flow:
                 split_dataset(flow_joints, details, evaluation, save_path, data_type='flowpose')
                 print(f'Saved flowpose {evaluation}', flush=True)
-                file_list.append(osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz'))
+                file_list.append(osp.join(save_path, f'NTU{120 if dataset == "ntu120" else 60}'\
+                                          f'_{evaluation}-flowpose.npz'))
     
     else:
         file_list = []
-        file_list += [osp.join(save_path, f'NTU60_{evaluation}-pose.npz') for evaluation in evaluations]
+        file_list += [osp.join(save_path, f'NTU{120 if dataset == "ntu120" else 60}_{evaluation}-pose.npz') for evaluation in evaluations]
         if args.flow:
-            file_list += [osp.join(save_path, f'NTU60_{evaluation}-flowpose.npz') for evaluation in evaluations]
+            file_list += [osp.join(save_path, f'NTU{120 if dataset == "ntu120" else 60}_{evaluation}-flowpose.npz') for evaluation in evaluations]
         print(file_list, flush=True)
 
     # Create the aligned dataset
