@@ -38,9 +38,9 @@ def run_epoch(
     log_acc = [
         AverageMeter() for _ in range(10)
     ]  # This one is a list of 10 AverageMeter objects
+    log_auc = AverageMeter()  # AUC 
     log_loss = AverageMeter()  # Total loss
     log_cls_loss = AverageMeter()  # class loss
-    # log_auc = AverageMeter()  # AUC TODO: make an AUC logger
     log_feature_loss = AverageMeter()  # feature loss
     log_recon_loss = AverageMeter()  # reconstruction loss
     # recon_2d_loss = AverageMeter()  # 2D reconstruction loss
@@ -66,7 +66,6 @@ def run_epoch(
             y = y.view(1, B, 1).expand(N_cls, B, y_hat.size(2))
             y_hat_ = rearrange(y_hat, "b i t -> (b t) i")
 
-            # TODO: make sure the second cls_loss here is LabelSmoothingCrossEntropy
             cls_loss = arg.lambda_1 * loss_funcs["cls_loss"](y_hat_, y.reshape(-1))
 
         # Reconstruction/prediction loss (EQ. 10)
@@ -135,36 +134,20 @@ def run_epoch(
                 .mean(),
                 B,
             )
+        log_auc.update((predict_label == y.data)\
+                       .view(N_cls, B, -1)[-1,:,:].float().mean(), B)
         log_loss.update(loss.data.item(), B)
         log_cls_loss.update(cls_loss.data.item(), B)
         log_feature_loss.update(feature_loss.data.item(), B)
         log_recon_loss.update(recon_loss.data.item(), B)
-        # loggers['kl_div'].update(kl_div.data.item(), B)
 
-        AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
-        # tbar.set_description(
-        #     f"[Epoch #{epoch}] "
-        #     f"AUC:{AUC:.3f}, "
-        #     f"CLS:{results['cls_loss'].avg:.3f}, "
-        #     f"FT:{results['feature_loss'].avg:.3f}, "
-        #     f"RECON:{results['recon_loss'].avg:.5f}, "
-        # )
-
-    # Calculate area under curve from the 10 accuracy values
+    # Calculate area under curve from average of the 10 accuracy values
     AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
-    # train_dict = {
-    #     "train/Recon2D_loss": results['recon_loss'].avg,
-    #     "train/cls_loss": results['cls_loss'].avg,
-    #     "train/feature_loss": results['feature_loss'].avg,
-    #     "train/kl_div": results['kl_div'].avg,
-    #     "train/AUC": AUC,
-    # }
-    # train_dict.update({f"train/ACC_{(i + 1) / 10}": results['acc'][i].avg for i in range(10)})
-    # wandb.log(train_dict)
+
 
     results[prefix + "_" + "ACC"].append({f"ACC_{(i+1)/10}":log_acc[i].avg for i in range(10)})
     results[prefix + "_" + "AUC"].append(AUC)
-    results[prefix + "_" + "loss"].append(loss)
+    results[prefix + "_" + "loss"].append(log_loss.avg)
     results[prefix + "_" + "cls_loss"].append(log_cls_loss.avg)
     results[prefix + "_" + "feature_loss"].append(log_feature_loss.avg)
     results[prefix + "_" + "recon_loss"].append(log_recon_loss.avg)
@@ -191,6 +174,7 @@ def train_network(
 ):
     """
     Train simple neural networks
+    TODO: Rewrite this doc string!
 
     Arguments:
         model: the PyTorch model / "Module" to train
@@ -276,7 +260,7 @@ def train_network(
                     arg=arg,
                     model=model,
                     optimiser=optimiser,
-                    data_loader=train_loader,
+                    data_loader=test_loader,
                     loss_funcs=loss_funcs,
                     device=device,
                     results=results,
@@ -286,7 +270,7 @@ def train_network(
             
             results["test_time"].append(test_time)
             # Print the results
-            print(f"\t\t{epoch} EPOCH BEST TEST ACC: {max(results['test_AUC'])}")
+            print(f"\t\t{epoch} EPOCH BEST TEST AUC: {max(results['test_AUC'])}")
             print(f"\t\t\tTrain time: {train_time:.2f} seconds")
             print(f"\t\t\tTest time: {test_time:.2f} seconds")
 
@@ -299,7 +283,78 @@ def train_network(
     return results
 
 
-def load_checkpoint(checkpoint_file: str, device, verbose: bool=False):
+def eval_network(
+    arg,
+    model,
+    loss_funcs,
+    test_loader,
+    checkpoint_file: str,
+    score_funcs=None,
+    device="cpu",
+    verbose: bool = False,
+    
+):
+    """
+    EVAL simple neural network
+
+    Arguments:
+        model: the PyTorch model / "Module" to train
+        loss_funcs: the loss function that takes in batch in two arguments, the model outputs and the labels, and returns a score
+        train_loader: PyTorch DataLoader object that returns tuples of (input, label) pairs.
+        test_loader: Optional PyTorch DataLoader to evaluate on after every epoch
+        score_funcs: A dictionary of scoring functions to use to evalue the performance of the model
+        epochs: the number of training epochs to perform
+        device: the compute lodation to perform training
+
+    """
+    to_track = ["epoch", "test_time", "test_loss", "lr"]
+    if score_funcs is not None:
+        for eval_score in score_funcs:
+            to_track.append("test_" + eval_score)
+
+    results = {}
+    print("\tTracking:")
+    # Initialize every item with an empty list
+    for item in to_track:
+        results[item] = []
+        print(f"\t\t{item}")
+
+    # Place the model on the correct compute resource (CPU or GPU)
+    model.to(device)
+
+    # Initialise the checkpoint file
+    checkpoint = load_checkpoint(checkpoint_file, device, verbose)
+    try:
+        results = checkpoint[
+            "results"
+        ]  # Don't override the results from previous training!
+    except KeyError:
+        pass  # Only just created the checkpoint file
+    del checkpoint  # might save us from OOM issues
+
+    # TEST
+    model = model.eval()
+    with torch.no_grad():
+        test_time = run_epoch(
+            arg=arg,
+            model=model,
+            optimiser=optimiser,
+            data_loader=test_loader,
+            loss_funcs=loss_funcs,
+            device=device,
+            results=results,
+            prefix="test",
+            desc="Testing",
+        )
+    
+    results["test_time"].append(test_time)
+    # Print the results???
+    print(f"\t\t\tTest time: {test_time:.2f} seconds")
+
+    return results
+
+
+def load_checkpoint(checkpoint_file: str, device, verbose: bool=False) -> dict:
     """
     Loads a checkpoint from a specified file.
 
