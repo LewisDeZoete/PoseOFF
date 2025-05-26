@@ -10,7 +10,7 @@ import torch.nn.functional as F
 
 
 def valid_crop_resize(
-    data_numpy: np.array, valid_frame_num: int, p_interval: list, window_size: int
+    data_numpy: np.ndarray, valid_frame_num: int, p_interval: list, window_size: int
 ):
     """
     Perform cropping and resizing on the input data.
@@ -63,7 +63,7 @@ def valid_crop_resize(
             print(cropped_length, bias, valid_size)
 
     # resize
-    data = torch.tensor(data, dtype=torch.float)
+    data = torch.tensor(data, dtype=torch.float) # C, T, V, M
     data = data.permute(0, 2, 3, 1).contiguous().view(C * V * M, cropped_length)
     data = data[None, None, :, :]
     data = F.interpolate(
@@ -108,7 +108,7 @@ def mean_subtractor(data_numpy, mean):
     return data_numpy
 
 
-def auto_pading(data_numpy, window_size=64, random_pad=False):
+def auto_padding(data_numpy, window_size=64, random_pad=False):
     """
     Pads the input data to a specified window size.
 
@@ -149,7 +149,7 @@ def random_choose(data_numpy, window_size=64, auto_pad=True):
         return data_numpy
     elif T < window_size:
         if auto_pad:
-            return auto_pading(data_numpy, window_size, random_pad=True)
+            return auto_padding(data_numpy, window_size, random_pad=True)
         else:
             return data_numpy
     else:
@@ -403,6 +403,8 @@ def random_rot(data_numpy, theta=0.3):
 if __name__ == "__main__":
     data = np.load("data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy")
     C, T, V, M = data.shape
+    print("(Channels, Time, Joints, Bodies)")
+    print(f"Original shape: {data.shape}")
 
     # Crop temporal dimension to only include valid frames
     valid_frame = data.sum(0, keepdims=True).sum(2, keepdims=True)
@@ -413,7 +415,7 @@ if __name__ == "__main__":
     for transform in [
         random_shift,
         random_choose,
-        auto_pading,
+        auto_padding,
         random_move,
         absolute_flow,
     ]:

@@ -40,24 +40,24 @@ class Feeder(Dataset):
 
     def __init__(
         self,
-        data_paths,
-        eval=None,
+        data_paths: str,
+        eval: int = 1,
         label_path=None,
         labels=None,
-        split="train",
+        split: str = "train",
         random_choose=False,
-        random_shift=False,
-        random_move=False,
-        random_rot=False,
-        p_interval=1,
-        window_size=64,
-        average_flow=False,
-        absolute_flow=False,
-        no_flow=False,
+        random_shift: bool = False,
+        random_move: bool = False,
+        random_rot: bool = False,
+        p_interval: list[float] = [1.0],
+        window_size: int = 64,
+        average_flow: bool = False,
+        absolute_flow: bool = False,
+        no_flow: bool = False,
         # normalisation=False,
-        use_mmap=False,
-        vel=False,
-        sort=False,
+        use_mmap: bool = False,
+        vel: bool = False,
+        sort: bool = False,
         A=None,
     ):
         self.eval = int(eval)
@@ -157,7 +157,7 @@ class Feeder(Dataset):
         if self.random_choose:
             data_numpy = tools.random_choose(data_numpy, self.window_size)
         elif self.window_size > 0:
-            data_numpy = tools.auto_pading(data_numpy, self.window_size)
+            data_numpy = tools.auto_padding(data_numpy, self.window_size)
         if self.random_move:
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
@@ -170,6 +170,7 @@ class Feeder(Dataset):
             data_numpy = tools.absolute_flow(
                 data_numpy, window_mean=self.absolute_flow["window_mean"]
             )
+        
         return data_numpy, label, mask, index
 
     def top_k(self, score, top_k):
@@ -206,8 +207,9 @@ if __name__ == "__main__":
     # and the first two frames of the first two persons
     print(f"\nTotal samples: {len(train_feeder)}")
     print(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
-    print(f"Data shape: {data_numpy.shape}") # (60, 3/53, 64, 25, 2)
-    print(f"Mask shape: {mask.shape}")
+    print(f"Data shape: {data_numpy.shape}") # (B (256), C (3/53), T (64), V (17), M (2))
+    print(f"Label shape: {label.shape}") # (B)
+    print(f"Mask shape: {mask.shape}") # (B, 1, 64, 1, 2)
 
     print(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
     print(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")

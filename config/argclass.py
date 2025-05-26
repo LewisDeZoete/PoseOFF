@@ -49,10 +49,10 @@ class ArgClass(object):
             print('Creating empty labels dictionary')
             self.feeder_args['labels'] = {}
         
-        # Create classes dictionary
-        self.classes = {}
-        for elem, key in enumerate(dict.fromkeys(key.split('_')[-1] for key in self.feeder_args['labels'].keys())):
-            self.classes[key] = elem
+        # # Create classes dictionary
+        # self.classes = {}
+        # for elem, key in enumerate(dict.fromkeys(key.split('_')[-1] for key in self.feeder_args['labels'].keys())):
+        #     self.classes[key] = elem
     
     def import_class(self, name):
         components = name.split('.')

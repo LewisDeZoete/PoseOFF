@@ -165,7 +165,7 @@ class Feeder(Dataset):
         if self.random_choose:
             data_numpy = tools.random_choose(data_numpy, self.window_size)
         elif self.window_size > 0:
-            data_numpy = tools.auto_pading(data_numpy, self.window_size)
+            data_numpy = tools.auto_padding(data_numpy, self.window_size)
         if self.random_move:
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
