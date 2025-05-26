@@ -128,6 +128,64 @@ class ODEFunc(nn.Module):
 
 
 class SODE(nn.Module):
+    '''
+    SODE: Spatio-Temporal ODE-based Graph Convolutional Network for Skeleton-based Action Recognition.
+
+    This class implements a neural network model that combines spatio-temporal graph convolutions, ODE-based temporal modeling, and classification for skeleton-based action recognition tasks.
+
+    Args:
+        num_class (int): Number of action classes for classification.
+        num_point (int): Number of joints (nodes) in the skeleton graph.
+        num_person (int): Number of persons in the input data.
+        graph (str or class): Graph structure definition or class for adjacency matrix.
+        pose_channels (int): Number of channels for pose input (e.g., 3 for (x, y, z)).
+        flow_channels (int): Number of channels for flow input.
+        embed_channels (int): Number of channels for joint embedding.
+        num_head (int): Number of attention heads for temporal encoder.
+        ode_method (str): ODE solver method (e.g., "rk4", "euler", "RNN").
+        depth (int): Depth of the temporal encoder (number of layers).
+        device (str): Device to use ("cuda" or "cpu").
+        T (int): Sequence length (number of frames).
+        n_step (int): Number of ODE steps for extrapolation.
+        SAGC_proj (bool): Whether to use projection in spatial attention graph convolution.
+        num_cls (int): Number of temporal classification segments.
+        n_sample (int): Number of samples for classification/reconstruction.
+        backbone (str): Backbone type for temporal encoder ("transformer" or "RNN").
+        cnn (bool): Whether to use CNN-based joint embedding.
+
+    Attributes:
+        Graph: Graph structure instance.
+        T (int): Sequence length.
+        arange (Tensor): Tensor of time indices.
+        shift_idx (Tensor): Indices for temporal shifting in extrapolation.
+        mask (Tensor): Mask for shifted predictions.
+        z0_prior (Normal): Prior distribution for latent variable z0.
+        num_class (int): Number of classes.
+        num_point (int): Number of joints.
+        num_person (int): Number of persons.
+        cls_idx (list): Indices for temporal classification segments.
+        zero (Tensor): Zero tensor for loss placeholder.
+        n_step (int): Number of ODE steps.
+        arange_n_step (Tensor): Range tensor for ODE steps.
+        to_joint_embedding (nn.Module): Module for joint embedding.
+        pos_embedding (nn.Parameter): Learnable positional embedding.
+        temporal_encoder (nn.Module): Temporal encoder module.
+        n_sample (int): Number of samples.
+        diffeq_solver (nn.Module): ODE solver or RNN for temporal dynamics.
+        recon_decoder (nn.Sequential): Decoder for reconstructing input.
+        cls_decoder (nn.Sequential): Decoder for classification.
+        classifier_lst (list): List of classifiers for each temporal segment.
+        spatial_pooling (function): Function for spatial pooling (default: mean).
+
+    Methods:
+        extrapolate(z_0, t): Extrapolates latent representations using ODE solver.
+        origin_extrapolate(z, t): Alternative extrapolation method (not commonly used).
+        get_A(k): Returns the k-th power adjacency matrix for the graph.
+        KL_div(z_mu, z_std, kl_coef=1): Computes KL divergence between latent and prior (not used).
+        forward(x): Forward pass of the model. Returns classification logits, reconstructed input, and latent variables.
+        get_attention(): Returns attention weights from the temporal encoder.
+        set_n_step(n_step): Sets the number of ODE steps for extrapolation.
+    '''
     def __init__(
         self,
         num_class=60,
@@ -333,6 +391,25 @@ class SODE(nn.Module):
         return loss
 
     def forward(self, x):
+        """
+        Forward pass of the model.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (N, C, T, V, M), where
+                N: batch size,
+                C: number of channels,
+                T: number of time steps,
+                V: number of joints (vertices),
+                M: number of persons (instances).
+
+        Returns:
+            tuple:
+                y (torch.Tensor): Classification output tensor of shape (N, num_cls, T).
+                x_hat (torch.Tensor): Reconstructed input tensor.
+                z_0 (torch.Tensor): Initial latent representation.
+                z_hat_shifted (torch.Tensor): Extrapolated latent representation after shifting.
+                self.zero (torch.Tensor): Zero tensor (purpose defined elsewhere in the class).
+        """
         N, C, T, V, M = x.size()
 
         # Joint embedding
@@ -408,5 +485,6 @@ if __name__ == "__main__":
     print(f"Input channels: {C}\n")
 
     x = torch.randn((8, C, 64, V, 2)).to(device)
+    print(x.shape)
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
-    print(f'y_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}')
+    print(f'y_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n')
