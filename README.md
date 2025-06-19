@@ -34,6 +34,9 @@ For each dataset, the following files will need to be run in this order:
 | the code block below (to combine each extraction) | 10 minutes | 75g | ❌ |
 | `seq_transformation.py` | 2 hours | 450g? | ❌ |
 
+Edit the file `data_gen/NTU/ntu_gendata.sh` and comment out each section as you go.
+Refer to the table above for resources needed for these extractions.
+
 ```python
 dataset = 'ntu120'
 data_path = f'./data/{dataset}/flow_data'

@@ -124,3 +124,6 @@ actors_info/
 # Videos (can always be regenerated)
 *.mp4
 *.avi
+
+# Emacs backups
+*~
