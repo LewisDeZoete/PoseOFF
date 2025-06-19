@@ -268,61 +268,62 @@ class FlowPoseSampler:
 
 
 
-    def __call__(self, flows, poses):
-        """
-        Samples the optical flow in windows surrounding the pose keypoints.
-        Returns array of shape:
-            (num_pose_channels+(window_size**2)*2,
-            frames, 
-            keypoints, 
-            num_people)
-        """
-        if isinstance(flows, torch.Tensor):
-            flows = flows.cpu().numpy()
-        if isinstance(poses, torch.Tensor):
-            poses = poses.cpu().numpy()
+    # def __call__(self, flows, poses):
+    #     """
+    #     Samples the optical flow in windows surrounding the pose keypoints.
+    #     Returns array of shape:
+    #         (num_pose_channels+(window_size**2)*2,
+    #         frames, 
+    #         keypoints, 
+    #         num_people)
+    #     """
+    #     if isinstance(flows, torch.Tensor):
+    #         flows = flows.cpu().numpy()
+    #     if isinstance(poses, torch.Tensor):
+    #         poses = poses.cpu().numpy()
         
-        num_frames, _, height, width = flows.shape
-        num_keypoints = poses.shape[2]*poses.shape[3]
-        
-        if self.pose_match:
-            poses = self.pose_match(poses)
+    #     num_frames, _, height, width = flows.shape
+    #     num_keypoints = poses.shape[2]*poses.shape[3]
 
-        # Calculate pose points and visibility mask outside of the loop
-        pose_points = ((poses[:2, :, :] + 0.5).reshape(2, poses.shape[1], num_keypoints)
-                       * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
-        vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
+    #     if hasattr(self, 'pose_match'):
+    #         poses = self.pose_match(poses)
 
-        # Prepare tensor to stack flow windows
-        stacker = np.zeros((self.window_size**2*2, poses.shape[1], num_keypoints))
+    #     # Calculate pose points and visibility mask outside of the loop
+    #     pose_points = ((poses[:2, :, :] + 0.5).reshape(2, poses.shape[1], num_keypoints)
+    #                    * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
+    #     print(poses.shape)
+    #     vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)
 
-        # Create a grid of valid indices (filter out points close to the image border)
-        valid_indices = (vis.reshape(poses.shape[1], num_keypoints) & 
-                         (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
-                         (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
+    #     # Prepare tensor to stack flow windows
+    #     stacker = np.zeros((self.window_size**2*2, poses.shape[1], num_keypoints))
+
+    #     # Create a grid of valid indices (filter out points close to the image border)
+    #     valid_indices = (vis.reshape(poses.shape[1], num_keypoints) & 
+    #                      (pose_points[0, :, :] >= self.half_k) & (pose_points[0, :, :] < width - self.half_k) & 
+    #                      (pose_points[1, :, :] >= self.half_k) & (pose_points[1, :, :] < height - self.half_k))
                         
-        # Loop through the frames and sample flow in window around each valid keypoint
-        for i in range(num_frames):
-            flow = flows[i]
-            for keypoint_num in range(num_keypoints):
-                if valid_indices[i+1, keypoint_num]:
-                    x, y = pose_points[0, i+1, keypoint_num], pose_points[1, i+1, keypoint_num]
-                    # Get the window of optical flow and calculate mean directly
-                    flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
+    #     # Loop through the frames and sample flow in window around each valid keypoint
+    #     for i in range(num_frames):
+    #         flow = flows[i]
+    #         for keypoint_num in range(num_keypoints):
+    #             if valid_indices[i+1, keypoint_num]:
+    #                 x, y = pose_points[0, i+1, keypoint_num], pose_points[1, i+1, keypoint_num]
+    #                 # Get the window of optical flow and calculate mean directly
+    #                 flow_window = flow[:, y - self.half_k : y + self.half_k + 1, x - self.half_k : x + self.half_k + 1]
                     
-                    stacker[:, i+1, keypoint_num] = flow_window.flatten()
+    #                 stacker[:, i+1, keypoint_num] = flow_window.flatten()
         
-        # Concatenate poses with computed flow
-        flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
+    #     # Concatenate poses with computed flow
+    #     flow_pose = np.concatenate((poses, stacker.reshape(stacker.shape[0], *poses.shape[1:])), axis=0)
         
-        # If we pass loop_graph = True, then loop the graph using this function!
-        if hasattr(self, 'loop_graph'):
-            flow_pose = self.loop_graph(flow_pose)
+    #     # If we pass loop_graph = True, then loop the graph using this function!
+    #     if hasattr(self, 'loop_graph'):
+    #         flow_pose = self.loop_graph(flow_pose)
         
-        if hasattr(self, 'norm'):
-            flow_pose = self.norm(flow_pose, flow_window=self.window_size)
+    #     if hasattr(self, 'norm'):
+    #         flow_pose = self.norm(flow_pose, flow_window=self.window_size)
         
-        return flow_pose
+    #     return flow_pose
 
 
 if __name__ == '__main__':

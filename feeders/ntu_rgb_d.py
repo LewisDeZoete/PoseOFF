@@ -206,6 +206,7 @@ if __name__ == "__main__":
 
     embed =  'cnn'
     arg = ArgClass(f"config/nturgbd/train_{embed}.yaml")
+    arg.feeder_args['data_paths']['CV'] = './data/ntu/aligned_data/MINI_CV_flowpose.npz'
     arg.feeder_args['eval'] = 'CV'
 
     train_feeder = Feeder(**arg.feeder_args, split="train")
