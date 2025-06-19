@@ -187,6 +187,7 @@ def split_dataset(joints, details, evaluation, save_path, data_type='pose'):
     test_x = joints[test_indices]
     test_y = one_hot_vector(test_labels)
 
+
     save_name = osp.join(save_path, f'NTU{120 if dataset == "ntu120" else 60}_{evaluation}-{data_type}.npz')
     np.savez(save_name, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
 

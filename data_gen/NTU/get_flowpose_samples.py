@@ -1,11 +1,5 @@
-# import sys
 import os
 import os.path as osp
-
-# # # add lib to path
-# curr_dir = osp.dirname(osp.abspath(__file__))
-# sys.path.insert(0, osp.abspath(osp.join(curr_dir, '../..')))
-
 from data_gen.utils import LoadVideo, GetFlow, FlowPoseSampler
 from config.argclass import ArgClass
 import torch
@@ -24,25 +18,35 @@ parser.add_argument(
     default='ntu',
     help='Dataset, either `ntu` or `ntu120` (default=ntu)')
 parser.add_argument(
-    '--idx_start',
-    dest='idx_start',
-    default=0,
+    '--batch_size',
+    dest='batch_size',
+    default=2000,
     type=int,
-    help='Index start for the data generation')
+    help='Processing batch size (default 2000), \
+        processes from (batch_number-1)*batch_size - batch_number*batch_size')
 parser.add_argument(
-    '--idx_end',
-    dest='idx_end',
-    default=20000,
+    '--batch_number',
+    dest='batch_number',
+    default=1,
     type=int,
-    help='Index end for the data generation')
+    help='Batch number for processing')
 args = parser.parse_args()
 
+# Parsed command line arguments
 dataset = args.dataset
-idx_start = args.idx_start
-idx_end = args.idx_end
+batch_size = args.batch_size
+batch_number = args.batch_number
+
+# Define start and end indexes based on passed arguments
+idx_start = (batch_number-1)*batch_size
+idx_end = batch_number*batch_size
+
+print(f'Start index: {idx_start}')
+print(f'End index: {idx_end}')
 
 # Get the argparse object
-arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}-cross-subject/train_base.yaml")
+# arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}/train_base.yaml")
+arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}/train_cnn_TMP.yaml")
 transform_args = arg.extractor
 
 # Get the device
@@ -62,14 +66,22 @@ transforms = v2.Compose([
     GetFlow(model=model, device=device, minibatch_size=transform_args['flow']['minibatch_size'])
     # GetFlow(model=model, device=device, minibatch_size=2) # For non-resized videos
     ])
-
-# TODO: Make sure these values are reflected in config file
 transform_args['flowpose']['norm'] = False
 transform_args['flowpose']['match_pose'] = False
 transform_args['flowpose']['ntu'] = True
 
 # Create the FlowPoseSampler transform object
 flowPoseTransform = FlowPoseSampler(**transform_args['flowpose'])
+
+def human_k(n):
+    if n<1000:
+        return "0"
+    elif n >= 1000:
+        val = n/1000
+        s = f"{val:.1f}".rstrip('0').rstrip('.')
+        return f"{s}k"
+    else:
+        return str(n)
 
 def remove_frame_drops(flow_data, frames_drop_list):
     """
@@ -86,10 +98,6 @@ def remove_frame_drops(flow_data, frames_drop_list):
 
 
 def get_raw_flowpose_data(idx_start=0, idx_end=20000):
-    skes_names = np.loadtxt(skes_name_file, dtype=str)
-    num_files = skes_names.size
-    print('Found %d available skeleton files.\n' % num_files, flush=True)
-
     flowpose_data = []
 
     # Assuming we've already denoised all the pose data
@@ -122,36 +130,46 @@ def get_raw_flowpose_data(idx_start=0, idx_end=20000):
                 C, _, V, M = poses.shape
                 poses = np.concatenate([np.zeros((C, 1, V, M)), poses], axis=1)
 
-        # NOTE: Flowpose data shape is (C, T, V, M)
-        # Reshaping to (T, (M V C)) for sequence transform
-        flowpose = flowPoseTransform(flow_data, poses) # Get the flowpose data!
+        # Get the flowpose data and reshape!
+        flowpose = flowPoseTransform(flow_data, poses) 
         flowpose_data.append(rearrange(flowpose, 'C T V M -> T (M V C)'))
 
-        if (ske_number+1) % 1000 == 0:
-            print(f'Processed {ske_number-999}-{ske_number} in {time.time()-start:0.2f} seconds', flush=True)
+        if (ske_number+1) % 500 == 0:
+            print(f'Processed {ske_number-499}-{ske_number} in {time.time()-start:0.2f} seconds', flush=True)
             start = time.time()
 
     # Save the data
-    data_name = f"flow_{str(idx_start)[:2]+'k' if start != 0 else 0}-{str(idx_end)[:2]}k"
+    data_name = f"flow_{human_k(idx_start)}-{human_k(idx_end)}"
     flowpose_pkl = osp.join(save_path, f'{data_name}.pkl')
     with open(flowpose_pkl, 'wb') as f:
         pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
 
     
 if __name__ == '__main__':
-    print(f'Processing flowpose samples for {dataset} dataset...', flush=True)
-    root_path = f'./data/{dataset}'
-
     # Define paths
-    save_path = osp.join(root_path, 'flow_data')
+    root_path = f'./data/{dataset}'
+    save_path = osp.join(root_path, 'flow_data', 'export_tmp')
     stat_path = osp.join(root_path, 'statistics')
     rgb_path = '../Datasets/NTU_RGBD{0}/nturgb+d_rgb{0}/'.format('120' if dataset == 'ntu120' else '')
     skes_name_file = osp.join(stat_path, f'ntu_rgbd{120 if dataset == "ntu120" else ""}-available.txt')
     denoised_skes_data_file = osp.join(root_path, 'denoised_data', 'raw_denoised_colors.pkl')
     frames_drop_file = osp.join(root_path, 'raw_data', 'frames_drop_skes.pkl')
+
+    # Get the skeleton names
+    skes_names = np.loadtxt(skes_name_file, dtype=str)
+    num_files = skes_names.size
+    print('Found %d available skeleton files.\n' % num_files, flush=True)
     
     if not osp.exists(save_path):
         os.makedirs(save_path)
+    
+    # Print processing information before processing...
+    print(f'Processing flowpose samples for {dataset} dataset...', flush=True)
+    print(f'\tIndex {idx_start} to {idx_end}')
+    try:
+        print(f'\tSkeleton {skes_names[idx_start]} to {skes_names[idx_end-1]}')
+    except IndexError:
+        print(f'\tSkeleton {skes_names[idx_start]} to {skes_names[-1]}')
     
     # Generate the data
     get_raw_flowpose_data(idx_start=idx_start, idx_end=idx_end)
