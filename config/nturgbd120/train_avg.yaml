@@ -1,28 +1,22 @@
 # Feeder
-feeder: feeders.ucf101.Feeder
+feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
   data_paths: 
-    1: ./data/UCF-101/flowpose/ucf101_01.npz
-    2: ./data/UCF-101/flowpose/ucf101_02.npz
-    3: ./data/UCF-101/flowpose/ucf101_03.npz
-  label_path: ../Datasets/UCF-101/ucf101_annotations.yaml
+    CSet: ./data/ntu120/aligned_data/NTU120_CSet-flowpose_aligned.npz
+    CSub: ./data/ntu120/aligned_data/NTU120_CSub-flowpose_aligned.npz
+  label_path: ./data/ntu/statistics/ntu_rgbd120-annotations.yaml
   p_interval: [0.5, 1]
-  random_shift: True
   random_choose: True
+  random_shift: True
   window_size: 64
   random_move: True
   random_rot: True
-  average_flow: False # model_args.flow_channels = 2
+  average_flow: True # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: False
 
 extractor:
-  data_paths: 
-    rgb_path: ../Datasets/UCF-101/
-    pose_path: ./data/UCF-101/pose/
-    flow_path: ./data/UCF-101/flow/
-    flowpose_path: ./data/UCF-101/flowpose/
   preprocessed: True
   pose: 
     weights: pretrained_models/yolo11x-pose.pt
@@ -34,16 +28,19 @@ extractor:
     window_size: 5
     threshold: 0.05
     loop: False
+    norm: False
+    match_pose: False
+    ntu: True
     
 # model
 model: model.infogcn2.sode.SODE
 model_args:
-  num_class: 101
-  num_point: 17
+  num_class: 60
+  num_point: 25
   num_person: 2
-  graph: graph.yolo_pose.Graph
+  graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 50 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
+  flow_channels: 2 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
   ode_method: euler
@@ -52,10 +49,10 @@ model_args:
   T: 64 # Maximum sequence length
   n_step: 3 # Number of ODE solver steps
   SAGC_proj: True # Using self-attention graph convolution, (GCN if False)
-  num_cls: 1 # Number of classification heads used
+  num_cls: 10 # Number of classification heads used
   n_sample: 1
   backbone: transformer
-  cnn: True
+  cnn: False
 ignore_weights: []
 phase: train
 # weights: ./pretrained_models/kinetics_joint.pt
@@ -79,10 +76,10 @@ lambda_5: 0.0
 # training
 num_epoch: 70
 device: 0
-batch_size: 128
+batch_size: 256
 forward_batch_size: 128
 test_batch_size: 256
 half: False
 
 checkpoint_freq: 10 # how often to save the model and training state
-save_location: ./results/ucf101/ # where to save the checkpoints
+save_location: ./results/nturgbd120/ # where to save the checkpoints
