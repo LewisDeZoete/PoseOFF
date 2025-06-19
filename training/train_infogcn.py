@@ -6,7 +6,7 @@ import time
 import os
 from einops import rearrange, repeat
 from tqdm import tqdm
-from .loss import AverageMeter
+from training.loss import AverageMeter
 
 
 def run_epoch(
@@ -18,26 +18,25 @@ def run_epoch(
     device,
     results,
     prefix="",
-    desc=None,
 ):
     """
     loggers contain the following:
-        'acc': list of 10 AverageMeter objects
+        'acc': AverageMeter object per video frame
         'cls_loss': AverageMeter object
         'feature_loss': AverageMeter object
         'recon_loss': AverageMeter object
-        'recon_2d_loss': AverageMeter object (maybe not?)
-        'kl_div': AverageMeter object (maybe not?)
+        'recon_2d_loss': AverageMeter object
+        'kl_div': AverageMeter object
     """
     if prefix == "train":
         model.train()
     else:
         model.eval()
 
-    # AverageResults objects (work like running loss)
+    # AverageMeter objects track values (n_values, mean, etc)
     log_acc = [
-        AverageMeter() for _ in range(10)
-    ]  # This one is a list of 10 AverageMeter objects
+        AverageMeter() for _ in range(arg.model_args['T'])
+    ]  # One AverageMeter for each frame in the input video
     log_auc = AverageMeter()  # AUC 
     log_loss = AverageMeter()  # Total loss
     log_cls_loss = AverageMeter()  # class loss
@@ -126,26 +125,38 @@ def run_epoch(
 
         # Update loggers
         _, predict_label = torch.max(y_hat.data, 1)
-        for i, ratio in enumerate([(i + 1) / 10 for i in range(10)]):
-            log_acc[i].update(
-                (predict_label == y.data)
-                .view(N_cls * B, -1)[:, int(math.ceil(T * ratio)) - 1]
+        correct = (predict_label == y.data)
+        for frame_no in range(T):
+            log_acc[frame_no].update(
+                correct[0, :, frame_no]
                 .float()
                 .mean(),
-                B,
-            )
-        log_auc.update((predict_label == y.data)\
-                       .view(N_cls, B, -1)[-1,:,:].float().mean(), B)
+                B)
+        # for i, ratio in enumerate([(i + 1) / 10 for i in range(10)]):
+        #     log_acc[i].update(
+        #         (predict_label == y.data)
+        #         .view(N_cls * B, -1)[:, int(math.ceil(T * ratio)) - 1]
+        #         .float()
+        #         .mean(),
+        #         B,
+        #     )
+        log_auc.update(
+            correct
+            .view(N_cls, B, -1)[-1,:,:]
+            .float()
+            .mean(), 
+            B)
         log_loss.update(loss.data.item(), B)
         log_cls_loss.update(cls_loss.data.item(), B)
         log_feature_loss.update(feature_loss.data.item(), B)
         log_recon_loss.update(recon_loss.data.item(), B)
 
     # Calculate area under curve from average of the 10 accuracy values
-    AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
+    AUC = np.mean([frame.avg.cpu().numpy() for frame in log_acc])
+    # AUC = np.mean([log_acc[i].avg.cpu().numpy() for i in range(10)])
 
-
-    results[prefix + "_" + "ACC"].append({f"ACC_{(i+1)/10}":log_acc[i].avg for i in range(10)})
+    # results[prefix + "_" + "ACC"].append({f"ACC_{(i+1)/10}":log_acc[i].avg for i in range(10)})
+    results[prefix + "_" + "ACC"].append([frame.avg.data for frame in log_acc])
     results[prefix + "_" + "AUC"].append(AUC)
     results[prefix + "_" + "loss"].append(log_loss.avg)
     results[prefix + "_" + "cls_loss"].append(log_cls_loss.avg)
@@ -173,8 +184,7 @@ def train_network(
     verbose: bool = False,
 ):
     """
-    Train simple neural networks
-    TODO: Rewrite this doc string!
+    Neural network training and testing loop.
 
     Arguments:
         model: the PyTorch model / "Module" to train
@@ -237,7 +247,6 @@ def train_network(
             device=device,
             results=results,
             prefix="train",
-            desc="Training",
         )
 
         # Append the post-training results to the results dictionary
@@ -265,7 +274,6 @@ def train_network(
                     device=device,
                     results=results,
                     prefix="test",
-                    desc="Testing",
                 )
             
             results["test_time"].append(test_time)
@@ -417,13 +425,14 @@ def save_checkpoint(
 if __name__ == "__main__":
     from config.argclass import ArgClass
     from model import ModelLoader
-    from feeders import ucf101
     from torch.utils.data import DataLoader
     from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
     import torch.optim as optim
 
-    arg = ArgClass("./config/ucf101/train_joint_infogcn.yaml")
-    arg.checkpoint_file = "DELETE_ME.pt"
+    arg = ArgClass("./config/nturgbd/train_cnn.yaml")
+    arg.feeder_args['data_paths']['CV'] = './data/ntu/aligned_data/MINI_CV_flowpose.npz'
+    arg.feeder_args['eval'] = 'CV'
+    arg.checkpoint_file = "./DELETE_ME.pt"
 
     # Model
     modelLoader = ModelLoader(arg)
@@ -443,13 +452,17 @@ if __name__ == "__main__":
         nesterov=arg.optim["nesterov"],
         weight_decay=arg.optim["weight_decay"],
     )
+    scheduler = optim.lr_scheduler.MultiStepLR(
+        optimiser, milestones=arg.optim["step"], gamma=arg.optim["gamma"]
+    )
 
     # Dataset and dataloader
-    train_dataset = ucf101.Feeder(**arg.feeder_args)
+    feeder_class = arg.import_class(arg.feeder)
+    train_dataset = feeder_class(**arg.feeder_args, split="train")
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=arg.batch_size,
-        num_workers=8,
+        num_workers=4,
         shuffle=True,
         pin_memory=True,
     )
@@ -460,20 +473,28 @@ if __name__ == "__main__":
     loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 
     # Score functions for tracking
-    score_funcs = ["AUC", "cls_loss", "feature_loss", "recon_loss"]
+    score_funcs = ["ACC", "AUC", "cls_loss", "feature_loss", "recon_loss"]
 
     # Get the device (cuda or cpu)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     results = train_network(
-        arg,
-        model,
-        loss_funcs,
-        train_dataloader,
+        arg=arg,
+        model=model,
+        loss_funcs=loss_funcs,
+        train_loader=train_dataloader,
         score_funcs=score_funcs,
         device=device,
-        epochs=1,
+        epochs=10,
+        scheduler=scheduler,
         optimiser=optimiser,
         checkpoint_file=arg.checkpoint_file,
-        checkpoint_freq=arg.checkpoint_freq,
+        checkpoint_freq=10,
+        verbose=True,
     )
+
+
+    checkpoint = torch.load('./DELETE_ME.pt', map_location='cpu')
+
+    res = checkpoint['results']
+    print(res['train_ACC'][-1])
