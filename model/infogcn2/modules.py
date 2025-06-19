@@ -257,12 +257,12 @@ def PositionalEncoding(d_model: int, dropout: float = 0.1, max_len: int = 5000):
 
 
 class TemporalEncoder(nn.Module):
-    def __init__(self, seq_len, dim, depth, heads, mlp_dim, dim_head=64, dropout=0., emb_dropout=0., A=1, num_point=25, SAGC_proj=True, device='cuda'):
+    def __init__(self, seq_len, dim, depth, heads, mlp_dim, dim_head=64, dropout=0., emb_dropout=0., A=1, num_point=25, SAGC_proj=True, device='cuda', use_mask=True):
         super().__init__()
 
         self.pe = PositionalEncoding(d_model=dim, max_len=seq_len).to(device)
         self.dropout = nn.Dropout(emb_dropout)
-        self.transformer = Transformer(dim, depth, heads, dim_head, mlp_dim, seq_len, dropout, A=A, num_point=num_point, use_mask=True, SAGC_proj=SAGC_proj)
+        self.transformer = Transformer(dim, depth, heads, dim_head, mlp_dim, seq_len, dropout, A=A, num_point=num_point, use_mask=use_mask, SAGC_proj=SAGC_proj)
         self.to_latent = nn.Identity()
         self.apply(self._init_weights)
 

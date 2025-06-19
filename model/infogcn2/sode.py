@@ -206,6 +206,7 @@ class SODE(nn.Module):
         n_sample=1,
         backbone="transformer",
         cnn=False,
+        use_mask=True
     ):
         super(SODE, self).__init__()
 
@@ -267,6 +268,7 @@ class SODE(nn.Module):
                 A=A,
                 num_point=num_point,
                 SAGC_proj=SAGC_proj,
+                use_mask=use_mask
             )
             if backbone == "transformer"
             else Encoder_z0_RNN(embed_channels, A, device)
@@ -467,7 +469,7 @@ class SODE(nn.Module):
 if __name__ == "__main__":
     from config.argclass import ArgClass
 
-    model_type = 'cnn'
+    model_type = 'cnn_TMP'
     dataset = 'nturgbd'
 
     arg = ArgClass(f"config/{dataset}/train_{model_type}.yaml")
@@ -485,6 +487,8 @@ if __name__ == "__main__":
     print(f"Input channels: {C}\n")
 
     x = torch.randn((8, C, 64, V, 2)).to(device)
-    print(x.shape)
+    print(f'Input shape: {x.shape}\n    (B, C, T, V, M)')
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
-    print(f'y_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n')
+    print(f'\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n')
+    print(f'Attention length: {len(model.get_attention())}')
+    print(f'Attention [0] shape: {model.get_attention()[0].shape}')
