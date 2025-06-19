@@ -1,0 +1,38 @@
+SLURM_ARRAY_TASK_ID: 3
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 4000 to 6000
+	Skeleton S002C002P003R001A049 to S002C003P014R001A013
+	Frames dropped for S002C002P007R002A055: 29
+	Frames dropped for S002C002P009R001A055: 43
+	Frames dropped for S002C002P010R001A001: 5
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S002C002P010R001A055: 7
+Processed 4000-4499 in 8949.72 seconds
+	Frames dropped for S002C002P012R001A042: 4
+	Frames dropped for S002C002P014R001A055: 9
+Processed 4500-4999 in 8969.18 seconds
+Processed 5000-5499 in 9176.79 seconds
+	Frames dropped for S002C003P011R001A055: 47
+Processed 5500-5999 in 8924.48 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------ Job Report: 1067353 (COMPLETED) -------------------+
+| Memory (RAM)  [################    ] 82.2% (20.5 GB peak / 25 GB)    |
+| CPU           [##################  ] 93.2% average                   |
+| GPU           [##############      ] 73.8% average                   |
+| Time          [---------------->   ] 83.4% (0-10:00:45 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            18                            |
+|   /fred   3.9 GB        4.6 KB         7.7 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      972 KB        0 B            220                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+

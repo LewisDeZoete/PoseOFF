@@ -1,0 +1,46 @@
+SLURM_ARRAY_TASK_ID: 8
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 14000 to 16000
+	Skeleton S006C001P015R001A004 to S006C002P024R002A035
+	Frames dropped for S006C001P016R001A008: 6
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C001P017R001A060: 7
+Processed 14000-14499 in 10061.02 seconds
+	Frames dropped for S006C001P023R001A055: 35
+	Frames dropped for S006C002P007R001A007: 19
+		Frame 0 in skip list, add blank frame to poses
+Processed 14500-14999 in 10513.79 seconds
+	Frames dropped for S006C002P007R001A060: 6
+	Frames dropped for S006C002P007R002A014: 31
+	Frames dropped for S006C002P008R001A060: 14
+	Frames dropped for S006C002P008R002A059: 48
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C002P008R002A060: 20
+	Frames dropped for S006C002P016R001A008: 9
+	Frames dropped for S006C002P016R001A042: 7
+Processed 15000-15499 in 10363.46 seconds
+	Frames dropped for S006C002P022R002A059: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C002P023R001A014: 68
+		Frame 0 in skip list, add blank frame to poses
+Processed 15500-15999 in 10973.79 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------ Job Report: 1067358 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 86.2% (21.5 GB peak / 25 GB)    |
+| CPU           [#################   ] 86.2% average                   |
+| GPU           [#############       ] 66.2% average                   |
+| Time          [------------------->] 97.1% (0-11:39:28 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   7.3 MB        0 B            30                            |
+|   /fred   4.2 GB        1.8 GB         5.9 K                         |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+

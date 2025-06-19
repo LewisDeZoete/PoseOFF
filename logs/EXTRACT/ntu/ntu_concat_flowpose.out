@@ -1,0 +1,74 @@
+Appending flow_0-2k.pkl
+Flow data samples: 2000
+Appending flow_2k-4k.pkl
+Flow data samples: 4000
+Appending flow_4k-6k.pkl
+Flow data samples: 6000
+Appending flow_6k-8k.pkl
+Flow data samples: 8000
+Appending flow_8k-10k.pkl
+Flow data samples: 10000
+Appending flow_10k-12k.pkl
+Flow data samples: 12000
+Appending flow_12k-14k.pkl
+Flow data samples: 14000
+Appending flow_14k-16k.pkl
+Flow data samples: 16000
+Appending flow_16k-18k.pkl
+Flow data samples: 18000
+Appending flow_18k-20k.pkl
+Flow data samples: 20000
+Appending flow_20k-22k.pkl
+Flow data samples: 22000
+Appending flow_22k-24k.pkl
+Flow data samples: 24000
+Appending flow_24k-26k.pkl
+Flow data samples: 26000
+Appending flow_26k-28k.pkl
+Flow data samples: 28000
+Appending flow_28k-30k.pkl
+Flow data samples: 30000
+Appending flow_30k-32k.pkl
+Flow data samples: 32000
+Appending flow_32k-34k.pkl
+Flow data samples: 34000
+Appending flow_34k-36k.pkl
+Flow data samples: 36000
+Appending flow_36k-38k.pkl
+Flow data samples: 38000
+Appending flow_38k-40k.pkl
+Flow data samples: 40000
+Appending flow_40k-42k.pkl
+Flow data samples: 42000
+Appending flow_42k-44k.pkl
+Flow data samples: 44000
+Appending flow_44k-46k.pkl
+Flow data samples: 46000
+Appending flow_46k-48k.pkl
+Flow data samples: 48000
+Appending flow_48k-50k.pkl
+Flow data samples: 50000
+Appending flow_50k-52k.pkl
+Flow data samples: 52000
+Appending flow_52k-54k.pkl
+Flow data samples: 54000
+Appending flow_54k-56k.pkl
+Flow data samples: 56000
+Appending flow_56k-58k.pkl
+Flow data samples: 56578
+
++------------------ Job Report: 1256495 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 85.7% (51.4 GB peak / 60 GB)    |
+| CPU           [##                  ] 10.6% average                   |
+| Time          [->                  ]  7.8% (0-00:03:08 / 0-00:40:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   924 KB        0 B                     30                   |
+|   /fred   40.3 GB       38.7 GB                 81                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,0 +1,45 @@
+SLURM_ARRAY_TASK_ID: 14
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 26000 to 28000
+	Skeleton S008C003P032R002A051 to S009C002P019R002A034
+	Frames dropped for S008C003P033R001A055: 31
+	Frames dropped for S008C003P033R001A059: 46
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C003P033R002A042: 41
+	Frames dropped for S008C003P034R001A059: 34
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C003P034R002A042: 29
+	Frames dropped for S008C003P034R002A043: 14
+	Frames dropped for S008C003P035R002A043: 10
+	Frames dropped for S008C003P036R001A055: 26
+	Frames dropped for S008C003P036R001A059: 59
+		Frame 0 in skip list, add blank frame to poses
+Processed 26000-26499 in 8562.11 seconds
+Processed 26500-26999 in 9684.62 seconds
+	Frames dropped for S009C001P025R002A060: 10
+	Frames dropped for S009C002P007R001A002: 10
+		Frame 0 in skip list, add blank frame to poses
+Processed 27000-27499 in 9912.93 seconds
+	Frames dropped for S009C002P019R001A003: 23
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S009C002P019R001A055: 6
+Processed 27500-27999 in 8215.08 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------ Job Report: 1082105 (COMPLETED) -------------------+
+| Memory (RAM)  [##################  ] 91.9% (23 GB peak / 25 GB)      |
+| CPU           [##################  ] 93.1% average                   |
+| GPU           [###############     ] 75.3% average                   |
+| Time          [---------------->   ] 84.5% (0-10:08:05 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   436 KB        0 B            23                            |
+|   /fred   5.8 GB        11 KB          8 K                           |
+|   /home   0 B           0 B            1                             |
+|   OS      148 KB        0 B            25                            |
++----------------------------------------------------------------------+

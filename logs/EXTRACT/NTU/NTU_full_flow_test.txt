@@ -1,0 +1,26 @@
+Processing flowpose samples for ntu dataset...
+Found 56578 available skeleton files.
+
+Processed -900-99 in 2023.56 seconds
+Processed -800-199 in 1827.58 seconds
+Processed -700-299 in 1921.16 seconds
+Processed -600-399 in 1943.34 seconds
+Processed -500-499 in 1641.23 seconds
+Processed -400-599 in 1460.10 seconds
+Processed -300-699 in 1686.70 seconds
+Processed -200-799 in 1671.15 seconds
+
++-------------------- Job Report: 942052 (TIMEOUT) ---------------------+
+| Memory (RAM)  [###############     ] 75.4% (18.8 GB peak / 25 GB)     |
+| CPU           [##################  ] 94.1% average                    |
+| GPU           [###############     ] 77.8% average                    |
+| Time          [------------------->] 100.1% (0-04:00:18 / 0-04:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write    Total IOPS                     |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   1.3 MB        0 B            65                             |
+|   /fred   2.6 GB        2.1 KB         6.2 K                          |
+|   /home   0 B           0 B            2                              |
+|   OS      28.4 MB       0 B            101                            |
++-----------------------------------------------------------------------+

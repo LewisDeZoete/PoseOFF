@@ -1,0 +1,35 @@
+SLURM_ARRAY_TASK_ID: 17
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 32000 to 34000
+	Skeleton S010C003P017R001A027 to S011C001P028R002A049
+	Frames dropped for S010C003P019R002A055: 19
+Processed 32000-32499 in 10368.71 seconds
+	Frames dropped for S010C003P025R001A060: 5
+	Frames dropped for S011C001P007R001A060: 6
+	Frames dropped for S011C001P007R002A060: 1
+Processed 32500-32999 in 10251.29 seconds
+Processed 33000-33499 in 10266.84 seconds
+	Frames dropped for S011C001P025R001A060: 10
+Processed 33500-33999 in 11365.33 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------ Job Report: 1093381 (COMPLETED) -------------------+
+| Memory (RAM)  [###############     ] 79.0% (19.8 GB peak / 25 GB)    |
+| CPU           [#################   ] 87.8% average                   |
+| GPU           [#############       ] 65.3% average                   |
+| Time          [------------------->] 98.2% (0-11:46:54 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   13.1 MB       0 B            38                            |
+|   /fred   7.8 GB        3.1 KB         9.7 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      3.1 MB        0 B            79                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+

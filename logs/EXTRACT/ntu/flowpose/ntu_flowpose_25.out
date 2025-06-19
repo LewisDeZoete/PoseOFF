@@ -1,0 +1,53 @@
+SLURM_ARRAY_TASK_ID: 25
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 48000 to 50000
+	Skeleton S014C003P027R001A008 to S015C002P019R002A039
+	Frames dropped for S014C003P027R001A055: 37
+	Frames dropped for S014C003P037R002A059: 47
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S015C001P007R001A059: 53
+		Frame 0 in skip list, add blank frame to poses
+Processed 48000-48499 in 9236.76 seconds
+	Frames dropped for S015C001P008R001A060: 8
+	Frames dropped for S015C001P008R002A059: 30
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S015C001P016R002A060: 22
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S015C001P017R001A060: 6
+Processed 48500-48999 in 8628.32 seconds
+	Frames dropped for S015C001P019R001A055: 19
+	Frames dropped for S015C001P025R001A055: 22
+	Frames dropped for S015C001P037R001A055: 26
+	Frames dropped for S015C002P007R002A059: 59
+		Frame 0 in skip list, add blank frame to poses
+Processed 49000-49499 in 10157.20 seconds
+	Frames dropped for S015C002P008R002A055: 19
+	Frames dropped for S015C002P008R002A059: 52
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S015C002P015R002A059: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S015C002P015R002A060: 3
+	Frames dropped for S015C002P019R001A060: 70
+Processed 49500-49999 in 8707.98 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------ Job Report: 1104353 (COMPLETED) -------------------+
+| Memory (RAM)  [################    ] 82.9% (20.7 GB peak / 25 GB)    |
+| CPU           [##################  ] 92.3% average                   |
+| GPU           [##############      ] 70.5% average                   |
+| Time          [----------------->  ] 85.3% (0-10:14:06 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   8.2 MB        0 B            35                            |
+|   /fred   5.2 GB        15.4 KB        8.4 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      212 KB        0 B            25                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+

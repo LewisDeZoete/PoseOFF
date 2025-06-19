@@ -1,0 +1,62 @@
+SLURM_ARRAY_TASK_ID: 27
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 52000 to 54000
+	Skeleton S016C001P040R002A020 to S017C001P008R001A051
+	Frames dropped for S016C002P007R002A059: 57
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C002P007R002A060: 9
+	Frames dropped for S016C002P008R001A013: 10
+	Frames dropped for S016C002P008R001A014: 38
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C002P008R001A060: 21
+	Frames dropped for S016C002P008R002A059: 60
+		Frame 0 in skip list, add blank frame to poses
+Processed 52000-52499 in 9084.92 seconds
+	Frames dropped for S016C002P021R002A059: 78
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C002P021R002A060: 17
+	Frames dropped for S016C002P025R002A059: 47
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C002P039R002A055: 25
+	Frames dropped for S016C002P039R002A057: 31
+	Frames dropped for S016C002P040R001A009: 19
+	Frames dropped for S016C002P040R002A055: 12
+	Frames dropped for S016C002P040R002A059: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C002P040R002A060: 56
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C003P007R001A005: 8
+	Frames dropped for S016C003P007R001A059: 58
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C003P007R001A060: 1
+Processed 52500-52999 in 10312.96 seconds
+	Frames dropped for S016C003P019R001A059: 62
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S016C003P019R001A060: 6
+	Frames dropped for S016C003P021R001A055: 6
+	Frames dropped for S016C003P021R001A059: 73
+		Frame 0 in skip list, add blank frame to poses
+Processed 53000-53499 in 10392.48 seconds
+	Frames dropped for S016C003P039R002A043: 14
+Processed 53500-53999 in 10299.48 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------ Job Report: 1104356 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 90.0% (22.5 GB peak / 25 GB)    |
+| CPU           [#################   ] 87.2% average                   |
+| GPU           [#############       ] 67.7% average                   |
+| Time          [------------------> ] 92.9% (0-11:08:58 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   9.4 MB        0 B            31                            |
+|   /fred   4.1 GB        27.2 KB        5.9 K                         |
+|   OS      0 B           0 B            2                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+

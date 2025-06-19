@@ -1,0 +1,278 @@
+SLURM_ARRAY_TASK_ID: 8
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 12000 to 14000
+	Skeleton S005C002P013R001A035 to S006C001P015R001A003
+	Frames dropped for S005C002P013R002A055: 1
+	Frames dropped for S003C002P007R001A059: 44
+		Frame 0 in skip list, add blank frame to poses
+Processed 7000-7499 in 8400.75 seconds
+	Frames dropped for S003C003P019R001A055: 25
+	Index 14000 to 16000
+	Skeleton S006C001P015R001A004 to S006C002P024R002A035
+	Frames dropped for S006C001P016R001A008: 6
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S005C001P015R002A042: 6
+	Frames dropped for S003C002P008R001A008: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C002P008R001A059: 38
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S005C002P016R001A008: 16
+	Frames dropped for S002C001P012R002A059: 27
+		Frame 0 in skip list, add blank frame to poses
+Processed 17000-17499 in 9725.82 seconds
+	Frames dropped for S005C001P016R002A042: 30
+	Frames dropped for S006C001P017R001A060: 7
+	Frames dropped for S001C002P008R002A060: 6
+Processed 5000-5499 in 9682.36 seconds
+	Frames dropped for S007C001P015R001A055: 10
+	Index 18000 to 20000
+	Skeleton S007C001P018R002A006 to S007C002P028R001A040
+	Frames dropped for S007C001P026R002A001: 23
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S001C003P001R001A055: 6
+	Frames dropped for S003C002P015R002A055: 24
+	Frames dropped for S002C001P014R001A055: 7
+Processed 1500-1999 in 8402.94 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953047 (COMPLETED) -------------------+
+| Memory (RAM)  [###############     ] 80.0% (20 GB peak / 25 GB)      |
+| CPU           [##################  ] 94.1% average                   |
+| GPU           [###############     ] 76.9% average                   |
+| Time          [---------------->   ] 80.7% (0-09:41:19 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   208 KB        0 B            15                            |
+|   /fred   3.5 GB        22.5 KB        5.9 K                         |
+|   OS      0 B           0 B            1                             |
++----------------------------------------------------------------------+
+Processed 9000-9499 in 11175.84 seconds
+Processed 11000-11499 in 10229.94 seconds
+Processed 12000-12499 in 8795.12 seconds
+Processed 3500-3999 in 9354.88 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953048 (COMPLETED) -------------------+
+| Memory (RAM)  [################    ] 82.1% (20.5 GB peak / 25 GB)    |
+| CPU           [##################  ] 92.8% average                   |
+| GPU           [##############      ] 74.2% average                   |
+| Time          [----------------->  ] 85.3% (0-10:14:28 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   11 MB         0 B            31                            |
+|   /fred   3.8 GB        11.9 KB        5.9 K                         |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+
+Processed 14000-14499 in 8860.20 seconds
+Processed 18000-18499 in 9160.33 seconds
+	Frames dropped for S003C002P017R001A055: 29
+Processed 7500-7999 in 8432.26 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953050 (COMPLETED) -------------------+
+| Memory (RAM)  [################    ] 80.6% (20.1 GB peak / 25 GB)    |
+| CPU           [##################  ] 94.2% average                   |
+| GPU           [###############     ] 77.0% average                   |
+| Time          [--------------->    ] 78.0% (0-09:21:32 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   11 MB         0 B            30                            |
+|   /fred   5 GB          33.7 KB        5.9 K                         |
+|   OS      0 B           0 B            2                             |
++----------------------------------------------------------------------+
+	Frames dropped for S002C003P011R001A055: 47
+	Frames dropped for S005C002P021R001A055: 32
+	Frames dropped for S006C001P023R001A055: 35
+	Frames dropped for S007C001P018R001A014: 33
+	Frames dropped for S007C002P007R001A014: 68
+		Frame 0 in skip list, add blank frame to poses
+Processed 17500-17999 in 10486.64 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+	Frames dropped for S007C002P007R001A020: 17
+		Frame 0 in skip list, add blank frame to poses
+
++------------------- Job Report: 953055 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 86.1% (21.5 GB peak / 25 GB)    |
+| CPU           [################    ] 81.5% average                   |
+| GPU           [############        ] 62.8% average                   |
+| Time          [------------------->] 97.8% (0-11:44:17 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   16.6 MB       0 B            27                            |
+|   /fred   6.9 GB        27.6 KB        6.6 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      28 KB         0 B            2                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+
+	Frames dropped for S005C002P004R001A059: 51
+	Frames dropped for S005C003P004R001A059: 61
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S004C002P003R001A059: 40
+		Frame 0 in skip list, add blank frame to poses
+Processed 5500-5999 in 10700.67 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953049 (COMPLETED) -------------------+
+| Memory (RAM)  [###############     ] 78.5% (19.6 GB peak / 25 GB)    |
+| CPU           [#################   ] 88.1% average                   |
+| GPU           [#############       ] 68.9% average                   |
+| Time          [------------------> ] 93.9% (0-11:15:58 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.6 MB        0 B            34                            |
+|   /fred   7.4 GB        20.9 KB        6.1 K                         |
+|   OS      0 B           0 B            6                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+
+	Frames dropped for S007C002P008R001A050: 18
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S005C002P010R002A055: 6
+	Frames dropped for S007C002P008R001A060: 1
+	Frames dropped for S006C002P007R001A007: 19
+		Frame 0 in skip list, add blank frame to poses
+Processed 11500-11999 in 9731.37 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953052 (COMPLETED) -------------------+
+| Memory (RAM)  [#############       ] 67.0% (16.7 GB peak / 25 GB)    |
+| CPU           [################    ] 83.0% average                   |
+| GPU           [#############       ] 65.9% average                   |
+| Time          [------------------->] 95.7% (0-11:28:43 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1 MB          0 B            27                            |
+|   /fred   5.2 GB        20.6 KB        6 K                           |
+|   OS      0 B           0 B            3                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+
+Processed 9500-9999 in 10603.18 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953051 (COMPLETED) -------------------+
+| Memory (RAM)  [###############     ] 77.4% (19.3 GB peak / 25 GB)    |
+| CPU           [################    ] 83.0% average                   |
+| GPU           [#############       ] 65.2% average                   |
+| Time          [------------------->] 95.9% (0-11:30:24 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   10.8 MB       0 B            31                            |
+|   /fred   10.2 GB       21 KB          10.6 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      2.8 MB        0 B            462                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+
+Processed 14500-14999 in 9075.89 seconds
+Processed 18500-18999 in 9168.28 seconds
+	Frames dropped for S006C002P007R001A060: 6
+Processed 12500-12999 in 9744.90 seconds
+	Frames dropped for S006C002P007R002A014: 31
+	Frames dropped for S005C003P015R001A055: 13
+	Frames dropped for S006C002P008R001A060: 14
+	Frames dropped for S006C002P008R002A059: 48
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C002P008R002A060: 20
+	Frames dropped for S005C003P016R002A008: 15
+	Frames dropped for S005C003P016R002A020: 44
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C002P016R001A008: 9
+	Frames dropped for S006C002P016R001A042: 7
+Processed 13000-13499 in 7439.71 seconds
+Processed 19000-19499 in 8427.48 seconds
+Processed 15000-15499 in 8847.13 seconds
+	Frames dropped for S005C003P021R001A055: 32
+	Frames dropped for S007C002P019R001A055: 36
+	Frames dropped for S005C003P021R002A055: 13
+	Frames dropped for S006C002P022R002A059: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C002P023R001A014: 68
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S006C001P008R001A059: 39
+		Frame 0 in skip list, add blank frame to poses
+Processed 13500-13999 in 8626.91 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953053 (COMPLETED) -------------------+
+| Memory (RAM)  [#############       ] 67.2% (16.8 GB peak / 25 GB)    |
+| CPU           [##################  ] 91.7% average                   |
+| GPU           [#############       ] 68.9% average                   |
+| Time          [---------------->   ] 80.2% (0-09:37:47 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   22.1 MB       0 B            34                            |
+|   /fred   4.7 GB        33.8 KB        5.9 K                         |
+|   OS      0 B           0 B            1                             |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+
+Processed 19500-19999 in 8647.88 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953046 (COMPLETED) -------------------+
+| Memory (RAM)  [##################  ] 90.5% (22.6 GB peak / 25 GB)    |
+| CPU           [##################  ] 93.6% average                   |
+| GPU           [###############     ] 77.7% average                   |
+| Time          [---------------->   ] 82.4% (0-09:53:19 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1 MB          0 B            33                            |
+|   /fred   6.1 GB        20 KB          12.4 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      3.3 MB        0 B            434                           |
++----------------------------------------------------------------------+
+Processed 15500-15999 in 9497.25 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data
+
++------------------- Job Report: 953054 (COMPLETED) -------------------+
+| Memory (RAM)  [################### ] 98.7% (24.7 GB peak / 25 GB)    |
+| CPU           [##################  ] 94.9% average                   |
+| GPU           [###############     ] 79.2% average                   |
+| Time          [---------------->   ] 84.1% (0-10:05:16 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   4.6 MB        0 B            31                            |
+|   /fred   4.2 GB        39.1 KB        5.9 K                         |
+|   OS      16.3 MB       0 B            10                            |
++----------------------------------------------------------------------+
