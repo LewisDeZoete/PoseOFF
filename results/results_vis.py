@@ -5,9 +5,9 @@ import os
 import os.path as osp
 
 dataset = 'nturgbd'
-evaluation = 'CS'
+evaluation = 'CV'
 # dataset = 'ucf101'
-# evaluation = '1'
+# evaluation = '2'
 
 checkpoint_base_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_base.pt'
 checkpoint_abs_path = f'results/{dataset}/{evaluation}/{dataset}_{evaluation}_abs.pt'
@@ -47,8 +47,13 @@ os.makedirs(save_root, exist_ok=True)
 #   Loss comparison graphing
 # ------------------------------
 
-def plot_loss_comp(fig_title: str, x, save_root,
-              results_base, results_abs, results_avg, results_cnn):
+def plot_loss_comp(
+        fig_title: str, x, save_root,
+        results_base=None, 
+        results_abs=None, 
+        results_avg=None, 
+        results_cnn=None
+        ):
     """
     Plot the loss comparison graph for different models.
     Args:
@@ -67,32 +72,31 @@ def plot_loss_comp(fig_title: str, x, save_root,
         ax.set_xlabel('Epoch', fontsize=20)
     ax1.set_ylabel('Loss', fontsize=20)
 
+    results = [results_base, results_abs, results_avg, results_cnn]
+    plot_params = [
+        {'label': 'Base', 'color': 'tab:olive'},
+        {'label': 'Absolute flow', 'color': 'tab:green'},
+        {'label':  'Average flow', 'color': 'tab:pink'},
+        {'label': 'CNN learning', 'color': 'tab:blue'}
+    ]
+
     # Plot class loss
     ax1.set_title('Classification Loss', fontsize = 25)
-    ax1.plot(x, results_base['train_cls_loss'], label='Base', color='tab:olive')
-    ax1.plot(x, results_abs['train_cls_loss'], label='Absolute flow', color='tab:green')
-    ax1.plot(x, results_avg['train_cls_loss'], label='Average flow', color='tab:pink')
-    ax1.plot(x, results_cnn['train_cls_loss'], label='CNN learning', color='tab:blue')
-    ax1.legend()
-
-    # Plot feature loss
     ax2.set_title('Feature Loss', fontsize = 25)
-    ax2.plot(x, results_base['train_feature_loss'], label='Base', color='tab:olive')
-    ax2.plot(x, results_abs['train_feature_loss'], label='Absolute flow', color='tab:green')
-    ax2.plot(x, results_avg['train_feature_loss'], label='Average flow', color='tab:pink')
-    ax2.plot(x, results_cnn['train_feature_loss'], label='CNN', color='tab:blue')
-
-    # Plot reconstruction loss
     ax3.set_title('Reconstruction Loss', fontsize = 25)
-    ax3.plot(x, results_base['train_recon_loss'], label='Base', color='tab:olive')
-    ax3.plot(x, results_abs['train_recon_loss'], label='Average flow', color='tab:green')
-    ax3.plot(x, results_avg['train_recon_loss'], label='Average flow', color='tab:pink')
-    ax3.plot(x, results_cnn['train_recon_loss'], label='CNN', color='tab:blue')
 
+    for axis, loss_type in {ax1: 'cls', ax2: 'feature', ax3:'recon'}.items():
+        for result, plot_param in zip(results, plot_params):
+            try:
+                axis.plot(x, result[f'train_{loss_type}_loss'],
+                         **plot_param)
+            except TypeError:
+                print(f"Failed to plot {plot_param['label']} {loss_type} loss")
+
+    ax1.legend()
     plt.tight_layout()
     os.makedirs(osp.join(save_root,'loss_comparison'), exist_ok=True)
     plt.savefig(osp.join(save_root,'loss_comparison/Loss_comparison.png'))
-
 
 # ------------------------------
 #   Accuracy comparison graphing
@@ -102,8 +106,13 @@ def plot_loss_comp(fig_title: str, x, save_root,
 def to_percentage(result):
     return [r*100 for r in result]
 
-def plot_accuracy(fig_title: str, x, save_root,
-                  results_base, results_abs, results_avg, results_cnn):
+def plot_accuracy(
+        fig_title: str, x, save_root,
+        results_base=None, 
+        results_abs=None, 
+        results_avg=None, 
+        results_cnn=None
+        ):
     """
     Plot the accuracy comparison graph for different models.
     Args:
@@ -128,30 +137,96 @@ def plot_accuracy(fig_title: str, x, save_root,
         # ax.set_xscale('log')
     ax1.set_ylabel('Classification accuracy %', fontsize=20)
 
-    # Plot train Accuracy
-    ax1.plot(x, to_percentage(results_base['train_AUC']), label='Base', color='tab:olive')
-    ax1.plot(x, to_percentage(results_abs['train_AUC']), label='Absolute flow', color='tab:green')
-    ax1.plot(x, to_percentage(results_avg['train_AUC']), label='Average flow', color='tab:pink')
-    ax1.plot(x, to_percentage(results_cnn['train_AUC']), label='CNN', color='tab:blue')
+    results = [results_base, results_abs, results_avg, results_cnn]
+    plot_params = [
+        {'label': 'Base', 'color': 'tab:olive'},
+        {'label': 'Absolute flow', 'color': 'tab:green'},
+        {'label':  'Average flow', 'color': 'tab:pink'},
+        {'label': 'CNN learning', 'color': 'tab:blue'}
+    ]
+
+
+    for result, plot_param in zip(results, plot_params):
+        try:
+            # Plot train and test AUC
+            ax1.plot(x, to_percentage(result['train_AUC']),
+                     **plot_param)
+            ax2.plot(x, to_percentage(result['test_AUC']),
+                     **plot_param)
+        except TypeError:
+            print(f"Failed to plot {plot_param['label']}")
+
+    # Set titles and legends
     ax1.set_title('Train accuracy', fontsize=25)
+    ax2.set_title('Test accuracy', fontsize=25)
     ax1.legend(loc=4, prop={'size':20})
 
-    # Plot test Accuracy
-    ax2.plot(x, to_percentage(results_base['test_AUC']), label='Base', color='tab:olive')
-    ax2.plot(x, to_percentage(results_abs['test_AUC']), label='Absolute flow', color='tab:green')
-    ax2.plot(x, to_percentage(results_avg['test_AUC']), label='Average flow', color='tab:pink')
-    ax2.plot(x, to_percentage(results_cnn['test_AUC']), label='CNN', color='tab:blue')
-    ax2.set_title('Test accuracy', fontsize=25)
-
+    # Print max AUC for each model
     for name, results in {'Base': results_base, 
                         'Absolute': results_abs, 
                         'Average': results_avg, 
                         'CNN': results_cnn}.items():
-        print(f"{name}: {max(to_percentage(results['test_AUC'])):.2f}%")
+        print(f"{name}: {to_percentage(results['test_ACC'][-1])[-1]:.2f}%")
+        # print(f"{name}: {max(to_percentage(results['test_AUC'])):.2f}%")
 
     os.makedirs(osp.join(save_root,'accuracy'), exist_ok=True)
     plt.savefig(osp.join(save_root,'accuracy/Acc_comparison_simple.png'))
 
+
+# ------------------------------
+#   Classification accuracy for observation ratios
+# ------------------------------ 
+
+def plot_obs_acc(fig_title: str, save_root,
+                  results_base=None, 
+                  results_abs=None, 
+                  results_avg=None,
+                  results_cnn=None):
+    """
+    Plot the accuray for the observation ratios 
+    Network provides a classification per-frame (64 frame input)
+    Args:
+        fig_title (str): Title of the figure.
+        x (array): Epochs.
+        results_base (dict): Results for the base model.
+        results_abs (dict): Results for the absolute flow model.
+        results_avg (dict): Results for the average flow model.
+        results_cnn (dict): Results for the CNN model.
+    """
+    # Create figure and axes
+    fig, (ax1, ax2) = plt.subplots(1,2, figsize=(25,10))
+    fig.suptitle(f'Loss Comparison - {fig_title}', fontsize=30)
+    for ax in (ax1, ax2):
+        ax.tick_params(axis='both', which='major', labelsize=20)
+        ax.set_xlabel('Observation Ratio', fontsize=20)
+    ax1.set_ylabel('Accuracy', fontsize=20)
+
+    results = [results_base, results_abs, results_avg, results_cnn]
+    plot_params = [
+        {'label': 'Base', 'color': 'tab:olive'},
+        {'label': 'Absolute flow', 'color': 'tab:green'},
+        {'label':  'Average flow', 'color': 'tab:pink'},
+        {'label': 'CNN learning', 'color': 'tab:blue'}
+    ]
+    percents = ((torch.arange(64)+1)*(100/64)).int()
+
+    # Plot class loss
+    ax1.set_title('Train Accuracy', fontsize = 25)
+    ax2.set_title('Test Accuracy', fontsize = 25)
+
+    for result, plot_param in zip(results, plot_params):
+        try:
+            ax1.plot(percents, torch.tensor(result['train_ACC'][-1]),
+                        **plot_param)
+            ax2.plot(percents, torch.tensor(result['test_ACC'][-1]),
+                        **plot_param)
+        except TypeError:
+            print(f"Failed to plot {plot_param['label']}")
+
+    ax1.legend(loc='lower right', fontsize='large')
+    plt.tight_layout()
+    os.makedirs(osp.join(save_root,'accuracy'), exist_ok=True)
+    plt.savefig(osp.join(save_root,'accuracy/Observation_Acc.png'))
 
 # # ------------------------------
 # #   Individual loss graphing
@@ -232,6 +307,31 @@ def plot_accuracy(fig_title: str, x, save_root,
 
 
 if __name__ == '__main__':
-    plot_loss_comp(fig_title, x, save_root, results_base, results_abs, results_avg, results_cnn)
-    plot_accuracy(fig_title, x, save_root, results_base, results_abs, results_avg, results_cnn)
+    # Plot the loss comparison
+    plot_loss_comp(
+        fig_title, x, save_root, 
+        results_base=results_base, 
+        results_abs=results_abs,
+        results_avg=results_avg,
+        results_cnn=results_cnn
+        )
+    
+    # Plot the accuracy comparison
+    plot_accuracy(
+        fig_title, x, save_root, 
+        results_base=results_base, 
+        results_abs=results_abs,
+        results_avg=results_avg,
+        results_cnn=results_cnn
+        )
+
+    # Plot the accuracy comparison across different observation ratios
+    plot_obs_acc(
+        fig_title, save_root,
+        results_base=results_base, 
+        results_abs=results_abs,
+        results_avg=results_avg,
+        results_cnn=results_cnn
+        )
+    # plot_accuracy(fig_title, x, save_root, results_base, results_abs, results_avg, results_cnn)
     # plt.show()
