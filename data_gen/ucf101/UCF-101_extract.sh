@@ -36,12 +36,11 @@ if ! [[ "$NUM_INCOMPLETE_CLASSES" =~ ^[0-9]+$ ]]; then
 fi
 
 # JOB ARRAY STARTS
-# sbatch --array=0-$(($NUM_INCOMPLETE_CLASSES-1)) --export=modality=$modality ./data_gen/utils/extract.sh
 array_job_id=$(sbatch --array=0-$(($NUM_INCOMPLETE_CLASSES-1)) --export=modality=$modality ./data_gen/ucf101/extractors/extract.sh | awk '{print $4}')
 
 # # Submit the validation job with a dependency on the array job
-sbatch --dependency=afterok:$array_job_id ./data_gen/ucf101/validation.sh
-# validation_job_id=$(sbatch --dependency=afterok:$array_job_id ./data_gen/ucf101/validation.sh | awk '{print $4}')
+# sbatch --dependency=afterok:$array_job_id ./data_gen/ucf101/validation.sh
+validation_job_id=$(sbatch --dependency=afterok:$array_job_id ./data_gen/ucf101/validation.sh | awk '{print $4}')
 
 # # Submit the next job with a dependency on the validation job
-# sbatch --dependency=afterok:$validation_job_id ./data_gen/ucf101/align.sh
+sbatch --dependency=afterok:$validation_job_id ./data_gen/ucf101/align.sh
