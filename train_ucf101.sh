@@ -15,4 +15,4 @@ export PYTHONUNBUFFERED=TRUE
 
 source ../environment/bin/activate
 
-python main.py -c ucf101 -p train -m avg -e 3 -r ucf101_3_avg -d 'UCF-101 eval 3 avg TESTING FULL DATASET' -v
+python main.py -c ucf101 -p train -m avg -e 3 -r ucf101_3_avg -d 'UCF-101 eval 3 avg' -v

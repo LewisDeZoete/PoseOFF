@@ -10,6 +10,7 @@ from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
 # from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 import os.path as osp
+import datetime
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -50,13 +51,24 @@ parser.add_argument(
     help="Description of what is being tested in run",
 )
 parser.add_argument(
+    "--data_path_overwrite", help="Overwrite dataset path"
+)
+parser.add_argument(
     "-v", dest="verbose", action="store_true", help="Print verbose output for argparse"
 )
+
 parsed = parser.parse_args()
 
 print("### Libraries loaded")
 # Pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
+# `with open(f'./config/{arg.config}/{arg.phase}_{arg.model_type}.yaml', 'r')...`
 arg = ArgClass(arg=parsed, verbose=parsed.verbose)
+
+# TODO: REMOVE if not using, can pass root path for the dataset object
+for arg_key, arg_val in arg.feeder_args['data_paths'].items():
+    arg.feeder_args['data_paths'][arg_key] = osp.join(arg.data_path_overwrite,
+                                                      arg_val.split('/')[-1])
+arg.feeder_args['use_mmap']=True
 
 # Define checkpoint file
 if arg.run_name != "":
@@ -112,18 +124,7 @@ optimiser = optim.SGD(
     weight_decay=arg.optim["weight_decay"],
 )
 
-# scheduler1 = optim.lr_scheduler.LinearLR(
-#     optimiser, start_factor=0.5, total_iters=arg.optim["step"][0]
-# )
-# scheduler2 = optim.lr_scheduler.ConstantLR(
-#     optimiser, factor=1, total_iters=arg.optim["step"][1]
-# )
-# scheduler3 = optim.lr_scheduler.ExponentialLR(optimiser, gamma=arg.optim["gamma"])
-# scheduler = optim.lr_scheduler.SequentialLR(
-#     optimiser,
-#     schedulers=[scheduler1, scheduler2, scheduler3],
-#     milestones=arg.optim["step"],
-# )
+# MultiStep Learning Rate scheduler (default steps at 50, 60 epochs)
 scheduler = optim.lr_scheduler.MultiStepLR(
     optimiser, milestones=arg.optim["step"], gamma=arg.optim["gamma"]
 )
@@ -134,22 +135,18 @@ recon_loss = masked_recon_loss
 loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 
 
-# TRAINING!
-# score_funcs = {'accuracy': accuracy_score,
-#                'confusion matrix': confusion_matrix,
-#                'classification report': classification_report}
-score_funcs = ["ACC", "AUC",
-               "AUC_avg_meter", # TODO Delete this! and in training/train_infogcn.py
-               "cls_loss", "feature_loss", "recon_loss"]
+# Score functions (train+test), accuracy, area under curve, 
+# class, feature and reconstruction losses
+score_funcs = ["ACC", "AUC", "cls_loss", "feature_loss", "recon_loss"]
 
-
+# Simultaneous training of the network
 results = train_network(
     arg=arg,
     model=skel_model,
     loss_funcs=loss_funcs,
     train_loader=train_dataloader,
     test_loader=test_dataloader,
-    score_funcs=score_funcs,  # TODO: Implement score functions for infogcn
+    score_funcs=score_funcs,
     device=device,
     epochs=arg.num_epoch,
     scheduler=scheduler,
@@ -159,7 +156,7 @@ results = train_network(
     verbose=arg.verbose,
 )
 
-
-# print(f'\tTraining time: {results['training time'][-1]/60:0.2f)} minutes')
-# print(f'\tBest train accuracy: {results['train accyracy'].max()}')
-# print(f'\tBest test accuracy: {results['test accyracy'].max()}')
+print(f"\tTraining time: \
+{datetime.timedelta(seconds=int(sum(results['train_time']+results['test_time'])))} minutes")
+print(f"\tBest train AUC: {torch.tensor(results['train_AUC']).max().item()}")
+print(f"\tBest test AUC: {torch.tensor(results['test_AUC']).max().item()}")

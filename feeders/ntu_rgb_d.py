@@ -91,7 +91,7 @@ class Feeder(Dataset):
 
     def load_data(self):
         # data: N T (MVC)
-        npz_data = np.load(self.data_path)
+        npz_data = np.load(self.data_path, mmap_mode='r' if self.use_mmap else None)
         if self.split == "train":
             self.data = npz_data["x_train"]
             self.labels = np.argmax(npz_data["y_train"], axis=-1)
