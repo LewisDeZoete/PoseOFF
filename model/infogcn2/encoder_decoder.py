@@ -257,7 +257,6 @@ class RNN(nn.Module):
             GCN(self.latent_dim, self.latent_dim, A),
         )
 
-
     def forward(self, z0, time):
         # data : B C T V
 

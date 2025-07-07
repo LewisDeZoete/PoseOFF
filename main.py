@@ -1,3 +1,7 @@
+import os.path as osp
+import datetime
+import argparse
+
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -9,9 +13,6 @@ from training.train_infogcn import train_network
 from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
 # from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-import os.path as osp
-import datetime
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -64,11 +65,12 @@ print("### Libraries loaded")
 # `with open(f'./config/{arg.config}/{arg.phase}_{arg.model_type}.yaml', 'r')...`
 arg = ArgClass(arg=parsed, verbose=parsed.verbose)
 
-# TODO: REMOVE if not using, can pass root path for the dataset object
-for arg_key, arg_val in arg.feeder_args['data_paths'].items():
-    arg.feeder_args['data_paths'][arg_key] = osp.join(arg.data_path_overwrite,
-                                                      arg_val.split('/')[-1])
-arg.feeder_args['use_mmap']=True
+# Pass root path for the dataset objects
+if arg.data_path_overwrite is not None:
+    arg.feeder_args['use_mmap']=True
+    for arg_key, arg_val in arg.feeder_args['data_paths'].items():
+        arg.feeder_args['data_paths'][arg_key] = osp.join(arg.data_path_overwrite,
+                                                          arg_val.split('/')[-1])
 
 # Define checkpoint file
 if arg.run_name != "":
@@ -92,6 +94,8 @@ device = torch.device(arg.device if torch.cuda.is_available() else "cpu")
 # # Create the datasets and dataloaders
 feeder_class = arg.import_class(arg.feeder)
 train_dataset = feeder_class(**arg.feeder_args, eval=arg.evaluation, split="train")
+
+
 test_dataset = feeder_class(**arg.feeder_args, eval=arg.evaluation, split="test")
 
 train_dataloader = DataLoader(
@@ -108,6 +112,8 @@ test_dataloader = DataLoader(
     shuffle=True,
     pin_memory=True,
 )
+
+print("### Dataloaders created")
 
 # Get the parameters to optimise
 param_groups = {"params": []}

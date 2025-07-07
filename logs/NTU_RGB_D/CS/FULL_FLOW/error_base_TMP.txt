@@ -1,0 +1,13 @@
+/jobfs/local/slurm/job1995471/slurm_script: line 27: [base_TMP: command not found
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/main.py", line 96, in <module>
+    train_dataset = feeder_class(**arg.feeder_args, eval=arg.evaluation, split="train")
+  File "/fred/oz141/ldezoete/MS-G3D/feeders/ntu_rgb_d.py", line 86, in __init__
+    self.load_data()
+  File "/fred/oz141/ldezoete/MS-G3D/feeders/ntu_rgb_d.py", line 96, in load_data
+    npz_data = mmnpz.load(self.data_path, mmap_mode='r')
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/mmnpz/reading.py", line 74, in __init__
+    with ZipFile(fn, mode="r") as f:
+  File "/usr/lib64/python3.9/zipfile.py", line 1250, in __init__
+    self.fp = io.open(file, filemode)
+FileNotFoundError: [Errno 2] No such file or directory: '/var/tmp/jobfs/data/NTU60_CS-flowpose_aligned.npz'

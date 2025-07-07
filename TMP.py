@@ -1,3 +1,4 @@
+#!/fred/oz141/ldezoete/environment python
 import torch
 from model import ModelLoader
 import os
@@ -5,6 +6,7 @@ import os.path as osp
 from config.argclass import ArgClass
 from torch.utils.data import DataLoader
 import numpy as np
+import yaml
 
 model_type = 'base'
 dataset = 'nturgbd'
@@ -12,10 +14,10 @@ evaluation = 'CS'
 # dataset = 'ucf101'
 # evaluation = '1'
 
-# TODO: move this file into the data or model visualisations 
-# create the path to save the visualiations 
-save_path = f'TMP/{dataset}/{evaluation}/{model_type}'
-os.makedirs(save_path, exist_ok=True)
+# Create a directory, ignoring if it already exists
+plot_root = 'results/plots/'
+save_root = osp.join(plot_root, f'{dataset}-{evaluation}/')
+os.makedirs(save_root, exist_ok=True)
 
 # Set up arg class
 arg = ArgClass(f"config/{dataset}/train_{model_type}.yaml")
@@ -33,9 +35,6 @@ arg.model_args["device"] = device
 model_loader = ModelLoader(arg)
 model = model_loader.model
 model.to(device)
-
-# Create the directory to save things in
-os.makedirs('TMP', exist_ok=True)
 
 # load the data
 if dataset == 'nturgbd':
@@ -68,12 +67,15 @@ if dataset == 'nturgbd':
             y_hat, x_hat, z_0, z_hat_shifted, zero = model(data)
 
             attentions = model.get_attention()
+
 else:
-    data = np.load('data/UCF-101/flowpose/SoccerJuggling/v_SoccerJuggling_g09_c01.npy')
-    # is_zero = (data == 0).all(axis=(0, 2, 3))  # shape: (300)
-    # padding_start = np.array([np.argmax(z) if np.any(z) else data.shape[0] for z in is_zero])
-    # first_padding = padding_start.max()
-    # print(first_padding)
+    class_name = "SoccerJuggling"
+    ID = {'g': '09', 'c': '01'}
+    sample_name = f"{class_name}/v_{class_name}_g{ID['g']}_c{ID['c']}"
+    data = np.load(f"data/UCF-101/flowpose/{sample_name}.npy")
+    with open('../Datasets/UCF-101/ucf101_annotations.yaml', 'r') as file:
+        classes = yaml.safe_load(file)
+        class_no = classes[sample_name]
 
     # Reshape to remove padded frames
     data = torch.tensor(np.expand_dims(data, axis=0))
@@ -94,22 +96,17 @@ if __name__ == "__main__":
     from einops import rearrange
     import os
 
-    # class_no = 0 # FOR UCF101
-    class_no = 24 # kicking something
-
-    # label0 = torch.load('TMP/label_0.pt')
-    # label1 = torch.load('TMP/label_1.pt')
-    # y_hat_0 = torch.load('TMP/y_hat_0.pt')
-    # y_hat_1 = torch.load('TMP/y_hat_1.pt')
-
-    sample = y_hat[class_no-1]
-    plt.figure(figsize=(10, 10))
-    plt.xlabel('Time (frames)')
-    plt.ylabel('Class number')
-    imgplot = plt.imshow(sample, cmap='gray')
-    plt.title('Action class - Kicking something (label number 24)')
-    # plt.title('Action class - Soccer juggling (label number 83)')
-    plt.savefig(osp.join(save_path, 'cls_heads.png'))
+    # class_no = 24 # kicking something
+    
+    def plot_cls_head(y_hat, class_name, class_no):
+        sample = y_hat[class_no-1]
+        plt.figure(figsize=(10, 10))
+        plt.xlabel('Time (frames)')
+        plt.ylabel('Class number')
+        imgplot = plt.imshow(sample, cmap='gray')
+        plt.title(f"Action class - {class_name} (label number {class_no})")
+        # plt.title('Action class - Soccer juggling (label number 83)')
+        plt.savefig(osp.join(save_path, 'cls_heads.png'))
 
 
     def plot_attn(attentions, batch_no=0, body_no=0, head=0):
@@ -147,6 +144,9 @@ if __name__ == "__main__":
             plt.xlabel('Time Step')
             plt.ylabel('Total Attention Received')
             plt.title(f'Layer {layer+1} Attention Saliency Over Time')
-            plt.savefig(osp.join(save_path, f'remove_attn_L{layer}'))
+            
+            os.makedirs(osp.join(save_root,'loss_comparison'), exist_ok=True)
+            plt.savefig(osp.join(save_root,'loss_comparison/Loss_comparison.png'))
 
     plot_attn(attentions, batch_no=class_no)
+    plot_cls_head(y_hat=y_hat, class_name=class_name, class_no=class_no)

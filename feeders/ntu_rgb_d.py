@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import mmnpz
 
 from torch.utils.data import Dataset
 
@@ -88,34 +89,46 @@ class Feeder(Dataset):
             self.sort()
         # if normalisation:
         #     self.get_mean_map()
-
     def load_data(self):
         # data: N T (MVC)
-        npz_data = np.load(self.data_path, mmap_mode='r' if self.use_mmap else None)
+        if self.use_mmap:
+            # npz_data = np.load(self.data_path, mmap_mode='r')
+            npz_data = mmnpz.load(self.data_path, mmap_mode='r')
+            print("\tLoaded data using mmap mode")
+        else:
+            npz_data = np.load(self.data_path)
+            print("\tLoaded data into memory")
+    
+            
         if self.split == "train":
             self.data = npz_data["x_train"]
+            print("\tSelf.data assigned")
             self.labels = np.argmax(npz_data["y_train"], axis=-1)
+            print("\tSelf.labels assigned")
         elif self.split == "test":
             self.data = npz_data["x_test"]
             self.labels = np.argmax(npz_data["y_test"], axis=-1)
         else:
             raise NotImplementedError("data split only supports train/test")
-        nan_out = np.isnan(self.data.mean(-1).mean(-1)) == False
-        self.data = self.data[nan_out]
-        self.labels = self.labels[nan_out]
-        # self.sample_name = [self.split + '_' + str(i) for i in range(len(self.data))]
+        print(f"\tAssigned self.data to unique split ({self.split})")
+        
+        # Handle NaN filtering more memory efficiently when using mmap
+        if self.use_mmap:
+            # For memory-mapped arrays, avoid operations that load entire array into memory
+            print("\tUsing memory-mapped data - skipping NaN filtering to preserve memory efficiency")
+            # You may want to handle NaN values during __getitem__ instead
+        else:
+            nan_out = ~np.isnan(self.data.mean(-1).mean(-1))
+            self.data = self.data[nan_out]
+            self.labels = self.labels[nan_out]
+            
         N, T, _ = self.data.shape
-        C = (
-            53 if self.data.shape[-1] > 150 else 3
-        )  # If the dataset doesn't have flow, this is false
+        C = (53 if self.data.shape[-1] > 150 else 3)
         if self.A is not None:
             self.data = self.data.reshape((N * T * 2, 25, C))
             self.data = np.array(self.A) @ self.data
-        self.data = self.data.reshape(N, T, 2, 25, C).transpose(
-            0, 4, 1, 3, 2
-        )  # N C T V M
-        if self.no_flow:  # If no flow argument is passed, take first three channels
-            self.data = self.data[:, :3, ...]
+        print("\tFinished loading data!")
+        
 
     def get_n_per_class(self):
         self.n_per_cls = np.zeros(len(self.labels), dtype=int)
@@ -123,11 +136,13 @@ class Feeder(Dataset):
             self.n_per_cls[labels] += 1
         self.csum_n_per_cls = np.insert(np.cumsum(self.n_per_cls), 0, 0)
 
+        
     def sort(self):
         sorted_idx = self.labels.argsort()
         self.data = self.data[sorted_idx]
         self.labels = self.labels[sorted_idx]
 
+        
     def get_mean_map(self):
         data = self.data
         N, C, T, V, M = data.shape
@@ -141,16 +156,31 @@ class Feeder(Dataset):
             .reshape((C, 1, V, 1))
         )
 
+        
     def __len__(self):
         return len(self.labels)
 
+    
     def __iter__(self):
         return self
 
+    
+    def _reshape(self, data_numpy):
+        T, _ = data_numpy.shape
+        C = (53 if self.data.shape[-1] > 150 else 3)
+        # data_numpy = np.array(data_numpy)
+        data_numpy = data_numpy.reshape(T, 2, 25, C).transpose(
+            3, 0, 2, 1
+        )
+        if self.no_flow: # If no_flow argument is passed, only take x,y,z positions
+            data_numpy = data_numpy[:, :3, ...]
+        return data_numpy
+
+    
     def __getitem__(self, index):
         data_numpy = self.data[index]
+        data_numpy = self._reshape(data_numpy)
         label = self.labels[index]
-        data_numpy = np.array(data_numpy)
 
         valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
         valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
@@ -201,19 +231,42 @@ if __name__ == "__main__":
     from config.argclass import ArgClass
     import time
     from torch.utils.data import DataLoader
+    import logging
+    import argparse
+    import os.path as osp
 
-    # srun --mem-per-cpu=190G --time=10:00 python feeders/ntu_rgb_d.py
+    # Argparser to test data moved to the slurm jobfs directory
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--data_path_overwrite",
+        help="Overwrite dataset path"
+    )
+    parsed = parser.parse_args()
 
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(filename='data_feeder_test.log', level=logging.DEBUG)
+
+    # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
     embed =  'cnn'
     arg = ArgClass(f"config/nturgbd/train_{embed}.yaml")
-    arg.feeder_args['data_paths']['CV'] = './data/ntu/aligned_data/MINI_CV_flowpose.npz'
     arg.feeder_args['eval'] = 'CV'
+    
+    # Pass root path for the dataset objects
+    if parsed.data_path_overwrite is not None:
+        arg.feeder_args['use_mmap']=True
+        for arg_key, arg_val in arg.feeder_args['data_paths'].items():
+            arg.feeder_args['data_paths'][arg_key] = \
+                osp.join(parsed.data_path_overwrite, arg_val.split('/')[-1])
+    logger.debug(arg.feeder_args['data_paths']['CV'])
 
+    # Create the dataset objects
     train_feeder = Feeder(**arg.feeder_args, split="train")
     test_feeder = Feeder(**arg.feeder_args, split="test")
 
-    dataloader = DataLoader(train_feeder, 
-                            batch_size=60, 
+    # Create a dataloader
+    dataloader = DataLoader(train_feeder,
+                            batch_size=60,
                             shuffle=False, 
                             pin_memory=True)
 
@@ -222,14 +275,15 @@ if __name__ == "__main__":
         if epoch == 10:
             break
 
-    # Print the shapes of the data and mask
+    # Log the shapes of the data and mask log
     # and the first two frames of the first two persons
-    print(f"\nTotal samples: {len(train_feeder)}")
-    print(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
-    print(f"Data shape: {data_numpy.shape}") # (60, 3/53, 64, 25, 2)
-    print(f"Mask shape: {mask.shape}")
+    logger.debug(f"Feeder path: {arg.feeder_args['data_paths']['CV']}")
+    logger.debug(f"Total samples: {len(train_feeder)}")
+    logger.debug(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
+    logger.debug(f"Data shape: {data_numpy.shape}") # (60, 3/53, 64, 25, 2)
+    logger.debug(f"Mask shape: {mask.shape}")
 
-    print(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
-    print(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
-    print(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
-    print(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")
+    logger.debug(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
+    logger.debug(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
+    logger.debug(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
+    logger.debug(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")

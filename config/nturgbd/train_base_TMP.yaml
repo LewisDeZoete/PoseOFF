@@ -12,9 +12,9 @@ feeder_args:
   random_move: True
   random_rot: True
   average_flow: False # model_args.flow_channels = 2
-  absolute_flow: 
-    window_mean: True # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
-  no_flow: False
+  absolute_flow: False
+    # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
+  no_flow: True
 
 extractor:
   preprocessed: True
@@ -41,7 +41,7 @@ model_args:
   num_person: 2
   graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 1 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
+  flow_channels: 0 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
   ode_method: euler

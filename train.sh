@@ -1,32 +1,40 @@
 #!/bin/bash
 
-#SBATCH --job-name=nturgbd_CV_cnn_ORIGINAL
+#SBATCH --job-name=nturgbd_CS_base_TMP
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=9:00:00
-#SBATCH --mem=10GB
+#SBATCH --time=4:00:00
+#SBATCH --mem=5GB
 #SBATCH --gres=gpu:1
-#SBATCH --tmp=250GB
+#SBATCH --tmp=200GB
 
-#SBATCH --error='logs/NTU_RGB_D/CV/error_cnn_ORIGINAL.txt'
-#SBATCH --output='logs/NTU_RGB_D/CV/train_cnn_ORIGINAL.txt'
+#SBATCH --error=logs/NTU_RGB_D/CS/FULL_FLOW/error_base_TMP.txt
+#SBATCH --output=logs/NTU_RGB_D/CS/FULL_FLOW/train_base_TMP.txt
 
 export PYTHONUNBUFFERED=TRUE
 
 source ../environment/bin/activate
 
-# Testing copying data to JOBFS during the job
+# Create directory on job file system to move dataset to
 mkdir $JOBFS/data
 
-model_type="cnn" # or cnn_TMP
-evalulation="CV"
+model_type="base_TMP" # or base, abs...
+evaluation="CS"
 
-cp "./data/ntu/aligned_data/NTU60_${evalulation}-flowpose_aligned.npz" "$JOBFS/data/"
+# Move the dataset (large) to the $JOBFS so it can be memory mapped during training
+if [ "$model_type" = "base" ]; then
+    cp ./data/ntu/aligned_data/NTU60_${evaluation}-pose_aligned.npz ${JOBFS}/data/
+elif [ "$model_type" = "abs" ] || [ "$model_type" = "avg" ] || [ "$model_type" = "cnn" ] || ["$model_type" = "base_TMP"]; then
+    # !!!!!!!!REMOVE THE BASE_TMP OPTION HERE!!!!!!!!!!
+    cp ./data/ntu/aligned_data/NTU60_${evaluation}-flowpose_aligned.npz ${JOBFS}/data/
+fi
+
+echo $(ls ${JOBFS}/data)
 
 
 # -c : config (eg. nturgbd)
 # -p : phase (train/test)
-# -m : model_type (eg. cnn, cnn, cnn_TMP)
+# -m : model_type (base, cnn, abs, avg)
 #         ./config/{config}/{phase}_{model_type}.yaml
 # -e : evaluation (eg. CV for ntu, CSet for ntu120, 2 for ucf101)
 # -r : run_name (eg. nturgbd_CV_cnn_full_flow)
@@ -38,8 +46,8 @@ python main.py \
        -c nturgbd \
        -p train \
        -m $model_type \
-       -e $evaluation \
-       -r nturgbd_CV_ORIGINAL \
-       -d 'nturgbd-cross-view full optical flow extraction WITH MASK' \
-       --data_path_overwrite $JOBFS/data \
+       -e "${evaluation}" \
+       -r "FULL_FLOW/nturgbd_CS_base_TMP" \
+       -d 'nturgbd-cross-subject BASE full optical flow extraction' \
+       --data_path_overwrite "${JOBFS}/data" \
        -v
