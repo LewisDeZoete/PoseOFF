@@ -1,5 +1,4 @@
 Dataset: ntu
-Realigning dataset
 Processing optical flow data
 
 	Train indices length: 40091
@@ -10,12 +9,5 @@ Total skes names: 56578
 	Test indices length: 18932
 Total skes names: 56578
 
-Flow joints dtype: float64
-Loaded 56578 skeleton sequences and 56578 flow sequences
-Full flow sequence shape: (56578, 300, 2500)
-Full skeleton sequence shape: (56578, 300, 150)
-Full flowpose sequence shape: (56578, 300, 2650)
-Flowpose approximate size: 0.00 GB
-Saved pose CS
-Saved flowpose CS
-Saved pose CV
+['./data/ntu/aligned_data/NTU60_CS-pose.npz', './data/ntu/aligned_data/NTU60_CV-pose.npz', './data/ntu/aligned_data/NTU60_CS-flowpose.npz', './data/ntu/aligned_data/NTU60_CV-flowpose.npz']
+Aligned datasets created successfully!

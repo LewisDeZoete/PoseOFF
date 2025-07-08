@@ -6,4 +6,4 @@
 
 source ../environment/bin/activate
 
-srun python ./data_gen/NTU/seq_transformation.py --dataset $dataset --flow --realign
+srun python ./data_gen/NTU/seq_transformation.py --dataset $dataset --flow
