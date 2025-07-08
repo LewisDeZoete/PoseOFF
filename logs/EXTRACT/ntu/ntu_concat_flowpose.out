@@ -56,19 +56,3 @@ Appending flow_54k-56k.pkl
 Flow data samples: 56000
 Appending flow_56k-58k.pkl
 Flow data samples: 56578
-
-+------------------ Job Report: 1256495 (COMPLETED) -------------------+
-| Memory (RAM)  [#################   ] 85.7% (51.4 GB peak / 60 GB)    |
-| CPU           [##                  ] 10.6% average                   |
-| Time          [->                  ]  7.8% (0-00:03:08 / 0-00:40:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   924 KB        0 B                     30                   |
-|   /fred   40.3 GB       38.7 GB                 81                   |
-|                                                                      |
-| Warnings:                                                            |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+

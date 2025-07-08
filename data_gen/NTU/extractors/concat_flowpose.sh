@@ -10,4 +10,4 @@ source ../environment/bin/activate
 
 srun python ./data_gen/NTU/concat_flowpose.py --dataset $dataset
 
-rm -rf ./data/${dataset}/flowpose/export_tmp
+rm -rf ./data/${dataset}/flow_data/export_tmp

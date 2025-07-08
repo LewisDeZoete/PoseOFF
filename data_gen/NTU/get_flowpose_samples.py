@@ -45,8 +45,7 @@ print(f'Start index: {idx_start}')
 print(f'End index: {idx_end}')
 
 # Get the argparse object
-# arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}/train_base.yaml")
-arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}/train_cnn_TMP.yaml")
+arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}/train_cnn.yaml")
 transform_args = arg.extractor
 
 # Get the device
