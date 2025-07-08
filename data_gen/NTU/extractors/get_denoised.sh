@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=00:20:00
-#SBATCH --mem-per-cpu=6g
+#SBATCH --mem-per-cpu=10g
 
 source ../environment/bin/activate
 

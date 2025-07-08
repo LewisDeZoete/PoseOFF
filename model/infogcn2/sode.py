@@ -252,7 +252,6 @@ class SODE(nn.Module):
             self.to_joint_embedding = nn.Linear(
                 pose_channels + flow_channels, embed_channels
             )
-            # self.to_joint_embedding = nn.Linear(pose_channels+flow_channels, embed_channels)
         self.pos_embedding = nn.Parameter(
             torch.randn(1, self.num_point, embed_channels)
         )

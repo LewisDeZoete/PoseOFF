@@ -1,4 +1,5 @@
 Dataset: ntu
+Realigning dataset
 Processing optical flow data
 
 	Train indices length: 40091
@@ -9,22 +10,12 @@ Total skes names: 56578
 	Test indices length: 18932
 Total skes names: 56578
 
-['./data/ntu/aligned_data/NTU60_CS-pose.npz', './data/ntu/aligned_data/NTU60_CV-pose.npz', './data/ntu/aligned_data/NTU60_CS-flowpose.npz', './data/ntu/aligned_data/NTU60_CV-flowpose.npz']
-Aligned datasets created successfully!
-
-+------------------ Job Report: 1261124 (COMPLETED) -------------------+
-| Memory (RAM)  [##################  ] 91.4% (411.3 GB peak / 450 GB)  |
-| CPU           [#                   ]  6.3% average                   |
-| Time          [------->            ] 37.7% (0-00:45:15 / 0-02:00:00) |
-|                                                                      |
-| Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
-|   ------  ------------  -------------  ------------                  |
-|   /apps   36.3 MB       0 B            35                            |
-|   /fred   630.2 GB      344.6 GB       1.1 K                         |
-|   OS      764 KB        0 B            181                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - CPU usage is low                                                 |
-|   - Too much time requested                                          |
-+----------------------------------------------------------------------+
+Flow joints dtype: float64
+Loaded 56578 skeleton sequences and 56578 flow sequences
+Full flow sequence shape: (56578, 300, 2500)
+Full skeleton sequence shape: (56578, 300, 150)
+Full flowpose sequence shape: (56578, 300, 2650)
+Flowpose approximate size: 0.00 GB
+Saved pose CS
+Saved flowpose CS
+Saved pose CV

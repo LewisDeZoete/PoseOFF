@@ -22,8 +22,9 @@ extractor:
     weights: pretrained_models/yolo11x-pose.pt
   flow:
     weights: pretrained_models/raft_large.pt
-    imsize: [240,320]
-    minibatch_size: 16
+    imsize: [1080,1920]
+    minibatch_size: 3
+    dilation: 3
   flowpose:
     window_size: 5
     threshold: 0.05
@@ -53,6 +54,7 @@ model_args:
   n_sample: 1
   backbone: transformer
   cnn: False
+  use_mask: False # Controls whether sequence can only attend itself and previous timesteps (true)
 ignore_weights: []
 phase: train
 # weights: ./pretrained_models/kinetics_joint.pt

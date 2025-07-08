@@ -43,13 +43,12 @@ mkdir -p ./data/${dataset}/flow_data/export_tmp
 #       --error=./logs/EXTRACT/${dataset}/flowpose/error_${dataset}_flowpose_%a.out \
 #       ./data_gen/NTU/extractors/get_flowpose.sh | awk '{print $4}')
 
-# sbatch --dependency=afterok:$flow_extract_id \
-# # sbatch \
-#       --export=dataset=$dataset \
-#       --output=./logs/EXTRACT/${dataset}/${dataset}_concat_flowpose.out \
-#       --error=./logs/EXTRACT/${dataset}/error_${dataset}_concat_flowpose.out \
-#       ./data_gen/NTU/extractors/concat_flowpose.sh
-
+# Uncomment the --dependency line below if you want to run the next step after flowpose extraction
+# sbatch --export=dataset=$dataset \
+#        --output=./logs/EXTRACT/${dataset}/${dataset}_concat_flowpose.out \
+#        --error=./logs/EXTRACT/${dataset}/error_${dataset}_concat_flowpose.out \
+#        --dependency=afterok:$flow_extract_id \
+#        ./data_gen/NTU/extractors/concat_flowpose.sh
 
 # ------------------------------------------
 # ALIGN SEQUENCES
