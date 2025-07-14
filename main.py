@@ -16,8 +16,8 @@ from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-c",
-    dest="config",
+    "-d",
+    dest="dataset",
     default="ucf101",
     help="config dictionary location (default=ucf101)",
 )
@@ -25,12 +25,12 @@ parser.add_argument(
     "-p",
     dest="phase",
     default="train",
-    help="network phase [train, test] (default=train)",
+    help="model phase (train/eval)"
 )
 parser.add_argument(
-    "-m", 
-    dest="model_type", 
-    default="base", 
+    "-m",
+    dest="model_type",
+    default="base",
     help="model type [base, cnn, avg, abs] (default=base)"
 )
 parser.add_argument(
@@ -46,7 +46,7 @@ parser.add_argument(
     help="name to save the results dictionary as after training",
 )
 parser.add_argument(
-    "-d",
+    "--desc",
     dest="description",
     default="",
     help="Description of what is being tested in run",
@@ -67,16 +67,28 @@ arg = ArgClass(arg=parsed, verbose=parsed.verbose)
 
 # Pass root path for the dataset objects
 if arg.data_path_overwrite is not None:
-    arg.feeder_args['use_mmap']=True
+    arg.feeder_args['use_mmap'] = True
     for arg_key, arg_val in arg.feeder_args['data_paths'].items():
         arg.feeder_args['data_paths'][arg_key] = osp.join(arg.data_path_overwrite,
                                                           arg_val.split('/')[-1])
 
-# Define checkpoint file
-if arg.run_name != "":
-    arg.checkpoint_file = osp.join(arg.save_location,
-                                   arg.evaluation,
-                                   arg.run_name + '.pt')
+# Define checkpoint file (this is the same for train and eval)
+assert arg.run_name != ""
+arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
+    arg.save_location,
+    arg.evaluation,
+    "train",
+    arg.run_name + ".pt"
+)
+# TODO: rework main.py to handle eval as well as train!
+if arg.phase == "eval":
+    arg.eval_save_name = osp.join(  # results/{dataset}/{eval}/eval/{run}.pt
+        arg.save_locastion,
+        arg.evaluation,
+        "eval",
+        arg.run_name + ".pt"
+    )
+
 
 print("### Arguments loaded")
 
@@ -93,10 +105,12 @@ device = torch.device(arg.device if torch.cuda.is_available() else "cpu")
 
 # # Create the datasets and dataloaders
 feeder_class = arg.import_class(arg.feeder)
-train_dataset = feeder_class(**arg.feeder_args, eval=arg.evaluation, split="train")
+train_dataset = feeder_class(
+    **arg.feeder_args, eval=arg.evaluation, split="train")
 
 
-test_dataset = feeder_class(**arg.feeder_args, eval=arg.evaluation, split="test")
+test_dataset = feeder_class(
+    **arg.feeder_args, eval=arg.evaluation, split="test")
 
 train_dataloader = DataLoader(
     train_dataset,
@@ -141,7 +155,7 @@ recon_loss = masked_recon_loss
 loss_funcs = {"cls_loss": cls_loss, "recon_loss": recon_loss}
 
 
-# Score functions (train+test), accuracy, area under curve, 
+# Score functions (train+test), accuracy, area under curve,
 # class, feature and reconstruction losses
 score_funcs = ["ACC", "AUC", "cls_loss", "feature_loss", "recon_loss"]
 
@@ -163,6 +177,6 @@ results = train_network(
 )
 
 print(f"\tTraining time: \
-{datetime.timedelta(seconds=int(sum(results['train_time']+results['test_time'])))} minutes")
+{datetime.timedelta(seconds=int(sum(results['train_time']+results['test_time'])))}")
 print(f"\tBest train AUC: {torch.tensor(results['train_AUC']).max().item()}")
 print(f"\tBest test AUC: {torch.tensor(results['test_AUC']).max().item()}")
