@@ -1,26 +1,29 @@
+from model.infogcn2.utils import LayerCompare, count_params, import_class
+from collections import OrderedDict
+import torch
 import sys
 sys.path.insert(0, '')
 
-import torch
-from collections import OrderedDict
-from model.infogcn2.utils import LayerCompare, count_params, import_class
 
 class ModelLoader:
+    '''
+
+    '''
+
     def __init__(self, arg):
         self.arg = arg
         # If cuda isn't available device is cpu, print device name debug
         if not torch.cuda.is_available():
-            output_device=torch.device('cpu')
-        else: 
+            output_device = torch.device('cpu')
+        else:
             output_device = torch.device(self.arg.device[0]) if type(
                 self.arg.device) is list else torch.device(self.arg.device)
-        
+
         self.output_device = output_device
         print(f'\tOutput device: {self.output_device}')
 
         # Load the model on object creation
         self.load_model()
-
 
     def load_model(self):
         '''
@@ -43,19 +46,21 @@ class ModelLoader:
                 # removing the 'module.' part of key name and moving weight to device
                 weights = OrderedDict(
                     [[k.split('module.')[-1],
-                    v.to(self.output_device)] for k, v in weights.items()])
+                      v.to(self.output_device)] for k, v in weights.items()])
 
                 # Check if the loaded pretrained weights match the model's
-                compatible, mis_keys = LayerCompare(self.model.state_dict(), weights)
+                compatible, mis_keys = LayerCompare(
+                    self.model.state_dict(), weights)
 
                 # Removing / ignoring weights (both from args and mismatched shape weights)
-                remove_weights = [key for key in weights.keys() 
-                            if any(weight_name in key for weight_name in self.arg.ignore_weights)]
+                remove_weights = [key for key in weights.keys()
+                                  if any(weight_name in key for weight_name in self.arg.ignore_weights)]
                 remove_weights.extend(mis_keys)
                 for w in remove_weights:
                     if weights.pop(w, None) is None:
                         print(f'\t\tWeight not found: {w}')
-                print(f'\tTotal number of weights removed: {len(remove_weights)}')
+                print(
+                    f'\tTotal number of weights removed: {len(remove_weights)}')
 
                 try:
                     # Strict must be false given we are missing some weights
@@ -66,31 +71,34 @@ class ModelLoader:
                     # If we didn't put the correct weights in the `ignore_weights`
                     # section of config dict, we can remove those weights from state dict
                     state = self.model.state_dict()
-                    diff = list(set(state.keys()).difference(set(weights.keys())))
+                    diff = list(set(state.keys()).difference(
+                        set(weights.keys())))
                     print('\tCan not find these weights:')
                     for d in diff:
                         print('\t  ' + d)
-    
-    
+
     def _get_weights(self):
         try:
             # checkpoint_file attr will stay as string
-            checkpoint = torch.load(self.arg.checkpoint_file, map_location=self.output_device)
-            weights = checkpoint['model_state_dict'] # we just want state dict!
+            checkpoint = torch.load(
+                self.arg.checkpoint_file, map_location=self.output_device)
+            # we just want state dict!
+            weights = checkpoint['model_state_dict']
             return weights
         except FileNotFoundError as error:
             print("\tCheckpoint file does not yet exist")
             print(f'\t({error})')
             return None
         except KeyError:
-            print(f'Checkpoint file {self.arg.checkpoint_file} does not contain a model state dict')
+            print(
+                f'Checkpoint file {self.arg.checkpoint_file} does not contain a model state dict')
             return None
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     from config.argclass import ArgClass
     import time
-    
+
     arg = ArgClass('./config/ucf101/train_joint_infogcn.yaml')
     # arg.checkpoint_file = 'results/ms-g3d_flow/flowpose-cnn_k5_t0.05.pt'
     arg.checkpoint_file = 'results/ms-g3d_flow/TMP.pt'
@@ -104,7 +112,7 @@ if __name__=='__main__':
         b = 8
         # N, C, T, V, M
         x = torch.randn((8, 5, 64, 17, 2)).to(modelLoader.output_device)
-        out = skel_model(x) # tuple(y, x_hat, z_0, z_hat_shifted, self.zero)
+        out = skel_model(x)  # tuple(y, x_hat, z_0, z_hat_shifted, self.zero)
         print(out[0].shape)
         print(f'\nOutput shape (batch size = {b}): {out[0].shape}')
         print(f'in {time.time()-start:0.5f} seconds')
