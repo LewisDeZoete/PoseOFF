@@ -2,8 +2,8 @@
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
   data_paths: 
-    CS: ./data/ntu/aligned_data/NTU60_CS-pose_aligned.npz
-    CV: ./data/ntu/aligned_data/NTU60_CV-pose_aligned.npz
+    CS: ./data/ntu/aligned_data/NTU60_CS-flowpose_aligned.npz
+    CV: ./data/ntu/aligned_data/NTU60_CV-flowpose_aligned.npz
   label_path: ./data/ntu/statistics/ntu-rgbd-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: True
@@ -14,7 +14,7 @@ feeder_args:
   average_flow: False # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
-  no_flow: True
+  no_flow: False
 
 extractor:
   preprocessed: True
@@ -23,7 +23,7 @@ extractor:
   flow:
     weights: pretrained_models/raft_large.pt
     imsize: [1080,1920]
-    minibatch_size: 3
+    minibatch_size: 3 # can be up to 16 for imsize: [240,320]
     dilation: 3
   flowpose:
     window_size: 5
@@ -41,11 +41,11 @@ model_args:
   num_person: 2
   graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 0 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
+  flow_channels: 50 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
   ode_method: euler
-  depth: 4
+  depth: 4 # layers of attention heads
   device: 0
   T: 64 # Maximum sequence length
   n_step: 3 # Number of ODE solver steps
@@ -53,8 +53,8 @@ model_args:
   num_cls: 10 # Number of classification heads used
   n_sample: 1
   backbone: transformer
-  cnn: False
-  use_mask: False # Controls whether sequence can only attend itself and previous timesteps (true)
+  cnn: True
+  use_mask: True # If true, previous timesteps are masked from attention (default=true)
 ignore_weights: []
 phase: train
 # weights: ./pretrained_models/kinetics_joint.pt

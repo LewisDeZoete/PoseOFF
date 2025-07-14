@@ -45,7 +45,7 @@ model_args:
   embed_channels: 64
   num_head: 3
   ode_method: euler
-  depth: 4
+  depth: 4 # layers of attention heads
   device: 0
   T: 64 # Maximum sequence length
   n_step: 3 # Number of ODE solver steps
