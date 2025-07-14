@@ -8,6 +8,6 @@
 # Activate the environment
 source ../environment/bin/activate
 
-srun python ./data_gen/NTU/concat_flowpose.py --dataset $dataset
+srun python ./data_gen/ntu/concat_flowpose.py --dataset $dataset
 
 rm -rf ./data/${dataset}/flow_data/export_tmp
