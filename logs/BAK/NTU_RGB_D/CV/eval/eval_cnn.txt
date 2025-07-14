@@ -1,0 +1,7 @@
+Dataset copied to JOBFS: NTU60_CV-flowpose_aligned.npz
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 620448
+	Loading weights from ./results/nturgbd/CV/FULL_FLOW/nturgbd_CV_cnn.pt
+	Checkpoint file does not yet exist
+	([Errno 2] No such file or directory: './results/nturgbd/CV/FULL_FLOW/nturgbd_CV_cnn.pt')

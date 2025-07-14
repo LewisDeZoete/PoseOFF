@@ -1,0 +1,46 @@
+Copied flowpose_aligned.npz
+Dataset copied to JOBFS: NTU60_CS-flowpose_aligned.npz
+Data paths: {'CS': '/var/tmp/jobfs/data/NTU60_CS-flowpose_aligned.npz', 'CV': '/var/tmp/jobfs/data/NTU60_CV-flowpose_aligned.npz'}
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 620448
+	Loading weights from ./results/nturgbd/CS/FULL_FLOW/nturgbd_CS_cnn.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Dataset contains 16487 samples
+	Tracking:
+		epoch
+		test_time
+		loss
+		lr
+		truth
+		pred
+		ACC
+		AUC
+		cls_loss
+		feature_loss
+		recon_loss
+
++------------------ Job Report: 2231781 (COMPLETED) -------------------+
+| Memory (RAM)  [################### ] 100.0% (15 GB peak / 15 GB)     |
+| CPU           [##                  ] 13.7% average                   |
+| GPU           [##                  ] 11.9% average                   |
+| Time          [------>             ] 32.3% (0-00:06:28 / 0-00:20:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   540 KB        0 B            172                           |
+|   /fred   168.1 GB      1.3 KB         7.8 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      6.5 MB        0 B            862                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
