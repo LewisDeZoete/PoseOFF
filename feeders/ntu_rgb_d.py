@@ -173,8 +173,8 @@ class Feeder(Dataset):
             3, 0, 2, 1
         )
         if self.no_flow: # If no_flow argument is passed, only take x,y,z positions
-            data_numpy = data_numpy[:, :3, ...]
-        return data_numpy
+            data_numpy = data_numpy[:3, ...]
+        return data_numpy # C, T, V, M
 
     
     def __getitem__(self, index):
@@ -251,6 +251,7 @@ if __name__ == "__main__":
     embed =  'cnn'
     arg = ArgClass(f"config/nturgbd/train_{embed}.yaml")
     arg.feeder_args['eval'] = 'CV'
+    arg.feeder_args['use_mmap'] = True
     
     # Pass root path for the dataset objects
     if parsed.data_path_overwrite is not None:
@@ -262,16 +263,18 @@ if __name__ == "__main__":
 
     # Create the dataset objects
     train_feeder = Feeder(**arg.feeder_args, split="train")
-    test_feeder = Feeder(**arg.feeder_args, split="test")
+    test_feeder = Feeder(**arg.feeder_args, split="test") 
 
     # Create a dataloader
     dataloader = DataLoader(train_feeder,
-                            batch_size=60,
+                            batch_size=64,
                             shuffle=False, 
                             pin_memory=True)
 
     start = time.time()
     for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
+        print(label.shape)
+        break
         if epoch == 10:
             break
 
