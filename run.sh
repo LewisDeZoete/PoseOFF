@@ -1,16 +1,25 @@
 #!/bin/bash
 # Testing a unified file for sending of model training jobs...
+# USAGE: Edit the variables below based on the
+#        network you'd like to train or evaluate
+# ```
+# bash run.sh
+# ```
 
-export dataset="ntu120" # (ntu, ntu120, ucf101)
+export dataset="ntu" # (ntu, ntu120, ucf101)
 export phase="train" # (train/eval)
-export model_type="cnn" # (base, cnn, abs, avg)
-export evaluation="CSub" # (CS/CV, CSub/CSet, 1/2/3)
-export run_name="${dataset}_${evaluation}_${model_type}"
-export desc="${phase} ${dataset} {evaluation} {model_type}" # Can change this as you need!
+export model_type="cnn" # (base, cnn, abs, avg, cnn_D3...)
+export dilation=2
+export modifier="D2" # still loads ${dataset}/{model_type}.yaml config... adds to run_name
+export evaluation="CS" # (CS/CV, CSub/CSet, 1/2/3)
+
+export run_name="${dataset}_${evaluation}_${model_type}_${modifier}"
+export desc="${phase} ${dataset} ${evaluation} ${model_type} with dilation ${dilation} TESTING n_step = 4" # Can change this as you need!
 
 # ---------------------------------------------------------
-# Create the results folder as needed...
+# Create the results and logs folders as needed...
 mkdir -p ./results/${dataset}/${evaluation}/${phase}
+mkdir -p ./logs/${dataset}/${evaluation}/${phase}
 # e.g. ./results/ntu/CS/train/
 
 
@@ -25,23 +34,28 @@ case $dataset in
         fi
         case $model_type in
             "base")
-                export copy_file="./data/ntu/aligned_data/NTU60_${evaluation}-pose_aligned.npz"
+                export copy_file="./data/ntu/aligned_data/${dataset}_${evaluation}-pose_D${dilation}_aligned.npz"
                 time=4:00:00
                 mem=3GB
                 tmp=15GB;;
             "abs" | "avg")
-                export copy_file="./data/ntu/aligned_data/NTU60_${evaluation}-flowpose_aligned.npz"
+                export copy_file="./data/${dataset}/aligned_data/${dataset}_${evaluation}-flowpose_D${dilation}_aligned.npz"
                 time=12:00:00
-                mem=3GB
+                mem=5GB
                 tmp=200GB;;
             "cnn")
-                export copy_file="./data/ntu/aligned_data/NTU60_${evaluation}-flowpose_aligned.npz"
-                time=13:00:00
+                export copy_file="./data/${dataset}/aligned_data/${dataset}_${evaluation}-flowpose_D${dilation}_aligned.npz"
+                time=16:00:00
                 mem=10GB
                 tmp=200GB;;
             *)
                 echo "Wrong model type '${model_type}', must be (base, cnn, abs, avg)"
-                exit 1
+                echo "If you want to continue please change arguments in the file"
+                read -p "Time : " time
+                read -p "Memory : " mem
+                read -p "Temporary storage : " tmp
+                read -p "Copy filename: " copy_file
+                export copy_file
         esac;;
 
     # -------------------------------------------------------------
@@ -54,17 +68,17 @@ case $dataset in
         fi
         case $model_type in
             "base")
-2                export copy_file="./data/ntu120/aligned_data/NTU120_${evaluation}-pose_aligned.npz"
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-pose_D${dilation}_aligned.npz"
                 time=7:00:00
                 mem=5GB
                 tmp=30GB;;
             "abs" | "avg")
-                export copy_file="./data/ntu120/aligned_data/NTU120_${evaluation}-flowpose_aligned.npz"
-                time=18:30:00
-                mem=5GB
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned.npz"
+                time=21:00:00
+                mem=7GB
                 tmp=400GB;;
             "cnn")
-                export copy_file="./data/ntu120/aligned_data/NTU120_${evaluation}-flowpose_aligned.npz"
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned.npz"
                 time=24:00:00
                 mem=15GB
                 tmp=400GB;;
@@ -91,8 +105,34 @@ case $dataset in
         esac;;
 esac
 
-error="logs/${dataset}/${evaluation}/${phase}/error_${model_type}.out"
-output="logs/${dataset}/${evaluation}/${phase}/train_${model_type}.out"
+
+if [ $phase = "eval" ]; then
+    # export run_name="EVAL-${dataset}_${evaluation}_${model_type}"
+    mem=15GB
+    time=0:40:00
+fi
+
+# Check if copy file exists
+if [ ! -f $copy_file ]; then
+    echo "File ${copy_file} not found!"
+    exit 1
+fi
+
+# Check if run file already exists
+if [ -f results/$dataset/$evaluation/train/$run_name.pt ]; then
+    echo -e "RUN ALREADY EXISTS: ${run_name}"
+    read -r -p "Do you want to continue training? [y/N] " response
+    case "$response" in
+        [yY][eE][sS]|[yY])
+            echo -e "\tContinuing run ${run_name}";;
+        *)
+            echo "Cancelling job batching..."
+            exit 1;;
+    esac
+fi
+
+error="logs/${dataset}/${evaluation}/${phase}/error_${model_type}_${modifier}.out"
+output="logs/${dataset}/${evaluation}/${phase}/${phase}_${model_type}_${modifier}.out"
 
 echo "${phase} ${dataset} ${evaluation} ${model_type} variables:"
 echo -e "\terror: ${error}"
