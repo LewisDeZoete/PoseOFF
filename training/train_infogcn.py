@@ -7,7 +7,10 @@ import os
 from einops import rearrange, repeat
 from tqdm import tqdm
 from training.loss import AverageMeter
+# TODO: Check that this logging method works without having it inside train_network()
+import logging
 
+logger = logging.getLogger(__name__)
 
 def run_epoch(
     arg,
@@ -54,7 +57,7 @@ def run_epoch(
             torch.tensor(0.0),
         )
         B, C, T, V, M = x.shape
-        x = x.float().to(device)
+        x = x.float().to(device) # (B, C, T, V, M)
         y = y.long().to(device)
         mask = mask.long().to(device)
         y_hat, x_hat, z_0, z_hat, kl_div = model(x)
@@ -70,12 +73,18 @@ def run_epoch(
         # Reconstruction/prediction loss (EQ. 10)
         if arg.lambda_2:
             N_rec = x_hat.size(0) // B
-            x_gt = (
-                x[:, :3, ...]
-                .unsqueeze(0)  # only use the first 3 channels (x,y,conf)
-                .expand(N_rec, B, 3, T, V, M)
-                .reshape(N_rec * B, 3, T, V, M)
+            logger.debug(
+                f"Original input shape: {x.shape}"
             )
+            logger.debug(
+                f"Reconstruction: cropping x to include {model.pose_channels} pose channels"
+            )
+            x_gt = ( # Only need to reconstruct the pose channels!!
+                x[:, :model.pose_channels, ...]
+                .unsqueeze(0)  # only use the pose channels (x,y,z/conf)
+                .expand(N_rec, B, model.pose_channels, T, V, M)
+                .reshape(N_rec * B, model.pose_channels, T, V, M)
+            )  # for n_sample=1, x_gt.shape = (B, 3, T, V, M)
             mask_recon = repeat(mask, "b c t v m -> n b c t v m", n=N_rec).clone()
             for i in range(N_rec):
                 if N_rec == arg.model_args["n_step"]:
@@ -291,76 +300,6 @@ def train_network(
     return results
 
 
-def eval_network(
-    arg,
-    model,
-    loss_funcs,
-    test_loader,
-    checkpoint_file: str,
-    score_funcs=None,
-    device="cpu",
-    verbose: bool = False,
-    
-):
-    """
-    EVAL simple neural network
-
-    Arguments:
-        model: the PyTorch model / "Module" to train
-        loss_funcs: the loss function that takes in batch in two arguments, the model outputs and the labels, and returns a score
-        train_loader: PyTorch DataLoader object that returns tuples of (input, label) pairs.
-        test_loader: Optional PyTorch DataLoader to evaluate on after every epoch
-        score_funcs: A dictionary of scoring functions to use to evalue the performance of the model
-        epochs: the number of training epochs to perform
-        device: the compute lodation to perform training
-
-    """
-    to_track = ["epoch", "test_time", "test_loss", "lr"]
-    if score_funcs is not None:
-        for eval_score in score_funcs:
-            to_track.append("test_" + eval_score)
-
-    results = {}
-    print("\tTracking:")
-    # Initialize every item with an empty list
-    for item in to_track:
-        results[item] = []
-        print(f"\t\t{item}")
-
-    # Place the model on the correct compute resource (CPU or GPU)
-    model.to(device)
-
-    # Initialise the checkpoint file
-    checkpoint = load_checkpoint(checkpoint_file, device, verbose)
-    try:
-        results = checkpoint[
-            "results"
-        ]  # Don't override the results from previous training!
-    except KeyError:
-        pass  # Only just created the checkpoint file
-    del checkpoint  # might save us from OOM issues
-
-    # TEST
-    model = model.eval()
-    with torch.no_grad():
-        test_time = run_epoch(
-            arg=arg,
-            model=model,
-            optimiser=optimiser,
-            data_loader=test_loader,
-            loss_funcs=loss_funcs,
-            device=device,
-            results=results,
-            prefix="test",
-            desc="Testing",
-        )
-    
-    results["test_time"].append(test_time)
-    # Print the results???
-    print(f"\t\t\tTest time: {test_time:.2f} seconds")
-
-    return results
-
 
 def load_checkpoint(checkpoint_file: str, device, verbose: bool=False) -> dict:
     """
@@ -425,14 +364,21 @@ def save_checkpoint(
 if __name__ == "__main__":
     from config.argclass import ArgClass
     from model import ModelLoader
-    from torch.utils.data import DataLoader
+    from torch.utils.data import DataLoader, SubsetRandomSampler
     from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
     import torch.optim as optim
 
-    arg = ArgClass("./config/nturgbd/train_cnn.yaml")
-    arg.feeder_args['data_paths']['CV'] = './data/ntu/aligned_data/MINI_CV_flowpose.npz'
-    arg.feeder_args['eval'] = 'CV'
+    logging.basicConfig(filename='train_infogcn_debug.log', level=logging.DEBUG)
+    logging.debug("Started train_infogcn debug")
+
+    dataset = "ntu"
+    model_type = "cnn"
+    evaluation = "CV"
+
+    arg = ArgClass(f"./config/{dataset}/{model_type}.yaml")
+    arg.feeder_args['eval'] = evaluation
     arg.checkpoint_file = "./DELETE_ME.pt"
+    arg.batch_size=16 # reduce the batch size for speed...
 
     # Model
     modelLoader = ModelLoader(arg)
@@ -459,11 +405,14 @@ if __name__ == "__main__":
     # Dataset and dataloader
     feeder_class = arg.import_class(arg.feeder)
     train_dataset = feeder_class(**arg.feeder_args, split="train")
+    # Reduce the size of the training dataset for the sake of speed...
+    indices = list(range(arg.batch_size*4))
+    sampler = SubsetRandomSampler(indices)
     train_dataloader = DataLoader(
         train_dataset,
+        sampler=sampler,
         batch_size=arg.batch_size,
         num_workers=4,
-        shuffle=True,
         pin_memory=True,
     )
 
@@ -478,6 +427,7 @@ if __name__ == "__main__":
     # Get the device (cuda or cpu)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Train for one epoch...
     results = train_network(
         arg=arg,
         model=model,
@@ -485,16 +435,18 @@ if __name__ == "__main__":
         train_loader=train_dataloader,
         score_funcs=score_funcs,
         device=device,
-        epochs=10,
+        epochs=1,
         scheduler=scheduler,
         optimiser=optimiser,
         checkpoint_file=arg.checkpoint_file,
-        checkpoint_freq=10,
+        checkpoint_freq=1,
         verbose=True,
     )
 
-
     checkpoint = torch.load('./DELETE_ME.pt', map_location='cpu')
+    os.remove('./DELETE_ME.pt')
 
     res = checkpoint['results']
-    print(res['train_ACC'][-1])
+    logging.info(
+        f"Training accuracy results: {res['train_ACC'][-1]}"
+    )

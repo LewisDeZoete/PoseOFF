@@ -133,7 +133,7 @@ def run_epoch(
         log_pred = torch.cat((log_pred, predict_label))
 
         if save_attention:
-            # NOTE: we average over all of the limbs and heads...
+            # NOTE: we average over all of the limbs and attn heads...
             attentions = model.get_attention()  # [ ((N M V) H Q K)*4 ]
             for layer_no, layer in enumerate(attentions):
                 layer = rearrange(
@@ -279,9 +279,12 @@ if __name__ == "__main__":
                                                               arg_val.split('/')[-1])
         print(f"Data paths: {arg.feeder_args['data_paths']}")
 
-    arg.checkpoint_file = osp.join(arg.save_location,
-                                   arg.evaluation,
-                                   arg.run_name + '.pt')
+    arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
+        arg.save_location,
+        arg.evaluation,
+        "train",
+        arg.run_name + ".pt"
+    )
 
     # Model
     modelLoader = ModelLoader(arg)
