@@ -22,8 +22,8 @@ extractor:
     weights: pretrained_models/yolo11x-pose.pt
   flow:
     weights: pretrained_models/raft_large.pt
-    imsize: [240,320]
-    minibatch_size: 16
+    imsize: [1080,1920]
+    minibatch_size: 3 # can be up to 16 for imsize: [240,320]
   flowpose:
     window_size: 5
     threshold: 0.05
@@ -31,6 +31,7 @@ extractor:
     norm: False
     match_pose: False
     ntu: True
+    dilation: 3
     
 # model
 model: model.infogcn2.sode.SODE
