@@ -3,15 +3,12 @@ import math
 import random
 import torch
 import torch.nn.functional as F
+import logging
 
 from torch import nn
 
 import sys
 import os
-
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-path = os.path.abspath(os.path.join(curr_dir, "..", ".."))
-sys.path.append(path)
 
 # TODO: If changing folder structure, update this import
 # from model.modules import SA_GC, TemporalEncoder, GCN
@@ -46,6 +43,7 @@ from torchdiffeq import odeint as odeint
 from torch.distributions.normal import Normal
 from torch.distributions import kl_divergence
 
+logger = logging.getLogger(__name__)
 
 class DiffeqSolver(nn.Module):
     def __init__(self, ode_func, method, odeint_rtol=1e-4, odeint_atol=1e-5):
@@ -238,6 +236,7 @@ class SODE(nn.Module):
             self.zero = torch.tensor(0.0).to(device)
             self.n_step = n_step
             self.arange_n_step = torch.arange(n_step + 1).to(device)
+            self.pose_channels = pose_channels
         if cnn:
             assert flow_channels > 2  # Could be a better assertion here...
             self.to_joint_embedding = Flow_conv(
@@ -245,7 +244,7 @@ class SODE(nn.Module):
                 flow_window=int(
                     math.sqrt(flow_channels / 2)
                 ),  # flow_window = sqrt(flow_channels/2)
-                original_channels=pose_channels,
+                pose_channels=pose_channels,
                 out_channels=embed_channels,
             )
         else:
@@ -291,7 +290,7 @@ class SODE(nn.Module):
         self.recon_decoder = nn.Sequential(
             GCN(embed_channels, embed_channels, A),
             GCN(embed_channels, embed_channels, A),
-            nn.Conv2d(embed_channels, 3, 1),
+            nn.Conv2d(embed_channels, self.pose_channels, 1),
         )
 
         if n_step:
@@ -415,13 +414,16 @@ class SODE(nn.Module):
 
         # Joint embedding
         x = rearrange(x, "n c t v m -> (n m t) v c", n=N, m=M, v=V)
+        res = x[:, :, :3]  # Pose only!
         x = self.to_joint_embedding(x)
 
         # Add positional embedding
-        x = x + self.pos_embedding[:, : self.num_point]
+        x = x + self.pos_embedding[:, :self.num_point]
 
         # encoding
+        # TODO: Test splitting up flow windows and joints
         x = rearrange(x, "(n m t) v c -> (n m) c t v", m=M, n=N)
+        
         z = self.temporal_encoder(x)
         # kl_div = self.KL_div(z_mu, z_std)
         # z = self.latent_sample(z_mu, z_std)
@@ -430,10 +432,13 @@ class SODE(nn.Module):
         z_0, z_hat, z_hat_shifted = self.extrapolate(z, self.arange_n_step.to(z.dtype))
 
         # reconstruction
+        logger.debug(f"Z_hat_shifted (to go into recon_decoder) shape: {z_hat_shifted.shape}")
         x_hat = self.recon_decoder(z_hat_shifted)
+        logger.debug(f"x_hat (post reconstruction) shape: {x_hat.shape}")
         x_hat = rearrange(
             x_hat, "(n m l) c t v -> n l c t v m", m=M, l=self.n_sample
         ).mean(1)
+        logger.debug(f"x_hat final (post rearrange) shape: {x_hat.shape}")
 
         # classification
         if self.n_step:
@@ -467,11 +472,18 @@ class SODE(nn.Module):
 
 if __name__ == "__main__":
     from config.argclass import ArgClass
+    import logging
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename='infogcn2_model_testing.log',
+        encoding='utf-8',
+        level=logging.DEBUG
+    )
 
-    model_type = 'cnn_TMP'
-    dataset = 'nturgbd'
+    dataset = 'ntu'
+    model_type = 'cnn'
 
-    arg = ArgClass(f"config/{dataset}/train_{model_type}.yaml")
+    arg = ArgClass(f"config/{dataset}/{model_type}_D3.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
@@ -482,12 +494,12 @@ if __name__ == "__main__":
     # N, C, T, V, M
     C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
     V = arg.model_args["num_point"]
-    print(f"Model: {model_type}")
-    print(f"Input channels: {C}\n")
+    logger.info(f"Model: {model_type}")
+    logger.info(f"Input channels: {C}\n")
 
     x = torch.randn((8, C, 64, V, 2)).to(device)
-    print(f'Input shape: {x.shape}\n    (B, C, T, V, M)')
+    logger.info(f'Input shape: {x.shape}\n    (B, C, T, V, M)')
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
-    print(f'\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n')
-    print(f'Attention length: {len(model.get_attention())}')
-    print(f'Attention [0] shape: {model.get_attention()[0].shape}')
+    logger.info(f'\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n')
+    logger.info(f'Attention length: {len(model.get_attention())}')
+    logger.info(f'Attention [0] shape: {model.get_attention()[0].shape}')

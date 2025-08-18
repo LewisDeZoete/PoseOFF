@@ -34,7 +34,7 @@ class Flow_conv(nn.Module):
     """
 
     def __init__(
-        self, kernel_size, flow_window=5, original_channels=3, out_channels=64
+        self, kernel_size, flow_window=5, pose_channels=3, out_channels=64
     ):
         super(Flow_conv, self).__init__()
 
@@ -42,9 +42,9 @@ class Flow_conv(nn.Module):
         # in_channels = 2 since flow is x and y motion channels
         # out_channels is the output shape of the convolutions
         self.kernel_size = kernel_size
-        self.original_channels = original_channels
+        self.pose_channels = pose_channels
         self.out_channels = out_channels
-        self.flow_out_channels = out_channels - original_channels
+        self.flow_out_channels = out_channels - pose_channels
         self.flow_window = flow_window
         # self.bn = nn.BatchNorm1d(2*(flow_window**2))
         self.conv = nn.Sequential(
@@ -54,16 +54,17 @@ class Flow_conv(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((1, 1)),
         )
-        self.fc = nn.Linear(32, self.flow_out_channels)
+        self.fc = nn.Linear(32, self.flow_out_channels) # For the flow channels
+        # self.lin = nn.Linear(self.out_channels, self.out_channels)
 
     def forward(self, x):
         A, V, C = x.size()  # A=N*M*T
         # x of shape ((batch, 2, 300), 17, pose_channels+2W**2)
         # x = rearrange(x, "n c t v m -> (n m t) v c")
         flow_data = rearrange(x, "A v c -> (A v) c", A=A, v=V, c=C)  # (N*M*T*V, C)
-        # flow_data = self.bn(flow_data[:, self.original_channels:]) # apply batchnorm
+        # flow_data = self.bn(flow_data[:, self.pose_channels:]) # apply batchnorm
         flow_data = rearrange(
-            flow_data[:, self.original_channels:],
+            flow_data[:, self.pose_channels:],
             "skels (w h c) -> skels c w h",
             w=self.flow_window,
             h=self.flow_window,
@@ -74,12 +75,11 @@ class Flow_conv(nn.Module):
         flow_features = self.conv(flow_data)  # Apply conv
         flow_features = flow_features.view(flow_features.size(0), -1)  # flatten
         flow_features = self.fc(flow_features)  # Linear layer to reduce out_channels
-        # flow_features = flow_features.view(N,self.flow_out_channels,T,V,M)
         flow_features = rearrange(flow_features, "(A v) c -> (A) v c", A=A, v=V)
 
         # Stack the output of this cnn onto the original graph features
-        # x = torch.cat((x[:,:self.original_channels,...], flow_features), dim=1)
-        x = torch.cat((x[:, :, : self.original_channels], flow_features), dim=-1)
+        x = torch.cat((x[:, :, : self.pose_channels], flow_features), dim=-1)
+        # x = self.lin(x) # connect the flow and pose channels
 
         return x
 
