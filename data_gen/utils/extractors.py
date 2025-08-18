@@ -163,6 +163,7 @@ class FlowPoseSampler:
         match_pose (bool): Whether to match the pose keypoints using pose_match function. Default is True.
         ntu (bool): Whether the pose keypoints are from NTU dataset. Default is False.
         dilation (int): The dilation factor for sampling points around keypoints. Default is 1.
+    TODO: scalable dilation with z-coordinate or mean joint distance.
     Methods:
         __call__(flows, poses):
             Samples the optical flow in windows surrounding the pose keypoints.
@@ -225,7 +226,7 @@ class FlowPoseSampler:
                         * np.array([(width - 1)/1920, (height - 1)/1080]).reshape(2, 1, 1)).astype(int)
             poses[0] = poses[0]/1920-0.5
             poses[1] = poses[1]/1080-0.5
-        else:
+        else: # Else we're assuming it's 2D poses (x,y, conf.)
             pose_points = ((poses[:2, ...] + 0.5).reshape(2, num_pose_frames, total_keypoints)
                         * np.array([width - 1, height - 1]).reshape(2, 1, 1)).astype(int)
             vis = poses[2, :, :].flatten() > self.threshold  # Visibility mask (frames, keypoints)

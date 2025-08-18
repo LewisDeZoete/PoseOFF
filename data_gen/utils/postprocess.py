@@ -210,3 +210,4 @@ def create_aligned_dataset(
             x_test=aligned_set["x_test"],
             y_test=org_data["y_test"],
         )
+        print(f'\t\tAligned {file}')

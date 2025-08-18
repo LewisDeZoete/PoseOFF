@@ -30,6 +30,13 @@ parser.add_argument(
     default=1,
     type=int,
     help='Batch number for processing')
+parser.add_argument(
+    '--dilation',
+    dest='dilation',
+    default=None,
+    type=int,
+    help='Overwrite the dilation value from the yaml config.'
+)
 args = parser.parse_args()
 
 # Parsed command line arguments
@@ -45,8 +52,12 @@ print(f'Start index: {idx_start}')
 print(f'End index: {idx_end}')
 
 # Get the argparse object
-arg = ArgClass(arg=f"./config/nturgbd{'120' if dataset == 'ntu120' else ''}/train_cnn.yaml")
+arg = ArgClass(arg=f"./config/ntu{'120' if dataset == 'ntu120' else ''}/cnn.yaml")
 transform_args = arg.extractor
+if args.dilation: # If a commandline argument is passed, overwrite the yaml config
+    transform_args['flowpose']['dilation'] = args.dilation
+print(f"Extracting flowpose samples for {dataset}"
+      f"dataset with dilation {transform_args['flowpose']['dilation']}...")
 
 # Get the device
 device = torch.device(arg.device if torch.cuda.is_available() else 'cpu')

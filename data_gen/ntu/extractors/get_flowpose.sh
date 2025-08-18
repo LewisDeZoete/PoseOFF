@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:1
-#SBATCH --time=12:00:00
+#SBATCH --time=14:00:00
 #SBATCH --mem-per-cpu=27g
 
 # Activate the environment
@@ -19,4 +19,4 @@ fi
 # # ~ 12 hours, 25g if processing 2000 each time NEEDS CUDA
 # Job array submits a batch of 2000 from
 # ( $SLURM_ARRAY_ID-2000, $SLURM_ARRAY_ID-1 )
-srun python ./data_gen/ntu/get_flowpose_samples.py --dataset $dataset --batch_number $SLURM_ARRAY_TASK_ID
+srun python ./data_gen/ntu/get_flowpose_samples.py --dataset $dataset --batch_number $SLURM_ARRAY_TASK_ID --dilation $dilation
