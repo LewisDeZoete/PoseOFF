@@ -1,0 +1,48 @@
+Dilation: 3
+Dataset: ntu120
+Splitting dataset
+Processing optical flow data
+
+		Train indices length: 63026
+		Test indices length: 50919
+	Total skes names: 113945
+
+		Train indices length: 54468
+		Test indices length: 59477
+	Total skes names: 113945
+
+Dataset: ntu120
+Processing optical flow data
+
+		Train indices length: 63026
+		Test indices length: 50919
+	Total skes names: 113945
+
+		Train indices length: 54468
+		Test indices length: 59477
+	Total skes names: 113945
+
+['./data/ntu120/aligned_data/ntu120_CSub-pose_D3.npz', './data/ntu120/aligned_data/ntu120_CSet-pose_D3.npz', './data/ntu120/aligned_data/ntu120_CSub-flowpose_D3.npz', './data/ntu120/aligned_data/ntu120_CSet-flowpose_D3.npz']
+		Aligned ./data/ntu120/aligned_data/ntu120_CSub-pose_D3.npz
+		Aligned ./data/ntu120/aligned_data/ntu120_CSet-pose_D3.npz
+		Aligned ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3.npz
+		Aligned ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3.npz
+	Aligned datasets created successfully!
+
++------------------ Job Report: 3739853 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 88.9% (711.1 GB peak / 800 GB)  |
+| CPU           [                    ]  4.2% average                   |
+| Time          [------->            ] 38.7% (0-01:32:57 / 0-04:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   437.3 MB      0 B            230                           |
+|   /fred   1.4 TB        713.5 GB       3 K                           |
+|   /home   0 B           0 B            1                             |
+|   OS      1.8 MB        0 B            549                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

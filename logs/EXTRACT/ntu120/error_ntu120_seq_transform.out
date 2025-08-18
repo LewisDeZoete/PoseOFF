@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/./data_gen/ntu/seq_transformation.py", line 328, in <module>
+    with open(f"./data/ntu/flow_data/flow_data{mod}.pkl", 'rb') as fr:
+FileNotFoundError: [Errno 2] No such file or directory: './data/ntu/flow_data/flow_data_D3.pkl'
+srun: error: gina305: task 0: Exited with exit code 1
+srun: Terminating StepId=3739853.0
+/fred/oz141/ldezoete/MS-G3D/data_gen/utils/postprocess.py:140: RuntimeWarning: invalid value encountered in divide
+  v2 = v2 / (np.linalg.norm(v2))

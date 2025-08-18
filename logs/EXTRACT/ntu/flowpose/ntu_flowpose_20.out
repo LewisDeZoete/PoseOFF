@@ -1,0 +1,47 @@
+SLURM_ARRAY_TASK_ID: 20
+Start index: 38000
+End index: 40000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 38000 to 40000
+	Skeleton S012C001P019R001A046 to S012C003P008R001A010
+	Frames dropped for S012C001P028R001A001: 1
+	Frames dropped for S012C001P028R001A009: 28
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C001P028R002A060: 4
+Processed 38000-38499 in 8427.96 seconds
+	Frames dropped for S012C002P007R002A059: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C002P007R002A060: 15
+	Frames dropped for S012C002P008R002A059: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C002P008R002A060: 17
+Processed 38500-38999 in 10044.17 seconds
+Processed 39000-39499 in 9443.39 seconds
+	Frames dropped for S012C002P025R002A059: 22
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C002P028R002A060: 15
+	Frames dropped for S012C002P037R002A055: 11
+Processed 39500-39999 in 8925.95 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+
++------------------ Job Report: 3593550 (COMPLETED) -------------------+
+| Memory (RAM)  [##############      ] 72.9% (19.7 GB peak / 27 GB)    |
+| CPU           [##################  ] 92.7% average                   |
+| GPU           [##############      ] 72.9% average                   |
+| Time          [-------------->     ] 73.2% (0-10:14:33 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   79.8 MB       0 B            262                           |
+|   /fred   12.7 GB       7.9 KB         8.6 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      347.7 MB      0 B            888                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
++----------------------------------------------------------------------+

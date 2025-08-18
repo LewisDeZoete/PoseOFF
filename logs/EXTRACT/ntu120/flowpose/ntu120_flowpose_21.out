@@ -1,0 +1,41 @@
+SLURM_ARRAY_TASK_ID: 21
+Start index: 40000
+End index: 42000
+Extracting flowpose samples for ntu120dataset with dilation 4...
+Found 57367 available skeleton files.
+
+Processing flowpose samples for ntu120 dataset...
+	Index 40000 to 42000
+	Skeleton S029C003P008R001A120 to S030C001P043R001A120
+	Frames dropped for S029C003P008R002A113: 13
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P041R001A094: 15
+	Frames dropped for S029C003P043R001A093: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P043R001A094: 7
+	Frames dropped for S029C003P043R001A095: 10
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P043R001A101: 59
+	Frames dropped for S029C003P043R001A104: 34
+	Frames dropped for S029C003P043R001A116: 4
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P044R001A065: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P044R002A109: 7
+	Frames dropped for S029C003P048R001A077: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P048R001A084: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P048R002A077: 22
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P048R002A093: 38
+		Frame 0 in skip list, add blank frame to poses
+Processed 40000-40499 in 8110.65 seconds
+	Frames dropped for S029C003P049R001A063: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P049R001A064: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P049R002A120: 21
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P051R001A101: 13
+	Frames dropped for S029C003P051R002A119: 42

@@ -1,0 +1,39 @@
+SLURM_ARRAY_TASK_ID: 2
+Start index: 2000
+End index: 4000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 2000 to 4000
+	Skeleton S001C003P001R002A023 to S002C002P003R001A048
+	Frames dropped for S001C003P003R002A011: 34
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S001C003P004R002A009: 25
+Processed 2000-2499 in 8699.69 seconds
+Processed 2500-2999 in 8085.67 seconds
+Processed 3000-3499 in 8724.90 seconds
+	Frames dropped for S002C001P012R002A059: 27
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S002C001P014R001A055: 7
+Processed 3500-3999 in 8858.09 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+
++------------------ Job Report: 3593516 (COMPLETED) -------------------+
+| Memory (RAM)  [###############     ] 75.9% (20.5 GB peak / 27 GB)    |
+| CPU           [##################  ] 93.8% average                   |
+| GPU           [###############     ] 77.4% average                   |
+| Time          [------------->      ] 68.6% (0-09:36:03 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   16.1 MB       0 B            253                           |
+|   /fred   5 GB          2.9 KB         12.5 K                        |
+|   /home   0 B           0 B            3                             |
+|   OS      19 MB         0 B            456                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

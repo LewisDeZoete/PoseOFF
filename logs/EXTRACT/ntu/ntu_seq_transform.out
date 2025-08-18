@@ -1,13 +1,58 @@
+Dilation: 5
+Dataset: ntu
+Splitting dataset
+Processing optical flow data
+
+		Train indices length: 40091
+		Test indices length: 16487
+	Total skes names: 56578
+
+		Train indices length: 37646
+		Test indices length: 18932
+	Total skes names: 56578
+
+	Loaded 56578 skeleton sequences and 56578 flow sequences
+	Full flow sequence shape: (56578, 300, 2500)
+	Full skeleton sequence shape: (56578, 300, 150)
+	Full flowpose sequence shape: (56578, 300, 2650)
+	Flowpose approximate size: 0.00 GB
+	Saved pose CS
+	Saved flowpose CS
+	Saved pose CV
+	Saved flowpose CV
 Dataset: ntu
 Processing optical flow data
 
-	Train indices length: 40091
-	Test indices length: 16487
-Total skes names: 56578
+		Train indices length: 40091
+		Test indices length: 16487
+	Total skes names: 56578
 
-	Train indices length: 37646
-	Test indices length: 18932
-Total skes names: 56578
+		Train indices length: 37646
+		Test indices length: 18932
+	Total skes names: 56578
 
-['./data/ntu/aligned_data/NTU60_CS-pose.npz', './data/ntu/aligned_data/NTU60_CV-pose.npz', './data/ntu/aligned_data/NTU60_CS-flowpose.npz', './data/ntu/aligned_data/NTU60_CV-flowpose.npz']
-Aligned datasets created successfully!
+['./data/ntu/aligned_data/ntu_CS-pose_D5.npz', './data/ntu/aligned_data/ntu_CV-pose_D5.npz', './data/ntu/aligned_data/ntu_CS-flowpose_D5.npz', './data/ntu/aligned_data/ntu_CV-flowpose_D5.npz']
+		Aligned ./data/ntu/aligned_data/ntu_CS-pose_D5.npz
+		Aligned ./data/ntu/aligned_data/ntu_CV-pose_D5.npz
+		Aligned ./data/ntu/aligned_data/ntu_CS-flowpose_D5.npz
+		Aligned ./data/ntu/aligned_data/ntu_CV-flowpose_D5.npz
+	Aligned datasets created successfully!
+
++------------------ Job Report: 3651361 (COMPLETED) -------------------+
+| Memory (RAM)  [#########           ] 49.8% (398.6 GB peak / 800 GB)  |
+| CPU           [                    ]  4.1% average                   |
+| Time          [----->              ] 25.4% (0-01:00:55 / 0-04:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   56.7 MB       0 B                    240                   |
+|   /fred   680.6 GB      862.6 GB               118                   |
+|   /home   0 B           0 B                      3                   |
+|   OS      0 B           0 B                     19                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,0 +1,40 @@
+SLURM_ARRAY_TASK_ID: 19
+Start index: 36000
+End index: 38000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 36000 to 38000
+	Skeleton S011C003P007R002A020 to S012C001P019R001A045
+	Frames dropped for S011C003P008R002A060: 10
+Processed 36000-36499 in 8487.43 seconds
+	Frames dropped for S011C003P018R001A060: 6
+	Frames dropped for S011C003P019R001A059: 19
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S011C003P019R002A055: 18
+	Frames dropped for S011C003P025R001A060: 4
+	Frames dropped for S011C003P027R001A055: 18
+Processed 36500-36999 in 9176.07 seconds
+Processed 37000-37499 in 9056.21 seconds
+Processed 37500-37999 in 8024.62 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+
++------------------ Job Report: 3593549 (COMPLETED) -------------------+
+| Memory (RAM)  [################    ] 81.5% (22 GB peak / 27 GB)      |
+| CPU           [##################  ] 94.4% average                   |
+| GPU           [################    ] 80.8% average                   |
+| Time          [------------->      ] 69.1% (0-09:40:07 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   216 KB        0 B            178                           |
+|   /fred   7.6 GB        4.9 KB         7.6 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      16.5 MB       0 B            33                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,0 +1,40 @@
+SLURM_ARRAY_TASK_ID: 22
+Start index: 42000
+End index: 44000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 42000 to 44000
+	Skeleton S013C001P019R002A048 to S013C003P008R002A011
+Processed 42000-42499 in 8100.46 seconds
+Processed 42500-42999 in 8239.91 seconds
+	Frames dropped for S013C002P025R002A060: 5
+	Frames dropped for S013C002P027R001A037: 54
+		Frame 0 in skip list, add blank frame to poses
+Processed 43000-43499 in 8523.17 seconds
+	Frames dropped for S013C002P037R002A055: 6
+	Frames dropped for S013C003P008R001A059: 45
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S013C003P008R001A060: 11
+Processed 43500-43999 in 8238.71 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+
++------------------ Job Report: 3593552 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 89.3% (24.1 GB peak / 27 GB)    |
+| CPU           [##################  ] 93.5% average                   |
+| GPU           [###############     ] 75.1% average                   |
+| Time          [------------->      ] 65.7% (0-09:12:06 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            21                            |
+|   /fred   5.8 GB        4.3 KB         9.6 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      0 B           0 B            191                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

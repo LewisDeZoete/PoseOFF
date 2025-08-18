@@ -1,0 +1,48 @@
+SLURM_ARRAY_TASK_ID: 16
+Start index: 30000
+End index: 32000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 30000 to 32000
+	Skeleton S010C001P021R001A058 to S010C003P017R001A026
+	Frames dropped for S010C001P021R002A055: 21
+	Frames dropped for S010C002P007R002A014: 62
+	Frames dropped for S010C002P008R002A059: 31
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C002P008R002A060: 3
+Processed 30000-30499 in 9495.05 seconds
+	Frames dropped for S010C002P017R001A039: 28
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C002P017R001A060: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C002P018R001A055: 24
+Processed 30500-30999 in 8257.10 seconds
+	Frames dropped for S010C002P021R002A055: 8
+	Frames dropped for S010C002P025R001A060: 10
+Processed 31000-31499 in 9327.03 seconds
+	Frames dropped for S010C003P008R001A016: 10
+	Frames dropped for S010C003P008R001A059: 50
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C003P008R001A060: 1
+	Frames dropped for S010C003P008R002A059: 40
+		Frame 0 in skip list, add blank frame to poses
+Processed 31500-31999 in 8453.95 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+
++------------------ Job Report: 3593546 (COMPLETED) -------------------+
+| Memory (RAM)  [##################  ] 91.3% (24.6 GB peak / 27 GB)    |
+| CPU           [##################  ] 94.0% average                   |
+| GPU           [###############     ] 79.4% average                   |
+| Time          [-------------->     ] 70.8% (0-09:54:57 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   13.2 MB       0 B            248                           |
+|   /fred   8 GB          12.4 KB        11.2 K                        |
+|   /home   0 B           0 B            3                             |
+|   OS      17.8 MB       0 B            289                           |
++----------------------------------------------------------------------+

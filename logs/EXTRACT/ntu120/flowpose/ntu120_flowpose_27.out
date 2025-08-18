@@ -1,0 +1,16 @@
+SLURM_ARRAY_TASK_ID: 27
+Start index: 52000
+End index: 54000
+Extracting flowpose samples for ntu120dataset with dilation 4...
+Found 57367 available skeleton files.
+
+Processing flowpose samples for ntu120 dataset...
+	Index 52000 to 54000
+	Skeleton S031C003P008R001A072 to S032C001P041R002A107
+	Frames dropped for S031C003P042R001A119: 16
+	Frames dropped for S031C003P042R002A119: 17
+	Frames dropped for S031C003P042R002A120: 36
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S031C003P043R001A092: 41
+Processed 52000-52499 in 8873.60 seconds
+	Frames dropped for S031C003P067R001A062: 23

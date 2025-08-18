@@ -1,5 +1,5 @@
-Concatenating ntu flowpose.
-	DILATION: 5
+Concatenating ntu120 flowpose.
+	DILATION: 3
 
 
 Flow data samples: 2000
@@ -30,21 +30,21 @@ Flow data samples: 50000
 Flow data samples: 52000
 Flow data samples: 54000
 Flow data samples: 56000
-Flow data samples: 56578
-Saved flowpose file to: ./data/ntu/flow_data/flow_data_D5.pkl
+Flow data samples: 57367
+Saved flowpose file to: ./data/ntu120/flow_data/flow_data_D3.pkl
 
-+------------------ Job Report: 3593514 (COMPLETED) -------------------+
-| Memory (RAM)  [#################   ] 85.8% (51.5 GB peak / 60 GB)    |
-| CPU           [#                   ]  9.9% average                   |
-| Time          [------>             ] 32.0% (0-00:03:12 / 0-00:10:00) |
++------------------ Job Report: 3739852 (COMPLETED) -------------------+
+| Memory (RAM)  [############        ] 64.4% (38.7 GB peak / 60 GB)    |
+| CPU           [#                   ]  5.0% average                   |
+| Time          [---->               ] 20.0% (0-00:02:00 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   1.2 MB        0 B                    216                   |
-|   /fred   38.2 GB       47.6 GB                 75                   |
-|   /home   0 B           0 B                      1                   |
-|   OS      0 B           0 B                      4                   |
+|   /apps   4.3 MB        0 B                    243                   |
+|   /fred   26.8 GB       27.8 GB                 70                   |
+|   /home   0 B           0 B                      2                   |
+|   OS      0 B           0 B                      1                   |
 |                                                                      |
 | Warnings:                                                            |
 |   - CPU usage is low                                                 |
