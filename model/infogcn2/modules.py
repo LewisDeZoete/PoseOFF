@@ -92,8 +92,12 @@ class SA_GC(nn.Module):
         out = self.bn(out)
         out += self.down(x)
         out = self.relu(out)
+        self._attn = attn
 
         return out
+
+    def get_attn(self):
+        return self._attn
 
 
 class GCN(nn.Module):

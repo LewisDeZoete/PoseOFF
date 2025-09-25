@@ -211,6 +211,7 @@ class SODE(nn.Module):
         self.Graph = import_class(graph)()
         with torch.no_grad():
             A = np.stack([self.Graph.A_norm] * num_head, axis=0)
+            self.A = A
             self.T = T
             self.arange = torch.arange(T).view(1, 1, T) + 1
             shift_idx = torch.arange(0, T, dtype=int).view(1, T, 1, 1)
@@ -290,6 +291,8 @@ class SODE(nn.Module):
         self.recon_decoder = nn.Sequential(
             GCN(embed_channels, embed_channels, A),
             GCN(embed_channels, embed_channels, A),
+            # SA_GC(embed_channels, embed_channels, A),
+            # SA_GC(embed_channels, embed_channels, A),
             nn.Conv2d(embed_channels, self.pose_channels, 1),
         )
 
@@ -305,6 +308,8 @@ class SODE(nn.Module):
         self.cls_decoder = nn.Sequential(
             GCN(in_dim, mid_dim, A),
             GCN(mid_dim, out_dim, A),
+            # SA_GC(in_dim, mid_dim, A),
+            # SA_GC(mid_dim, out_dim, A),
         )
 
         # amp is not working with for loop.
@@ -475,31 +480,42 @@ if __name__ == "__main__":
     import logging
     logger = logging.getLogger(__name__)
     logging.basicConfig(
-        filename='infogcn2_model_testing.log',
+        filename='logs/debug/infogcn2_model_testing.log',
         encoding='utf-8',
+        filemode='w',
         level=logging.DEBUG
     )
 
     dataset = 'ntu'
     model_type = 'cnn'
 
-    arg = ArgClass(f"config/{dataset}/{model_type}_D3.yaml")
+    arg = ArgClass(f"config/{dataset}/{model_type}.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
 
+    # Create the model, set to train
     model = SODE(**arg.model_args)
     model = model.to(device)
+    model.train()
 
+    # Create dummy input
     # N, C, T, V, M
     C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
     V = arg.model_args["num_point"]
+    x = torch.randn((8, C, 64, V, 2)).to(device)
     logger.info(f"Model: {model_type}")
     logger.info(f"Input channels: {C}\n")
+    logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
 
-    x = torch.randn((8, C, 64, V, 2)).to(device)
-    logger.info(f'Input shape: {x.shape}\n    (B, C, T, V, M)')
+    # Pass input to model
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
-    logger.info(f'\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n')
-    logger.info(f'Attention length: {len(model.get_attention())}')
-    logger.info(f'Attention [0] shape: {model.get_attention()[0].shape}')
+    logger.info(f"\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n")
+    logger.info(f"Attention length: {len(model.get_attention())}")
+    logger.info(f"Attention [0] shape: {model.get_attention()[0].shape}")
+    logger.info(f"Adjacency matrix shape: {model.A.mean(0)}")
+    logger.info(f"cls_decoder GCN-0 shared topology:  {model.cls_decoder[0].shared_topology.mean(0)}")
+    logger.info(f"cls_decoder GCN-0 shared topology shape: {model.cls_decoder[0].shared_topology.shape}")
+    logger.info(f"cls_decoder GCN-1 shared topology shape: {model.cls_decoder[1].shared_topology.shape}")
+    logger.info(f"cls_decoder GCN-0 attn shape: {model.cls_decoder[0].get_attn().shape}")
+    logger.info(f"cls_decoder GCN-1 attn shape: {model.cls_decoder[1].get_attn().shape}")
