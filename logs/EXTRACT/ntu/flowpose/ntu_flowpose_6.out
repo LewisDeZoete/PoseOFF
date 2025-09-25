@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 6
 Start index: 10000
 End index: 12000
-Extracting flowpose samples for ntudataset with dilation 5...
+Extracting flowpose samples for ntudataset with dilation 1...
 Found 56578 available skeleton files.
 
 Processing flowpose samples for ntu dataset...
@@ -12,32 +12,32 @@ Processing flowpose samples for ntu dataset...
 	Frames dropped for S004C002P020R001A060: 5
 	Frames dropped for S004C003P003R001A059: 28
 		Frame 0 in skip list, add blank frame to poses
-Processed 10000-10499 in 8813.12 seconds
+Processed 10000-10499 in 9142.18 seconds
 	Frames dropped for S005C001P004R001A059: 55
 		Frame 0 in skip list, add blank frame to poses
-Processed 10500-10999 in 8505.89 seconds
+Processed 10500-10999 in 8820.05 seconds
 	Frames dropped for S005C001P015R002A042: 6
 	Frames dropped for S005C001P016R002A042: 30
-Processed 11000-11499 in 7536.26 seconds
+Processed 11000-11499 in 7515.17 seconds
 	Frames dropped for S005C002P004R001A059: 51
 	Frames dropped for S005C002P010R002A055: 6
-Processed 11500-11999 in 8360.06 seconds
+Processed 11500-11999 in 8346.10 seconds
 Flowpose samples for ntu dataset generated successfully!
 Data saved to ./data/ntu/flow_data/export_tmp
 
-+------------------ Job Report: 3593520 (COMPLETED) -------------------+
-| Memory (RAM)  [#############       ] 67.8% (18.3 GB peak / 27 GB)    |
-| CPU           [##################  ] 93.3% average                   |
-| GPU           [###############     ] 75.3% average                   |
-| Time          [------------->      ] 66.3% (0-09:17:01 / 0-14:00:00) |
++------------------ Job Report: 4264255 (COMPLETED) -------------------+
+| Memory (RAM)  [##############      ] 70.3% (19 GB peak / 27 GB)      |
+| CPU           [##################  ] 93.5% average                   |
+| GPU           [###############     ] 78.8% average                   |
+| Time          [------------->      ] 67.2% (0-09:24:25 / 0-14:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   19 MB         0 B            252                           |
-|   /fred   6.5 GB        7.4 KB         12.5 K                        |
+|   /apps   150.3 MB      0 B            27                            |
+|   /fred   14.9 GB       7.4 KB         8.9 K                         |
 |   /home   0 B           0 B            3                             |
-|   OS      19 MB         0 B            456                           |
+|   OS      57.5 MB       0 B            268                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much time requested                                          |

@@ -1,4 +1,4 @@
-Dilation: 5
+Dilation: 1
 Dataset: ntu
 Splitting dataset
 Processing optical flow data
@@ -11,7 +11,7 @@ Processing optical flow data
 		Test indices length: 18932
 	Total skes names: 56578
 
-	Loaded 56578 skeleton sequences and 56578 flow sequences
+	Loaded 56578 skeleton         sequences and 56578 flow sequences
 	Full flow sequence shape: (56578, 300, 2500)
 	Full skeleton sequence shape: (56578, 300, 150)
 	Full flowpose sequence shape: (56578, 300, 2650)
@@ -31,28 +31,27 @@ Processing optical flow data
 		Test indices length: 18932
 	Total skes names: 56578
 
-['./data/ntu/aligned_data/ntu_CS-pose_D5.npz', './data/ntu/aligned_data/ntu_CV-pose_D5.npz', './data/ntu/aligned_data/ntu_CS-flowpose_D5.npz', './data/ntu/aligned_data/ntu_CV-flowpose_D5.npz']
-		Aligned ./data/ntu/aligned_data/ntu_CS-pose_D5.npz
-		Aligned ./data/ntu/aligned_data/ntu_CV-pose_D5.npz
-		Aligned ./data/ntu/aligned_data/ntu_CS-flowpose_D5.npz
-		Aligned ./data/ntu/aligned_data/ntu_CV-flowpose_D5.npz
+['./data/ntu/aligned_data/ntu_CS-pose.npz', './data/ntu/aligned_data/ntu_CV-pose.npz', './data/ntu/aligned_data/ntu_CS-flowpose_D1.npz', './data/ntu/aligned_data/ntu_CV-flowpose_D1.npz']
+		Aligned ./data/ntu/aligned_data/ntu_CS-pose.npz
+		Aligned ./data/ntu/aligned_data/ntu_CV-pose.npz
+		Aligned ./data/ntu/aligned_data/ntu_CS-flowpose_D1.npz
+		Aligned ./data/ntu/aligned_data/ntu_CV-flowpose_D1.npz
 	Aligned datasets created successfully!
 
-+------------------ Job Report: 3651361 (COMPLETED) -------------------+
-| Memory (RAM)  [#########           ] 49.8% (398.6 GB peak / 800 GB)  |
-| CPU           [                    ]  4.1% average                   |
-| Time          [----->              ] 25.4% (0-01:00:55 / 0-04:00:00) |
++------------------ Job Report: 4324432 (COMPLETED) -------------------+
+| Memory (RAM)  [##########          ] 51.0% (407.9 GB peak / 800 GB)  |
+| CPU           [                    ]  4.6% average                   |
+| Time          [---->               ] 20.4% (0-00:48:56 / 0-04:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write      Total IOPS                  |
+|   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   56.7 MB       0 B                    240                   |
-|   /fred   680.6 GB      862.6 GB               118                   |
-|   /home   0 B           0 B                      3                   |
-|   OS      0 B           0 B                     19                   |
+|   /apps   1.6 MB        0 B            240                           |
+|   /fred   569.4 GB      851.8 GB       2.4 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      2 MB          0 B            367                           |
 |                                                                      |
 | Warnings:                                                            |
-|   - Too much memory requested                                        |
 |   - CPU usage is low                                                 |
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+

@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 17
 Start index: 32000
 End index: 34000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
@@ -9,5 +9,30 @@ Processing flowpose samples for ntu120 dataset...
 	Skeleton S027C003P078R001A113 to S028C001P087R001A078
 	Frames dropped for S027C003P078R002A061: 85
 		Frame 0 in skip list, add blank frame to poses
-Processed 32000-32499 in 9369.51 seconds
+Processed 32000-32499 in 8275.02 seconds
 	Frames dropped for S027C003P083R001A119: 29
+	Frames dropped for S027C003P086R001A119: 23
+Processed 32500-32999 in 8484.67 seconds
+Processed 33000-33499 in 6425.93 seconds
+Processed 33500-33999 in 6477.52 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362560 (COMPLETED) -------------------+
+| Memory (RAM)  [##############      ] 72.8% (19.6 GB peak / 27 GB)    |
+| CPU           [################    ] 84.7% average                   |
+| GPU           [############        ] 64.1% average                   |
+| Time          [----------->        ] 59.3% (0-08:18:27 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1.9 MB        0 B            195                           |
+|   /fred   12.4 GB       3.1 KB         9.2 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      219.9 MB      0 B            472                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

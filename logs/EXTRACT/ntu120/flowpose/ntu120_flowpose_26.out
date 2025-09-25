@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 26
 Start index: 50000
 End index: 52000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
@@ -9,7 +9,31 @@ Processing flowpose samples for ntu120 dataset...
 	Skeleton S031C002P006R001A099 to S031C003P008R001A071
 	Frames dropped for S031C002P008R002A119: 7
 	Frames dropped for S031C002P042R001A092: 25
-Processed 50000-50499 in 6630.72 seconds
+Processed 50000-50499 in 6002.43 seconds
 	Frames dropped for S031C002P051R001A119: 19
-Processed 50500-50999 in 5735.48 seconds
+Processed 50500-50999 in 5466.69 seconds
 	Frames dropped for S031C002P082R002A116: 4
+	Frames dropped for S031C002P096R001A119: 16
+Processed 51000-51499 in 6109.63 seconds
+Processed 51500-51999 in 5952.91 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362569 (COMPLETED) -------------------+
+| Memory (RAM)  [##########          ] 53.8% (14.5 GB peak / 27 GB)    |
+| CPU           [################    ] 83.3% average                   |
+| GPU           [#############       ] 67.9% average                   |
+| Time          [--------->          ] 47.1% (0-06:36:03 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1.7 MB        0 B            141                           |
+|   /fred   2.8 GB        4 KB           8.8 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      860 KB        0 B            236                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

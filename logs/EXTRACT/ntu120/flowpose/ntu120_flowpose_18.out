@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 18
 Start index: 34000
 End index: 36000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
@@ -10,7 +10,34 @@ Processing flowpose samples for ntu120 dataset...
 	Frames dropped for S028C002P008R001A119: 4
 	Frames dropped for S028C002P008R002A120: 7
 		Frame 0 in skip list, add blank frame to poses
-Processed 34000-34499 in 6202.65 seconds
+Processed 34000-34499 in 5295.99 seconds
 	Frames dropped for S028C002P048R001A119: 18
 	Frames dropped for S028C002P070R002A119: 30
-Processed 34500-34999 in 5993.51 seconds
+Processed 34500-34999 in 5855.84 seconds
+	Frames dropped for S028C002P087R002A119: 24
+	Frames dropped for S028C003P008R001A119: 1
+	Frames dropped for S028C003P008R002A119: 10
+Processed 35000-35499 in 7992.58 seconds
+	Frames dropped for S028C003P070R001A119: 29
+Processed 35500-35999 in 8424.55 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362561 (COMPLETED) -------------------+
+| Memory (RAM)  [############        ] 64.4% (17.4 GB peak / 27 GB)    |
+| CPU           [#################   ] 85.6% average                   |
+| GPU           [############        ] 64.4% average                   |
+| Time          [----------->        ] 55.2% (0-07:43:22 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            18                            |
+|   /fred   9.3 GB        6.6 KB         8.9 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      868 KB        0 B            208                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

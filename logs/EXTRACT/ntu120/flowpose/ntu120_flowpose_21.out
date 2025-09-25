@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 21
 Start index: 40000
 End index: 42000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
@@ -30,7 +30,7 @@ Processing flowpose samples for ntu120 dataset...
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S029C003P048R002A093: 38
 		Frame 0 in skip list, add blank frame to poses
-Processed 40000-40499 in 8110.65 seconds
+Processed 40000-40499 in 7336.91 seconds
 	Frames dropped for S029C003P049R001A063: 29
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S029C003P049R001A064: 24
@@ -39,3 +39,56 @@ Processed 40000-40499 in 8110.65 seconds
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S029C003P051R001A101: 13
 	Frames dropped for S029C003P051R002A119: 42
+	Frames dropped for S029C003P074R002A108: 15
+	Frames dropped for S029C003P074R002A114: 6
+	Frames dropped for S029C003P074R002A116: 67
+		Frame 0 in skip list, add blank frame to poses
+Processed 40500-40999 in 7556.62 seconds
+	Frames dropped for S029C003P075R001A092: 23
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P075R001A119: 40
+	Frames dropped for S029C003P075R002A108: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P075R002A116: 41
+	Frames dropped for S029C003P080R001A078: 9
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P080R001A085: 6
+	Frames dropped for S029C003P080R001A089: 4
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P080R001A117: 23
+	Frames dropped for S029C003P088R001A066: 20
+	Frames dropped for S029C003P088R001A080: 13
+	Frames dropped for S029C003P088R002A066: 39
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P089R001A076: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P089R001A081: 47
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P089R001A109: 33
+Processed 41000-41499 in 8467.10 seconds
+	Frames dropped for S029C003P090R002A080: 31
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S029C003P090R002A117: 4
+	Frames dropped for S030C001P041R001A092: 1
+Processed 41500-41999 in 5726.34 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362564 (COMPLETED) -------------------+
+| Memory (RAM)  [##############      ] 73.6% (19.9 GB peak / 27 GB)    |
+| CPU           [#################   ] 87.7% average                   |
+| GPU           [#############       ] 69.4% average                   |
+| Time          [----------->        ] 58.2% (0-08:08:54 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   688 KB        0 B            25                            |
+|   /fred   5.5 GB        862.1 MB       9.3 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      3.2 MB        0 B            383                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 16
 Start index: 30000
 End index: 32000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
@@ -9,6 +9,37 @@ Processing flowpose samples for ntu120 dataset...
 	Skeleton S027C002P043R002A083 to S027C003P078R001A112
 	Frames dropped for S027C002P078R001A114: 10
 	Frames dropped for S027C002P079R002A119: 19
-Processed 30000-30499 in 5784.46 seconds
+Processed 30000-30499 in 5649.14 seconds
 	Frames dropped for S027C002P080R002A119: 36
-Processed 30500-30999 in 5593.15 seconds
+Processed 30500-30999 in 5402.10 seconds
+	Frames dropped for S027C003P006R001A119: 18
+	Frames dropped for S027C003P008R001A076: 17
+	Frames dropped for S027C003P008R002A119: 12
+Processed 31000-31499 in 6165.99 seconds
+	Frames dropped for S027C003P011R001A119: 48
+	Frames dropped for S027C003P011R002A115: 38
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S027C003P043R002A119: 15
+	Frames dropped for S027C003P044R002A120: 7
+		Frame 0 in skip list, add blank frame to poses
+Processed 31500-31999 in 7301.27 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362559 (COMPLETED) -------------------+
+| Memory (RAM)  [###########         ] 59.5% (16.1 GB peak / 27 GB)    |
+| CPU           [##################  ] 92.5% average                   |
+| GPU           [###############     ] 76.8% average                   |
+| Time          [--------->          ] 49.1% (0-06:52:29 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   412 KB        0 B            25                            |
+|   /fred   6.1 GB        8 KB           9.3 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      5.5 MB        0 B            400                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 10
 Start index: 18000
 End index: 20000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
@@ -9,7 +9,34 @@ Processing flowpose samples for ntu120 dataset...
 	Skeleton S024C001P062R002A062 to S024C003P067R001A090
 	Frames dropped for S024C001P063R001A108: 5
 	Frames dropped for S024C001P067R001A108: 7
-Processed 18000-18499 in 5840.69 seconds
+Processed 18000-18499 in 4161.19 seconds
 	Frames dropped for S024C002P062R001A119: 7
-Processed 18500-18999 in 5604.14 seconds
+Processed 18500-18999 in 4326.63 seconds
 	Frames dropped for S024C002P064R002A119: 12
+	Frames dropped for S024C003P057R001A108: 7
+Processed 19000-19499 in 5149.59 seconds
+	Frames dropped for S024C003P061R002A117: 12
+	Frames dropped for S024C003P063R002A063: 26
+		Frame 0 in skip list, add blank frame to poses
+Processed 19500-19999 in 6133.85 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362552 (COMPLETED) -------------------+
+| Memory (RAM)  [##########          ] 50.4% (13.6 GB peak / 27 GB)    |
+| CPU           [##################  ] 91.3% average                   |
+| GPU           [##############      ] 72.4% average                   |
+| Time          [------->            ] 39.7% (0-05:33:22 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   260 KB        0 B            188                           |
+|   /fred   3.5 GB        5.4 KB         8.6 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      17.1 MB       0 B            213                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

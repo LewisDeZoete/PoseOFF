@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 24
 Start index: 46000
 End index: 48000
-Extracting flowpose samples for ntudataset with dilation 5...
+Extracting flowpose samples for ntudataset with dilation 1...
 Found 56578 available skeleton files.
 
 Processing flowpose samples for ntu dataset...
@@ -14,10 +14,10 @@ Processing flowpose samples for ntu dataset...
 	Frames dropped for S014C002P007R002A059: 30
 	Frames dropped for S014C002P008R002A043: 28
 	Frames dropped for S014C002P008R002A059: 52
-Processed 46000-46499 in 9028.61 seconds
+Processed 46000-46499 in 9147.55 seconds
 	Frames dropped for S014C002P019R002A059: 43
 		Frame 0 in skip list, add blank frame to poses
-Processed 46500-46999 in 7905.83 seconds
+Processed 46500-46999 in 8151.61 seconds
 	Frames dropped for S014C002P027R002A059: 54
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S014C002P027R002A060: 33
@@ -25,29 +25,29 @@ Processed 46500-46999 in 7905.83 seconds
 	Frames dropped for S014C002P037R002A059: 56
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S014C002P039R002A055: 21
-Processed 47000-47499 in 9100.08 seconds
+Processed 47000-47499 in 9194.24 seconds
 	Frames dropped for S014C003P008R002A059: 33
 	Frames dropped for S014C003P008R002A060: 8
 	Frames dropped for S014C003P017R002A008: 5
 	Frames dropped for S014C003P025R002A059: 54
 		Frame 0 in skip list, add blank frame to poses
-Processed 47500-47999 in 8192.72 seconds
+Processed 47500-47999 in 8331.37 seconds
 Flowpose samples for ntu dataset generated successfully!
 Data saved to ./data/ntu/flow_data/export_tmp
 
-+------------------ Job Report: 3593652 (COMPLETED) -------------------+
++------------------ Job Report: 4282453 (COMPLETED) -------------------+
 | Memory (RAM)  [##################  ] 91.7% (24.8 GB peak / 27 GB)    |
-| CPU           [##################  ] 94.4% average                   |
-| GPU           [###############     ] 78.0% average                   |
-| Time          [------------->      ] 68.1% (0-09:31:53 / 0-14:00:00) |
+| CPU           [##################  ] 92.7% average                   |
+| GPU           [###############     ] 76.7% average                   |
+| Time          [------------->      ] 69.2% (0-09:41:02 / 0-14:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   10.7 MB       0 B            255                           |
-|   /fred   5.5 GB        14.8 KB        16.4 K                        |
-|   /home   0 B           0 B            3                             |
-|   OS      17.3 MB       0 B            110                           |
+|   /apps   12.3 MB       0 B            238                           |
+|   /fred   4.2 GB        14.8 KB        5.9 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      16.6 MB       0 B            47                            |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much time requested                                          |

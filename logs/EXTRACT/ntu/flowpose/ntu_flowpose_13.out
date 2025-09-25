@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 13
 Start index: 24000
 End index: 26000
-Extracting flowpose samples for ntudataset with dilation 5...
+Extracting flowpose samples for ntudataset with dilation 1...
 Found 56578 available skeleton files.
 
 Processing flowpose samples for ntu dataset...
@@ -14,7 +14,7 @@ Processing flowpose samples for ntu dataset...
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S008C002P033R002A059: 47
 		Frame 0 in skip list, add blank frame to poses
-Processed 24000-24499 in 7905.22 seconds
+Processed 24000-24499 in 8007.48 seconds
 	Frames dropped for S008C002P035R002A055: 27
 	Frames dropped for S008C002P035R002A059: 53
 		Frame 0 in skip list, add blank frame to poses
@@ -23,7 +23,7 @@ Processed 24000-24499 in 7905.22 seconds
 	Frames dropped for S008C003P007R001A008: 21
 	Frames dropped for S008C003P007R001A024: 32
 		Frame 0 in skip list, add blank frame to poses
-Processed 24500-24999 in 7271.24 seconds
+Processed 24500-24999 in 7317.80 seconds
 	Frames dropped for S008C003P007R002A060: 2
 	Frames dropped for S008C003P015R001A060: 14
 	Frames dropped for S008C003P025R001A055: 8
@@ -32,7 +32,7 @@ Processed 24500-24999 in 7271.24 seconds
 	Frames dropped for S008C003P025R001A060: 3
 	Frames dropped for S008C003P025R002A007: 4
 		Frame 0 in skip list, add blank frame to poses
-Processed 25000-25499 in 8084.11 seconds
+Processed 25000-25499 in 8440.10 seconds
 	Frames dropped for S008C003P025R002A014: 58
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S008C003P025R002A024: 30
@@ -42,23 +42,23 @@ Processed 25000-25499 in 8084.11 seconds
 	Frames dropped for S008C003P032R001A055: 38
 	Frames dropped for S008C003P032R001A059: 43
 		Frame 0 in skip list, add blank frame to poses
-Processed 25500-25999 in 8006.07 seconds
+Processed 25500-25999 in 8724.03 seconds
 Flowpose samples for ntu dataset generated successfully!
 Data saved to ./data/ntu/flow_data/export_tmp
 
-+------------------ Job Report: 3593543 (COMPLETED) -------------------+
-| Memory (RAM)  [#################   ] 88.3% (23.8 GB peak / 27 GB)    |
-| CPU           [##################  ] 94.2% average                   |
-| GPU           [###############     ] 77.0% average                   |
-| Time          [------------>       ] 62.4% (0-08:44:22 / 0-14:00:00) |
++------------------ Job Report: 4270092 (COMPLETED) -------------------+
+| Memory (RAM)  [#################   ] 89.2% (24.1 GB peak / 27 GB)    |
+| CPU           [##################  ] 92.7% average                   |
+| GPU           [###############     ] 77.7% average                   |
+| Time          [------------>       ] 64.9% (0-09:05:17 / 0-14:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   700 KB        0 B            233                           |
-|   /fred   5 GB          25.9 KB        12.4 K                        |
+|   /apps   34.2 MB       0 B            228                           |
+|   /fred   7.2 GB        580 MB         19.3 K                        |
 |   /home   0 B           0 B            2                             |
-|   OS      18.9 MB       0 B            450                           |
+|   OS      19 MB         0 B            524                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much time requested                                          |

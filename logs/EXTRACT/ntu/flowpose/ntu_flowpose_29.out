@@ -1,7 +1,7 @@
 SLURM_ARRAY_TASK_ID: 29
 Start index: 56000
 End index: 58000
-Extracting flowpose samples for ntudataset with dilation 5...
+Extracting flowpose samples for ntudataset with dilation 1...
 Found 56578 available skeleton files.
 
 Processing flowpose samples for ntu dataset...
@@ -10,7 +10,7 @@ Processing flowpose samples for ntu dataset...
 	Frames dropped for S017C003P009R001A059: 39
 		Frame 0 in skip list, add blank frame to poses
 	Frames dropped for S017C003P009R001A060: 12
-Processed 56000-56499 in 7466.98 seconds
+Processed 56000-56499 in 7473.81 seconds
 	Frames dropped for S017C003P020R001A060: 6
 Flowpose samples for ntu dataset generated successfully!
 Data saved to ./data/ntu/flow_data/export_tmp

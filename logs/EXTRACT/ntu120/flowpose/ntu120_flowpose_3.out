@@ -1,14 +1,43 @@
 SLURM_ARRAY_TASK_ID: 3
 Start index: 4000
 End index: 6000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
 	Index 4000 to 6000
 	Skeleton S019C002P049R001A111 to S020C001P053R001A076
 	Frames dropped for S019C002P051R002A119: 7
-Processed 4000-4499 in 8454.68 seconds
+Processed 4000-4499 in 6848.32 seconds
 	Frames dropped for S019C003P042R002A092: 16
 	Frames dropped for S019C003P046R001A119: 11
 	Frames dropped for S019C003P047R002A119: 9
+	Frames dropped for S019C003P048R002A065: 25
+		Frame 0 in skip list, add blank frame to poses
+Processed 4500-4999 in 7087.74 seconds
+	Frames dropped for S019C003P048R002A119: 3
+	Frames dropped for S019C003P049R001A114: 11
+	Frames dropped for S019C003P049R002A119: 9
+	Frames dropped for S019C003P051R002A119: 10
+Processed 5000-5499 in 6632.19 seconds
+Processed 5500-5999 in 6471.58 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362545 (COMPLETED) -------------------+
+| Memory (RAM)  [############        ] 60.9% (16.4 GB peak / 27 GB)    |
+| CPU           [##################  ] 92.7% average                   |
+| GPU           [###############     ] 75.7% average                   |
+| Time          [---------->         ] 54.1% (0-07:34:33 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   25.7 MB       0 B            193                           |
+|   /fred   5.7 GB        7.2 KB         12.7 K                        |
+|   /home   0 B           0 B            2                             |
+|   OS      19.8 MB       0 B            496                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

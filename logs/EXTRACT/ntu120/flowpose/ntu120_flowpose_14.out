@@ -1,13 +1,39 @@
 SLURM_ARRAY_TASK_ID: 14
 Start index: 26000
 End index: 28000
-Extracting flowpose samples for ntu120dataset with dilation 4...
+Extracting flowpose samples for ntu120dataset with dilation 1...
 Found 57367 available skeleton files.
 
 Processing flowpose samples for ntu120 dataset...
 	Index 26000 to 28000
 	Skeleton S026C003P008R001A097 to S027C001P041R001A061
 	Frames dropped for S026C003P008R002A119: 28
-Processed 26000-26499 in 7493.49 seconds
+Processed 26000-26499 in 7289.39 seconds
 	Frames dropped for S026C003P069R002A119: 6
 	Frames dropped for S026C003P070R002A092: 29
+Processed 26500-26999 in 7698.57 seconds
+	Frames dropped for S026C003P075R002A092: 38
+		Frame 0 in skip list, add blank frame to poses
+Processed 27000-27499 in 7843.85 seconds
+	Frames dropped for S026C003P077R001A087: 6
+Processed 27500-27999 in 5761.30 seconds
+Flowpose samples for ntu120 dataset generated successfully!
+Data saved to ./data/ntu120/flow_data/export_tmp
+
++------------------ Job Report: 4362557 (COMPLETED) -------------------+
+| Memory (RAM)  [############        ] 61.5% (16.6 GB peak / 27 GB)    |
+| CPU           [##################  ] 92.5% average                   |
+| GPU           [###############     ] 75.2% average                   |
+| Time          [----------->        ] 57.2% (0-08:00:27 / 0-14:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            28                            |
+|   /fred   5.7 GB        3.8 KB         9 K                           |
+|   /home   0 B           0 B            1                             |
+|   OS      19.2 MB       0 B            330                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

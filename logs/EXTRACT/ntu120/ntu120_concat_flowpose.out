@@ -1,5 +1,5 @@
 Concatenating ntu120 flowpose.
-	DILATION: 3
+	DILATION: 1
 
 
 Flow data samples: 2000
@@ -31,18 +31,18 @@ Flow data samples: 52000
 Flow data samples: 54000
 Flow data samples: 56000
 Flow data samples: 57367
-Saved flowpose file to: ./data/ntu120/flow_data/flow_data_D3.pkl
+Saved flowpose file to: ./data/ntu120/flow_data/flow_data_D1.pkl
 
-+------------------ Job Report: 3739852 (COMPLETED) -------------------+
-| Memory (RAM)  [############        ] 64.4% (38.7 GB peak / 60 GB)    |
-| CPU           [#                   ]  5.0% average                   |
-| Time          [---->               ] 20.0% (0-00:02:00 / 0-00:10:00) |
++------------------ Job Report: 4362541 (COMPLETED) -------------------+
+| Memory (RAM)  [############        ] 64.5% (38.7 GB peak / 60 GB)    |
+| CPU           [#                   ]  5.4% average                   |
+| Time          [---->               ] 24.5% (0-00:02:27 / 0-00:10:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   4.3 MB        0 B                    243                   |
-|   /fred   26.8 GB       27.8 GB                 70                   |
+|   /apps   4.3 MB        0 B                    256                   |
+|   /fred   27.5 GB       27.9 GB                 70                   |
 |   /home   0 B           0 B                      2                   |
 |   OS      0 B           0 B                      1                   |
 |                                                                      |

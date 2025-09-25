@@ -1,0 +1,30 @@
+Total original samples (in annotations): 13320
+Extract test complete.
+Incomplete classes:
+flow: []
+	0 classes are incomplete
+pose: []
+	0 classes are incomplete
+flowpose: []
+	0 classes are incomplete
+Total non-zero samples: 13096
+	224 removed
+Validation script completed
+
++------------------ Job Report: 4263585 (COMPLETED) -------------------+
+| Memory (RAM)  [##########          ] 51.0% (51 MB peak / 100 MB)     |
+| CPU           [                    ]  2.1% average                   |
+| Time          [----------->        ] 55.3% (0-00:05:32 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1.4 MB        0 B            209                           |
+|   /fred   51.8 GB       0 B            39.2 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      2.2 MB        0 B            361                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
