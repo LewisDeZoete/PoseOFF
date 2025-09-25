@@ -11,6 +11,7 @@ import os
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from PIL import Image
 
 
@@ -23,17 +24,23 @@ body = [trunk_joints, arm_joints, leg_joints]
 # Show 3D Skeleton with Axes3D for NTU RGB+D
 class Draw3DSkeleton(object):
 
-	def __init__(self, file, save_path=None, init_horizon=-45,
-				 init_vertical=20, x_rotation=None,
-				 y_rotation=None):
+	def __init__(
+			self,
+			file_path,
+			save_path=None,
+			init_horizon=-45,
+			init_vertical=20,
+			x_rotation=None,
+			y_rotation=None
+ ):
 
-		self.file = file
+		self.file_path = file_path
 		self.save_path = save_path
 
 		if not os.path.exists(self.save_path):
 			os.mkdir(self.save_path)
 
-		self.xyz = self.read_xyz(self.file)
+		self.xyz = self.read_xyz()
 
 		self.init_horizon = init_horizon
 		self.init_vertical = init_vertical
@@ -41,8 +48,8 @@ class Draw3DSkeleton(object):
 		self.x_rotation = x_rotation
 		self.y_rotation = y_rotation
 
-	def _read_skeleton(self, file):
-		with open(file, 'r') as f:
+	def _read_skeleton(self):
+		with open(self.file_path, 'r') as f:
 			skeleton_sequence = {}
 			skeleton_sequence['numFrame'] = int(f.readline())
 			skeleton_sequence['frameInfo'] = []
@@ -79,8 +86,8 @@ class Draw3DSkeleton(object):
 				skeleton_sequence['frameInfo'].append(frame_info)
 		return skeleton_sequence
 
-	def read_xyz(self, file, max_body=2, num_joint=25):
-		seq_info = self._read_skeleton(file)
+	def read_xyz(self, max_body=2, num_joint=25):
+		seq_info = self._read_skeleton()
 		data = np.zeros((3, seq_info['numFrame'], num_joint, max_body))  # (3,frame_nums,25 2)
 		for n, f in enumerate(seq_info['frameInfo']):
 			for m, b in enumerate(f['bodyInfo']):
@@ -125,12 +132,14 @@ class Draw3DSkeleton(object):
 
 		return data
 	
-	def save_skeleton_frames(self, frame_indices):
+	def draw_skeleton_frames(self, frame_indices, adj=None):
 		"""
 		Save 3D skeleton plots for specific frames as images.
 
 		Args:
 			frame_indices (list): List of frame indices to process.
+			adj (list): list of value that are used to add cmap colors to scatter plot
+				points that represent the joints of the skeleton.
 		"""
 
 		fig = plt.figure(figsize=(10,8))
@@ -164,7 +173,16 @@ class Draw3DSkeleton(object):
 				x_plot = x[part]
 				y_plot = y[part]
 				z_plot = z[part]
-				ax.plot(x_plot, y_plot, z_plot, color='b', marker='o', markerfacecolor='r')
+				ax.plot(
+					x_plot,
+					y_plot,
+					z_plot,
+					color='b',
+					# marker='o',
+					# markerfacecolor='r'
+				)
+
+			ax.scatter(x,y,z, s=adj*1000, c=adj, cmap='Reds', marker='o')
 
 			ax.set_xlabel('X')
 			ax.set_ylabel('Z')
@@ -184,13 +202,41 @@ class Draw3DSkeleton(object):
 
 
 if __name__ == '__main__':
+	from graph.ntu_rgb_d import Graph
+
+	# graph = Graph()
+	# A = graph.A.mean(0).mean(1)
+
+	dataset='ntu'
+	model_type = 'base'
+	evaluation="CV"
+	dilation=3
+	gcn_number=1
+
+	# This value is created by passing samples through the model and saving the
+	# adjacency matrix gradients
+	grad_importance = np.load(f"grad_importance_{model_type}.npy")
+
+	A = grad_importance.mean(axis=0).mean(axis=0)
+	# A_norm = (A - np.min(A)) / (np.max(A) - np.min(A))
+	A_norm = (A) / (0.2)
+
 	# 26 - hopping, 42 - staggering, 31 - point at something, 24 - kicking
 	# skel_name = 'S009C003P019R001A026.skeleton' # Hopping (-70, 90) rotation
 	skel_name = 'S009C001P019R001A024.skeleton'
 	rotation = {'x_rotation': -90, 'y_rotation': 150}
-	sk = Draw3DSkeleton(f"../Datasets/NTU_RGBD/nturgb+d_skeletons/{skel_name}", './data/visualisations/skeletons', **rotation)
-	
+	sk = Draw3DSkeleton(
+		file_path=f"../Datasets/NTU_RGBD/nturgb+d_skeletons/{skel_name}",
+		save_path='./data/visualisations/skeletons',
+		init_horizon=-45,
+		init_vertical=20,
+		**rotation
+	)
+
 	# Define frames to process and save
 	frames_to_save = [0,10,20,30,40,50]
 	# frames_to_save = [0,30,60,90,120]
-	sk.save_skeleton_frames(frame_indices=frames_to_save)
+	sk.draw_skeleton_frames(
+		frame_indices=frames_to_save,
+		adj=A_norm
+	)
