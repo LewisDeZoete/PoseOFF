@@ -74,10 +74,6 @@ arg = ArgClass(arg=parsed, verbose=parsed.verbose)
 if arg.data_path_overwrite is not None:
     arg.feeder_args['use_mmap'] = True
     arg.feeder_args['data_paths'][arg.evaluation] = arg.data_path_overwrite
-    # for arg_key, arg_val in arg.feeder_args['data_paths'].items():
-    #     arg.feeder_args['data_paths'][arg_key] = 
-    #     arg.feeder_args['data_paths'][arg_key] = osp.join(arg.data_path_overwrite,
-    #                                                       arg_val.split('/')[-1])
 
 # Define checkpoint file (this is the same for train and eval)
 assert arg.run_name != ""

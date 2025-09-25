@@ -3,7 +3,7 @@ import os
 import os.path as osp
 
 # Defining the datasets we want and where logs live
-datasets = ['ntu', 'ntu120']
+datasets = ['ntu', 'ntu120', 'ucf101']
 root = './logs'
 status_dict = {} # We will use this to store the full status of all the runs
 
@@ -51,8 +51,11 @@ for dataset in datasets:
         eval_folder_pth = osp.join(root, dataset, evaluation, 'eval')
         train_log_files = [osp.join(train_folder_pth, log_file) for log_file in
                      os.listdir(train_folder_pth) if 'train' in log_file]
-        eval_log_files = [osp.join(eval_folder_pth, log_file) for log_file in
-                          os.listdir(eval_folder_pth) if 'eval' in log_file]
+        try:
+            eval_log_files = [osp.join(eval_folder_pth, log_file) for log_file in
+                            os.listdir(eval_folder_pth) if 'eval' in log_file]
+        except FileNotFoundError:
+            print(f"Eval folder does not yet exist for {dataset}")
         # Check status of log_file
         for log_file in train_log_files:
             check_failed(log_file, run_status)

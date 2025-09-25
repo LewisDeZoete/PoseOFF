@@ -67,10 +67,10 @@ class Graph:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     graph = Graph()
-    A, A_binary, A_binary_with_I = graph.A, graph.A_binary, graph.A_binary_with_I
-    f, ax = plt.subplots(1, 3)
-    ax[0].imshow(A_binary_with_I, cmap='gray')
-    ax[1].imshow(A_binary, cmap='gray')
-    ax[2].imshow(A, cmap='gray')
+    A, A_binary = graph.A, graph.A_binary+1
+    A = np.moveaxis(A, 0, -1)+1
+    A_binary = np.moveaxis(A_binary, 0, -1)
+    f, ax = plt.subplots(1, 2)
+    ax[0].imshow(A_binary, cmap='gray')
+    ax[1].imshow(A, cmap='gray')
     plt.show()
-    print(A_binary_with_I.shape, A_binary.shape, A.shape)

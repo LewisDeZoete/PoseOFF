@@ -279,6 +279,7 @@ if __name__ == "__main__":
                                                               arg_val.split('/')[-1])
         print(f"Data paths: {arg.feeder_args['data_paths']}")
 
+    # Trained model checkpoint to load...
     arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
         arg.save_location,
         arg.evaluation,

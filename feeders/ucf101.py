@@ -1,5 +1,9 @@
 import numpy as np
+import pickle
+import mmnpz
+
 from torch.utils.data import Dataset
+
 from feeders import tools
 
 
@@ -54,7 +58,9 @@ class Feeder(Dataset):
         average_flow: bool = False,
         absolute_flow: bool = False,
         no_flow: bool = False,
+        no_conf: bool = False,
         # normalisation=False,
+        debug: bool = False,
         use_mmap: bool = False,
         vel: bool = False,
         sort: bool = False,
@@ -81,46 +87,73 @@ class Feeder(Dataset):
             self.window_size = 64
             self.random_move = False
             self.random_rot = False
-        self.average_flow = average_flow # Average and absolute flow must be the same for train and test
+        if average_flow and absolute_flow:
+            print("Cannot simultaneously calculate absolute and average optical flow...")
+            quit()
+        self.average_flow = average_flow
         self.absolute_flow = (
-            absolute_flow # NOTE: cannot have both average and absolute flow!
+            absolute_flow
         )
         self.no_flow = no_flow
+        self.no_conf = no_conf
+        self.debug = debug
         self.use_mmap = use_mmap
         self.vel = vel
         self.A = A
-        self.load_data()
+        # self.load_data()
+        self.data = None # defer loading (lazy loading)
         if sort:
             self.get_n_per_class()
             self.sort()
+        # if normalisation:
+        #     self.get_mean_map()
 
     def load_data(self):
-        # data: N T (MVC)
-        npz_data = np.load(self.data_path)
-        if self.split == "train":
-            self.data = npz_data["x_train"]
-            self.labels = np.argmax(npz_data["y_train"], axis=-1)
-        elif self.split == "test":
-            self.data = npz_data["x_test"]
-            self.labels = np.argmax(npz_data["y_test"], axis=-1)
-        else:
-            raise NotImplementedError("data split only supports train/test")
-        nan_out = np.isnan(self.data.mean(-1).mean(-1)) == False
-        self.data = self.data[nan_out]
-        self.labels = self.labels[nan_out]
-        # self.sample_name = [self.split + '_' + str(i) for i in range(len(self.data))]
-        N, T, _ = self.data.shape
-        C = (
-            53 if self.data.shape[-1] > 150 else 3
-        )  # If the dataset doesn't have flow, this is false
-        if self.A is not None:
-            self.data = self.data.reshape((N * T * 2, 17, C))
-            self.data = np.array(self.A) @ self.data
-        self.data = self.data.reshape(N, T, 2, 17, C).transpose(
-            0, 4, 1, 3, 2
-        )  # N C T V M
-        if self.no_flow:  # If no flow argument is passed, take first three channels
-            self.data = self.data[:, :3, ...]
+        if self.data is None:
+            if self.use_mmap:
+                npz_data = mmnpz.load(self.data_path, mmap_mode='r')
+                print("\tLoaded data using mmap mode")
+            else:
+                npz_data = np.load(self.data_path)
+                print("\tLoaded data into memory")
+
+            if self.split == "train":
+                self.data = npz_data["x_train"]
+                print("\tSelf.data assigned")
+                self.labels = np.argmax(npz_data["y_train"], axis=-1)
+                print("\tSelf.labels assigned")
+            elif self.split == "test":
+                self.data = npz_data["x_test"]
+                self.labels = np.argmax(npz_data["y_test"], axis=-1)
+            else:
+                raise NotImplementedError(
+                    "data split only supports train/test")
+            print(f"\tAssigned self.data to unique split ({self.split})")
+
+            # Handle NaN filtering more memory efficiently when using mmap
+            if self.use_mmap:
+                # For memory-mapped arrays, avoid operations that load entire array into memory
+                print(
+                    "\tUsing memory-mapped data - skipping NaN filtering to preserve memory efficiency")
+                # You may want to handle NaN values during __getitem__ instead
+            else:
+                nan_out = ~np.isnan(self.data.mean(-1).mean(-1))
+                self.data = self.data[nan_out]
+                self.labels = self.labels[nan_out]
+                if self.no_flow:  # If no flow argument is passed, take first three channels
+                    self.data = self.data[:, :3, ...]
+
+            N, T, _ = self.data.shape
+            C = (
+                53 if self.data.shape[-1] > 150 else 3
+            )  # If the dataset doesn't have flow, this is false
+            if self.A is not None:
+                self.data = self.data.reshape((N * T * 2, 17, C))
+                self.data = np.array(self.A) @ self.data
+            print("\tFinished loading data!")
+            # self.data = self.data.reshape(N, T, 2, 17, C).transpose(
+            #     0, 4, 1, 3, 2
+            # )  # N C T V M
 
     def get_n_per_class(self):
         self.n_per_cls = np.zeros(len(self.labels), dtype=int)
@@ -134,13 +167,29 @@ class Feeder(Dataset):
         self.labels = self.labels[sorted_idx]
 
     def __len__(self):
+        self.load_data()
         return len(self.labels)
 
     def __iter__(self):
         return self
 
+    def _reshape(self, data_numpy):
+        T, _ = data_numpy.shape
+        C = (53 if self.data.shape[-1] > 150 else 3)
+        # data_numpy = np.array(data_numpy)
+        data_numpy = data_numpy.reshape(T, 2, 17, C).transpose(
+            3, 0, 2, 1
+        )
+        if self.no_flow:  # If no_flow argument is passed, only take x,y,z positions
+            data_numpy = data_numpy[:3, ...]
+        if self.no_conf:
+            data_numpy = np.delete(data_numpy, 2, axis=0)
+        return data_numpy  # C, T, V, M
+
     def __getitem__(self, index):
+        self.load_data()
         data_numpy = self.data[index]
+        data_numpy = self._reshape(data_numpy)
         label = self.labels[index]
         data_numpy = np.array(data_numpy)
 
@@ -183,35 +232,76 @@ if __name__ == "__main__":
     from config.argclass import ArgClass
     import time
     from torch.utils.data import DataLoader
+    import logging
+    import argparse
+    import os.path as osp
 
-    # srun --mem-per-cpu=40G python feeders/ucf101.py
 
-    embed =  'base'
-    arg = ArgClass(f"./config/ucf101/train_{embed}.yaml")
-    arg.evaluation = 1
+    # Argparser to test data moved to the slurm jobfs directory
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--data_overwrite",
+        help="Overwrite dataset path to full file"
+    )
+    parser.add_argument(
+        "-embed", "--embed",
+        help="Embedding type (base, abs, avg, cnn) for loading config"
+    )
+    parsed = parser.parse_args()
 
-    train_feeder = Feeder(**arg.feeder_args, eval=arg.evaluation, split="train")
-    test_feeder = Feeder(**arg.feeder_args, eval=arg.evaluation, split="test")
-    
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(filename='data_feeder_test.log', level=logging.DEBUG)
+
+    # Change this to test different embedding configs
+    dataset = "ucf101"
+    if parsed.embed == None:
+        embed =  'base'
+    else:
+        embed = parsed.embed
+    evaluation = 1
+    arg = ArgClass(f"./config/ucf101/{embed}.yaml")
+    arg.feeder_args['eval'] = evaluation
+    arg.feeder_args['use_mmap'] = True
+
+    # Pass root path for the dataset objects
+    if parsed.data_overwrite is not None:
+        for arg_key, arg_val in arg.feeder_args['data_paths'].items():
+            arg.feeder_args['data_paths'][arg_key] = osp.join(
+                f"data/{dataset}/aligned_data",
+                parsed.data_overwrite
+                )
+    logger.debug(f"Feeder testing for dataset: {dataset}")
+    logger.debug(f"\tEmbed: {embed}")
+    logger.debug(f"\tEvaluation: {evaluation}")
+    logger.debug(f"\tData path: {arg.feeder_args['data_paths'][evaluation]}")
+
+    # Create the dataset objects
+    train_feeder = Feeder(**arg.feeder_args, split="train")
+    test_feeder = Feeder(**arg.feeder_args, split="test")
+
     dataloader = DataLoader(train_feeder, 
-                            batch_size=arg.batch_size,
+                            batch_size=64,
+                            num_workers=4,
                             shuffle=False,
                             pin_memory=True)
 
     start = time.time()
     for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
-        if epoch == 10:
-            break
+        logger.debug(f"Full data shape: {train_feeder.data.shape}")
+        break
 
-    # Print the shapes of the data and mask
+    # Log the shapes of the data and mask log
     # and the first two frames of the first two persons
-    print(f"\nTotal samples: {len(train_feeder)}")
-    print(f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
-    print(f"Data shape: {data_numpy.shape}") # (B (256), C (3/53), T (64), V (17), M (2))
-    print(f"Label shape: {label.shape}") # (B)
-    print(f"Mask shape: {mask.shape}") # (B, 1, 64, 1, 2)
+    logger.debug(f"Feeder path: {arg.feeder_args['data_paths'][evaluation]}")
+    logger.debug(f"Total samples: {len(train_feeder)}")
+    logger.debug(
+        f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
+    logger.debug(f"Data shape: {data_numpy.shape}")  # (B, C, T, V, M)
+    logger.debug(f"Label shape: {label.shape}") # (B)
+    logger.debug(f"Mask shape: {mask.shape}") # (B, 1, 64, 1, 2)
 
-    print(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
-    print(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
-    print(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
-    print(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")
+    logger.debug(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
+    logger.debug(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
+    logger.debug(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
+    logger.debug(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")

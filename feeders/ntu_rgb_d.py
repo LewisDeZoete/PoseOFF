@@ -10,21 +10,21 @@ from feeders import tools
 class Feeder(Dataset):
     def __init__(
         self,
-        data_paths,
+        data_paths: str,
         eval=None,
         label_path=None,
         labels=None,
-        split="train",
-        random_choose=False,
-        random_shift=False,
-        random_move=False,
-        random_rot=False,
-        p_interval=1,
-        window_size=64,
-        average_flow=False,
-        absolute_flow=False,
-        no_flow=False,
-        no_Z=False,
+        split: str ="train",
+        random_choose: bool = False,
+        random_shift: bool = False,
+        random_move: bool = False,
+        random_rot: bool = False,
+        p_interval: list[float] = [1.0],
+        window_size: int = 64,
+        average_flow: bool = False,
+        absolute_flow: bool = False,
+        no_flow: bool = False,
+        no_Z: bool = False,
         # normalisation=False,
         debug=False,
         use_mmap=True,
@@ -75,9 +75,12 @@ class Feeder(Dataset):
             self.window_size = 64
             self.random_move = False
             self.random_rot = False
+        if average_flow and absolute_flow:
+            print("Cannot simultaneously calculate absolute and average optical flow...")
+            quit()
         self.average_flow = average_flow
         self.absolute_flow = (
-            absolute_flow  # NOTE: cannot have both average and absolute flow!
+            absolute_flow
         )
         self.no_flow = no_flow
         self.no_Z = no_Z
@@ -128,7 +131,9 @@ class Feeder(Dataset):
                 self.labels = self.labels[nan_out]
 
             N, T, _ = self.data.shape
-            C = (53 if self.data.shape[-1] > 150 else 3)
+            C = (
+                53 if self.data.shape[-1] > 150 else 3
+            ) # If the dataset doesn't have flow, this is false
             if self.A is not None:
                 self.data = self.data.reshape((N * T * 2, 25, C))
                 self.data = np.array(self.A) @ self.data
@@ -144,6 +149,7 @@ class Feeder(Dataset):
         sorted_idx = self.labels.argsort()
         self.data = self.data[sorted_idx]
         self.labels = self.labels[sorted_idx]
+
     def get_mean_map(self):
         data = self.data
         N, C, T, V, M = data.shape
@@ -183,6 +189,7 @@ class Feeder(Dataset):
         data_numpy = self.data[index]
         data_numpy = self._reshape(data_numpy)
         label = self.labels[index]
+        data_numpy = np.array(data_numpy)
 
         valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
         valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
@@ -247,7 +254,7 @@ if __name__ == "__main__":
 
     # Create logger
     logger = logging.getLogger(__name__)
-    logging.basicConfig(filename='data_feeder_test.log', level=logging.DEBUG)
+    logging.basicConfig(filename='./logs/debug/data_feeder_test.log', level=logging.DEBUG)
 
     # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
     dataset = 'ntu'
@@ -255,7 +262,6 @@ if __name__ == "__main__":
     evaluation = 'CS'
     arg = ArgClass(f"config/{dataset}/{embed}.yaml")
     arg.feeder_args['eval'] = evaluation
-
     arg.feeder_args['use_mmap'] = True
 
     # Pass root path for the dataset objects

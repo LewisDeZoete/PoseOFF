@@ -1,13 +1,29 @@
 # UCF-101 Data Generation
 First, prepare for optical flow and pose extraction:
-- Download the data [link]()
-- Update config **RGB** data path in [path_to_yaml]()
-  - Default is `../Datasets/UCF-101/`
+- Download the data [link](https://www.crcv.ucf.edu/data/UCF101.php)
+  - You must download the *UCF101 data set* itself AND the *Train/Test Splits for Action Recognition* (text files)
+  - **NOTE:** The extraction pipeline assumes that the dataset and train/test split .txt files are within the same directory initially as follows:
+    ```
+    ../Datasets/UCF-101
+    |-- ApplyEyeMakeup
+    |   |-- v_ApplyEyeMakeup_g01_c01.avi
+    |   |-- ...
+    |   \-- v_ApplyEyeMakeup_g25_c07.avi
+    |-- ...
+    |-- testlist01.txt
+    |-- ...
+    \-- trainlist03.txt
+    ```
+- In the config files `./data/config/ucf101/*.yaml` update the following properties:
+  - extractor: data_paths: rgb_path: 
+    - Default is `../Datasets/UCF-101/`
 
-Next, create the annotations dictionary, that will be
+Run the bash script to generate annotations and extract the optical flow, pose and then flowpose for the ucf101 dataset.
+
+``` bash
+bash ./data_gen/ucf101/ucf101_extract.sh
 ```
-python data_gen/ucf101/UCF-101_annotations.py
-```
+
 
 Uncomment the appropriate line in [the extraction file](data_gen/UCF-101_extract.sh). Optical flow and pose extraction must precede flowpose extraction.
 
@@ -59,3 +75,7 @@ for file in files:
 with open(osp.join(data_path, 'flow_data.pkl'), 'wb') as f:
     pickle.dump(flow_data, f, pickle.HIGHEST_PROTOCOL)
 ```
+
+## NW-UCLA extract
+- Download the data (put it in any folder you like...)
+- The val_labels.pkl are already in the `./data/nucla/statistics/` folder
