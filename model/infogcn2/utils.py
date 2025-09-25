@@ -69,7 +69,9 @@ def LayerCompare(dict1, dict2):
     """
     # Check if both dictionaries have the same keys
     if dict1.keys() != dict2.keys():
-        raise ValueError("Dictionaries have different keys.")
+        mismatched_keys = [item for item in list(dict1.keys()) if item not in list(dict2.keys())]
+        raise ValueError(f"State dictionary keys must match, but have different keys.\n\
+        State dictionary key differences: {mismatched_keys}")
 
     mismatched_keys = []
 

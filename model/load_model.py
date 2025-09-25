@@ -87,7 +87,7 @@ class ModelLoader:
             return weights
         except FileNotFoundError as error:
             print("\tCheckpoint file does not yet exist")
-            print(f'\t({error})')
+            print(f'\t\t({error})')
             return None
         except KeyError:
             print(
@@ -99,9 +99,10 @@ if __name__ == '__main__':
     from config.argclass import ArgClass
     import time
 
-    arg = ArgClass('./config/ucf101/train_joint_infogcn.yaml')
-    # arg.checkpoint_file = 'results/ms-g3d_flow/flowpose-cnn_k5_t0.05.pt'
-    arg.checkpoint_file = 'results/ms-g3d_flow/TMP.pt'
+    dataset = 'ntu'
+    model_type = 'cnn'
+
+    arg = ArgClass(f"./config/{dataset}/{model_type}.yaml")
 
     # Load the model!
     modelLoader = ModelLoader(arg)
