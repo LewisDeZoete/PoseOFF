@@ -125,5 +125,9 @@ actors_info/
 *.mp4
 *.avi
 
-# Emacs backups
+# Emacs backups and files
 *~
+.dir-locals.el
+
+# Scratch files
+scratch*
