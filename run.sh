@@ -6,15 +6,15 @@
 # bash run.sh
 # ```
 
-export dataset="ntu" # (ntu, ntu120, ucf101)
-export phase="train" # (train/eval)
+export dataset="ntu120" # (ntu, ntu120, ucf101)
+export phase="eval" # (train/eval)
 export model_type="cnn" # (base, cnn, abs, avg, cnn_D3...)
-export dilation=2
-export modifier="D2" # still loads ${dataset}/{model_type}.yaml config... adds to run_name
-export evaluation="CS" # (CS/CV, CSub/CSet, 1/2/3)
+export dilation=3
+export modifier="D3" # still loads ${dataset}/{model_type}.yaml config... adds to run_name
+export evaluation="CSet" # (CS/CV, CSub/CSet, 1/2/3)
 
 export run_name="${dataset}_${evaluation}_${model_type}_${modifier}"
-export desc="${phase} ${dataset} ${evaluation} ${model_type} with dilation ${dilation} TESTING n_step = 4" # Can change this as you need!
+export desc="${phase} ${dataset} ${evaluation} ${model_type} re-running dilation 1 for testing..." # Can change this as you need!
 
 # ---------------------------------------------------------
 # Create the results and logs folders as needed...
@@ -68,7 +68,7 @@ case $dataset in
         fi
         case $model_type in
             "base")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-pose_D${dilation}_aligned.npz"
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-pose_aligned.npz"
                 time=7:00:00
                 mem=5GB
                 tmp=30GB;;
@@ -95,14 +95,23 @@ case $dataset in
            echo "Wrong evaluation type for ucf101: '${evaluation}', must be (1/2/3)"
            exit 1
         fi
-        case $model_type in
-            "base")
-                export copy_file="./data/ucf101/aligned_data/NTU120_${evaluation}-flowpose_aligned.npz";;
-            "abs" | "avg")
-                echo "not_base";;
-            "cnn")
-                pass
-        esac;;
+        export copy_file="./data/ucf101/aligned_data/ucf101_0${evaluation}_D${dilation}.npz"
+        time=2:00:00
+        mem=5GB
+        tmp=30GB
+        # case $model_type in
+        #     "base")
+        #         time=7:00:00
+        #         mem=5GB
+        #         tmp=30GB;;
+        #     "abs" | "avg")
+        #         echo "not_base";;
+        #     "cnn")
+        #         echo "CNN";;
+        #     *)
+        #         echo "Wrong model type '${model_type}', must be (base, cnn, abs, avg)"
+        #         exit 1
+        # esac;;
 esac
 
 
@@ -144,6 +153,7 @@ echo -e "\tcopy file: ${copy_file}"
 
 echo -e "\tdataset: ${dataset}" # (ntu, ntu120, ucf101)
 echo -e "\tmodel type: ${model_type}" # (base, cnn, abs, avg)
+echo -e "\tdilation: ${dilation}"
 echo -e "\tevaluation: ${evaluation}" # (CS/CV, CSub/CSet, 1/2/3)
 echo -e "\trun name: ${run_name}"
 

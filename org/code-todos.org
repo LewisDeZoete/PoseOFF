@@ -1,0 +1,218 @@
+* Extract TODOs with Elisp
+
+#+BEGIN_SRC emacs-lisp :results output 
+(dolist (file (directory-files-recursively default-directory "\\.py\\|\\.sh$"))
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (while (re-search-forward "# TODO:.*" nil t)
+      (let ((line (line-number-at-pos))
+            (text (string-trim (match-string 0))))
+        (princ (format "** TODO %s\n   [[file:%s::%d][%s:%d]]\n"
+                       text file line (file-name-nondirectory file) line))))))
+(prin1 default-directory)
+#+END_SRC
+
+#+RESULTS:
+: "/ssh:nt:/fred/oz141/ldezoete/MS-G3D/"
+
+* Data extraction, training, evaluation and graphing
+dataset -> evaluation -> dilation -> model_type
+** Data extraction:
+- ucf101
+  - [-] 1
+    - [X] D1
+    - [ ] D2
+    - [ ] D3
+    - [ ] D4
+    - [ ] D5
+  - [-] 2
+    - [X] D1
+    - [ ] D2
+    - [ ] D3
+    - [ ] D4
+    - [ ] D5
+  - [-] 3
+    - [X] D1
+    - [ ] D2
+    - [ ] D3
+    - [ ] D4
+    - [ ] D5
+- ntu120
+  -dilation 5!
+** Models to train:
+- ucf101
+  - [-] 1
+    - [X] D1
+      - [X] abs
+      - [X] avg
+      - [X] base
+      - [X] cnn
+    - [ ] D2
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D3
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D4
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D5
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+  - [-] 2
+    - [X] D1
+      - [X] abs
+      - [X] avg
+      - [X] base
+      - [X] cnn
+    - [ ] D2
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D3
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D4
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D5
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+  - [-] 3
+    - [X] D1
+      - [X] abs
+      - [X] avg
+      - [X] base
+      - [X] cnn
+    - [ ] D2
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D3
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D4
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+    - [ ] D5
+      - [ ] abs
+      - [ ] avg
+      - [ ] cnn
+- ntu120
+  - CSub
+    - [X] D1
+      - [X] abs
+      - [X] avg
+      - [X] base
+      - [X] cnn
+    - [X] D2
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+    - [X] D3
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+    - [X] D4
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+    - [X] D5
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+  - [X] CSet
+    - [X] D1
+      - [X] abs
+      - [X] avg
+      - [X] base
+      - [X] cnn
+    - [X] D2
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+    - [X] D3
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+    - [X] D4
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+    - [X] D5
+      - [X] abs
+      - [X] avg
+      - [X] cnn
+** evaluation:
+** Model testing:
+- SA-GCN [0/3]
+  - [-] ucf101
+    - [-] 1
+      - [-] cnn
+      - [X] base
+  - [-] ntu
+    - [-] CV
+      - [X] cnn
+      - [-] base
+  - [-] ntu120
+    - [-] CSub
+      - [X] cnn
+      - [-] base
+** Graphing
+For accuracy comparison plot, remove the training data accuracy.
+For observation accuracy plot, remove the training data accuracy
+- [ ] ucf101
+  - [ ] Accuracy comparison
+  - [ ] Dilation comparisons
+    - [ ] Bar chart
+    - [ ] Epoch dilation
+  - [ ] Observation accuracy
+  - [ ] Loss comparisons
+- [ ] ntu
+  - [ ] Accuracy comparison
+  - [ ] Dilation comparisons
+    - [ ] Bar chart
+    - [ ] Epoch dilation
+  - [ ] Observation accuracy
+  - [ ] Loss comparisons
+- [ ] ntu120
+  - [ ] Accuracy comparison
+  - [ ] Dilation comparisons
+    - [ ] Bar chart
+    - [ ] Epoch dilation
+  - [ ] Observation accuracy
+  - [ ] Loss comparisons
+
+
+* FAST PYTHON PACKAGE AND PROJECT MANAGER
+- [[https://github.com/astral-sh/uv][UV Package manager]]
+
+* Code cleanup
+- Consistency across ntu/120 data gen
+  - Only extract ntu{120}_{evaluation}-pose_aligned.npz once!
+- Reformat ./models
+  - ./models/infogcn
+  - ./models/MS-G3D
+  - ./models/utils...
+
+* Visualisation
+- [ ] Look for large optical flow fluctuations
+- [ ] Temporal attention maps
+- [ ] Spatial attention maps
+
+* Skeleton normalisation
+Testing out normalising skeletons (about the centre point), this may be causing a change to the attention of the pose keypoints.
+- [ ] ucf101
+- [ ] ntu
+- [ ] ntu120
+- [ ] nucla
