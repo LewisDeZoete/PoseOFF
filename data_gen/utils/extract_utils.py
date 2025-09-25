@@ -1,6 +1,7 @@
 import os
 import torch
 import numpy as np
+import yaml
 
 
 def create_class_folder(arg, class_name: str, modality: str):
@@ -17,12 +18,11 @@ def create_class_folder(arg, class_name: str, modality: str):
     """
     folder = os.path.join(arg.extractor["data_paths"][f"{modality}_path"], class_name)
     os.makedirs(folder, exist_ok=True)
-    print("\tAttempting to create folder:", folder)
 
 
 def get_incomplete(arg, modality: str):
     """
-    Identifies and returns a list of unprocessed videos for each class.
+    Identifies and writes a yaml file of unprocessed videos for each class per-modality.
     Args:
         arg: An object containing feeder arguments and data paths.
         modality (str): The modality type (e.g., 'rgb', 'flow', 'pose') to check for unprocessed videos.
@@ -47,16 +47,14 @@ def get_incomplete(arg, modality: str):
         incomplete_videos = set(class_videos) - processed_videos
         if incomplete_videos:
             incomplete[class_name] = sorted(list(incomplete_videos))
-    
-    with open("./data_gen/ucf101/incomplete_classes.txt", "w") as f:
-        for class_name, video_names in incomplete.items():
-            video_names=','.join(video_names)
-            f.write(f"{class_name}:{video_names}\n")
+
+    with open(f"./data/ucf101/statistics/{modality}_incomplete_classes.yaml", "w") as f:
+        yaml.dump(incomplete, f)
 
     return incomplete
 
 
-def get_class_by_index(process_number: int):
+def get_class_by_index(modality: str, process_number: int):
     """
     Retrieve the class name and video names by the given process number.
     Args:
@@ -68,12 +66,9 @@ def get_class_by_index(process_number: int):
     Raises:
         IndexError: If the process_number is out of range of the incomplete list.
     """
-    with open('./data_gen/ucf101/incomplete_classes.txt', 'r') as f:
-        incomplete = {}
-        for line in f.readlines():
-            line = line.strip()
-            class_name, video_names = line.split(":")
-            incomplete[class_name] = video_names.split(",")
+    with open(f"./data/ucf101/statistics/{modality}_incomplete_classes.yaml", 'r') as f:
+        incomplete = yaml.safe_load(f)
+
     if process_number <= len(incomplete):
         class_name, video_names = list(incomplete.items())[process_number]
     else:
@@ -82,19 +77,19 @@ def get_class_by_index(process_number: int):
     return class_name, video_names
 
 
-def is_null(data):
-    """Check if the data is filled with zeros"""
-    if isinstance(data, torch.Tensor):
-        return torch.all(data == 0).item()
-    if isinstance(data, np.ndarray):
-        return np.all(data == 0)
-    return False
+# def is_null(data):
+#     """Check if the data is filled with zeros"""
+#     if isinstance(data, torch.Tensor):
+#         return torch.all(data == 0).item()
+#     if isinstance(data, np.ndarray):
+#         return np.all(data == 0)
+#     return False
 
 
-def log_zero_data(class_name, video_name):
-    """Function to log the name of the data to a text file"""
-    with open(f"./TMP/zero_data_{class_name}.txt", "a") as f:
-        f.write(f"{video_name}\n")  # Write the key to the file
+# def log_zero_data(class_name, video_name):
+#     """Function to log the name of the data to a text file"""
+#     with open(f"./TMP/zero_data_{class_name}.txt", "a") as f:
+#         f.write(f"{video_name}\n")  # Write the key to the file
 
 
 def extract_data(
@@ -116,28 +111,29 @@ def extract_data(
     Returns:
         None
     """
-    class_name, video_names = get_class_by_index(process_number=process_number)
+    class_name, video_names = get_class_by_index(
+        modality=modality,
+        process_number=process_number
+    )
     print("Processing:", class_name)
     print("\tTotal videos:", len(video_names))
 
     for video_name in video_names:
         if modality == "flowpose":
-            # TODO: Change this implementation to default to numpy
             poses = np.load(
                 f"{arg.extractor['data_paths']['pose_path']}/{class_name}/{video_name}.npy"
             )
-            flows = torch.load(
-                f"{arg.extractor['data_paths']['flow_path']}/{class_name}/{video_name}.pt",
-                map_location="cpu",
+            flows = np.load(
+                f"{arg.extractor['data_paths']['flow_path']}/{class_name}/{video_name}.npy",
             )
             data = transforms(flows, poses)
         else:
             # Get the video path
             video_path = f"{os.path.join(arg.extractor['data_paths']['rgb_path'], class_name, video_name)}.avi"
-            # Transform and estimate poses
+            # Transform and estimate poses or flow
             data = transforms(video_path)
-        if is_null(data):  # Check if the data is all zeros
-            log_zero_data(class_name=class_name, video_name=video_name)
+        # if is_null(data):  # Check if the data is all zeros
+        #     log_zero_data(class_name=class_name, video_name=video_name)
 
         # Get the path to save the estimated poses to
         save_path = os.path.join(
@@ -167,8 +163,11 @@ if __name__ == "__main__":
     )
     parsed = parser.parse_args()
 
+    print("\tIncomplete classes will be written to: ")
+    print(f"\t\t./data/ucf101/statistics/{parsed.modality}_incomplete_classes.yaml")
+
     # Create ArgClass object
-    arg = ArgClass(arg="./config/ucf101/train_base.yaml")
+    arg = ArgClass(arg="./config/ucf101/base.yaml")
 
     # Ensure the modality folder exists
     os.makedirs(arg.extractor["data_paths"][f"{parsed.modality}_path"], exist_ok=True)

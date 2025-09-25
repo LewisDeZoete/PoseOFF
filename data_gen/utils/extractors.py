@@ -101,29 +101,18 @@ class GetFlow:
     Attributes:
         model (torch.tensor): RAFT flow model.
         device (torch.device): Compute device.
-        resdict (bool): Whether or not input for call method is a results `dict`
         minibatch_size (int): Number of batches to break up video processing into.
     """
 
-    def __init__(self, model, device, resdict: bool = False, minibatch_size: int = 8):
+    def __init__(self, model, device, minibatch_size: int = 8):
         self.model = model
         self.device = device
-        self.resdict = resdict
         self.minibatch_size = minibatch_size
 
         # Move the model to the corresponding device
         self.model.to(self.device)
 
     def __call__(self, video) -> torch.tensor:
-        # If input is a dicitonary, we want the video to work with
-        if isinstance(video, dict):
-            video = video["rgb"]
-        # If not, it could be we just want the poses
-        else:
-            # OR we may want to output a dict but we need to create it
-            if self.resdict:
-                results = {"rgb": video}
-
         # Stack the frames in a tensor that looks like: [[0, 1],
         stacked = stack_frames(video)  #                  [1, 2]] etc.
         # NOTE: this returns the video video stacked, we're batching it
@@ -142,13 +131,8 @@ class GetFlow:
 
         # Concatenate the list elements back into one array!
         flow = torch.cat(flow, axis=0)
-        # If we're expecting a dictionary output, add the new key
-        if self.resdict:
-            results["flow"] = flow
-            return results
-        # Otherwise simply return the flow
-        else:
-            return flow 
+
+        return flow
 
 
 class FlowPoseSampler:
@@ -233,6 +217,7 @@ class FlowPoseSampler:
 
         stacker = np.zeros((self.window_size**2*2, num_pose_frames, total_keypoints))
 
+        # Exclude keypoints that are too close to the edge where the flow window is cut off
         if self.ntu:
             valid_indices = ((pose_points[0, :, :] >= self.half_k * self.dilation) & 
                              (pose_points[0, :, :] < width - self.half_k * self.dilation) & 
@@ -264,7 +249,12 @@ class FlowPoseSampler:
         
         if hasattr(self, 'norm'):
             flow_pose = self.norm(flow_pose, flow_window=self.window_size)
-        
+
+        # Pad sequence to ensure it is of the same shape as the poses!
+        # TODO: TEST THIS ON NTU GENDATA!!!
+        if not self.ntu:
+            flow_pose = np.pad(flow_pose, ((0, 0), (0, 1), (0, 0), (0, 0)), mode="constant")
+
         return flow_pose
 
 
@@ -330,14 +320,7 @@ class FlowPoseSampler:
 if __name__ == '__main__':
     import os.path as osp
     from config.argclass import ArgClass
-    # NOTE: extract_data is for testing ucf101
-    # from data_gen.utils.extract_utils import extract_data 
 
-    # arg = ArgClass(arg='./config/nturgbd-cross-subject/train_base.yaml')
     arg = ArgClass(arg='./config/ucf101/train_base.yaml')
 
     flowposeSampler = FlowPoseSampler(device=torch.device('cpu'), norm=True)
-    # extract_data(arg, 0, flowposeSampler, 'flowpose', save_as_numpy=True, debug=True)
-
-    
-

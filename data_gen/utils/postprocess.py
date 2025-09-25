@@ -151,7 +151,7 @@ def align_skeleton(data):
 
 
 def create_aligned_dataset(
-    file_list=["data/ntu/NTU60_CS-pose.npz", "data/ntu/NTU60_CV-pose.npz"]
+    file_list=["data/ntu/ntu_CS-pose.npz", "data/ntu/ntu_CV-pose.npz"]
 ):
     """
     Create an aligned dataset from the given list of .npz files.
