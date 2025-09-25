@@ -8,7 +8,7 @@
 # Change the dilation value (1 is default)
 
 export dataset=ntu120
-export dilation=4
+export dilation=1
 # ------------------------------------------
 
 mkdir -p ./logs/EXTRACT/${dataset}

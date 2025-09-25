@@ -32,10 +32,7 @@ root_path = f'./data/{dataset}'
 in_path = osp.join(root_path, 'flow_data', 'export_tmp')
 save_path = osp.join(root_path, 'flow_data')
 # Give the flow data a more meaningful name to reflect the dilation value
-if int(args.dilation) > 1:
-    save_name = f"flow_data_D{args.dilation}.pkl"
-else:
-    save_name = "flow_data.pkl"
+save_name = f"flow_data_D{args.dilation}.pkl"
 files = os.listdir(in_path)
 
 flow_file_names = {} # Dictionary to hold file names

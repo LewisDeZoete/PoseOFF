@@ -180,7 +180,23 @@ def one_hot_vector(labels):
     return labels_vector
 
 
-def split_dataset(joints, details, evaluation, save_path, data_type='pose', mod=''):
+def split_dataset(joints, details: dict, evaluation: str, save_path: str, data_type='pose', mod=''):
+    """
+    Splits the numpy array of joints into the specified train/test split.
+    Saves the split array as a .npz file, with keys:
+        ['x_train', 'x_test', 'y_train', 'y_test']
+    where 'x' and 'y' relate to data and labels respectively.
+
+    Args:
+        joints: Numpy array containing all data of shape (N, T, MVC).
+        details: Dictionary containing metadata about all samples with keys such as:
+            ('Setup', 'Camera',...,'Label', 'Frame_cnt)
+            See `get_details` function for detail.
+        evaluation: String indicating which evaluation to use (see `get_indices` function).
+        save_path: The root path where .npz files are saved to.
+        data_type: Type of data being split, either 'pose' or 'flowpose'.
+        mod: Modifier to append to the end of the name of the file being saved.
+    """
     train_indices, test_indices = get_indices(
         details['Performer'], 
         details['Camera'],
@@ -343,7 +359,8 @@ if __name__ == '__main__':
                 print(f'\tFlow joints dtype: {flow_joints[0].dtype}', flush=True)
             else:
                 flow_joints = None
-        print(f'\tLoaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences', flush=True)
+        print(f'\tLoaded {len(skes_joints)} skeleton \
+        sequences and {len(flow_joints)} flow sequences', flush=True)
 
         # Translates the sequence to a new origin first non-zero frame of the first actor
         skes_joints = seq_translation(skes_joints, flow_joints)
@@ -363,8 +380,10 @@ if __name__ == '__main__':
         # Generate train-test splits and save the data
         file_list = []
         for evaluation in evaluations:
+            # Split the pose joints, this will be the same array regardless of dilation
+            # saves as: {dataset}_{evaluation}-{data_type}{mod}.npz
             file_save_path = split_dataset(skes_joints, details, evaluation,
-                                           save_path, data_type='pose', mod=mod)
+                                           save_path, data_type='pose', mod='')
             print(f'\tSaved pose {evaluation}', flush=True)
             file_list.append(file_save_path)
             # If flow arg is passed, also split the flowpose dataset
@@ -382,7 +401,7 @@ if __name__ == '__main__':
                          dataset=dataset,
                          evaluation=evaluation,
                          data_type='pose',
-                         mod=mod))
+                         mod=''))
                      for evaluation in evaluations]
         if args.flow:
                       file_list += [
