@@ -1,13 +1,10 @@
-import sys
-sys.path.insert(0, '')
-
 import math
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from lib.utils.model_utils import import_class
+from model.infogcn2.utils import import_class
 from model.ms_gcn import MultiScale_GraphConv as MS_GCN
 from model.ms_tcn import MultiScale_TemporalConv as MS_TCN
 from model.ms_gtcn import SpatialTemporal_MS_GCN, UnfoldTemporalWindows
@@ -15,6 +12,7 @@ from model.attn import Flow_conv, NodeAttention, TemporalAttention, TemporalTran
 from model.mlp import MLP
 # from model.activation import activation_factory
 
+from einops import rearrange, repeat
 
 class MS_G3D(nn.Module):
     def __init__(self,
@@ -111,47 +109,126 @@ class Model(nn.Module):
                  num_gcn_scales,
                  num_g3d_scales,
                  graph,
-                 in_channels=3,
-                 flow_window=5,
-                 kernel_size=3,
-                 flow_channels=4,
-                 conv=True):
-        # TODO: DEBUG remove the conv option (True=conv, False=attn)
+                 in_channels=3):
         super(Model, self).__init__()
 
         Graph = import_class(graph)
         A_binary = Graph().A_binary
 
+        self.data_bn = nn.BatchNorm1d(num_person * in_channels * num_point)
+
+        # channels
+        c1 = 96
+        c2 = c1 * 2     # 192
+        c3 = c2 * 2     # 384
+
+        # r=3 STGC blocks
+        self.gcn3d1 = MultiWindow_MS_G3D(3, c1, A_binary, num_g3d_scales, window_stride=1)
+        self.sgcn1 = nn.Sequential(
+            MS_GCN(num_gcn_scales, 3, c1, A_binary, disentangled_agg=True),
+            MS_TCN(c1, c1),
+            MS_TCN(c1, c1))
+        self.sgcn1[-1].act = nn.Identity()
+        self.tcn1 = MS_TCN(c1, c1)
+
+        self.gcn3d2 = MultiWindow_MS_G3D(c1, c2, A_binary, num_g3d_scales, window_stride=2)
+        self.sgcn2 = nn.Sequential(
+            MS_GCN(num_gcn_scales, c1, c1, A_binary, disentangled_agg=True),
+            MS_TCN(c1, c2, stride=2),
+            MS_TCN(c2, c2))
+        self.sgcn2[-1].act = nn.Identity()
+        self.tcn2 = MS_TCN(c2, c2)
+
+        self.gcn3d3 = MultiWindow_MS_G3D(c2, c3, A_binary, num_g3d_scales, window_stride=2)
+        self.sgcn3 = nn.Sequential(
+            MS_GCN(num_gcn_scales, c2, c2, A_binary, disentangled_agg=True),
+            MS_TCN(c2, c3, stride=2),
+            MS_TCN(c3, c3))
+        self.sgcn3[-1].act = nn.Identity()
+        self.tcn3 = MS_TCN(c3, c3)
+
+        self.fc = nn.Linear(c3, num_class)
+
+    def forward(self, x):
+        N, C, T, V, M = x.size()
+        x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
+        x = self.data_bn(x)
+        x = x.view(N * M, V, C, T).permute(0,2,3,1).contiguous()
+
+        # Apply activation to the sum of the pathways
+        x = F.relu(self.sgcn1(x) + self.gcn3d1(x), inplace=True)
+        x = self.tcn1(x)
+
+        x = F.relu(self.sgcn2(x) + self.gcn3d2(x), inplace=True)
+        x = self.tcn2(x)
+
+        x = F.relu(self.sgcn3(x) + self.gcn3d3(x), inplace=True)
+        x = self.tcn3(x)
+
+        out = x
+        out_channels = out.size(1)
+        out = out.view(N, M, out_channels, -1)
+        out = out.mean(3)   # Global Average Pooling (Spatial+Temporal)
+        out = out.mean(1)   # Average pool number of bodies in the sequence
+
+        out = self.fc(out)
+        return out
+
+
+class TEST_MODEL(nn.Module):
+    def __init__(self,
+                 num_class,
+                 num_point,
+                 num_person,
+                 num_gcn_scales,
+                 num_g3d_scales,
+                 graph,
+                 pose_channels=3,
+                 flow_channels=50,
+                 cnn=False):
+        super(TEST_MODEL, self).__init__()
+
+        Graph = import_class(graph)()
+        A_binary = Graph.A_binary
+
         self.data_bn = nn.BatchNorm1d(num_person * 
-                                     (in_channels + (flow_window**2*2)) *
+                                     (pose_channels + flow_channels) *
                                       num_point)
 
         # channels
         c1 = 96
         c2 = c1 * 2     # 192
         # c3 = c2 * 2     # 384
-        self.flow_channels = flow_channels
 
-        if conv:
+        if cnn:
+            assert flow_channels > 2
             # Adding the new Flow_Windows module
             # Input to the rest of MS-G3D will simply be in_channels+1
-            self.flow_conv = Flow_conv(kernel_size=kernel_size,
-                                       flow_window = flow_window,
-                                       original_channels=in_channels,
-                                       out_channels=self.flow_channels)
-            mg_g3d_in_channels = in_channels + self.flow_channels
-        else: 
-            self.attn = NodeAttention(in_features_skeleton=in_channels,
-                                      in_features_flow=int((flow_window**2)*2),
-                                      out_features=16) # TODO: Add a way to debug number of attended output features
-            mg_g3d_in_channels = 16
+            # self.flow_conv = Flow_conv(kernel_size=kernel_size,
+            #                            flow_window = flow_window,
+            #                            original_channels=in_channels,
+            #                            out_channels=self.flow_channels)
+            joint_embed_channels = 16
+            self.to_joint_embedding = Flow_conv(
+                kernel_size=3,
+                flow_window=int(
+                    math.sqrt(flow_channels / 2)
+                ),  # flow_window = sqrt(flow_channels/2)
+                pose_channels=pose_channels,
+                out_channels=joint_embed_channels,
+            )
+        # else:
+        #     self.attn = NodeAttention(in_features_skeleton=in_channels,
+        #                               in_features_flow=int((flow_window**2)*2),
+        #                               out_features=16)
+        #     mg_g3d_in_channels = 16
 
-        # r=2? STGC blocks
+
         # self.gcn3d1 = MultiWindow_MS_G3D(in_channels, c1, A_binary, num_g3d_scales, window_stride=1)
-        self.gcn3d1 = MultiWindow_MS_G3D(mg_g3d_in_channels, c1, A_binary, num_g3d_scales, window_stride=1)
+        self.gcn3d1 = MultiWindow_MS_G3D(joint_embed_channels, c1, A_binary, num_g3d_scales, window_stride=1)
         self.sgcn1 = nn.Sequential(
             # MS_GCN(num_gcn_scales, 3, c1, A_binary, disentangled_agg=True),
-            MS_GCN(num_gcn_scales, mg_g3d_in_channels, c1, A_binary, disentangled_agg=True),
+            MS_GCN(num_gcn_scales, joint_embed_channels, c1, A_binary, disentangled_agg=True),
             MS_TCN(c1, c1),
             MS_TCN(c1, c1))
         self.sgcn1[-1].act = nn.Identity()
@@ -178,21 +255,17 @@ class Model(nn.Module):
     def forward(self, x):
         N, C, T, V, M = x.size()
         # (N, M*V*C, T)
-        x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
+        x = rearrange(x, "n c t v m -> n (m v c) t", n=N, c=C, t=T, m=M,v=V)
+        # x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
         x = self.data_bn(x)
+        x = rearrange(x, "n (m v c) t -> (n m t) v c", n=N, c=C, t=T, m=M,v=V)
 
         # ------------------------------------------------------------
-        # NODE FLOW MODULE
-        # (N, T, M, V, C)
-        x = x.view(N, M, V, C, T).permute(0,4,1,2,3).contiguous()
-        if hasattr(self, 'attn'):
-            x = self.attn(x)
-            # (N * M, attended_features, T, V)
-            x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 16, T, V)
-        else:
-            x = self.flow_conv(x)
-            # (N * M, in_channels+flow_out_channels, T, V)
-            x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 3+self.flow_channels, T, V)
+        # Joint embedding
+        x = self.to_joint_embedding(x)
+        # # (N * M, in_channels+flow_out_channels, T, V)
+        # x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 3+self.flow_channels, T, V)
+        x = rearrange(x, "(n m t) v c -> (n m) c t v", n=N, t=T, m=M, v=V)
         # ------------------------------------------------------------
 
         # Apply activation to the sum of the pathways
@@ -215,99 +288,55 @@ class Model(nn.Module):
         return out
 
 
-class testModel(nn.Module):
-    def __init__(self,
-                 num_class,
-                 num_point,
-                 num_person,
-                 num_gcn_scales,
-                 num_g3d_scales,
-                 graph,
-                 in_channels=3,
-                 flow_window=5,
-                 kernel_size=3,
-                 flow_channels=4,
-                 conv=True):
-        # TODO: DEBUG remove the kernel,flow,conv options
-        super(testModel, self).__init__()
-
-        Graph = import_class(graph)
-        A_binary = Graph().A_binary
-
-        # channels
-        c1 = 96
-        c2 = c1 * 2     # 192
-
-        self.data_bn = nn.BatchNorm1d(num_person * 
-                                     (in_channels + (flow_window**2*2)) *
-                                      num_point)
-
-        self.node_attn = NodeAttention(in_features_skeleton=3, in_features_flow=50, out_features=16)
-        self.msgcn1 = MS_GCN(num_scales=num_gcn_scales, in_channels=16, out_channels=c1, A_binary=A_binary)
-        self.msgcn2 = MS_GCN(num_scales=num_gcn_scales, in_channels=c1, out_channels=c2, A_binary=A_binary)
-        self.tempattn = TemporalAttention(feature_dim=c2, attention_dim=16)
-
-        self.transformer = TemporalTransformer(d_model=c2, nhead=8, num_encoder_layers=4)
-        self.fc = nn.Linear(c2, num_class)
-
-    def forward(self, x):
-        N, C, T, V, M = x.size()
-        # (N, M*V*C, T)
-        x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
-        x = self.data_bn(x)
-
-        # NODE CHANNEL ATTENTION
-        # (N, T, M, V, C)
-        x = x.view(N, M, V, C, T).permute(0,4,1,2,3).contiguous()
-        x = self.node_attn(x)
-        # (N * M, attended_features, T, V)
-        x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 16, T, V)
-
-        # MSGCN LAYERS
-        x = F.relu(self.msgcn1(x)) # -> (N*M, c1, T, V)
-        x = F.relu(self.msgcn2(x)) # -> (N*M, c2, T, V)
-
-        # # TEMPORAL ATTENTION
-        # x = self.tempattn(x)
-
-        # REPLACING ABOVE...
-        x = x.mean(3) # Pooling across people in each video -> (N*M, c2, T)
-        x = x.permute(0, 2, 1).contiguous() # -> (N*M, T, c2)
-        x = self.transformer(x) # -> (N*M, F) (F is dim_feedforward pretty sure)
-
-        out = x
-        out_channels = out.size(1)
-        out = out.view(N, M, out_channels)
-        # out = out.mean(3)   # Global Average Pooling (Spatial+Temporal)
-        out = out.mean(1)   # Average pool number of bodies in the sequence
-
-        out = self.fc(out)
-        return out
-
-
-
 if __name__ == "__main__":
-    # For debugging purposes
-    import sys
-    sys.path.append('..')
-    from lib.utils.objects import ArgClass
-    import time
+    from config.argclass import ArgClass
+    import logging
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename='logs/debug/MS-G3D_model_testing.log',
+        encoding='utf-8',
+        filemode='w',
+        level=logging.DEBUG
+    )
+
+    dataset = 'ntu'
+    model_type = 'cnn'
 
     # Get the config file and use the model arguments defined within
-    arg = ArgClass('config/ucf101/train_joint.yaml')
-    attmodel = testModel(**arg.model_args) # Initialise the model
-    mainmodel = Model(**arg.model_args)
+    arg = ArgClass(f'config/{dataset}/{model_type}.yaml', verbose=True)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    arg.model_args["device"] = device
 
-    # x = torch.load('data/UCF-101/flowpose/Basketball/v_Basketball_g01_c01.pt')
-    # x = x.unsqueeze(0) # N, C, T, V, M = 1, 3+2*flow_window**2, 300, 17, 2
+    model = TEST_MODEL(
+        num_class=60,
+        num_point=25,
+        num_person=2,
+        num_gcn_scales=2,
+        num_g3d_scales=3,
+        graph=arg.model_args['graph'],
+        pose_channels=3,
+        flow_channels=50,
+        cnn=True
+    )
 
-    x = torch.randn(16, 53, 300, 17, 2) # N, C, T, V, M = 1, 3+2*flow_window**2, 300, 17,
-    
-    start = time.time()
-    out = attmodel.forward(x)
-    att_finished = time.time()
-    out = mainmodel.forward(x)
-    finish = time.time()
-    
-    print(f'Attention model took {att_finished-start} seconds')
-    print(f'Main model took {finish-att_finished} seconds')
+    # Create dummy input
+    # N, C, T, V, M
+    C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
+    V = arg.model_args["num_point"]
+    x = torch.randn((8, C, 64, V, 2)).to(device)
+    logger.info(f"Model: {model_type}")
+    logger.info(f"Input channels: {C}\n")
+    logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
+
+    # Pass input to model
+    y_hat = model(x)
+    logger.info(f"\ny_hat: {y_hat.shape}")
+
+    # start = time.time()
+    # out = attmodel.forward(x)
+    # att_finished = time.time()
+    # out = mainmodel.forward(x)
+    # finish = time.time()
+
+    # print(f'Attention model took {att_finished-start} seconds')
+    # print(f'Main model took {finish-att_finished} seconds')
