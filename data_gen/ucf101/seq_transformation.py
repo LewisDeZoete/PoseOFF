@@ -3,18 +3,29 @@ import os
 import os.path as osp
 from config.argclass import ArgClass
 from einops import rearrange
+import argparse
 
-arg = ArgClass("./config/ucf101/train_base.yaml")
+parser = argparse.ArgumentParser(prog="flowpose_seq_transform")
+
+parser.add_argument(
+    '--dilation',
+    dest='dilation',
+    default=None,
+    type=int,
+    help='Overwrite the dilation value from the yaml config.'
+)
+
+parsed = parser.parse_args()
+arg = ArgClass("./config/ucf101/base.yaml")
 labels = arg.feeder_args['labels']
 
 # Define the paths
-data_labels_root = '../Datasets/UCF-101'
-root_path = './data/UCF-101/flowpose'
-save_path = './data/UCF-101/flowpose/processed'
+data_labels_root = './data/ucf101/statistics/'
+flowpose_path = './data/ucf101/flowpose'
+save_path = './data/ucf101/aligned_data'
 
-# # Create the save directory if it doesn't exist
-# os.makedirs(save_path, exist_ok=True)
-
+# Create the save directory if it doesn't exist
+os.makedirs(save_path, exist_ok=True)
 
 def combine_data(all_paths):
     """
@@ -24,7 +35,7 @@ def combine_data(all_paths):
         all_paths (list): List of paths to the flowpose data files (numpy).
             These numpy files should be of shape (C, T, V, M) where:
             C is the number of channels (53),
-            T is the number of frames (299), since the first frame is removed,
+            T is the number of frames (300)
             V is the number of joints (17),
             M is the number of modalities (2).
     Returns:
@@ -56,6 +67,7 @@ def get_indices(evaluation: int, data_labels_root: str):
     Get the indices of the training and testing data for the given evaluation number.
     Args:
         evaluation (int): The evaluation number (1, 2, or 3).
+        data_labels_root (str): Root path to where the evaluation lists live
     '''
     train_indices = np.empty(0)
     test_indices = np.empty(0)
@@ -83,7 +95,7 @@ def get_indices(evaluation: int, data_labels_root: str):
     return train_indices, test_indices
 
 
-def split_dataset(joints, labels, evaluation, save_path, data_labels_root):
+def split_dataset(joints, labels, evaluation, dilation, save_path, data_labels_root):
     """
     Splits the dataset into training and testing sets based on the evaluation index,
     processes the labels into one-hot vectors, and saves the resulting data to a file.
@@ -120,14 +132,14 @@ def split_dataset(joints, labels, evaluation, save_path, data_labels_root):
     test_x = joints[test_indices]
     test_y = one_hot_vector(test_labels)
 
-    save_name = osp.join(save_path, f'ucf101_0{evaluation}.npz')
+    save_name = osp.join(save_path, f'ucf101_0{evaluation}_D{dilation}.npz')
     np.savez(save_name, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
 
 
 if __name__ == '__main__':
     from sys import getsizeof
     # Get the paths for the flowpose data
-    flowpose_paths = [osp.join(root_path, item)+'.npy' for item in list(arg.feeder_args['labels'].keys())]
+    flowpose_paths = [osp.join(flowpose_path, item)+'.npy' for item in list(arg.feeder_args['labels'].keys())]
 
     # Combine all the data into a single numpy array (N, T, M*V*C)
     joints = combine_data(flowpose_paths)
@@ -139,9 +151,10 @@ if __name__ == '__main__':
     for evaluation in range(1, 4):
         split_dataset(joints, 
                       labels=np.array(list(arg.feeder_args['labels'].values())), 
-                      evaluation=evaluation, 
-                      save_path=root_path, # I just want to save it inside the flowpose folder...
+                      evaluation=evaluation,
+                      dilation=parsed.dilation,
+                      save_path=save_path, # I just want to save it inside the flowpose folder...
                       data_labels_root=data_labels_root)
         print(f'\tProcessed evaluation {evaluation}.')
-        print(f'\t\tSaved to: {save_path}/ucf101_0{evaluation}.')
+        print(f'\t\tSaved to: {save_path}/ucf101_0{evaluation}_D{parsed.dilation}.npz')
     print('Completed processing all evaluations.')

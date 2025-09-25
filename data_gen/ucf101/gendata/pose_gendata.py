@@ -19,7 +19,7 @@ process_number = int(parsed.number) # Get class number command line arg
 debug = parsed.debug # Get debug mode command line arg
 
 # Get the arg object and create the classes
-arg = ArgClass(arg='./config/ucf101/train_base.yaml')
+arg = ArgClass(arg='./config/ucf101/base.yaml')
 transform_args = arg.extractor['pose'] # grab transforms arg
 
 # Get the device
@@ -44,16 +44,16 @@ print(f'Data shape: {data.shape}')
 print(data[:, 10, 5, 0])
 
 
-# # ------------------------------
-# #         PROCESS
-# # ------------------------------
-# start = time.time()
+# ------------------------------
+#         PROCESS
+# ------------------------------
+start = time.time()
 
-# # get_poses(arg, process_number=process_number)
-# extract_data(arg, 
-#              process_number=process_number, 
-#              transforms=transforms, 
-#              modality='pose',
-#              debug=debug)
+# get_poses(arg, process_number=process_number)
+extract_data(arg,
+             process_number=process_number,
+             transforms=transforms,
+             modality='pose',
+             debug=debug)
 
-# print(f'Processing time: {time.time()-start:.2f}s')
+print(f'Processing time: {time.time()-start:.2f}s')

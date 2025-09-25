@@ -19,7 +19,7 @@ process_number = int(parsed.number) # Get class number command line arg
 debug = parsed.debug # Get debug mode command line arg
 
 # Get the arg object and create the classes
-arg = ArgClass(arg='./config/ucf101/train_base.yaml')
+arg = ArgClass(arg='./config/ucf101/base.yaml')
 transform_args = arg.extractor['flow']
 
 # Get the device

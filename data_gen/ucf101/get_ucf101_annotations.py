@@ -1,5 +1,8 @@
 import os
+import os.path as osp
+import shutil
 import yaml
+import re
 from config.argclass import ArgClass
 
 
@@ -20,19 +23,21 @@ def remove_bad_lines(lines):
     return new_lines
 
 
-def format_label_files():
+def format_label_files(evaluation_lists_dir=None):
     '''
     Format the test and train lists that come with UCF-101
     '''
+    assert evaluation_lists_dir is not None
+
     files = ['testlist01.txt', 'testlist02.txt', 'testlist03.txt', 'trainlist01.txt', 'trainlist02.txt', 'trainlist03.txt']
     for file in files:
-        with open(f'../Datasets/UCF-101/{file}', 'r') as f:
+        with open(osp.join(evaluation_lists_dir, file), 'r') as f:
             lines = f.readlines()
             lines = [line.strip() for line in lines]
         
         lines = remove_bad_lines(lines)
 
-        with open(f'../Datasets/UCF-101/{file}', 'w') as f:
+        with open(osp.join(stat_path, file), 'w') as f:
             for line in lines:
                 f.write(line)
                 f.write('\n')
@@ -66,11 +71,26 @@ def annotations_yaml():
 
 
 if __name__=='__main__':
+    # First, make sure the data directories exist
+    root_path = './data/ucf101'
+    stat_path = osp.join(root_path, 'statistics')
+    os.makedirs(stat_path, exist_ok=True)
+
     # Get the arg class
-    arg = ArgClass(arg='./config/ucf101/train_base.yaml')
+    arg = ArgClass(arg='./config/ucf101/base.yaml')
+
+    # Now, generally the train/test lists will be downloaded with UCF-101...
+    # Move them into the stats folder!
+    for filename in os.listdir(arg.extractor["data_paths"]["rgb_path"]):
+        if re.search(r"\d.txt$", filename): # check for filenames train/textlist0#.txt
+            shutil.copy(
+                osp.join(arg.extractor["data_paths"]["rgb_path"], filename),
+                osp.join(stat_path, filename)
+            )
+    print(f"Train/test lists copied to: {stat_path}")
 
     # Get the annotations for the UCF-101 dataset
     annotations_yaml()
 
     # Format the label files that come with the UCF-101 datasets
-    format_label_files()
+    format_label_files(evaluation_lists_dir=stat_path)
