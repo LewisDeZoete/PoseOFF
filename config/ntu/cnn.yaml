@@ -15,7 +15,7 @@ feeder_args:
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: False
-  no_Z: True
+  no_Z: False
 
 extractor:
   preprocessed: True
@@ -41,7 +41,7 @@ model_args:
   num_point: 25
   num_person: 2
   graph: graph.ntu_rgb_d.Graph
-  pose_channels: 2
+  pose_channels: 3
   flow_channels: 50 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
