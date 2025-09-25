@@ -11,10 +11,18 @@ import numpy as np
 # - edit the `dataset` and `evaluation` variables below
 # - Set values of plot_* as needed, if True, that plot will be generated
 # - edit the `plot_data` for specific extensions (keys) and plot params
+#
+# - Default save root:
+#      results/plots/{dataset}/{evaluation}/
+# - Creates graphs:
+#      {save_root}/Epoch_dilation_acc_comparison.png
+#      {save_root}/Bar_dilation_acc_comparison.png
+#
+# - To run:
 #      python ./results/visualisations/dilation_comp.py
 
-dataset = 'ntu'  # ntu, ntu120, ucf101
-evaluation = 'CV'  # CS/CV, CSub/CSet, 1/2/3
+dataset = 'ntu120'  # ntu, ntu120, ucf101
+evaluation = 'CSub'  # CS/CV, CSub/CSet, 1/2/3
 
 # In case you didn't want to
 epoch_dilation_comp = True
@@ -124,10 +132,12 @@ def epoch_acc_dilation_comp(
                     f"Failed to plot {data['plot_params']['label']}")
             except KeyError:
                 print(
-                    f"Failed to find key, likely because training is unfinished")
-            except ValueError:
+                    f"Failed to find key for {model_type} with dilation {dilation}")
+            except ValueError as e:
                 print(
-                    f"Failed to find key, likely because training is unfinished")
+                    f"Value error raised for {model_type} with dilation {dilation}",
+                    e
+                )
 
     ax1.legend()
     plt.tight_layout()
@@ -181,7 +191,7 @@ def bar_acc_dilation_comp(
         multiplier += 1
 
     ax.set_ylabel('Highest test accuracy (%)')
-    ax.set_ylim(80, 100)
+    ax.set_ylim(70, 100)
     ax.set_xlabel('Flow sampling dilation value')
     ax.set_xticks(bins+width, bins/2)
     ax.legend(loc='upper left', ncols=3)

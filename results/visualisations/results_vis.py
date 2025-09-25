@@ -14,11 +14,11 @@ from sklearn.metrics import ConfusionMatrixDisplay
 #      python ./results/visualisations/results_vis.py
 
 dataset = 'ntu'  # ntu, ntu120, ucf101
-evaluation = 'CV'  # CS/CV, CSub/CSet, 1/2/3
+evaluation = 'CS'  # CS/CV, CSub/CSet, 1/2/3
 dilation = 3
 
 # In case you didn't want to
-loss = True
+loss = False
 acc = True
 obs = True
 confusion = False # REQUIRES EVAL
@@ -52,10 +52,12 @@ for extension, data in plot_data.items():
     if os.path.exists(filename):
         data['results'] = torch.load(filename, map_location='cpu')['results']
         plot_data[extension] = data
+    else:
+        print(f"Couldn't find: {filename}")
 
 
 # Get the epochs as the x-axis
-x = plot_data[list(plot_data.keys())[0]]['results']['epoch']
+x = plot_data['base']['results']['epoch']
 
 # Evaluation string and Dataset string dictionaries for plot titles
 eval_str_dict = {'CS': 'Cross Subject', 'CV': 'Cross View',
@@ -140,24 +142,50 @@ def plot_accuracy(
             {"extension": {"plot_params": {...}, "results": {...}}}
     """
     # Create figure and axes
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
-    fig.suptitle(f'Accuracy Comparison - {fig_title}', fontsize=30)
-    for ax in (ax1, ax2):
-        ax.tick_params(axis='both', which='major', labelsize=20)
-        ax.set_xlabel('Epoch', fontsize=20)
-        ax.set_ylim(0, 100)  # 0-100% accuracy
-        ax.set_xlim(0, 70)  # 0-70 epochs
-        ax.axvline(x=50, color='black', linestyle='--', alpha=0.2)  # Epoch 50
-        ax.axvline(x=60, color='black', linestyle='--', alpha=0.2)  # Epoch 60
-        # ax.set_xscale('log')
-    ax1.set_ylabel('Classification accuracy %', fontsize=20)
+    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+    # fig.suptitle(f'Accuracy Comparison - {fig_title}', fontsize=30)
+    # for ax in (ax1, ax2):
+    #     ax.tick_params(axis='both', which='major', labelsize=20)
+    #     ax.set_xlabel('Epoch', fontsize=20)
+    #     ax.set_ylim(0, 100)  # 0-100% accuracy
+    #     ax.set_xlim(0, 70)  # 0-70 epochs
+    #     ax.axvline(x=50, color='black', linestyle='--', alpha=0.2)  # Epoch 50
+    #     ax.axvline(x=60, color='black', linestyle='--', alpha=0.2)  # Epoch 60
+    #     # ax.set_xscale('log')
+    # ax1.set_ylabel('Classification accuracy %', fontsize=20)
+
+    # for data in plot_data.values():
+    #     try:
+    #         # Plot train and test AUC
+    #         ax1.plot(x, to_percentage(data['results']['train_AUC']),
+    #                  **data['plot_params'])
+    #         ax2.plot(x, to_percentage(data['results']['test_AUC']),
+    #                  **data['plot_params'])
+    #         print(f"\t\t{data['plot_params']['label']}:  "
+    #         f"{to_percentage(data['results']['test_ACC'][-1])[-1]:.2f}%")
+    #     except TypeError:
+    #         print(f"Failed to plot {data['plot_params']['label']}")
+
+    # # Set titles and legends
+    # ax1.set_title('Train accuracy', fontsize=25)
+    # ax2.set_title('Test accuracy', fontsize=25)
+    # ax1.legend(loc=4, prop={'size': 20})
+
+    # os.makedirs(osp.join(save_root, 'accuracy'), exist_ok=True)
+    # plt.savefig(osp.join(save_root, 'accuracy/Acc_comparison_simple.png'))
+    fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+    fig.suptitle(f'Accuracy Comparison - {fig_title}', fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=15)
+    ax.set_xlabel('Epoch', fontsize=20)
+    ax.set_ylim(0, 100)  # 0-100% accuracy
+    ax.set_xlim(0, 70)  # 0-70 epochs
+    ax.axvline(x=50, color='black', linestyle='--', alpha=0.2)  # Epoch 50
+    ax.axvline(x=60, color='black', linestyle='--', alpha=0.2)  # Epoch 60
 
     for data in plot_data.values():
         try:
-            # Plot train and test AUC
-            ax1.plot(x, to_percentage(data['results']['train_AUC']),
-                     **data['plot_params'])
-            ax2.plot(x, to_percentage(data['results']['test_AUC']),
+            # Plot test AUC
+            ax.plot(x, to_percentage(data['results']['test_AUC']),
                      **data['plot_params'])
             print(f"\t\t{data['plot_params']['label']}:  "
             f"{to_percentage(data['results']['test_ACC'][-1])[-1]:.2f}%")
@@ -165,9 +193,7 @@ def plot_accuracy(
             print(f"Failed to plot {data['plot_params']['label']}")
 
     # Set titles and legends
-    ax1.set_title('Train accuracy', fontsize=25)
-    ax2.set_title('Test accuracy', fontsize=25)
-    ax1.legend(loc=4, prop={'size': 20})
+    ax.legend(loc=4, prop={'size': 20})
 
     os.makedirs(osp.join(save_root, 'accuracy'), exist_ok=True)
     plt.savefig(osp.join(save_root, 'accuracy/Acc_comparison_simple.png'))
@@ -189,30 +215,52 @@ def plot_obs_acc(
         plot_data: (dict) containing plotting parameters and plotting data.
             {"extension": {"plot_params": {...}, "results": {...}}}
     """
+    # # Create figure and axes
+    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(25, 10))
+    # fig.suptitle(f'Observation accuracy - {fig_title}', fontsize=30)
+    # for ax in (ax1, ax2):
+    #     ax.tick_params(axis='both', which='major', labelsize=20)
+    #     ax.set_xlabel('Observation Ratio', fontsize=20)
+    # ax1.set_ylabel('Accuracy', fontsize=20)
+
+    # percents = ((torch.arange(64)+1)*(100/64)).int()
+
+    # # Plot class loss
+    # ax1.set_title('Train Accuracy', fontsize=25)
+    # ax2.set_title('Test Accuracy', fontsize=25)
+
+    # for data in plot_data.values():
+    #     try:
+    #         ax1.plot(percents, torch.tensor(data['results']['train_ACC'][-1]),
+    #                  **data['plot_params'])
+    #         ax2.plot(percents, torch.tensor(data['results']['test_ACC'][-1]),
+    #                  **data['plot_params'])
+    #     except TypeError:
+    #         print(f"Failed to plot {data['plot_params']['label']}")
+
+    # ax1.legend(loc='lower right', fontsize='large')
+    # plt.tight_layout()
+    # os.makedirs(osp.join(save_root, 'accuracy'), exist_ok=True)
+    # plt.savefig(osp.join(save_root, 'accuracy/Observation_Acc.png'))
+
     # Create figure and axes
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(25, 10))
-    fig.suptitle(f'Observation accuracy - {fig_title}', fontsize=30)
-    for ax in (ax1, ax2):
-        ax.tick_params(axis='both', which='major', labelsize=20)
-        ax.set_xlabel('Observation Ratio', fontsize=20)
-    ax1.set_ylabel('Accuracy', fontsize=20)
+    fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+    fig.suptitle(f'Observation accuracy - {fig_title}', fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=15)
+    ax.set_xlabel('Observation Ratio', fontsize=15)
+    ax.set_ylabel('Accuracy', fontsize=15)
 
     percents = ((torch.arange(64)+1)*(100/64)).int()
 
     # Plot class loss
-    ax1.set_title('Train Accuracy', fontsize=25)
-    ax2.set_title('Test Accuracy', fontsize=25)
-
     for data in plot_data.values():
         try:
-            ax1.plot(percents, torch.tensor(data['results']['train_ACC'][-1]),
-                     **data['plot_params'])
-            ax2.plot(percents, torch.tensor(data['results']['test_ACC'][-1]),
+            ax.plot(percents, torch.tensor(data['results']['test_ACC'][-1]),
                      **data['plot_params'])
         except TypeError:
             print(f"Failed to plot {data['plot_params']['label']}")
 
-    ax1.legend(loc='lower right', fontsize='large')
+    ax.legend(loc='lower right', fontsize='large')
     plt.tight_layout()
     os.makedirs(osp.join(save_root, 'accuracy'), exist_ok=True)
     plt.savefig(osp.join(save_root, 'accuracy/Observation_Acc.png'))
