@@ -1,0 +1,81 @@
+# Feeder
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: 
+    CSet: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz
+    CSub: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz
+  label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 100
+  random_move: True
+  random_rot: True
+  average_flow: True # model_args.flow_channels = 2
+  absolute_flow: False
+    # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
+  no_flow: False
+  no_Z: False
+
+extractor:
+  preprocessed: True
+  pose: 
+    weights: pretrained_models/yolo11x-pose.pt
+  flow:
+    weights: pretrained_models/raft_large.pt
+    imsize: [1080,1920]
+    minibatch_size: 3 # can be up to 16 for imsize: [240,320]
+  flowpose:
+    window_size: 5
+    threshold: 0.05
+    loop: False
+    norm: False
+    match_pose: False
+    ntu: True
+    dilation: 3
+    
+# model
+model: models.stgcn2.stgcn2.TEST_MODEL
+model_args:
+  num_class: 120
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 2
+  base_channels: 64
+  data_bn_type: 'MVC'
+  ch_ratio: 2
+  num_stages: 10
+  inflate_stages: [5 8]
+  down_stages: [5, 8]
+  cnn: False
+ignore_weights: []
+phase: train
+# weights: ./pretrained_models/kinetics_joint.pt
+
+
+# Optimiser
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+
+# Scheduler
+scheduler: torch.optim.lr_scheduler.CosineAnnealingLR
+scheduler_params:
+  eta_min: 0
+
+
+# training
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 80
+device: 0
+batch_size: 128
+half: False
+
+checkpoint_freq: 10 # how often to save the model and training state
+save_location: ./results/stgcn2/ntu120/ # where to save the checkpoints

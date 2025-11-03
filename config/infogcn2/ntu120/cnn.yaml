@@ -2,8 +2,8 @@
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
   data_paths: 
-    CSet: ./data/ntu120/aligned_data/NTU120_CSet-pose_aligned.npz
-    CSub: ./data/ntu120/aligned_data/NTU120_CSub-pose_aligned.npz
+    CSet: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz
+    CSub: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz
   label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: True
@@ -14,7 +14,7 @@ feeder_args:
   average_flow: False # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
-  no_flow: True
+  no_flow: False
   no_Z: False
 
 extractor:
@@ -35,14 +35,14 @@ extractor:
     dilation: 3
     
 # model
-model: model.infogcn2.sode.SODE
+model: models.infogcn2.sode.SODE
 model_args:
   num_class: 120
   num_point: 25
   num_person: 2
   graph: graph.ntu_rgb_d.Graph
   pose_channels: 3
-  flow_channels: 0 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
+  flow_channels: 50 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
   ode_method: euler
@@ -54,7 +54,7 @@ model_args:
   num_cls: 10 # Number of classification heads used
   n_sample: 1
   backbone: transformer
-  cnn: False
+  cnn: True
 ignore_weights: []
 phase: train
 # weights: ./pretrained_models/kinetics_joint.pt

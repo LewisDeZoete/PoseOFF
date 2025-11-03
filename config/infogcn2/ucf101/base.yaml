@@ -12,10 +12,10 @@ feeder_args:
   window_size: 64
   random_move: True
   random_rot: True
-  average_flow: True # model_args.flow_channels = 2
+  average_flow: False # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
-  no_flow: False
+  no_flow: True
 
 extractor:
   data_paths:
@@ -23,7 +23,6 @@ extractor:
     pose_path: ./data/ucf101/pose/
     flow_path: ./data/ucf101/flow/
     flowpose_path: ./data/ucf101/flowpose/
-  preprocessed: True
   pose: 
     weights: pretrained_models/yolo11x-pose.pt
   flow:
@@ -34,16 +33,20 @@ extractor:
     window_size: 5
     threshold: 0.05
     loop: False
-    
+    norm: False
+    match_pose: False
+    ntu: False
+    dilation: 3
+
 # model
-model: model.infogcn2.sode.SODE
+model: models.infogcn2.sode.SODE
 model_args:
   num_class: 101
   num_point: 17
   num_person: 2
   graph: graph.yolo_pose.Graph
   pose_channels: 3
-  flow_channels: 2
+  flow_channels: 0 # (extractor.flowpose.window_size ** 2) * 2 eg. 9x9x2
   embed_channels: 64
   num_head: 3
   ode_method: euler
@@ -77,6 +80,7 @@ lambda_5: 0.0
   
 
 # training
+trainer: training.train_infogcn2.train_network
 num_epoch: 70
 device: 0
 batch_size: 256
