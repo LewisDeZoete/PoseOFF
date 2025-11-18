@@ -318,7 +318,6 @@ if __name__ == '__main__':
         skes_name = np.hstack((skes_name, np.loadtxt(skes_name_file, dtype=str)))
     details = get_details(skes_name, frames_cnt)
 
-
     print(f'Dataset: {dataset}')
     if args.split:
         print('Splitting dataset')
@@ -327,8 +326,8 @@ if __name__ == '__main__':
 
     for evaluation in evaluations:
         train_indices, test_indices = get_indices(
-            details['Performer'], 
-            details['Camera'], 
+            details['Performer'],
+            details['Camera'],
             details['Setup'],
             evaluation)
         print(f'\t\tTrain indices length: {len(train_indices)}')
@@ -375,7 +374,7 @@ if __name__ == '__main__':
             print(f'\tFull flowpose sequence shape: {flow_joints.shape}', flush=True)
             with open(raw_flowpose_pkl, 'wb') as f:
                 pickle.dump(flow_joints, f, pickle.HIGHEST_PROTOCOL)
-        
+
         print(f'\tFlowpose approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
         # Generate train-test splits and save the data
         file_list = []
@@ -392,7 +391,7 @@ if __name__ == '__main__':
                                                save_path, data_type='flowpose', mod=mod)
                 print(f'\tSaved flowpose {evaluation}', flush=True)
                 file_list.append(file_save_path)
-    
+
     else:
         file_list = []
         file_list += [

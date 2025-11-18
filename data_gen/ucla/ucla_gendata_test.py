@@ -36,7 +36,6 @@ def read_xyz(sample_folder, max_bodies=1, num_joint=20):
     data = np.zeros((3, len(sample_skel_files), num_joint, max_bodies))
 
     for frame_no, skel_frame_file_name in enumerate(sample_skel_files):
-        print(skel_frame_file_name)
         with open(osp.join(sample_folder, skel_frame_file_name), 'r') as f:
             skel_frame = f.readlines()[1:]
             skel_frame = [limb.split(',')[:-1] for limb in skel_frame]
@@ -141,8 +140,8 @@ def gendata(data_path,
     # fp = pre_normalisation(fp)
     # np.save('{}/{}_data_joint.npy'.format(out_path, part), fp)
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='NTU-RGB-D Data Converter.')
     parser.add_argument(
         '--data_path', default='../Datasets/N-UCLA/multiview_action'
@@ -184,7 +183,8 @@ if __name__ == '__main__':
     # print(fp[0, :, 0, :, 0])
     print(bad_samples)
 
-    # # NOTE: There are a number of samples (I don't yet know exactly which view etc.) that have strange crossover with other actors...
+    # # NOTE: There are a number of samples (I don't yet know exactly which view etc.)
+    # # that have strange crossover with other actors...
     # # Not sure how I can go about parsing these out
     # # Possibly I could parse the fileList.txt since some of the lines in this list have two samples...
     # # e.g. a01_s08_e02
