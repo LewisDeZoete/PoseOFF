@@ -4,13 +4,20 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.infogcn2.utils import import_class
-from model.ms_gcn import MultiScale_GraphConv as MS_GCN
-from model.ms_tcn import MultiScale_TemporalConv as MS_TCN
-from model.ms_gtcn import SpatialTemporal_MS_GCN, UnfoldTemporalWindows
-from model.attn import Flow_conv, NodeAttention, TemporalAttention, TemporalTransformer
-from model.mlp import MLP
-# from model.activation import activation_factory
+from models.msg3d.ms_gcn import MultiScale_GraphConv as MS_GCN
+from models.msg3d.ms_tcn import MultiScale_TemporalConv as MS_TCN
+from models.msg3d.ms_gtcn import SpatialTemporal_MS_GCN, UnfoldTemporalWindows
+from models.msg3d.mlp import MLP
+from model_utils import (
+    Flow_conv,
+    NodeAttention,
+    TemporalAttention,
+    TemporalTransformer,
+    import_class
+)
+# from model_utils import Flow_conv, NodeAttention, TemporalAttention, TemporalTransformer
+# from model_utils import import_class
+# from models.utils import activation_factory
 
 from einops import rearrange, repeat
 
@@ -176,16 +183,20 @@ class Model(nn.Module):
 
 
 class TEST_MODEL(nn.Module):
-    def __init__(self,
-                 num_class,
-                 num_point,
-                 num_person,
-                 num_gcn_scales,
-                 num_g3d_scales,
-                 graph,
-                 pose_channels=3,
-                 flow_channels=50,
-                 cnn=False):
+    # TODO: Rename this to something more appropriate, possibly add third layer back
+    def __init__(
+            self,
+            num_class,
+            num_point,
+            num_person,
+            num_gcn_scales,
+            num_g3d_scales,
+            graph,
+            pose_channels=3,
+            flow_channels=50,
+            cnn=False,
+            **kwargs
+        ):
         super(TEST_MODEL, self).__init__()
 
         Graph = import_class(graph)()
@@ -213,18 +224,16 @@ class TEST_MODEL(nn.Module):
                 kernel_size=3,
                 flow_window=int(
                     math.sqrt(flow_channels / 2)
-                ),  # flow_window = sqrt(flow_channels/2)
+                ),
                 pose_channels=pose_channels,
                 out_channels=joint_embed_channels,
             )
-        # else:
-        #     self.attn = NodeAttention(in_features_skeleton=in_channels,
-        #                               in_features_flow=int((flow_window**2)*2),
-        #                               out_features=16)
-        #     mg_g3d_in_channels = 16
+        else:
+            joint_embed_channels = 3
+            self.to_joint_embedding = nn.Linear(
+                pose_channels + flow_channels, joint_embed_channels
+            )
 
-
-        # self.gcn3d1 = MultiWindow_MS_G3D(in_channels, c1, A_binary, num_g3d_scales, window_stride=1)
         self.gcn3d1 = MultiWindow_MS_G3D(joint_embed_channels, c1, A_binary, num_g3d_scales, window_stride=1)
         self.sgcn1 = nn.Sequential(
             # MS_GCN(num_gcn_scales, 3, c1, A_binary, disentangled_agg=True),
@@ -251,12 +260,11 @@ class TEST_MODEL(nn.Module):
         # self.tcn3 = MS_TCN(c3, c3)
 
         self.fc = nn.Linear(c2, num_class)
+        # self.fc = nn.Linear(c3, num_class)
 
     def forward(self, x):
         N, C, T, V, M = x.size()
-        # (N, M*V*C, T)
         x = rearrange(x, "n c t v m -> n (m v c) t", n=N, c=C, t=T, m=M,v=V)
-        # x = x.permute(0, 4, 3, 1, 2).contiguous().view(N, M * V * C, T)
         x = self.data_bn(x)
         x = rearrange(x, "n (m v c) t -> (n m t) v c", n=N, c=C, t=T, m=M,v=V)
 
@@ -264,7 +272,6 @@ class TEST_MODEL(nn.Module):
         # Joint embedding
         x = self.to_joint_embedding(x)
         # # (N * M, in_channels+flow_out_channels, T, V)
-        # x = x.permute(0, 2, 4, 1, 3).contiguous().view(N*M, 3+self.flow_channels, T, V)
         x = rearrange(x, "(n m t) v c -> (n m) c t v", n=N, t=T, m=M, v=V)
         # ------------------------------------------------------------
 
@@ -291,52 +298,56 @@ class TEST_MODEL(nn.Module):
 if __name__ == "__main__":
     from config.argclass import ArgClass
     import logging
+    import os.path as osp
+    from model_utils import ModelLoader
+
     logger = logging.getLogger(__name__)
     logging.basicConfig(
-        filename='logs/debug/MS-G3D_model_testing.log',
+        filename='logs/debug/models/msg3d.log',
         encoding='utf-8',
         filemode='w',
         level=logging.DEBUG
     )
 
-    dataset = 'ntu'
-    model_type = 'cnn'
+    model_type="msg3d"
+    dataset = "ntu120"
+    flow_embedding = "base"
+    evaluation = "CSet"
+
+    run_name = f"{model_type}_{dataset}_{evaluation}_{flow_embedding}"
 
     # Get the config file and use the model arguments defined within
-    arg = ArgClass(f'config/{dataset}/{model_type}.yaml', verbose=True)
+    arg = ArgClass(f'config/{model_type}/{dataset}/{flow_embedding}.yaml', verbose=True)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
+    arg.evaluation = evaluation
+    arg.run_name = run_name
 
-    model = TEST_MODEL(
-        num_class=60,
-        num_point=25,
-        num_person=2,
-        num_gcn_scales=2,
-        num_g3d_scales=3,
-        graph=arg.model_args['graph'],
-        pose_channels=3,
-        flow_channels=50,
-        cnn=True
-    )
+    # # Define and attempt to load a checkpoint time
+    # arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
+    #     arg.save_location,
+    #     arg.evaluation,
+    #     "train",
+    #     arg.run_name + ".pt"
+    # )
+
+    # Create the model, set to train
+    modelLoader = ModelLoader(arg)
+    model = modelLoader.model
+    model.train()
 
     # Create dummy input
     # N, C, T, V, M
     C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
     V = arg.model_args["num_point"]
     x = torch.randn((8, C, 64, V, 2)).to(device)
-    logger.info(f"Model: {model_type}")
+    logger.info(f"Model: {flow_embedding}")
     logger.info(f"Input channels: {C}\n")
     logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
 
     # Pass input to model
     y_hat = model(x)
-    logger.info(f"\ny_hat: {y_hat.shape}")
-
-    # start = time.time()
-    # out = attmodel.forward(x)
-    # att_finished = time.time()
-    # out = mainmodel.forward(x)
-    # finish = time.time()
-
-    # print(f'Attention model took {att_finished-start} seconds')
-    # print(f'Main model took {finish-att_finished} seconds')
+    logger.info(f"y_hat shape: {y_hat.shape}")
+    logger.info(f"y_hat argmax shape: {torch.argmax(y_hat, dim=1).shape}")
+    logger.info(f"y_hat argmax: {torch.argmax(y_hat, dim=1)}")

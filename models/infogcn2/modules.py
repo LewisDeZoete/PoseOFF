@@ -8,8 +8,8 @@ from einops import rearrange
 from torch.autograd import Variable
 from einops.layers.torch import Rearrange
 
-# from model.utils import conv_init, bn_init, conv_branch_init
-from model.infogcn2.utils import conv_init, bn_init, conv_branch_init
+# from models.utils import conv_init, bn_init, conv_branch_init
+from model_utils import conv_init, bn_init, conv_branch_init
 
 
 class SelfAttention(nn.Module):

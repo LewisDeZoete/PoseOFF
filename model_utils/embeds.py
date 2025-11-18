@@ -11,11 +11,11 @@ class Flow_conv(nn.Module):
     Args:
         kernel_size (int or tuple): Size of the convolving kernel.
         flow_window (int, optional): Size of the flow window. Default is 5.
-        original_channels (int, optional): Number of original channels in the input data. Default is 3.
+        pose_channels (int, optional): Number of original pose channels in the input data. Default is 3.
         out_channels (int, optional): Number of output channels after the final linear layer. Default is 4.
     Attributes:
         kernel_size (int or tuple): Size of the convolving kernel.
-        original_channels (int): Number of original channels in the input data.
+        pose_channels (int): Number of original pose channels in the input data.
         out_channels (int): Number of output channels after the final linear layer.
         flow_window (int): Size of the flow window.
         conv (nn.Sequential): Sequential container of convolutional layers and activation functions.
@@ -26,7 +26,7 @@ class Flow_conv(nn.Module):
             Args:
                 x (torch.Tensor): Input tensor of shape (N*M*T, V, C).
             Returns:
-                torch.Tensor: Output tensor of shape (N, T, M, V, C + out_channels - original_channels).
+                torch.Tensor: Output tensor of shape (N, T, M, V, C + out_channels - pose_channels).
     """
 
     def __init__(
@@ -249,23 +249,22 @@ if __name__ == "__main__":
 
     kernel_size = 3
     flow_window = 5
-    original_channels = 3
+    pose_channels = 3
     embed_channels = 64
 
     # Example usage
-    N, C, T, V, M = 16, (original_channels + 2 * (flow_window**2)), 300, 17, 2
-    print(f"Total input channels: {C}")
+    N, C, T, V, M = 16, (pose_channels + 2 * (flow_window**2)), 300, 17, 2
 
     # Dummy data
     x = torch.randn(N, C, T, V, M)
     x = rearrange(x, "n c t v m -> (n m t) v c")
 
     # Define two potential joint embedding methods
-    lin = nn.Linear(original_channels + 2 * (flow_window**2), 64)
+    lin = nn.Linear(pose_channels + 2 * (flow_window**2), 64)
     flow = Flow_conv(
-        kernel_size=3,
-        flow_window=flow_window,  # flow_window = sqrt(flow_channels/2)
-        original_channels=original_channels,
+        kernel_size=kernel_size,
+        flow_window=flow_window,
+        pose_channels=pose_channels,
         out_channels=embed_channels,
     )
 
@@ -276,6 +275,7 @@ if __name__ == "__main__":
     # Dummy positional embedding (1, V, embed_channels)
     pos_embedding = torch.randn(1, V, embed_channels)
 
+    print(f"Input shape: {x.shape} (N: {N}, C: {C}, T: {T}, V: {V}, M: {M})")
     print(f"Expected output shape: ({N * M * T}, {V}, {embed_channels})")
     print(f"Flow embeddings: {(flows + pos_embedding[:, :V]).shape}")
     print(f"Linear embeddings: {(lins + pos_embedding[:, :V]).shape}")

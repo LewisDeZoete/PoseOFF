@@ -11,12 +11,12 @@ import sys
 import os
 
 # TODO: If changing folder structure, update this import
-# from model.modules import SA_GC, TemporalEncoder, GCN
-# from model.utils import bn_init, import_class, sample_standard_gaussian,\
+# from models.modules import SA_GC, TemporalEncoder, GCN
+# from models.utils import bn_init, import_class, sample_standard_gaussian,\
 #     cum_mean_pooling, cum_max_pooling, identity, max_pooling
-# from model.encoder_decoder import Encoder_z0_RNN, RNN
-from model.infogcn2.modules import SA_GC, TemporalEncoder, GCN
-from model.infogcn2.utils import (
+# from models.encoder_decoder import Encoder_z0_RNN, RNN
+from models.infogcn2.modules import SA_GC, TemporalEncoder, GCN
+from model_utils import (
     bn_init,
     import_class,
     sample_standard_gaussian,
@@ -24,19 +24,18 @@ from model.infogcn2.utils import (
     cum_max_pooling,
     identity,
     max_pooling,
+    Flow_conv
 )
-from model.infogcn2.encoder_decoder import Encoder_z0_RNN, RNN
-from model.attn import Flow_conv
-
+from models.infogcn2.encoder_decoder import Encoder_z0_RNN, RNN
 
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
 from torchdiffeq import odeint as odeint
 # @misc{torchdiffeq,
-# 	author={Chen, Ricky T. Q.},
-# 	title={torchdiffeq},
-# 	year={2018},
-# 	url={https://github.com/rtqichen/torchdiffeq},
+#   author={Chen, Ricky T. Q.},
+#   title={torchdiffeq},
+#   year={2018},
+#   url={https://github.com/rtqichen/torchdiffeq},
 # }
 
 
@@ -288,6 +287,7 @@ class SODE(nn.Module):
             else RNN(embed_channels, A, n_step)
         )
 
+        # TODO: Allow for configuration of GCN and SA_GC
         self.recon_decoder = nn.Sequential(
             GCN(embed_channels, embed_channels, A),
             GCN(embed_channels, embed_channels, A),
@@ -305,6 +305,7 @@ class SODE(nn.Module):
             mid_dim = embed_channels
             out_dim = embed_channels
 
+        # TODO: Allow for configuration of GCN and SA_GC
         self.cls_decoder = nn.Sequential(
             GCN(in_dim, mid_dim, A),
             GCN(mid_dim, out_dim, A),
@@ -428,7 +429,7 @@ class SODE(nn.Module):
         # encoding
         # TODO: Test splitting up flow windows and joints
         x = rearrange(x, "(n m t) v c -> (n m) c t v", m=M, n=N)
-        
+
         z = self.temporal_encoder(x)
         # kl_div = self.KL_div(z_mu, z_std)
         # z = self.latent_sample(z_mu, z_std)
@@ -478,25 +479,42 @@ class SODE(nn.Module):
 if __name__ == "__main__":
     from config.argclass import ArgClass
     import logging
+    import os.path as osp
+    from model_utils import ModelLoader
+
     logger = logging.getLogger(__name__)
     logging.basicConfig(
-        filename='logs/debug/infogcn2_model_testing.log',
+        filename='logs/debug/models/infogcn2.log',
         encoding='utf-8',
         filemode='w',
         level=logging.DEBUG
     )
 
-    dataset = 'ntu'
-    model_type = 'cnn'
+    dataset = 'ntu120'
+    flow_embedding = "base"
+    evaluation = "CSet"
 
-    arg = ArgClass(f"config/{dataset}/{model_type}.yaml")
+    run_name = f"{dataset}_{evaluation}_{flow_embedding}"
+
+    # Get the config file and use the model arguments defined within
+    arg = ArgClass(f"config/infogcn2/{dataset}/{flow_embedding}.yaml", verbose=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
+    arg.evaluation = evaluation
+    arg.run_name = run_name
+
+    # Define and attempt to load a checkpoint time
+    arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
+        arg.save_location,
+        arg.evaluation,
+        "train",
+        arg.run_name + ".pt"
+    )
 
     # Create the model, set to train
-    model = SODE(**arg.model_args)
-    model = model.to(device)
+    modelLoader = ModelLoader(arg)
+    model = modelLoader.model
     model.train()
 
     # Create dummy input
@@ -504,18 +522,20 @@ if __name__ == "__main__":
     C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
     V = arg.model_args["num_point"]
     x = torch.randn((8, C, 64, V, 2)).to(device)
-    logger.info(f"Model: {model_type}")
+    logger.info(f"Model: {flow_embedding}")
     logger.info(f"Input channels: {C}\n")
     logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
 
     # Pass input to model
     y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
     logger.info(f"\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n")
+    logger.info(f"y_hat argmax shape: {torch.argmax(y_hat, dim=1).shape}")
+    logger.info(f"y_hat argmax: {torch.argmax(y_hat, dim=1)}")
     logger.info(f"Attention length: {len(model.get_attention())}")
     logger.info(f"Attention [0] shape: {model.get_attention()[0].shape}")
-    logger.info(f"Adjacency matrix shape: {model.A.mean(0)}")
-    logger.info(f"cls_decoder GCN-0 shared topology:  {model.cls_decoder[0].shared_topology.mean(0)}")
-    logger.info(f"cls_decoder GCN-0 shared topology shape: {model.cls_decoder[0].shared_topology.shape}")
-    logger.info(f"cls_decoder GCN-1 shared topology shape: {model.cls_decoder[1].shared_topology.shape}")
-    logger.info(f"cls_decoder GCN-0 attn shape: {model.cls_decoder[0].get_attn().shape}")
-    logger.info(f"cls_decoder GCN-1 attn shape: {model.cls_decoder[1].get_attn().shape}")
+    # logger.info(f"Adjacency matrix shape: {model.A.mean(0)}")
+    # logger.info(f"cls_decoder GCN-0 shared topology:  {model.cls_decoder[0].shared_topology.mean(0)}")
+    # logger.info(f"cls_decoder GCN-0 shared topology shape: {model.cls_decoder[0].shared_topology.shape}")
+    # logger.info(f"cls_decoder GCN-1 shared topology shape: {model.cls_decoder[1].shared_topology.shape}")
+    # logger.info(f"cls_decoder GCN-0 attn shape: {model.cls_decoder[0].get_attn().shape}")
+    # logger.info(f"cls_decoder GCN-1 attn shape: {model.cls_decoder[1].get_attn().shape}")

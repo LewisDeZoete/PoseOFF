@@ -1,13 +1,11 @@
-from model.infogcn2.utils import LayerCompare, count_params, import_class
+from .utils import LayerCompare, count_params, import_class
 from collections import OrderedDict
 import torch
 import sys
-sys.path.insert(0, '')
-
 
 class ModelLoader:
     '''
-
+    Load a model given an ArgClass object
     '''
 
     def __init__(self, arg):
@@ -31,7 +29,6 @@ class ModelLoader:
         If `arg.weights` exists, it will try to load the weights from the file passed.
         '''
         Model = import_class(self.arg.model)
-        # InfoGCN++ takes the device argument, we want it to be dynamic
         if 'device' in self.arg.model_args:
             self.arg.model_args['device'] = self.output_device
         self.model = Model(**self.arg.model_args).to(self.output_device)
@@ -99,10 +96,11 @@ if __name__ == '__main__':
     from config.argclass import ArgClass
     import time
 
+    model = 'infogcn2'
     dataset = 'ntu'
-    model_type = 'cnn'
+    flow_embedding = 'cnn'
 
-    arg = ArgClass(f"./config/{dataset}/{model_type}.yaml")
+    arg = ArgClass(f"./config/{model}/{dataset}/{flow_embedding}.yaml")
 
     # Load the model!
     modelLoader = ModelLoader(arg)
@@ -112,7 +110,9 @@ if __name__ == '__main__':
         start = time.time()
         b = 8
         # N, C, T, V, M
-        x = torch.randn((8, 5, 64, 17, 2)).to(modelLoader.output_device)
+        C = arg.model_args['pose_channels'] + arg.model_args['flow_channels']
+        V = arg.model_args['num_point']
+        x = torch.randn((8, C, 64, V, 2)).to(modelLoader.output_device)
         out = skel_model(x)  # tuple(y, x_hat, z_0, z_hat_shifted, self.zero)
         print(out[0].shape)
         print(f'\nOutput shape (batch size = {b}): {out[0].shape}')

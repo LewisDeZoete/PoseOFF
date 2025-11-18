@@ -1,14 +1,13 @@
 import torch
 import math
 import torch.nn as nn
+import importlib
 
-
-def import_class(name):
-    components = name.split('.')
-    mod = __import__(components[0])
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
+def import_class(path: str):
+    """Dynamically import a class from a string path."""
+    module_path, class_name = path.rsplit('.', 1)
+    module = importlib.import_module(module_path)
+    return getattr(module, class_name)
 
 def bn_init(bn, scale):
     nn.init.constant_(bn.weight, scale)

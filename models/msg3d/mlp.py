@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.activation import activation_factory
+from model_utils import activation_factory
 
 
 class MLP(nn.Module):
