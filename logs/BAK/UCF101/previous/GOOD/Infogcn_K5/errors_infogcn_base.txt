@@ -1,33 +1,0 @@
-Epoch:   0%|          | 0/70 [00:00<?, ?it/s]
-Training:   0%|          | 0/84 [00:00<?, ?it/s][A/fred/oz141/ldezoete/MS-G3D/feeders/tools.py:287: RuntimeWarning: Mean of empty slice.
-  flow = flow.mean(axis=(1, 2))  # Average flow vectors
-/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/numpy/core/_methods.py:121: RuntimeWarning: invalid value encountered in divide
-  ret = um.true_divide(
-Training:   0%|          | 0/84 [00:03<?, ?it/s]
-Epoch:   0%|          | 0/70 [00:03<?, ?it/s]
-Traceback (most recent call last):
-  File "/fred/oz141/ldezoete/MS-G3D/tester.py", line 128, in <module>
-    results = train_network(
-  File "/fred/oz141/ldezoete/MS-G3D/training/train_infogcn.py", line 243, in train_network
-    total_train_time += run_epoch(
-  File "/fred/oz141/ldezoete/MS-G3D/training/train_infogcn.py", line 53, in run_epoch
-    for x, y, mask, index in tbar:
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/tqdm/std.py", line 1181, in __iter__
-    for obj in iterable:
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py", line 631, in __next__
-    data = self._next_data()
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py", line 675, in _next_data
-    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
-    data = self.dataset.__getitems__(possibly_batched_index)
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataset.py", line 419, in __getitems__
-    return [self.dataset[self.indices[idx]] for idx in indices]
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataset.py", line 419, in <listcomp>
-    return [self.dataset[self.indices[idx]] for idx in indices]
-  File "/fred/oz141/ldezoete/MS-G3D/feeders/feeder.py", line 152, in __getitem__
-    data_numpy = tools.valid_crop_resize(
-  File "/fred/oz141/ldezoete/MS-G3D/feeders/tools.py", line 43, in valid_crop_resize
-    data = F.interpolate(
-  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/functional.py", line 4065, in interpolate
-    return torch._C._nn.upsample_bilinear2d(input, output_size, align_corners, scale_factors)
-RuntimeError: Input and output sizes should be greater than 0, but got input (H: 1802, W: 0) output (H: 1802, W: 64)

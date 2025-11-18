@@ -1,5 +1,0 @@
-cp: cannot stat './data/ntu/aligned_data/NTU60_CV-flowpose_aligned.npz': No such file or directory
-usage: main.py [-h] [-c CONFIG] [-p PHASE] [-m MODEL_TYPE] [-e EVALUATION]
-               [-r RUN_NAME] [-d DESCRIPTION]
-               [--data_path_overwrite DATA_PATH_OVERWRITE] [-v]
-main.py: error: argument -e: expected one argument
