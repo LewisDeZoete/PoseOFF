@@ -2,13 +2,13 @@
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
   data_paths:
-    CSet: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz
-    CSub: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz
-  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+    CSet: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned_mean.npz
+    CSub: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned_mean.npz
+  label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: True
   random_shift: True
-  window_size: 64
+  window_size: 300
   random_move: True
   random_rot: True
   average_flow: True # model_args.flow_channels = 2
@@ -49,14 +49,19 @@ model_args:
 ignore_weights: []
 phase: train
 
-optim:
-  base_lr: 0.05
+# Optimiser
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
   nesterov: True
-  weight_decay: 0.0003
-  step: [30, 50]
-  gamma: 0.1
-lambda_1: 1 # CLS loss (1 from paper)
 
+# Scheduler
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 50]
+  gamma: 0.1
 
 # training
 training_function: training.train_msg3d.train_network

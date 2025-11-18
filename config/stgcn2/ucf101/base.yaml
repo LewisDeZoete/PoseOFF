@@ -9,7 +9,7 @@ feeder_args:
   p_interval: [0.5, 1]
   random_shift: True
   random_choose: True
-  window_size: 64
+  window_size: 100
   random_move: True
   random_rot: True
   average_flow: False # model_args.flow_channels = 2
