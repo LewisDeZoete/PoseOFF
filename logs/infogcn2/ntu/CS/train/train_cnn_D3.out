@@ -1,0 +1,85 @@
+Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CS-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+Run name: msg3d_ntu_CS_cnn_D3
+
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: msg3d
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  cnn: True
+ignore_weights: []
+phase: train
+optim:
+  momentum: 0.9
+  base_lr: 0.05
+  nesterov: True
+  weight_decay: 0.0003
+  step: [30, 40]
+  gamma: 0.1
+lambda_1: 1
+trainer: training.train_msg3d.train_network
+num_epoch: 50
+device: 0
+batch_size: 32
+forward_batch_size: 32
+test_batch_size: 128
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ntu/
+dataset: ntu
+flow_embedding: cnn
+evaluation: CS
+run_name: msg3d_ntu_CS_cnn_D3
+description: msg3d_train ntu CS cnn dilation 3...
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+
++-------------------- Job Report: 5700210 (FAILED) --------------------+
+| Memory (RAM)  [                    ]  2.6% (266.4 MB peak / 10 GB)   |
+| CPU           [                    ]  3.2% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  0.7% (0-00:06:17 / 0-16:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   5.1 MB        0 B                    230                   |
+|   /fred   167.5 GB      92 B                    12                   |
+|   /home   0 B           0 B                      4                   |
+|   OS      17.1 MB       0 B                     15                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

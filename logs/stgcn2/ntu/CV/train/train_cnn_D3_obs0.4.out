@@ -1,0 +1,206 @@
+Copying file: ./data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CV-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu_CV-flowpose_D3_aligned.npz
+Run name: stgcn2_ntu_CV_cnn_D3_obs0.4
+
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 100
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.stgcn2.stgcn2.TEST_MODEL
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  base_channels: 64
+  data_bn_type: MVC
+  ch_ratio: 2
+  num_stages: 10
+  inflate_stages: ['5 8']
+  down_stages: [5, 8]
+  cnn: True
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.CosineAnnealingLR
+scheduler_params:
+  eta_min: 0
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 80
+device: 0
+batch_size: 128
+half: False
+checkpoint_freq: 10
+save_location: ./results/stgcn2/ntu/
+model_type: stgcn2
+dataset: ntu
+flow_embedding: cnn
+evaluation: CV
+obs_ratio: 0.4
+run_name: stgcn2_ntu_CV_cnn_D3_obs0.4
+description: stgcn2_train ntu CV cnn observation ratio 0.4, dilation 3...
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CV-flowpose_D3_aligned.npz
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 488584
+	Loading weights from ./results/stgcn2/ntu/CV/train/stgcn2_ntu_CV_cnn_D3_obs0.4.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/stgcn2/ntu/CV/train/stgcn2_ntu_CV_cnn_D3_obs0.4.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+test feeder length: 18932
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/stgcn2/ntu/CV/train/stgcn2_ntu_CV_cnn_D3_obs0.4.pt
+		1 EPOCH BEST TEST ACC: 0.2453647255897522
+			Train time: 819.02 seconds
+			Test time: 815.27 seconds
+		2 EPOCH BEST TEST ACC: 0.41226160526275635
+			Train time: 794.53 seconds
+			Test time: 810.92 seconds
+		3 EPOCH BEST TEST ACC: 0.44424375891685486
+			Train time: 815.20 seconds
+			Test time: 814.24 seconds
+		4 EPOCH BEST TEST ACC: 0.44424375891685486
+			Train time: 815.79 seconds
+			Test time: 806.98 seconds
+		5 EPOCH BEST TEST ACC: 0.44424375891685486
+			Train time: 819.65 seconds
+			Test time: 803.24 seconds
+		6 EPOCH BEST TEST ACC: 0.4462094306945801
+			Train time: 827.86 seconds
+			Test time: 7082.89 seconds
+		7 EPOCH BEST TEST ACC: 0.51073157787323
+			Train time: 894.67 seconds
+			Test time: 4717.49 seconds
+		8 EPOCH BEST TEST ACC: 0.51073157787323
+			Train time: 815.17 seconds
+			Test time: 800.67 seconds
+		9 EPOCH BEST TEST ACC: 0.51073157787323
+			Train time: 796.83 seconds
+			Test time: 802.74 seconds
+		10 EPOCH BEST TEST ACC: 0.51073157787323
+			Train time: 790.13 seconds
+			Test time: 782.93 seconds
+		11 EPOCH BEST TEST ACC: 0.51073157787323
+			Train time: 786.58 seconds
+			Test time: 797.09 seconds
+		12 EPOCH BEST TEST ACC: 0.570658266544342
+			Train time: 822.08 seconds
+			Test time: 808.03 seconds
+		13 EPOCH BEST TEST ACC: 0.570658266544342
+			Train time: 804.70 seconds
+			Test time: 800.79 seconds
+		14 EPOCH BEST TEST ACC: 0.570658266544342
+			Train time: 803.32 seconds
+			Test time: 804.73 seconds
+		15 EPOCH BEST TEST ACC: 0.570658266544342
+			Train time: 804.90 seconds
+			Test time: 806.38 seconds
+		16 EPOCH BEST TEST ACC: 0.5801678895950317
+			Train time: 796.53 seconds
+			Test time: 798.99 seconds
+		17 EPOCH BEST TEST ACC: 0.5801678895950317
+			Train time: 788.27 seconds
+			Test time: 780.51 seconds
+		18 EPOCH BEST TEST ACC: 0.5801678895950317
+			Train time: 813.01 seconds
+			Test time: 789.64 seconds
+		19 EPOCH BEST TEST ACC: 0.5801678895950317
+			Train time: 797.50 seconds
+			Test time: 788.54 seconds
+		20 EPOCH BEST TEST ACC: 0.5801678895950317
+			Train time: 800.95 seconds
+			Test time: 780.74 seconds
+		21 EPOCH BEST TEST ACC: 0.5815491676330566
+			Train time: 795.86 seconds
+			Test time: 801.34 seconds
+		22 EPOCH BEST TEST ACC: 0.5979653000831604
+			Train time: 807.59 seconds
+			Test time: 797.06 seconds
+		23 EPOCH BEST TEST ACC: 0.5979653000831604
+			Train time: 806.01 seconds
+			Test time: 795.97 seconds
+		24 EPOCH BEST TEST ACC: 0.5979653000831604
+			Train time: 823.86 seconds
+			Test time: 839.14 seconds
+		25 EPOCH BEST TEST ACC: 0.5979653000831604
+			Train time: 836.25 seconds
+			Test time: 841.40 seconds
+		26 EPOCH BEST TEST ACC: 0.5979653000831604
+			Train time: 834.13 seconds
+			Test time: 830.32 seconds
+		27 EPOCH BEST TEST ACC: 0.5979653000831604
+			Train time: 818.73 seconds
+			Test time: 800.85 seconds
+		28 EPOCH BEST TEST ACC: 0.6220581531524658
+			Train time: 820.20 seconds
+			Test time: 811.25 seconds
+		29 EPOCH BEST TEST ACC: 0.6248738169670105
+			Train time: 835.20 seconds
+			Test time: 821.05 seconds
+
++-------------------- Job Report: 6587165 (TIMEOUT) --------------------+
+| Memory (RAM)  [#########           ] 46.3% (9.3 GB peak / 20 GB)      |
+| CPU           [##########          ] 53.0% average                    |
+| GPU           [                    ]  2.5% average                    |
+| Time          [------------------->] 100.0% (0-16:00:15 / 0-16:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write      Total IOPS                   |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   4.8 GB        0 B                    294                    |
+|   /fred   184.7 GB      7.9 MB                 588                    |
+|   /home   0 B           0 B                      3                    |
+|   OS      1.5 MB        0 B                    115                    |
+|                                                                       |
+| Warnings:                                                             |
+|   - Too much memory requested                                         |
+|   - CPU usage is low                                                  |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+

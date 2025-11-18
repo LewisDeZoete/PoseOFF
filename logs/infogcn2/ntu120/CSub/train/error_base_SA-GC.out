@@ -1,0 +1,73 @@
+/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 4 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+Epoch:   0%|          | 0/70 [00:00<?, ?it/s]Epoch:   1%|▏         | 1/70 [06:57<8:00:15, 417.62s/it]Epoch:   3%|▎         | 2/70 [13:50<7:50:00, 414.71s/it]Epoch:   4%|▍         | 3/70 [20:42<7:41:57, 413.70s/it]Epoch:   6%|▌         | 4/70 [27:34<7:34:14, 412.95s/it]Epoch:   7%|▋         | 5/70 [34:26<7:26:57, 412.58s/it]Epoch:   9%|▊         | 6/70 [41:18<7:19:59, 412.49s/it]Epoch:  10%|█         | 7/70 [48:10<7:12:52, 412.26s/it]Epoch:  11%|█▏        | 8/70 [55:02<7:05:47, 412.05s/it]Epoch:  13%|█▎        | 9/70 [1:01:53<6:58:47, 411.93s/it]Epoch:  14%|█▍        | 10/70 [1:08:45<6:51:54, 411.91s/it]Epoch:  16%|█▌        | 11/70 [1:15:37<6:45:00, 411.87s/it]Epoch:  17%|█▋        | 12/70 [1:22:28<6:37:58, 411.69s/it]Epoch:  19%|█▊        | 13/70 [1:29:20<6:31:06, 411.70s/it]Epoch:  20%|██        | 14/70 [1:36:12<6:24:15, 411.70s/it]Epoch:  21%|██▏       | 15/70 [1:43:03<6:17:20, 411.64s/it]Epoch:  23%|██▎       | 16/70 [1:50:05<6:13:19, slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+414.80s/it]Epoch:  24%|██▍       | 17/70 [1:57:00<6:06:21, 414.74s/it]Epoch:  26%|██▌       | 18/70 [2:03:53<5:58:58, 414.19s/it]Epoch:  27%|██▋       | 19/70 [2:10:45<5:51:36, 413.65s/it]Epoch:  29%|██▊       | 20/70 [2:17:53<5:48:11, 417.83s/it]Epoch:  30%|███       | 21/70 [2:24:48<5:40:36, 417.07s/it]Epoch:  31%|███▏      | 22/70 [2:31:41<5:32:38, 415.79s/it]Epoch:  33%|███▎      | 23/70 [2:38:38<5:25:57, 416.12s/it]Epoch:  34%|███▍      | 24/70 [2:45:31<5:18:16, 415.14s/it]Epoch:  36%|███▌      | 25/70 [2:52:29<5:12:04, 416.10s/it]Epoch:  37%|███▋      | 26/70 [2:59:21<5:04:13, 414.84s/it]Epoch:  39%|███▊      | 27/70 [3:06:15<4:57:09, 414.64s/it]slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+Epoch:  40%|████      | 28/70 [3:13:10<4:50:19, 414.75s/it]Epoch:  41%|████▏     | 29/70 [3:20:03<4:43:07, 414.33s/it]slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Failure when receiving data from the peer
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+Epoch:  43%|████▎     | 30/70 [3:26:57<4:36:07, 414.19s/it]slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+slurmstepd: error: slurm_curl_request: curl_easy_perform failed to send data to influxdb:8086/write?db=ozstar_slurm&rp=ozstar_slurm_90d&precision=s. Reason: Couldn't connect to server
+slurmstepd: error: send data failed
+Epoch:  44%|████▍     | 31/70 [3:33:49<4:28:42, 413.41s/it]Epoch:  46%|████▌     | 32/70 [3:40:40<4:21:27, 412.84s/it]Epoch:  47%|████▋     | 33/70 [3:47:34<4:14:44, 413.09s/it]Epoch:  49%|████▊     | 34/70 [3:54:27<4:07:45, 412.92s/it]Epoch:  50%|█████     | 35/70 [4:01:19<4:00:50, 412.86s/it]Epoch:  51%|█████▏    | 36/70 [4:08:11<3:53:48, 412.59s/it]Epoch:  53%|█████▎    | 37/70 [4:15:04<3:47:01, 412.77s/it]Epoch:  54%|█████▍    | 38/70 [4:21:58<3:40:15, 412.99s/it]Epoch:  56%|█████▌    | 39/70 [4:28:52<3:33:30, 413.26s/it]Epoch:  57%|█████▋    | 40/70 [4:35:47<3:26:56, 413.90s/it]Epoch:  59%|█████▊    | 41/70 [4:42:41<3:20:04, 413.94s/it]Epoch:  60%|██████    | 42/70 [4:49:34<3:13:03, 413.71s/it]Epoch:  61%|██████▏   | 43/70 [4:56:35<3:07:08, 415.86s/it]Epoch:  63%|██████▎   | 44/70 [5:03:30<3:00:00, 415.41s/it]Epoch:  64%|██████▍   | 45/70 [5:10:25<2:53:00, 415.22s/it]Epoch:  66%|██████▌   | 46/70 [5:17:16<2:45:36, 414.03s/it]Epoch:  67%|██████▋   | 47/70 [5:24:17<2:39:34, 416.28s/it]Epoch:  69%|██████▊   | 48/70 [5:31:19<2:33:12, 417.82s/it]Epoch:  70%|███████   | 49/70 [5:38:18<2:26:22, 418.23s/it]Epoch:  71%|███████▏  | 50/70 [5:45:20<2:19:46, 419.34s/it]Epoch:  73%|███████▎  | 51/70 [5:52:18<2:12:39, 418.90s/it]Epoch:  74%|███████▍  | 52/70 [5:59:17<2:05:40, 418.91s/it]Epoch:  76%|███████▌  | 53/70 [8:31:38<14:20:08, 3035.79s/it]Epoch:  77%|███████▋  | 54/70 [8:38:36<10:00:04, 2250.27s/it]Epoch:  79%|███████▊  | 55/70 [8:45:35<7:05:14, 1700.97s/it] Epoch:  80%|████████  | 56/70 [8:52:31<5:06:55, 1315.38s/it]Epoch:  81%|████████▏ | 57/70 [8:59:28<3:46:35, 1045.81s/it]Epoch:  83%|████████▎ | 58/70 [9:06:25<srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+2:51:27, 857.29s/it] Epoch:  84%|████████▍ | 59/70 [9:13:23<2:12:59, 725.43s/it]Epoch:  86%|████████▌ | 60/70 [9:20:24<1:45:41, 634.17s/it]slurmstepd: error: *** STEP 4425271.0 ON gina9 CANCELLED AT 2025-09-12T20:14:39 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 4425271 ON gina9 CANCELLED AT 2025-09-12T20:14:39 DUE TO TIME LIMIT ***

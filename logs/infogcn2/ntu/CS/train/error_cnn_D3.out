@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/main.py", line 105, in <module>
+    modelLoader = ModelLoader(arg)
+  File "/fred/oz141/ldezoete/MS-G3D/model_utils/load_model.py", line 24, in __init__
+    self.load_model()
+  File "/fred/oz141/ldezoete/MS-G3D/model_utils/load_model.py", line 31, in load_model
+    Model = import_class(self.arg.model)
+  File "/fred/oz141/ldezoete/MS-G3D/model_utils/utils.py", line 8, in import_class
+    module_path, class_name = path.rsplit('.', 1)
+ValueError: not enough values to unpack (expected 2, got 1)
+srun: error: gina5: task 0: Exited with exit code 1
+srun: Terminating StepId=5700210.0

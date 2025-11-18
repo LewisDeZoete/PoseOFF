@@ -1,0 +1,170 @@
+Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CS-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+Run name: stgcn2_ntu_CS_avg_D3
+
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: True
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.stgcn2.stgcn2.TEST_MODEL
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 2
+  base_channels: 64
+  data_bn_type: MVC
+  ch_ratio: 2
+  num_stages: 10
+  inflate_stages: ['5 8']
+  down_stages: [5, 8]
+  cnn: False
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.CosineAnnealingLR
+scheduler_params:
+  eta_min: 0
+trainer: training.train_msg3d.train_network
+num_epoch: 16
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 1
+save_location: ./results/stgcn/ntu/
+model_type: stgcn2
+dataset: ntu
+flow_embedding: avg
+evaluation: CS
+run_name: stgcn2_ntu_CS_avg_D3
+description: stgcn2_train ntu CS avg initial testing for ST-GCN++, dilation 3...
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 517038
+	Loading weights from ./results/stgcn/ntu/CS/train/stgcn2_ntu_CS_avg_D3.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/stgcn/ntu/CS/train/stgcn2_ntu_CS_avg_D3.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/stgcn/ntu/CS/train/stgcn2_ntu_CS_avg_D3.pt
+		1 EPOCH BEST TEST ACC: 0.48018258810043335
+			Train time: 334.59 seconds
+			Test time: 332.59 seconds
+		2 EPOCH BEST TEST ACC: 0.572597324848175
+			Train time: 338.00 seconds
+			Test time: 336.30 seconds
+		3 EPOCH BEST TEST ACC: 0.6674814820289612
+			Train time: 339.53 seconds
+			Test time: 337.34 seconds
+		4 EPOCH BEST TEST ACC: 0.6977875232696533
+			Train time: 340.57 seconds
+			Test time: 338.10 seconds
+		5 EPOCH BEST TEST ACC: 0.6977875232696533
+			Train time: 339.10 seconds
+			Test time: 338.13 seconds
+		6 EPOCH BEST TEST ACC: 0.7404404878616333
+			Train time: 340.63 seconds
+			Test time: 338.18 seconds
+		7 EPOCH BEST TEST ACC: 0.7887805104255676
+			Train time: 339.13 seconds
+			Test time: 338.28 seconds
+		8 EPOCH BEST TEST ACC: 0.7890549302101135
+			Train time: 341.43 seconds
+			Test time: 338.00 seconds
+		9 EPOCH BEST TEST ACC: 0.8091342449188232
+			Train time: 340.48 seconds
+			Test time: 337.74 seconds
+		10 EPOCH BEST TEST ACC: 0.8537576794624329
+			Train time: 340.76 seconds
+			Test time: 337.46 seconds
+		11 EPOCH BEST TEST ACC: 0.8698959946632385
+			Train time: 341.73 seconds
+			Test time: 336.73 seconds
+		12 EPOCH BEST TEST ACC: 0.8855354189872742
+			Train time: 341.73 seconds
+			Test time: 340.36 seconds
+		13 EPOCH BEST TEST ACC: 0.9176124334335327
+			Train time: 343.69 seconds
+			Test time: 340.16 seconds
+		14 EPOCH BEST TEST ACC: 0.9333516359329224
+			Train time: 343.73 seconds
+			Test time: 340.78 seconds
+		15 EPOCH BEST TEST ACC: 0.9369434714317322
+			Train time: 345.50 seconds
+			Test time: 341.49 seconds
+		16 EPOCH BEST TEST ACC: 0.9380658864974976
+			Train time: 344.38 seconds
+			Test time: 341.00 seconds
+	Best train ACC: 0.9312065243721008
+	Best test ACC: 0.9380658864974976
+	Training time:         3:01:07
+
++------------------ Job Report: 6362907 (COMPLETED) -------------------+
+| Memory (RAM)  [##                  ] 11.6% (1.7 GB peak / 15 GB)     |
+| CPU           [###########         ] 59.1% average                   |
+| GPU           [                    ]  4.0% average                   |
+| Time          [----->              ] 25.7% (0-03:05:05 / 0-12:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   9.6 MB        0 B                    129                   |
+|   /fred   168 GB        62 MB                   83                   |
+|   /home   0 B           0 B                      2                   |
+|   OS      1.8 MB        0 B                      8                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

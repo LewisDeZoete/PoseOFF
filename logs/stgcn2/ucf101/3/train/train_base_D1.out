@@ -1,0 +1,150 @@
+Copying file: ./data/ucf101/aligned_data/ucf101_03_D1.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ucf101_03_D1.npz
+Data path: /var/tmp/jobfs/data/ucf101_03_D1.npz
+Run name: stgcn2_ucf101_3_base
+
+### Libraries loaded
+feeder: feeders.ucf101.Feeder
+feeder_args:
+  data_paths: {1: './data/ucf101/aligned_data/ucf101_01_D1.npz', 2: './data/ucf101/aligned_data/ucf101_02_D1.npz', 3: './data/ucf101/aligned_data/ucf101_03_D1.npz'}
+  label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
+  p_interval: [0.5, 1]
+  random_shift: True
+  random_choose: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+extractor:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/ucf101/pose/', 'flow_path': './data/ucf101/flow/', 'flowpose_path': './data/ucf101/flowpose/'}
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': False, 'dilation': 3}
+model: models.stgcn2.stgcn2.TEST_MODEL
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 0
+  base_channels: 64
+  data_bn_type: MVC
+  ch_ratio: 2
+  num_stages: 10
+  inflate_stages: ['5 8']
+  down_stages: [5, 8]
+  cnn: False
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.CosineAnnealingLR
+scheduler_params:
+  eta_min: 0
+trainer: training.train_msg3d.train_network
+num_epoch: 16
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 1
+save_location: ./results/stgcn/ucf101/
+model_type: stgcn2
+dataset: ucf101
+flow_embedding: base
+evaluation: 3
+run_name: stgcn2_ucf101_3_base
+description: stgcn2_train ucf101 3 base initial testing for ST-GCN++, dilation 1...
+data_path_overwrite: /var/tmp/jobfs/data/ucf101_03_D1.npz
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 508943
+	Loading weights from ./results/stgcn/ucf101/3/train/stgcn2_ucf101_3_base.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/stgcn/ucf101/3/train/stgcn2_ucf101_3_base.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/stgcn/ucf101/3/train/stgcn2_ucf101_3_base.pt
+		1 EPOCH BEST TEST ACC: 0.06881607323884964
+			Train time: 309.11 seconds
+			Test time: 299.59 seconds
+		2 EPOCH BEST TEST ACC: 0.18150106072425842
+			Train time: 301.26 seconds
+			Test time: 300.73 seconds
+		3 EPOCH BEST TEST ACC: 0.21236787736415863
+			Train time: 302.83 seconds
+			Test time: 308.49 seconds
+		4 EPOCH BEST TEST ACC: 0.29408034682273865
+			Train time: 324.50 seconds
+			Test time: 323.41 seconds
+		5 EPOCH BEST TEST ACC: 0.3053911328315735
+			Train time: 305.57 seconds
+			Test time: 300.40 seconds
+		6 EPOCH BEST TEST ACC: 0.3992600440979004
+			Train time: 302.59 seconds
+			Test time: 307.78 seconds
+		7 EPOCH BEST TEST ACC: 0.4286469519138336
+			Train time: 324.40 seconds
+			Test time: 307.46 seconds
+		8 EPOCH BEST TEST ACC: 0.44735729694366455
+			Train time: 305.75 seconds
+			Test time: 304.62 seconds
+		9 EPOCH BEST TEST ACC: 0.5011628270149231
+			Train time: 316.53 seconds
+			Test time: 303.39 seconds
+		10 EPOCH BEST TEST ACC: 0.5205073952674866
+			Train time: 303.68 seconds
+			Test time: 306.87 seconds
+		11 EPOCH BEST TEST ACC: 0.563530683517456
+			Train time: 316.54 seconds
+			Test time: 301.07 seconds
+
++-------------------- Job Report: 6395841 (TIMEOUT) --------------------+
+| Memory (RAM)  [####                ] 23.0% (1.1 GB peak / 5 GB)       |
+| CPU           [                    ]  5.0% average                    |
+| GPU           [                    ]  1.1% average                    |
+| Time          [------------------->] 100.3% (0-02:00:25 / 0-02:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write      Total IOPS                   |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   74.1 MB       0 B                    443                    |
+|   /fred   26.8 GB       44.3 MB                119                    |
+|   /home   0 B           0 B                      1                    |
+|   OS      1.6 MB        0 B                     94                    |
+|                                                                       |
+| Warnings:                                                             |
+|   - Too much memory requested                                         |
+|   - CPU usage is low                                                  |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+

@@ -1,0 +1,239 @@
+Mon Nov 17 10:44:30 AM AEDT 2025
+Copying file: ./data/ntu/aligned_data/ntu_CV-pose_aligned_mean.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CV-pose_aligned_mean.npz
+Data path: /var/tmp/jobfs/data/ntu_CV-pose_aligned_mean.npz
+Run name: msg3d_ntu_CV_base_ORIGINAL_MODEL
+
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-pose_aligned_mean.npz', 'CV': './data/ntu/aligned_data/ntu_CV-pose_aligned_mean.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 300
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+  no_Z: False
+  normalisation: True
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.msg3d.Model
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.ntu_rgb_d.Graph
+  in_channels: 3
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 40]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 50
+device: 0
+batch_size: 32
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ntu/
+model_type: msg3d
+dataset: ntu
+flow_embedding: base
+evaluation: CV
+obs_ratio: 1.0
+run_name: msg3d_ntu_CV_base_ORIGINAL_MODEL
+description: msg3d_train ntu CV base observation ratio 1.0, dilation 3...
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CV-pose_aligned_mean.npz
+debug: True
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 2194464
+	Loading weights from ./results/msg3d/ntu/CV/train/msg3d_ntu_CV_base_ORIGINAL_MODEL.pt
+Checkpoint file ./results/msg3d/ntu/CV/train/msg3d_ntu_CV_base_ORIGINAL_MODEL.pt does not contain a model state dict
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Resuming from checkpoint at epoch 0
+Key 'results' did not match... this may cause errors during training
+		1 EPOCH BEST TEST ACC: 0.19417734444141388
+			Train time: 582.41 seconds
+			Test time: 234.40 seconds
+		2 EPOCH BEST TEST ACC: 0.22645169496536255
+			Train time: 572.64 seconds
+			Test time: 235.07 seconds
+		3 EPOCH BEST TEST ACC: 0.24111460149288177
+			Train time: 571.90 seconds
+			Test time: 234.25 seconds
+		4 EPOCH BEST TEST ACC: 0.272698312997818
+			Train time: 572.28 seconds
+			Test time: 234.60 seconds
+		5 EPOCH BEST TEST ACC: 0.28087979555130005
+			Train time: 572.84 seconds
+			Test time: 233.78 seconds
+		6 EPOCH BEST TEST ACC: 0.29958030581474304
+			Train time: 571.98 seconds
+			Test time: 233.32 seconds
+		7 EPOCH BEST TEST ACC: 0.30754929780960083
+			Train time: 571.94 seconds
+			Test time: 234.95 seconds
+		8 EPOCH BEST TEST ACC: 0.3179355263710022
+			Train time: 572.69 seconds
+			Test time: 234.62 seconds
+		9 EPOCH BEST TEST ACC: 0.35010361671447754
+			Train time: 572.50 seconds
+			Test time: 234.21 seconds
+		10 EPOCH BEST TEST ACC: 0.37427616119384766
+			Train time: 572.50 seconds
+			Test time: 235.33 seconds
+		11 EPOCH BEST TEST ACC: 0.37427616119384766
+			Train time: 573.64 seconds
+			Test time: 235.57 seconds
+		12 EPOCH BEST TEST ACC: 0.38973596692085266
+			Train time: 574.28 seconds
+			Test time: 233.35 seconds
+		13 EPOCH BEST TEST ACC: 0.3974127471446991
+			Train time: 574.50 seconds
+			Test time: 233.96 seconds
+		14 EPOCH BEST TEST ACC: 0.4093130826950073
+			Train time: 574.10 seconds
+			Test time: 235.33 seconds
+		15 EPOCH BEST TEST ACC: 0.4093130826950073
+			Train time: 574.54 seconds
+			Test time: 235.36 seconds
+		16 EPOCH BEST TEST ACC: 0.43364500999450684
+			Train time: 574.10 seconds
+			Test time: 235.78 seconds
+		17 EPOCH BEST TEST ACC: 0.437363862991333
+			Train time: 573.75 seconds
+			Test time: 235.43 seconds
+		18 EPOCH BEST TEST ACC: 0.4383467137813568
+			Train time: 573.91 seconds
+			Test time: 234.66 seconds
+		19 EPOCH BEST TEST ACC: 0.4383467137813568
+			Train time: 573.70 seconds
+			Test time: 235.00 seconds
+		20 EPOCH BEST TEST ACC: 0.4718695282936096
+			Train time: 573.79 seconds
+			Test time: 235.43 seconds
+		21 EPOCH BEST TEST ACC: 0.4718695282936096
+			Train time: 574.20 seconds
+			Test time: 235.68 seconds
+		22 EPOCH BEST TEST ACC: 0.4807416498661041
+			Train time: 574.08 seconds
+			Test time: 234.85 seconds
+		23 EPOCH BEST TEST ACC: 0.4807416498661041
+			Train time: 576.53 seconds
+			Test time: 235.68 seconds
+		24 EPOCH BEST TEST ACC: 0.4807416498661041
+			Train time: 576.75 seconds
+			Test time: 235.38 seconds
+		25 EPOCH BEST TEST ACC: 0.4927482604980469
+			Train time: 575.26 seconds
+			Test time: 234.02 seconds
+		26 EPOCH BEST TEST ACC: 0.4927482604980469
+			Train time: 574.27 seconds
+			Test time: 236.36 seconds
+		27 EPOCH BEST TEST ACC: 0.506693959236145
+			Train time: 573.83 seconds
+			Test time: 236.94 seconds
+		28 EPOCH BEST TEST ACC: 0.506693959236145
+			Train time: 576.08 seconds
+			Test time: 234.49 seconds
+		29 EPOCH BEST TEST ACC: 0.506693959236145
+			Train time: 575.13 seconds
+			Test time: 234.86 seconds
+		30 EPOCH BEST TEST ACC: 0.5228709578514099
+			Train time: 573.53 seconds
+			Test time: 235.23 seconds
+		31 EPOCH BEST TEST ACC: 0.5269616842269897
+			Train time: 575.03 seconds
+			Test time: 234.06 seconds
+		32 EPOCH BEST TEST ACC: 0.5274398326873779
+			Train time: 574.83 seconds
+			Test time: 235.06 seconds
+		33 EPOCH BEST TEST ACC: 0.5389417409896851
+			Train time: 573.32 seconds
+			Test time: 235.11 seconds
+		34 EPOCH BEST TEST ACC: 0.54165118932724
+			Train time: 573.51 seconds
+			Test time: 235.18 seconds
+		35 EPOCH BEST TEST ACC: 0.54165118932724
+			Train time: 573.71 seconds
+			Test time: 233.85 seconds
+		36 EPOCH BEST TEST ACC: 0.54165118932724
+			Train time: 573.51 seconds
+			Test time: 235.87 seconds
+		37 EPOCH BEST TEST ACC: 0.5612282752990723
+			Train time: 572.85 seconds
+			Test time: 235.25 seconds
+		38 EPOCH BEST TEST ACC: 0.5612282752990723
+			Train time: 576.74 seconds
+			Test time: 234.78 seconds
+		39 EPOCH BEST TEST ACC: 0.5612282752990723
+			Train time: 574.49 seconds
+			Test time: 233.84 seconds
+		40 EPOCH BEST TEST ACC: 0.5612282752990723
+			Train time: 574.26 seconds
+			Test time: 237.25 seconds
+		41 EPOCH BEST TEST ACC: 0.5612282752990723
+			Train time: 572.22 seconds
+			Test time: 234.30 seconds
+		42 EPOCH BEST TEST ACC: 0.5696753859519958
+			Train time: 574.58 seconds
+			Test time: 235.24 seconds
+		43 EPOCH BEST TEST ACC: 0.5701801180839539
+			Train time: 574.97 seconds
+			Test time: 233.81 seconds
+		44 EPOCH BEST TEST ACC: 0.5817351341247559
+			Train time: 573.20 seconds
+			Test time: 236.24 seconds
+
++-------------------- Job Report: 6968083 (TIMEOUT) --------------------+
+| Memory (RAM)  [###############     ] 76.7% (26.8 GB peak / 35 GB)     |
+| CPU           [#################   ] 86.1% average                    |
+| GPU           [##################  ] 90.0% average                    |
+| Time          [------------------->] 100.0% (0-10:00:16 / 0-10:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write      Total IOPS                   |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   8 MB          0 B                    245                    |
+|   /fred   9.6 GB        69.1 MB                206                    |
+|   /home   0 B           0 B                      1                    |
+|   OS      1.2 MB        0 B                    191                    |
++-----------------------------------------------------------------------+

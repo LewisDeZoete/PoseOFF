@@ -1,0 +1,169 @@
+Copying file: ./data/ucf101/aligned_data/ucf101_02_D1.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ucf101_02_D1.npz
+Data path: /var/tmp/jobfs/data/ucf101_02_D1.npz
+Run name: stgcn2_ucf101_2_avg_D1
+
+### Libraries loaded
+feeder: feeders.ucf101.Feeder
+feeder_args:
+  data_paths: {1: './data/ucf101/aligned_data/ucf101_01_D1.npz', 2: './data/ucf101/aligned_data/ucf101_02_D1.npz', 3: './data/ucf101/aligned_data/ucf101_03_D1.npz'}
+  label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
+  p_interval: [0.5, 1]
+  random_shift: True
+  random_choose: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: True
+  absolute_flow: False
+  no_flow: False
+extractor:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/ucf101/pose/', 'flow_path': './data/ucf101/flow/', 'flowpose_path': './data/ucf101/flowpose/'}
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False}
+model: models.stgcn2.stgcn2.TEST_MODEL
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 2
+  base_channels: 64
+  data_bn_type: MVC
+  ch_ratio: 2
+  num_stages: 10
+  inflate_stages: ['5 8']
+  down_stages: [5, 8]
+  cnn: False
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.CosineAnnealingLR
+scheduler_params:
+  eta_min: 0
+trainer: training.train_msg3d.train_network
+num_epoch: 16
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 1
+save_location: ./results/stgcn/ucf101/
+model_type: stgcn2
+dataset: ucf101
+flow_embedding: avg
+evaluation: 2
+run_name: stgcn2_ucf101_2_avg_D1
+description: stgcn2_train ucf101 2 avg initial testing for ST-GCN++, dilation 1...
+data_path_overwrite: /var/tmp/jobfs/data/ucf101_02_D1.npz
+verbose: True
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 509463
+	Loading weights from ./results/stgcn/ucf101/2/train/stgcn2_ucf101_2_avg_D1.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/stgcn/ucf101/2/train/stgcn2_ucf101_2_avg_D1.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/stgcn/ucf101/2/train/stgcn2_ucf101_2_avg_D1.pt
+		1 EPOCH BEST TEST ACC: 0.06827564537525177
+			Train time: 49.57 seconds
+			Test time: 44.57 seconds
+		2 EPOCH BEST TEST ACC: 0.18482057750225067
+			Train time: 45.48 seconds
+			Test time: 45.02 seconds
+		3 EPOCH BEST TEST ACC: 0.26918599009513855
+			Train time: 45.18 seconds
+			Test time: 45.25 seconds
+		4 EPOCH BEST TEST ACC: 0.26918599009513855
+			Train time: 45.82 seconds
+			Test time: 44.62 seconds
+		5 EPOCH BEST TEST ACC: 0.3325923681259155
+			Train time: 45.20 seconds
+			Test time: 44.92 seconds
+		6 EPOCH BEST TEST ACC: 0.4054197072982788
+			Train time: 45.23 seconds
+			Test time: 44.64 seconds
+		7 EPOCH BEST TEST ACC: 0.4523128867149353
+			Train time: 45.08 seconds
+			Test time: 44.27 seconds
+		8 EPOCH BEST TEST ACC: 0.5321266055107117
+			Train time: 45.04 seconds
+			Test time: 44.53 seconds
+		9 EPOCH BEST TEST ACC: 0.5637768507003784
+			Train time: 45.08 seconds
+			Test time: 44.81 seconds
+		10 EPOCH BEST TEST ACC: 0.6043187975883484
+			Train time: 45.32 seconds
+			Test time: 44.34 seconds
+		11 EPOCH BEST TEST ACC: 0.6373451948165894
+			Train time: 45.12 seconds
+			Test time: 44.62 seconds
+		12 EPOCH BEST TEST ACC: 0.661056399345398
+			Train time: 45.13 seconds
+			Test time: 44.57 seconds
+		13 EPOCH BEST TEST ACC: 0.6917539834976196
+			Train time: 44.90 seconds
+			Test time: 44.68 seconds
+		14 EPOCH BEST TEST ACC: 0.7107018232345581
+			Train time: 45.19 seconds
+			Test time: 44.54 seconds
+		15 EPOCH BEST TEST ACC: 0.7137715816497803
+			Train time: 45.28 seconds
+			Test time: 44.41 seconds
+		16 EPOCH BEST TEST ACC: 0.7137715816497803
+			Train time: 45.21 seconds
+			Test time: 44.57 seconds
+	Best train ACC: 0.7024452090263367
+	Best test ACC: 0.7137715816497803
+	Training time:         0:24:02
+
++------------------ Job Report: 6395835 (COMPLETED) -------------------+
+| Memory (RAM)  [######              ] 32.3% (1.6 GB peak / 5 GB)      |
+| CPU           [###############     ] 76.5% average                   |
+| GPU           [#                   ]  5.7% average                   |
+| Time          [---->               ] 20.7% (0-00:24:49 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.6 MB        0 B                    208                   |
+|   /fred   26.4 GB       60.5 MB                 96                   |
+|   /home   0 B           0 B                      1                   |
+|   OS      28 KB         0 B                     16                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
