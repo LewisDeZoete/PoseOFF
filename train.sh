@@ -8,6 +8,9 @@ export PYTHONUNBUFFERED=TRUE
 
 source ../environment/bin/activate
 
+# Print the date...
+date
+
 # Create directory on job file system to move dataset to
 mkdir $JOBFS/data
 
@@ -33,12 +36,13 @@ echo "Data path: ${data_path}"
 echo -e "Run name: ${run_name}\n"
 
 
-
+# -m : model (eg. infogcn2, msg3d)
 # -d : dataset (eg. ntu)
 # -p : phase (for train.sh, it's train)
-# -m : model_type (base, cnn, abs, avg)
-#         ./config/{dataset}/{model_type}.yaml
+# -f : flow_embedding (base, cnn, abs, avg)
+#         ./config/{dataset}/{flow_embedding}.yaml
 # -e : evaluation (eg. CV for ntu, CSet for ntu120, 2 for ucf101)
+# -o : observation ratio for training and testing (default 1.0)
 # -r : run_name (eg. nturgbd_CV_cnn_full_flow)
 #         checkpoint_file = '{arg.save_location}/{evaluation}/run_name'
 # --desc : description (eg. 'nturgbd-cross-view cnn full flow')
@@ -46,11 +50,16 @@ echo -e "Run name: ${run_name}\n"
 # -v : verbose
 
 srun python main.py \
+     -m "${model}" \
      -d "${dataset}" \
      -p "${phase}" \
-     -m "${model_type}" \
+     -f "${flow_embedding}" \
      -e "${evaluation}" \
+     -o "${obs_ratio}" \
      -r "${run_name}" \
      --desc "${desc}" \
      --data_path_overwrite "${data_path}" \
+     --debug "$debug" \
      -v
+     # -v \
+     # --debug
