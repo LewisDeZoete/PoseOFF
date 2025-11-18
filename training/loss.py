@@ -39,6 +39,7 @@ class LabelSmoothingCrossEntropy(nn.Module):
         return loss.mean()
 
 class AverageMeter(object):
+    # TODO: Move this into it's own file...
     """Computes and stores the average and current value"""
 
     def __init__(self):
