@@ -1,5 +1,6 @@
 import yaml
 import argparse
+import importlib
 
 class ArgClass(object):
     def __init__(self, arg, verbose=False):
@@ -13,7 +14,8 @@ class ArgClass(object):
         # as an argparse object
         if isinstance(arg, argparse.Namespace):
             # Get arg file
-            with open(f'./config/{arg.dataset}/{arg.model_type}.yaml', 'r') as file:
+            # with open(f'./config/{arg.dataset}/{arg.model_type}.yaml', 'r') as file:
+            with open(f'./config/{arg.model_type}/{arg.dataset}/{arg.flow_embedding}.yaml', 'r') as file:
                 in_dict = yaml.safe_load(file)
             # Also add the attributes in parser to the arg class
             for key in arg.__dict__:
@@ -54,27 +56,51 @@ class ArgClass(object):
         # for elem, key in enumerate(dict.fromkeys(key.split('_')[-1] for key in self.feeder_args['labels'].keys())):
         #     self.classes[key] = elem
     
-    def import_class(self, name):
-        components = name.split('.')
-        mod = __import__(components[0])
-        for comp in components[1:]:
-            mod = getattr(mod, comp)
-        return mod
+    # def import_class(self, name):
+    #     components = name.split('.')
+    #     mod = __import__(components[0])
+    #     for comp in components[1:]:
+    #         mod = getattr(mod, comp)
+    #         return mod
+
+    def import_class(self, path: str):
+        """Dynamically import a class from a string path."""
+        module_path, class_name = path.rsplit('.', 1)
+        module = importlib.import_module(module_path)
+        return getattr(module, class_name)
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', dest='config', default='ucf101',
-                        help='config dictionary location (default=ucf101)')
-    parser.add_argument('-p', dest='phase', default='test',
-                        help='network phase [train, test] (default=test)')
-    parser.add_argument( "-m", dest="model_type", 
-                        default="base", help="model type [base, cnn, avg, abs] (default=base)")
-    parser.add_argument('-s', dest='save_name', default='',
-                        help='name to save the results dictionary as after training')
+    parser.add_argument(
+        "-m", dest="model_type", default="infogcn2",
+        help="Base model_type (e.g. infogcn2, msg3d, stgcn2)"
+    )
+    parser.add_argument(
+        "-d", dest="dataset", default="ucf101",
+        help="config dictionary location (default=ucf101)",
+    )
+    parser.add_argument(
+        "-p", dest="phase", default="train",
+        help="model phase (train/eval)"
+    )
+    parser.add_argument(
+        "-f", dest="flow_embedding", default="base",
+        help="model type [base, cnn, avg, abs] (default=base)"
+    )
+    parser.add_argument(
+        "-e", dest="evaluation",
+        help="Evaluation benchmark used for specific dataset \
+            (eg. 1-3 for ucf101, CV/CS for NTU_RGB+D)"
+    )
+    parser.add_argument(
+        "-v", dest="verbose", action="store_true", help="Print verbose output for argparse"
+    )
     parsed = parser.parse_args()
     
-    arg = ArgClass(parsed)   
+    arg = ArgClass(parsed)
+
     feeder = arg.import_class(arg.feeder)
+    model = arg.import_class(arg.model)
+    print(arg.model)
     print(arg.feeder_args['data_paths'])
-    
