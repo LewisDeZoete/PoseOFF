@@ -2,20 +2,14 @@
 
 from config.argclass import ArgClass
 import time
+import math
 from torch.utils.data import DataLoader
 import logging
 import argparse
 import os.path as osp
 from einops import rearrange
+import numpy as np
 
-# Create logger
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    filename='./logs/debug/feeders/ntu_feeder.log',
-    encoding="utf-8",
-    filemode="w",
-    level=logging.DEBUG
-)
 
 # Argparser to test data moved to the slurm jobfs directory
 parser = argparse.ArgumentParser()
@@ -23,7 +17,7 @@ parser.add_argument(
     "-d",
     dest="dataset",
     default="ntu",
-    help="Config dictionary location (default=ucf101)",
+    help="Config dictionary location (default=ntu)",
 )
 parser.add_argument(
     "-f",
@@ -46,15 +40,24 @@ parser.add_argument(
 )
 parsed = parser.parse_args()
 
+
 assert parsed.evaluation in ['CV', 'CS', 'CSub', 'CSet']
 assert parsed.flow_embedding in ['base', 'cnn']
 
-# CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
+# Set the variables
 model_type = "msg3d"
 dataset = parsed.dataset
 evaluation = parsed.evaluation
 flow_embedding = parsed.flow_embedding
 
+# Create logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    filename=f"./logs/debug/data_gen/get_mean_map_{dataset}.log",
+    encoding="utf-8",
+    filemode="w",
+    level=logging.DEBUG
+)
 
 arg = ArgClass(f"config/{model_type}/{dataset}/{flow_embedding}.yaml", verbose=True)
 arg.feeder_args['eval'] = evaluation
@@ -67,19 +70,20 @@ if parsed.data_path_overwrite is not None:
     arg.feeder_args['use_mmap'] = True
     arg.feeder_args['data_paths'][parsed.evaluation] = parsed.data_path_overwrite
 
-logger.debug(f"Feeder testing for dataset: {dataset}")
+logger.debug(f"Datagen testing for dataset: {dataset}")
 logger.debug(f"\tFlow embedding: {flow_embedding}")
 logger.debug(f"\tEvaluation: {evaluation}")
 logger.debug(f"\tData path: {arg.feeder_args['data_paths'][evaluation]}")
 
 # Create the dataset objects
-train_feeder = Feeder(
+FeederClass = arg.import_class(arg.feeder)
+train_feeder = FeederClass(
     **arg.feeder_args,
     split="train",
     debug=parsed.debug
 )
 logger.debug(f"\tTrain feeder length: {len(train_feeder)}")
-test_feeder = Feeder(
+test_feeder = FeederClass(
     **arg.feeder_args,
     split="test",
     debug=parsed.debug)
@@ -136,6 +140,7 @@ for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
     total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
 
 mean_map = (sum_map / total)
+mean_map = rearrange(mean_map, 'C V -> C 1 V 1')
 
 
 # After mean map calculations, we can calculate standard deviation map
@@ -146,7 +151,7 @@ for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader)
     # data_numpy shape: (B, C, T, V, M)
     B, C, T, V, M = data_numpy.shape
     data_numpy_t = rearrange(data_numpy, 'B C T V M -> (B T M) (C V)')
-    mean_flat = rearrange(mean_map, 'C V -> 1 (C V)')
+    mean_flat = rearrange(mean_map, 'C 1 V 1 -> 1 (C V)')
     sq_diff = (data_numpy_t - mean_flat) ** 2
     sq_diff_sum += sq_diff.sum(axis=0).numpy()
 
@@ -155,7 +160,7 @@ for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
     # data_numpy shape: (B, C, T, V, M)
     B, C, T, V, M = data_numpy.shape
     data_numpy_t = rearrange(data_numpy, 'B C T V M -> (B T M) (C V)')
-    mean_flat = rearrange(mean_map, 'C V -> 1 (C V)')
+    mean_flat = rearrange(mean_map, 'C 1 V 1 -> 1 (C V)')
     sq_diff = (data_numpy_t - mean_flat) ** 2
     sq_diff_sum += sq_diff.sum(axis=0).numpy()
 
@@ -172,7 +177,9 @@ logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
 logger.debug(f"\tMask shape: {mask.shape}")
 logger.debug(f"\tLabel shape: {label.shape}")
 
+logger.debug(f"mean map shape: {mean_map.shape}") # (3/53, 1, 25, 1)
 logger.debug(f"mean map: {mean_map}")
+logger.debug(f"standard deviation map shape: {std_map.shape}") # (3/53, 1, 25, 1)
 logger.debug(f"standard deviation map: {std_map}")
 logger.debug(f"train labels: {debug_labels['train']}")
 logger.debug(f"test labels: {debug_labels['test']}")
