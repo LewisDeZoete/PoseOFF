@@ -13,6 +13,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 # - edit the `plot_data` for specific extensions (keys) and plot params
 #      python ./results/visualisations/results_vis.py
 
+model_type = "msg3d" # infogcn2, msg3d, stgcn2
 dataset = 'ntu'  # ntu, ntu120, ucf101
 evaluation = 'CS'  # CS/CV, CSub/CSet, 1/2/3
 dilation = 3
@@ -27,11 +28,11 @@ cls_pred = False # REQUIRES EVAL
 # ----------------------------------------------------
 
 # Where to load the results dictionaries (checkpoints) from
-results_root = f"results/{dataset}/{evaluation}/train"
+results_root = f"results/{model_type}/{dataset}/{evaluation}/train"
 # We use the train results dict for now
 
 # Create a directory, ignoring if it already exists
-save_root = osp.join('results/plots/', f'{dataset}/{evaluation}/')
+save_root = f"./results/plots/{model_type}/{dataset}/{evaluation}/"
 os.makedirs(save_root, exist_ok=True)
 
 # Define plotting parameters, the extension is the name of the checkpoint
@@ -48,7 +49,7 @@ plot_data = {
 }
 
 for extension, data in plot_data.items():
-    filename = osp.join(results_root, f"{dataset}_{evaluation}_{extension}.pt")
+    filename = osp.join(results_root, f"{model_type}_{dataset}_{evaluation}_{extension}.pt")
     if os.path.exists(filename):
         data['results'] = torch.load(filename, map_location='cpu')['results']
         plot_data[extension] = data
@@ -72,7 +73,8 @@ dataset_str_dict = {
 # Figure titles!
 fig_title = f'{dataset_str_dict[dataset]} - {eval_str_dict[evaluation]}'
 print(
-    f'Plotting results for {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]} evaluation')
+    f'Plotting results for {model_type} trained on\
+    {dataset_str_dict[dataset]} - {eval_str_dict[evaluation]} evaluation')
 
 # ------------------------------
 #   Loss comparison graphing
@@ -130,7 +132,7 @@ def to_percentage(result):
 
 
 def plot_accuracy(
-        fig_title: str, x, save_root, plot_data
+        fig_title: str, x, model_type: str, save_root, plot_data
 ):
     """
     Plot the accuracy comparison graph for different models.
@@ -141,38 +143,6 @@ def plot_accuracy(
         plot_data: (dict) containing plotting parameters and plotting data.
             {"extension": {"plot_params": {...}, "results": {...}}}
     """
-    # Create figure and axes
-    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
-    # fig.suptitle(f'Accuracy Comparison - {fig_title}', fontsize=30)
-    # for ax in (ax1, ax2):
-    #     ax.tick_params(axis='both', which='major', labelsize=20)
-    #     ax.set_xlabel('Epoch', fontsize=20)
-    #     ax.set_ylim(0, 100)  # 0-100% accuracy
-    #     ax.set_xlim(0, 70)  # 0-70 epochs
-    #     ax.axvline(x=50, color='black', linestyle='--', alpha=0.2)  # Epoch 50
-    #     ax.axvline(x=60, color='black', linestyle='--', alpha=0.2)  # Epoch 60
-    #     # ax.set_xscale('log')
-    # ax1.set_ylabel('Classification accuracy %', fontsize=20)
-
-    # for data in plot_data.values():
-    #     try:
-    #         # Plot train and test AUC
-    #         ax1.plot(x, to_percentage(data['results']['train_AUC']),
-    #                  **data['plot_params'])
-    #         ax2.plot(x, to_percentage(data['results']['test_AUC']),
-    #                  **data['plot_params'])
-    #         print(f"\t\t{data['plot_params']['label']}:  "
-    #         f"{to_percentage(data['results']['test_ACC'][-1])[-1]:.2f}%")
-    #     except TypeError:
-    #         print(f"Failed to plot {data['plot_params']['label']}")
-
-    # # Set titles and legends
-    # ax1.set_title('Train accuracy', fontsize=25)
-    # ax2.set_title('Test accuracy', fontsize=25)
-    # ax1.legend(loc=4, prop={'size': 20})
-
-    # os.makedirs(osp.join(save_root, 'accuracy'), exist_ok=True)
-    # plt.savefig(osp.join(save_root, 'accuracy/Acc_comparison_simple.png'))
     fig, ax = plt.subplots(1, 1, figsize=(10, 8))
     fig.suptitle(f'Accuracy Comparison - {fig_title}', fontsize=20)
     ax.tick_params(axis='both', which='major', labelsize=15)
@@ -184,8 +154,9 @@ def plot_accuracy(
 
     for data in plot_data.values():
         try:
+            plot_metric = 'test_AUC' if dataset == 'infogcn2' else 'test_ACC'
             # Plot test AUC
-            ax.plot(x, to_percentage(data['results']['test_AUC']),
+            ax.plot(x, to_percentage(data['results'][plot_metric]),
                      **data['plot_params'])
             print(f"\t\t{data['plot_params']['label']}:  "
             f"{to_percentage(data['results']['test_ACC'][-1])[-1]:.2f}%")
@@ -404,7 +375,7 @@ if __name__ == '__main__':
         # Plot the accuracy comparison
         print("\tPlotting accuracy comparison")
         plot_accuracy(
-            fig_title, x, save_root, plot_data
+            fig_title, x, model_type, save_root, plot_data
         )
 
     if obs:
