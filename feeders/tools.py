@@ -4,6 +4,7 @@ These are all effectively augments to be used during dataloading.
 
 import random
 import numpy as np
+import math
 
 import torch
 import torch.nn.functional as F
@@ -80,6 +81,23 @@ def valid_crop_resize(
     return data
 
 
+def obs_mask(data_numpy, obs_ratio: float = 1.0):
+    '''Temporal masking of the sequence by duplicating last observed frame.
+    Args:
+        data_numpy (np.array): Input data with shape (C, T, V, M).
+        obs_ratio (float): Ratio of sequence to KEEP (default: 1.0)
+    Returns:
+        np.array: Processed data with shape (C, T*obs_ratio, V, M).
+    '''
+    C, T, V, M = data_numpy.shape
+    pad_frame_no = int(obs_ratio*T)-1
+    data_numpy[:, pad_frame_no:, ...] = np.expand_dims(
+        data_numpy[:, pad_frame_no, ...],
+        axis=1
+        )
+    return data_numpy
+
+
 def downsample(data_numpy, step, random_sample=True):
     # input: C,T,V,M
     begin = np.random.randint(step) if random_sample else 0
@@ -108,25 +126,37 @@ def mean_subtractor(data_numpy, mean):
     return data_numpy
 
 
-def auto_padding(data_numpy, window_size=64, random_pad=False):
-    """
-    Pads the input data to a specified window size.
+def auto_padding(data_numpy, window_size:int=64, pad_method:str='last_frame'):
+    """Pads the input data to a specified window size.
 
-    Parameters:
-    data_numpy (numpy.ndarray): Input data array with shape (C, T, V, M).
-    window_size (int, optional): The size of the window to pad to. Default is 64.
-    random_pad (bool, optional): If True, pads the data at a random starting position.
-                                 If False, pads the data at the beginning. Default is False.
+    Args:
+        data_numpy (numpy.ndarray): Input data array with shape (C, T, V, M).
+        window_size (int, optional): The size of the window to pad to. Default is 64.
+        pad_method (str, optional): Pad data_numpy time dimension using either
+            ['last_frame', 'replay'](default = 'last_frame').
 
     Returns:
-    numpy.ndarray: Padded data array with shape (C, window_size, V, M) if T < window_size,
-                   otherwise returns the original data array.
+        numpy.ndarray: Padded data array with shape (C, window_size, V, M) if T < window_size,
+            otherwise returns the original data array.
     """
     C, T, V, M = data_numpy.shape
+    assert pad_method in ['last_frame', 'replay'], \
+        "Pad method must be either 'last_frame' or 'replay'"
     if T < window_size:
-        begin = random.randint(0, window_size - T) if random_pad else 0
-        data_numpy_paded = np.zeros((C, window_size, V, M))
-        data_numpy_paded[:, begin : begin + T, :, :] = data_numpy
+        if pad_method == 'last_frame':
+            data_numpy_paded = np.zeros((C, window_size, V, M))
+            data_numpy_paded[:, :T, ...] = data_numpy
+            data_numpy_paded[:, T:, ...] = np.repeat(
+                np.expand_dims(data_numpy[:, -1, ...], axis=1),
+                window_size-T,
+                axis=1
+            )
+        else:
+            data_numpy_paded = np.concatenate(
+                [data_numpy for i in range(math.ceil(window_size/T))],
+                axis=1
+                )[:, :window_size]
+            pass
         return data_numpy_paded
     else:
         return data_numpy
@@ -136,20 +166,20 @@ def random_choose(data_numpy, window_size=64, auto_pad=True):
     """
     Randomly selects a window of data from the input numpy array.
 
-    Parameters:
-    data_numpy (numpy.ndarray): The input data array with shape (C, T, V, M).
-    window_size (int, optional): The size of the window to select. Default is 64.
-    auto_pad (bool, optional): If True, pads the data if T < window_size. Default is True.
+    Args:
+        data_numpy (numpy.ndarray): The input data array with shape (C, T, V, M).
+        window_size (int, optional): The size of the window to select. Default is 64.
+        auto_pad (bool, optional): If True, pads the data if T < window_size. Default is True.
 
     Returns:
-    numpy.ndarray: The selected window of data with shape (C, window_size, V, M).
+        numpy.ndarray: The selected window of data with shape (C, window_size, V, M).
     """
     C, T, V, M = data_numpy.shape
     if T == window_size:
         return data_numpy
     elif T < window_size:
         if auto_pad:
-            return auto_padding(data_numpy, window_size, random_pad=True)
+            return auto_padding(data_numpy, window_size)
         else:
             return data_numpy
     else:
@@ -401,23 +431,73 @@ def random_rot(data_numpy, theta=0.3):
 
 
 if __name__ == "__main__":
-    data = np.load("data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy")
+    from feeders.ntu_rgb_d import Feeder
+    from config.argclass import ArgClass
+    import logging
+
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename='./logs/debug/feeders/feeder_tools.log',
+        encoding="utf-8",
+        filemode="w",
+        level=logging.DEBUG
+    )
+
+    # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
+    model_type = "stgcn2"
+    dataset = "ntu"
+    evaluation = "CV"
+    flow_embedding = "cnn"
+    obs_ratio = 0.6
+
+    arg = ArgClass(f"config/{model_type}/{dataset}/{flow_embedding}.yaml")
+    arg.feeder_args['eval'] = evaluation
+    arg.feeder_args['obs_ratio'] = obs_ratio
+    arg.feeder_args['window_size'] = 15 # Get a window of size 15 so we can test padding
+
+    feeder = Feeder(**arg.feeder_args, split="train")
+
+    data, label, _,_ = feeder[30]
     C, T, V, M = data.shape
-    print("(Channels, Time, Joints, Bodies)")
-    print(f"Original shape: {data.shape}")
+    logger.debug(f"Data shape (C, T, V, M): {data.shape}")
+    logger.debug(f"Label: {label}")
 
-    # Crop temporal dimension to only include valid frames
-    valid_frame = data.sum(0, keepdims=True).sum(2, keepdims=True)
-    valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
-    data = valid_crop_resize(data, valid_frame_num, p_interval=[0.95], window_size=64)
-    print(f"{data.shape} - valid_crop_resize")
+    data_pad_last_frame = auto_padding(data, 100)
+    data_pad_replay = auto_padding(data, 100, pad_method="replay")
 
-    for transform in [
-        random_shift,
-        random_choose,
-        auto_padding,
-        random_move,
-        absolute_flow,
-    ]:
-        data = transform(data)
-        print(f"{data.shape} - {transform.__name__}")
+    logger.debug(f"Last frame padding shape: {data_pad_last_frame.shape}")
+    logger.debug(f"Last frame padding (first frame): {data_pad_last_frame[:3, 0, 0, 0]}")
+    logger.debug(f"Last frame padding (last valid frame): {data_pad_last_frame[:3, 14, 0, 0]}")
+    logger.debug(f"Last frame padding (last valid frame+1): {data_pad_last_frame[:3, 15, 0, 0]}")
+    logger.debug(f"Last frame padding (last frame): {data_pad_last_frame[:3, -1, 0, 0]}\n")
+
+    logger.debug(f"Relay padding shape: {data_pad_replay.shape}")
+    logger.debug(f"Replay padding (first frame): {data_pad_replay[:3, 0, 0, 0]}")
+    logger.debug(f"Replay padding (last valid frame-1): {data_pad_replay[:3, 13, 0, 0]}")
+    logger.debug(f"Replay padding (last valid frame): {data_pad_replay[:3, 14, 0, 0]}")
+    logger.debug(f"Replay padding (last valid frame+1): {data_pad_replay[:3, 15, 0, 0]}")
+    logger.debug(f"Replay padding (last frame-1): {data_pad_replay[:3, -2, 0, 0]}")
+    logger.debug(f"Replay padding (last frame): {data_pad_replay[:3, -1, 0, 0]}")
+
+
+    # data = np.load("data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy")
+    # C, T, V, M = data.shape
+    # print("(Channels, Time, Joints, Bodies)")
+    # print(f"Original shape: {data.shape}")
+
+    # # Crop temporal dimension to only include valid frames
+    # valid_frame = data.sum(0, keepdims=True).sum(2, keepdims=True)
+    # valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
+    # data = valid_crop_resize(data, valid_frame_num, p_interval=[0.95], window_size=64)
+    # print(f"{data.shape} - valid_crop_resize")
+
+    # for transform in [
+    #     random_shift,
+    #     random_choose,
+    #     auto_padding,
+    #     random_move,
+    #     absolute_flow,
+    # ]:
+    #     data = transform(data)
+    #     print(f"{data.shape} - {transform.__name__}")
