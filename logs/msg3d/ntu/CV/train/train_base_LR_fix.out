@@ -1,11 +1,11 @@
-Wed Nov 19 16:07:39 AEDT 2025
+Thu Nov 20 05:53:20 PM AEDT 2025
 Copying file: ./data/ntu/aligned_data/ntu_CV-pose_aligned_mean.npz to /var/tmp/jobfs/data
 Dataset copied to JOBFS: ntu_CV-pose_aligned_mean.npz
 Data path: /var/tmp/jobfs/data/ntu_CV-pose_aligned_mean.npz
 Run name: msg3d_ntu_CV_base_LR_fix
 
 Python script run command arguments:
-python main.py -m msg3d -d ntu -p train -f base -e CV -o 1.0 -r msg3d_ntu_CV_base_LR_fix --desc msg3d_train ntu CV base Fixed LR Scheduler, original model with no data augmentation using the REPLAY padding method --data_path_overwrite /var/tmp/jobfs/data/ntu_CV-pose_aligned_mean.npz -v
+python main.py -m msg3d -d ntu -p train -f base -e CV -o 1.0 -r msg3d_ntu_CV_base_LR_fix --desc msg3d_train ntu CV base Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method --data_path_overwrite /var/tmp/jobfs/data/ntu_CV-pose_aligned_mean.npz -v
 ### Libraries loaded
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
@@ -63,7 +63,7 @@ flow_embedding: base
 evaluation: CV
 obs_ratio: 1.0
 run_name: msg3d_ntu_CV_base_LR_fix
-description: msg3d_train ntu CV base Fixed LR Scheduler, original model with no data augmentation using the REPLAY padding method
+description: msg3d_train ntu CV base Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method
 data_path_overwrite: /var/tmp/jobfs/data/ntu_CV-pose_aligned_mean.npz
 verbose: True
 debug: False
@@ -71,8 +71,8 @@ debug: False
 	Output device: cuda:0
 	Model total number of params: 2194464
 	Loading weights from ./results/msg3d/ntu/CV/train/msg3d_ntu_CV_base_LR_fix.pt
-	Checkpoint file does not yet exist
-		([Errno 2] No such file or directory: './results/msg3d/ntu/CV/train/msg3d_ntu_CV_base_LR_fix.pt')
+	Total number of weights removed: 0
+	Pretrained model loaded
 ### Model created
 	Loaded data using mmap mode
 	Self.data assigned
@@ -92,7 +92,7 @@ debug: False
 		test_ACC
 		train_cls_loss
 		test_cls_loss
-	Created new checkpoint file: ./results/msg3d/ntu/CV/train/msg3d_ntu_CV_base_LR_fix.pt
+	Resuming from checkpoint at epoch 40
 		1 EPOCH BEST TEST ACC: 0.4746055603027344
 			Train time: 579.17 seconds
 			Test time: 195.40 seconds
@@ -114,13 +114,13 @@ debug: False
 		7 EPOCH BEST TEST ACC: 0.7327737808227539
 			Train time: 567.14 seconds
 			Test time: 194.26 seconds
-		8 EPOCH BEST TEST ACC: 0.7327737808227539
+		8 EPOCH BEST TEST ACC: 0.6113531589508057
 			Train time: 566.77 seconds
 			Test time: 194.18 seconds
 		9 EPOCH BEST TEST ACC: 0.7384848594665527
 			Train time: 566.70 seconds
 			Test time: 193.66 seconds
-		10 EPOCH BEST TEST ACC: 0.7384848594665527
+		10 EPOCH BEST TEST ACC: 0.7371566891670227
 			Train time: 566.82 seconds
 			Test time: 193.99 seconds
 		11 EPOCH BEST TEST ACC: 0.7561228275299072
@@ -129,28 +129,28 @@ debug: False
 		12 EPOCH BEST TEST ACC: 0.7756733894348145
 			Train time: 566.75 seconds
 			Test time: 193.96 seconds
-		13 EPOCH BEST TEST ACC: 0.7756733894348145
+		13 EPOCH BEST TEST ACC: 0.7612230181694031
 			Train time: 566.95 seconds
 			Test time: 195.59 seconds
-		14 EPOCH BEST TEST ACC: 0.7756733894348145
+		14 EPOCH BEST TEST ACC: 0.7334644198417664
 			Train time: 567.01 seconds
 			Test time: 194.65 seconds
-		15 EPOCH BEST TEST ACC: 0.7756733894348145
+		15 EPOCH BEST TEST ACC: 0.7683419585227966
 			Train time: 567.14 seconds
 			Test time: 194.28 seconds
-		16 EPOCH BEST TEST ACC: 0.7756733894348145
+		16 EPOCH BEST TEST ACC: 0.6437072157859802
 			Train time: 567.48 seconds
 			Test time: 194.84 seconds
 		17 EPOCH BEST TEST ACC: 0.7820751667022705
 			Train time: 567.27 seconds
 			Test time: 197.53 seconds
-		18 EPOCH BEST TEST ACC: 0.7820751667022705
+		18 EPOCH BEST TEST ACC: 0.747808575630188
 			Train time: 567.25 seconds
 			Test time: 198.13 seconds
-		19 EPOCH BEST TEST ACC: 0.7820751667022705
+		19 EPOCH BEST TEST ACC: 0.6891568899154663
 			Train time: 567.31 seconds
 			Test time: 198.37 seconds
-		20 EPOCH BEST TEST ACC: 0.7820751667022705
+		20 EPOCH BEST TEST ACC: 0.7545821666717529
 			Train time: 567.39 seconds
 			Test time: 198.35 seconds
 		21 EPOCH BEST TEST ACC: 0.7853955626487732
@@ -159,28 +159,28 @@ debug: False
 		22 EPOCH BEST TEST ACC: 0.7884237766265869
 			Train time: 567.87 seconds
 			Test time: 196.45 seconds
-		23 EPOCH BEST TEST ACC: 0.7884237766265869
+		23 EPOCH BEST TEST ACC: 0.7797110080718994
 			Train time: 567.46 seconds
 			Test time: 195.24 seconds
-		24 EPOCH BEST TEST ACC: 0.7884237766265869
+		24 EPOCH BEST TEST ACC: 0.5586516857147217
 			Train time: 567.48 seconds
 			Test time: 195.37 seconds
-		25 EPOCH BEST TEST ACC: 0.7884237766265869
+		25 EPOCH BEST TEST ACC: 0.7503586411476135
 			Train time: 569.12 seconds
 			Test time: 196.52 seconds
 		26 EPOCH BEST TEST ACC: 0.8070180416107178
 			Train time: 568.51 seconds
 			Test time: 196.57 seconds
-		27 EPOCH BEST TEST ACC: 0.8070180416107178
+		27 EPOCH BEST TEST ACC: 0.6497635841369629
 			Train time: 569.40 seconds
 			Test time: 197.14 seconds
-		28 EPOCH BEST TEST ACC: 0.8070180416107178
+		28 EPOCH BEST TEST ACC: 0.5308399200439453
 			Train time: 569.29 seconds
 			Test time: 197.04 seconds
-		29 EPOCH BEST TEST ACC: 0.8070180416107178
+		29 EPOCH BEST TEST ACC: 0.5974339842796326
 			Train time: 568.96 seconds
 			Test time: 195.74 seconds
-		30 EPOCH BEST TEST ACC: 0.8070180416107178
+		30 EPOCH BEST TEST ACC: 0.7750093340873718
 			Train time: 569.17 seconds
 			Test time: 197.00 seconds
 		31 EPOCH BEST TEST ACC: 0.9002816081047058
@@ -195,7 +195,7 @@ debug: False
 		34 EPOCH BEST TEST ACC: 0.9291558265686035
 			Train time: 568.68 seconds
 			Test time: 194.86 seconds
-		35 EPOCH BEST TEST ACC: 0.9291558265686035
+		35 EPOCH BEST TEST ACC: 0.9234713315963745
 			Train time: 568.75 seconds
 			Test time: 195.69 seconds
 		36 EPOCH BEST TEST ACC: 0.9398342967033386
@@ -210,39 +210,58 @@ debug: False
 		39 EPOCH BEST TEST ACC: 0.9471391439437866
 			Train time: 568.77 seconds
 			Test time: 192.37 seconds
-		40 EPOCH BEST TEST ACC: 0.9471391439437866
+		40 EPOCH BEST TEST ACC: 0.933299720287323
 			Train time: 569.29 seconds
 			Test time: 193.33 seconds
-		41 EPOCH BEST TEST ACC: 0.9598098397254944
-			Train time: 569.35 seconds
-			Test time: 189.48 seconds
-		42 EPOCH BEST TEST ACC: 0.9641662240028381
-			Train time: 572.42 seconds
-			Test time: 191.49 seconds
-		43 EPOCH BEST TEST ACC: 0.9666631817817688
-			Train time: 567.73 seconds
-			Test time: 189.68 seconds
-		44 EPOCH BEST TEST ACC: 0.9680444598197937
-			Train time: 569.30 seconds
-			Test time: 188.63 seconds
-		45 EPOCH BEST TEST ACC: 0.9680975675582886
-			Train time: 567.85 seconds
-			Test time: 187.72 seconds
-		46 EPOCH BEST TEST ACC: 0.9680975675582886
-			Train time: 566.65 seconds
-			Test time: 186.22 seconds
+		41 EPOCH BEST TEST ACC: 0.9599692225456238
+			Train time: 576.41 seconds
+			Test time: 193.84 seconds
+		42 EPOCH BEST TEST ACC: 0.9626786708831787
+			Train time: 564.03 seconds
+			Test time: 194.75 seconds
+		43 EPOCH BEST TEST ACC: 0.963927149772644
+			Train time: 563.64 seconds
+			Test time: 194.48 seconds
+		44 EPOCH BEST TEST ACC: 0.9686819911003113
+			Train time: 563.97 seconds
+			Test time: 195.23 seconds
+		45 EPOCH BEST TEST ACC: 0.9686819911003113
+			Train time: 563.73 seconds
+			Test time: 194.99 seconds
+		46 EPOCH BEST TEST ACC: 0.9686819911003113
+			Train time: 564.05 seconds
+			Test time: 195.12 seconds
+		47 EPOCH BEST TEST ACC: 0.9686819911003113
+			Train time: 564.71 seconds
+			Test time: 195.79 seconds
+		48 EPOCH BEST TEST ACC: 0.9686819911003113
+			Train time: 565.09 seconds
+			Test time: 195.91 seconds
+		49 EPOCH BEST TEST ACC: 0.9686819911003113
+			Train time: 564.80 seconds
+			Test time: 195.52 seconds
+		50 EPOCH BEST TEST ACC: 0.9721617698669434
+			Train time: 565.41 seconds
+			Test time: 196.50 seconds
+	Best train ACC: 0.9466078877449036
+	Best test ACC: 0.9721617698669434
+	Training time:         10:36:01
 
-+-------------------- Job Report: 7016319 (TIMEOUT) --------------------+
-| Memory (RAM)  [####################] 109.7% (38.4 GB peak / 35 GB)    |
-| CPU           [#################   ] 86.0% average                    |
-| GPU           [##################  ] 94.8% average                    |
-| Time          [------------------->] 100.0% (0-10:00:07 / 0-10:00:00) |
-|                                                                       |
-| Lustre Filesystem:                                                    |
-|   Path    Total Read    Total Write    Total IOPS                     |
-|   ------  ------------  -------------  ------------                   |
-|   /apps   6.9 MB        0 B            155                            |
-|   /fred   9.8 GB        69.1 MB        5.8 K                          |
-|   /home   0 B           0 B            3                              |
-|   OS      9.2 MB        0 B            735                            |
-+-----------------------------------------------------------------------+
++------------------ Job Report: 7045697 (COMPLETED) -------------------+
+| Memory (RAM)  [######              ] 30.8% (10.8 GB peak / 35 GB)    |
+| CPU           [#################   ] 86.5% average                   |
+| GPU           [##################  ] 94.1% average                   |
+| Time          [---->               ] 21.5% (0-02:09:08 / 0-10:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   476 KB        0 B            190                           |
+|   /fred   9.6 GB        48.6 KB        5.7 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      19.3 MB       0 B            402                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
