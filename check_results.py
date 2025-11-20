@@ -3,6 +3,7 @@ import os
 import os.path as osp
 
 # Defining the datasets we want and where logs live
+model_types = ['infogcn2', 'msg3d', 'stgcn2']
 datasets = ['ntu', 'ntu120', 'ucf101']
 root = './logs'
 status_dict = {} # We will use this to store the full status of all the runs
@@ -34,35 +35,37 @@ def check_failed(fname, run_status):
 
 
 
-for dataset in datasets:
-    # Status_dict = {'dataset': {'evaluation': {'completed': ...}}}
-    status_dict[dataset] = {}
-    evals = os.listdir(osp.join(root, dataset))
-    print(dataset)
-    for evaluation in evals:
-        print(f"  {evaluation}")
-        run_status = {'training': [],
-                      'failed': [],
-                      'timeout': [],
-                      'completed': [],
-                      'evaluated': []}
-        # eg.                 ./logs/ntu/CS/train/
-        train_folder_pth = osp.join(root, dataset, evaluation, 'train')
-        eval_folder_pth = osp.join(root, dataset, evaluation, 'eval')
-        train_log_files = [osp.join(train_folder_pth, log_file) for log_file in
-                     os.listdir(train_folder_pth) if 'train' in log_file]
-        try:
-            eval_log_files = [osp.join(eval_folder_pth, log_file) for log_file in
-                            os.listdir(eval_folder_pth) if 'eval' in log_file]
-        except FileNotFoundError:
-            print(f"Eval folder does not yet exist for {dataset}")
-        # Check status of log_file
-        for log_file in train_log_files:
-            check_failed(log_file, run_status)
-        # Check if that run has been evaluated
-        for log_file in eval_log_files:
-            eval_runname = log_file.split('/')[-1].replace('_', ' ')[5:-4]
-            if eval_runname in run_status['completed']:
-                run_status['evaluated'].append(eval_runname)
-        status_dict[dataset][evaluation] = run_status
-        print(f"    {run_status}")
+for model_type in model_types:
+    print(model_type)
+    for dataset in datasets:
+        # Status_dict = {'dataset': {'evaluation': {'completed': ...}}}
+        status_dict[dataset] = {}
+        evals = os.listdir(osp.join(root, model_type, dataset))
+        print(f"   {dataset}")
+        for evaluation in evals:
+            print(f"     {evaluation}")
+            run_status = {'training': [],
+                        'failed': [],
+                        'timeout': [],
+                        'completed': [],
+                        'evaluated': []}
+            # eg.                 ./logs/infogcn2/ntu/CS/train/
+            train_folder_pth = osp.join(root, model_type, dataset, evaluation, 'train')
+            eval_folder_pth = osp.join(root, model_type, dataset, evaluation, 'eval')
+            train_log_files = [osp.join(train_folder_pth, log_file) for log_file in
+                        os.listdir(train_folder_pth) if 'train' in log_file]
+            try:
+                eval_log_files = [osp.join(eval_folder_pth, log_file) for log_file in
+                                os.listdir(eval_folder_pth) if 'eval' in log_file]
+            except FileNotFoundError:
+                pass
+            # Check status of log_file
+            for log_file in train_log_files:
+                check_failed(log_file, run_status)
+            # Check if that run has been evaluated
+            for log_file in eval_log_files:
+                eval_runname = log_file.split('/')[-1].replace('_', ' ')[5:-4]
+                if eval_runname in run_status['completed']:
+                    run_status['evaluated'].append(eval_runname)
+            status_dict[dataset][evaluation] = run_status
+            print(f"       {run_status}")
