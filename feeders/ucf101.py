@@ -9,8 +9,8 @@ from feeders import tools
 
 class Feeder(Dataset):
     """
-    TODO: Based on `split` input, split the data based on the 3 train/test splits outlined in the .txt files in the dataset folder
-    Feeder class for loading and processing dataset.
+    TODO: Based on `split` input, split the data based on the 3 train/test splits outlined in
+    the .txt files in the dataset folder Feeder class for loading and processing dataset.
     NOTE: If you're finding issues with this feeder, it might be caused by 
     the renaming of folders and videos, and to keep consistencies 
     in naming (eg. HandstandPushups -> HandStandPushups, HandstandWalking etc.)
@@ -61,7 +61,7 @@ class Feeder(Dataset):
         no_conf: bool = False,
         # normalisation=False,
         debug: bool = False,
-        use_mmap: bool = False,
+        use_mmap: bool = True,
         vel: bool = False,
         sort: bool = False,
         A=None,
@@ -251,7 +251,14 @@ if __name__ == "__main__":
 
     # Create logger
     logger = logging.getLogger(__name__)
-    logging.basicConfig(filename='data_feeder_test.log', level=logging.DEBUG)
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename='./logs/debug/ucf_feeder_test.log',
+        encoding="utf-8",
+        filemode="w",
+        level=logging.DEBUG
+    )
 
     # Change this to test different embedding configs
     dataset = "ucf101"
