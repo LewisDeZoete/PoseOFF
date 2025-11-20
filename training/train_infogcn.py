@@ -250,8 +250,8 @@ def train_network(
             results = checkpoint[
                 "results"
             ]  # Don't override the results from previous training!
-            optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
             scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+            optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
         except KeyError:
             pass  # Only just created the checkpoint file
         del checkpoint  # might save us from OOM issues

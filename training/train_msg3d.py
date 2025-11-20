@@ -67,7 +67,8 @@ def run_epoch(
             nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimiser.step()
 
-            if scheduler is not None:
+            if isinstance(scheduler, torch.optim.lr_scheduler.CosineAnnealingLR):
+                # For cosine annealing scheduler, step every batch
                 scheduler.step()
 
         # Update loggers
@@ -138,8 +139,8 @@ def train_network(
             results = checkpoint[
                 "results"
             ]  # Don't override the results from previous training!
-            optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
             scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+            optimiser.load_state_dict(checkpoint["optimiser_state_dict"])
         except KeyError:
             pass  # Only just created the checkpoint file
         del checkpoint  # might save us from OOM issues
@@ -170,7 +171,7 @@ def train_network(
         if scheduler is not None:
             if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                 scheduler.step(results["val loss"][-1])
-            else:
+            elif isinstance(scheduler, torch.optim.lr_scheduler.MultiStepLR):
                 scheduler.step()
             results["lr"].append(scheduler.get_last_lr()[0])
 
