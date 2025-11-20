@@ -6,21 +6,21 @@
 # bash run.sh
 # ```
 
-export model="infogcn2" # (infogcn2, msg3d, stgcn2)
+export model="msg3d" # (infogcn2, msg3d, stgcn2)
 export dataset="ntu" # (ntu, ntu120, ucf101)
 export phase="train" # (train/eval)
-export flow_embedding="cnn" # (base, cnn, abs, avg)
+export flow_embedding="base" # (base, cnn, abs, avg)
 export dilation=3
 export evaluation="CV" # (CS/CV, CSub/CSet, 1/2/3)
 export obs_ratio="1.0"
 export debug=false
 
-export modifier="with_norm" # still loads ${dataset}/{flow_embedding}.yaml config... adds to run_name
+export modifier="LR_fix" # still loads ${dataset}/{flow_embedding}.yaml config... adds to run_name
 
 export run_name="${model}_${dataset}_${evaluation}_${flow_embedding}_${modifier}"
-export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} observation ratio ${obs_ratio}, retraining model with mean and std norm" # Can change this as you need!
+# export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} observation ratio ${obs_ratio}, retraining model with mean and std norm" # Can change this as you need!
 # export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} Fixed LR Scheduler, original model with no data augmentation using the REPLAY padding method" # Can change this as you need!
-# export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method" # Can change this as you need!
+export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method" # Can change this as you need!
 
 
 # ---------------------------------------------------------

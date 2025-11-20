@@ -32,6 +32,9 @@
 * Data generation
 - [ ] Move mean and standard deviation map calculations to the data_gen
   - For now it's only implemented for ntu, and is calculated and saved in the feeder class __main__...
+- [-] ntu120 CSet flowpose
+- [ ] ntu120 CSub flowpose
+- [ ] debug problems in the ntu120 mean and std maps...
 
 * Evaluation bugs
 Evaluation pipeline for infogcn2 works...
