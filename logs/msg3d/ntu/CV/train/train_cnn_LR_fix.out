@@ -1,0 +1,169 @@
+Wed Nov 19 16:14:30 AEDT 2025
+Copying file: ./data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned_mean.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CV-flowpose_D3_aligned_mean.npz
+Data path: /var/tmp/jobfs/data/ntu_CV-flowpose_D3_aligned_mean.npz
+Run name: msg3d_ntu_CV_cnn_LR_fix
+
+Python script run command arguments:
+python main.py -m msg3d -d ntu -p train -f cnn -e CV -o 1.0 -r msg3d_ntu_CV_cnn_LR_fix --desc msg3d_train ntu CV cnn Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method --data_path_overwrite /var/tmp/jobfs/data/ntu_CV-flowpose_D3_aligned_mean.npz -v
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned_mean.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned_mean.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 300
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+  normalisation: True
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.msg3d.TEST_MODEL
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  cnn: True
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 40]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 50
+device: 0
+batch_size: 32
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ntu/
+model_type: msg3d
+dataset: ntu
+flow_embedding: cnn
+evaluation: CV
+obs_ratio: 1.0
+run_name: msg3d_ntu_CV_cnn_LR_fix
+description: msg3d_train ntu CV cnn Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CV-flowpose_D3_aligned_mean.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 582813
+	Loading weights from ./results/msg3d/ntu/CV/train/msg3d_ntu_CV_cnn_LR_fix.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/msg3d/ntu/CV/train/msg3d_ntu_CV_cnn_LR_fix.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/msg3d/ntu/CV/train/msg3d_ntu_CV_cnn_LR_fix.pt
+		1 EPOCH BEST TEST ACC: 0.550257682800293
+			Train time: 1660.74 seconds
+			Test time: 1707.61 seconds
+		2 EPOCH BEST TEST ACC: 0.6995431184768677
+			Train time: 1808.16 seconds
+			Test time: 1699.97 seconds
+		3 EPOCH BEST TEST ACC: 0.7206078171730042
+			Train time: 1693.06 seconds
+			Test time: 1625.44 seconds
+		4 EPOCH BEST TEST ACC: 0.7476757168769836
+			Train time: 1647.72 seconds
+			Test time: 1696.53 seconds
+		5 EPOCH BEST TEST ACC: 0.7691919803619385
+			Train time: 1684.24 seconds
+			Test time: 1617.33 seconds
+		6 EPOCH BEST TEST ACC: 0.7691919803619385
+			Train time: 1646.01 seconds
+			Test time: 1546.42 seconds
+		7 EPOCH BEST TEST ACC: 0.7691919803619385
+			Train time: 1572.84 seconds
+			Test time: 1517.07 seconds
+		8 EPOCH BEST TEST ACC: 0.7691919803619385
+			Train time: 1594.96 seconds
+			Test time: 1544.89 seconds
+		9 EPOCH BEST TEST ACC: 0.7862190008163452
+			Train time: 1521.31 seconds
+			Test time: 1418.22 seconds
+		10 EPOCH BEST TEST ACC: 0.8040961027145386
+			Train time: 1476.19 seconds
+			Test time: 1453.81 seconds
+		11 EPOCH BEST TEST ACC: 0.8040961027145386
+			Train time: 1505.04 seconds
+			Test time: 1457.78 seconds
+		12 EPOCH BEST TEST ACC: 0.8068320751190186
+			Train time: 1501.76 seconds
+			Test time: 1422.49 seconds
+		13 EPOCH BEST TEST ACC: 0.8098071813583374
+			Train time: 1480.14 seconds
+			Test time: 1424.92 seconds
+		14 EPOCH BEST TEST ACC: 0.8098071813583374
+			Train time: 1457.71 seconds
+			Test time: 1430.69 seconds
+		15 EPOCH BEST TEST ACC: 0.8098071813583374
+			Train time: 1477.40 seconds
+			Test time: 1484.48 seconds
+		16 EPOCH BEST TEST ACC: 0.8098071813583374
+			Train time: 1541.15 seconds
+			Test time: 1477.28 seconds
+		17 EPOCH BEST TEST ACC: 0.8098071813583374
+			Train time: 1550.02 seconds
+			Test time: 1521.41 seconds
+		18 EPOCH BEST TEST ACC: 0.8360782265663147
+			Train time: 1588.31 seconds
+			Test time: 1498.13 seconds
+
++-------------------- Job Report: 7016339 (TIMEOUT) --------------------+
+| Memory (RAM)  [##########          ] 52.0% (10.4 GB peak / 20 GB)     |
+| CPU           [##############      ] 73.1% average                    |
+| GPU           [##                  ] 14.8% average                    |
+| Time          [------------------->] 100.0% (0-16:00:27 / 0-16:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write    Total IOPS                     |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   5.5 MB        0 B            217                            |
+|   /fred   168 GB        4.8 MB         4.2 K                          |
+|   /home   0 B           0 B            2                              |
+|   OS      3.2 MB        0 B            322                            |
+|                                                                       |
+| Warnings:                                                             |
+|   - CPU usage is low                                                  |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+
