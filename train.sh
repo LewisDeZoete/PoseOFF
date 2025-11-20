@@ -48,18 +48,29 @@ echo -e "Run name: ${run_name}\n"
 # --desc : description (eg. 'nturgbd-cross-view cnn full flow')
 # --data_path_overwrite : overwrites the path to the dataset
 # -v : verbose
+# --debug: debug the main file (creates a log file and only runs on epoch)
+# TODO: Make debug only run one epoch
 
-srun python main.py \
-     -m "${model}" \
-     -d "${dataset}" \
-     -p "${phase}" \
-     -f "${flow_embedding}" \
-     -e "${evaluation}" \
-     -o "${obs_ratio}" \
-     -r "${run_name}" \
-     --desc "${desc}" \
-     --data_path_overwrite "${data_path}" \
-     --debug "$debug" \
-     -v
-     # -v \
-     # --debug
+args=(
+     "-m" "${model}"
+     "-d" "${dataset}"
+     "-p" "${phase}"
+     "-f" "${flow_embedding}"
+     "-e" "${evaluation}"
+     "-o" "${obs_ratio}"
+     "-r" "${run_name}"
+     "--desc" "${desc}"
+     "--data_path_overwrite" "${data_path}"
+     "-v"
+)
+
+# Debug is passed from run.sh
+if $debug
+then
+    args+=("--debug")
+fi
+
+echo "Python script run command arguments:"
+echo "python main.py ${args[@]}"
+# Python script runs!
+srun python main.py "${args[@]}"
