@@ -196,6 +196,8 @@ For observation accuracy plot, remove the training data accuracy
 
 * FAST PYTHON PACKAGE AND PROJECT MANAGER
 - [[https://github.com/astral-sh/uv][UV Package manager]]
+  - [[https://github.com/z80dev/uv-mode][UV mode for Emacs]]
+
 
 * Code cleanup
 - Consistency across ntu/120 data gen

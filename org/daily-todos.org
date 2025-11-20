@@ -1,5 +1,14 @@
 #+title: Daily Todos
 
-- [ ] TEST SHAP
 - [ ] Extract N-UCLA
-- [ ] Integrate flowpose into MS-G3D (or another model?)
+  - Proving difficult... Some mixed up frames and difficulty going from world coordinates to image coordinates
+  - Testing for this taking place in [[../data_gen/ucla/tmp_draw_skels.py][this test file]]
+    - I've almost certainly written a function to project the 3D coordinates to image space...
+- [ ] TEST SHAP
+- [ ] Graphing for MS-G3D results
+- [ ] LaTeX flowpose data size comparison
+
+- [ ] Test flowpose joint embedding versus STGCNBlock embedding...
+  - [ ] STGCNBlock(..., stride=1, ...)
+  - [ ] Flow_conv + STGCNBlock(..., stride=1, ...)
+  - [ ] Flow_conv

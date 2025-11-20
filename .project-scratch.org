@@ -1,0 +1,119 @@
+#+title:  Project Scratch
+# When underneath a checklist item:
+# M-RET: insert new dotpoint
+# s-M-RET: insert todo item
+
+* Feeders:
+- [X] Implement a method in the feeder(s) for specific observation ratios.
+  - [X] Implement method for overriding arg.feeder_args['obs_ratio'] in main or within configs...
+  - "The last frame duplication strategy performs best..." (Chi et al. 2023, p.7)
+- Sequence length = 100
+  - "To generate a skeleton sequence of length M (M=100 in PYSKL), we divide the original sequence uniformly into M splits with equal lengths and randomly sample one frame per split."
+
+* Train stgcn
+- [-] ntu
+- [-] ntu120
+- [-] ucf101
+
+
+* Configs
+- [X] add `training_function` and `testing_function` to all configs...
+- [ ] Add arg.feeder_args['normalisation'] option (set True once mean/std calculations are complete)
+- [ ] Change data_path to ...data_path..._mean.npz
+
+* General
+- [X] Implement normalisation in ntu feeder
+  - The generation for mean_maps is in `data_gen/utils/get_mean_map.py`
+- [X] Determine cause of accuracy drops MS-G3D
+- [-] fix ntu120 CSet
+  - It seems to be the dataset
+    - Retraining *infogcn2 ntu120 CSet*
+
+* Data generation
+- [ ] Move mean and standard deviation map calculations to the data_gen
+  - For now it's only implemented for ntu, and is calculated and saved in the feeder class __main__...
+
+* Evaluation bugs
+Evaluation pipeline for infogcn2 works...
+Checkpoint saves and continuing *training* also works...
+AverageMeter works...
+
+* Image export
+Cropping bounds: (250,150) -> (1150, 1050)
+                # (x1, y1) -> (x2, y2)
+Images 30-38
+
+
+* Python testing...
+#+begin_src emacs-lisp
+(setq org-babel-python-command "/fred/oz141/ldezoete/environment/bin/python3")
+#+end_src
+
+#+RESULTS:
+: /fred/oz141/ldezoete/environment/bin/python3
+
+#+begin_src python :results output
+import torch
+import mmnpz
+
+# NTU60
+CS_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned_mean.npz"
+CS_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CS-pose_aligned_mean.npz"
+CV_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned_mean.npz"
+CV_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CV-pose_aligned_mean.npz"
+
+# NTU120
+CSet_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned_mean.npz"
+CSet_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSet-pose_aligned_mean.npz"
+CSub_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned_mean.npz"
+CSub_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSub-pose_aligned_mean.npz"
+
+path_dict = {
+    'CS flowpose': CS_flow, 'CS pose': CS_pose, 'CV flowpose': CV_flow, 'CV pose': CV_pose,
+    'CSet flowpose': CSet_flow, 'CSet pose': CSet_pose, 'CSub flowpose': CSub_flow, 'CSub pose': CSub_pose,
+}
+
+error_dict = {}
+
+for name, path in path_dict.items():
+    try:
+        dat = mmnpz.load(path)
+        print(f"Mean map shape: {dat['mean_map'].shape}")
+        print(f"Std map shape: {dat['std_map'].shape}")
+        if "CSub-pose" in path:
+            print(dat['mean_map'])
+            print(dat['mean_map'])
+    except Exception as e:
+        error_dict[name] = e
+
+print(error_dict)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Mean map shape: (53, 25)
+Std map shape: (53, 1, 25, 1)
+Mean map shape: (3, 25)
+Std map shape: (3, 1, 25, 1)
+Mean map shape: (53, 25)
+Std map shape: (53, 1, 25, 1)
+Mean map shape: (3, 25)
+Std map shape: (3, 1, 25, 1)
+Mean map shape: (3, 25)
+Std map shape: (3, 1, 25, 1)
+Mean map shape: (3, 25)
+Std map shape: (3, 1, 25, 1)
+[[nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
+  nan nan nan nan nan nan nan]
+ [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
+  nan nan nan nan nan nan nan]
+ [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
+  nan nan nan nan nan nan nan]]
+[[nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
+  nan nan nan nan nan nan nan]
+ [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
+  nan nan nan nan nan nan nan]
+ [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
+  nan nan nan nan nan nan nan]]
+{'CSet flowpose': FileNotFoundError(2, 'No such file or directory'), 'CSub flowpose': FileNotFoundError(2, 'No such file or directory')}
+#+end_example
