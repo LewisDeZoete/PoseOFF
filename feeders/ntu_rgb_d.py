@@ -1,56 +1,64 @@
 import numpy as np
 import pickle
 import mmnpz
+import math
 
 from torch.utils.data import Dataset
 
 from feeders import tools
 
 
+
 class Feeder(Dataset):
     def __init__(
-        self,
-        data_paths: str,
-        eval=None,
-        label_path=None,
-        labels=None,
-        split: str ="train",
-        random_choose: bool = False,
-        random_shift: bool = False,
-        random_move: bool = False,
-        random_rot: bool = False,
-        p_interval: list[float] = [1.0],
-        window_size: int = 64,
-        average_flow: bool = False,
-        absolute_flow: bool = False,
-        no_flow: bool = False,
-        no_Z: bool = False,
-        # normalisation=False,
-        debug=False,
-        use_mmap=True,
-        vel=False,
-        sort=False,
-        A=None,
-    ):
-        """
-        :param data_path:
-        :param eval: evaluation set (CS/CV)
-        :param label_path:
-        :param split: training set or test set (default='train')
-        :param random_choose: If true, randomly choose a portion of the input sequence (default=False)
-        :param random_shift: If true, randomly pad zeros at the begining or end of sequence (default=False)
-        :param random_move: If true, perform random move (rotation, scale and translation) (default=False)
-        :param random_rot: rotate skeleton around xyz axis (default=False)
-        :param p_interval: proportion of valid frames to be cropped as single proportion or range (default=1)
-        :param window_size: the length of the output sequence (default=64)
-        :param average_flow: average value of x and y coordinates of the optical flow windows (default=False)
-        :param absolute_flow: if
-        :param normalisation: If true, normalise input sequence (default=False)
-        :param debug: If true, only use the first 100 samples (default=False)
-        :param use_mmap: If true, use mmap mode to load data, which can save the running memory (default=False)
-        :param vel: use motion modality or not (default=False)
-        :param sort:
-        :param A: adjacency matrix
+            self,
+            data_paths: str,
+            eval=None,
+            label_path=None,
+            labels=None,
+            split: str ="train",
+            random_choose: bool = False,
+            random_shift: bool = False,
+            random_move: bool = False,
+            random_rot: bool = False,
+            p_interval: list[float] = [1.0],
+            window_size: int = 64,
+            pad_method: str = "last_frame",
+            average_flow: bool = False,
+            absolute_flow: bool = False,
+            no_flow: bool = False,
+            no_Z: bool = False,
+            obs_ratio: float = 1.0,
+            normalisation: bool = False,
+            debug: bool = False,
+            use_mmap: bool = True,
+            vel: bool = False,
+            sort: bool = False,
+            A=None,
+            ):
+        """Feeder class for the NTU60 and NTU120 datasets.
+
+        Args:
+            data_path (str):
+            eval (str): Evaluation set (CS/CV, CSub/CSet for ntu120)
+            label_path (str):
+            split (str): Training set or test set (default='train')
+            random_choose (bool): If true, randomly choose a portion of the input sequence (default=False)
+            random_shift (bool): If true, randomly pad zeros at the begining or end of sequence (default=False)
+            random_move (bool): If true, perform random move (rotation, scale and translation) (default=False)
+            random_rot (bool): Rotate skeleton around xyz axis (default=False)
+            p_interval list[float]: Proportion of valid frames to be cropped as single proportion or range (default=1)
+            window_size (int): The length of the output sequence (default=64)
+            pad_method (str): Method used for auto-padding data to correct window_size,
+                either "last_frame" or "replay" (default="last_frame")
+            average_flow (bool): Average value of x and y coordinates of the optical flow windows (default=False)
+            absolute_flow (bool): If true, calculates the absolute value of all flow vectors in flow window.
+            normalisation (bool): If true, normalise input sequence (default=False)
+            debug (bool): If true, only use the first 100 samples (default=False)
+            use_mmap (bool): If true, use mmap mode to load data, which can save the running memory (default=False)
+            vel (bool): Use motion modality or not (default=False)
+            sort (bool):
+            A: Adjacency matrix
         """
 
         self.eval = eval
@@ -66,13 +74,15 @@ class Feeder(Dataset):
             self.random_shift = random_shift
             self.random_choose = random_choose
             self.window_size = window_size
+            self.pad_method = pad_method
             self.random_move = random_move
             self.random_rot = random_rot
         else:
             self.p_interval = [0.95]
             self.random_shift = False
             self.random_choose = False
-            self.window_size = 64
+            self.window_size = window_size
+            self.pad_method = pad_method
             self.random_move = False
             self.random_rot = False
         if average_flow and absolute_flow:
@@ -84,17 +94,16 @@ class Feeder(Dataset):
         )
         self.no_flow = no_flow
         self.no_Z = no_Z
+        self.obs_ratio = float(obs_ratio)
+        self.normalisation = normalisation
         self.debug = debug
         self.use_mmap = use_mmap
         self.vel = vel
         self.A = A
-        # self.load_data()
         self.data = None  # defer loading (lazy loading)
         if sort:
             self.get_n_per_class()
             self.sort()
-        # if normalisation:
-        #     self.get_mean_map()
 
     def load_data(self):
         if self.data is None:
@@ -118,6 +127,9 @@ class Feeder(Dataset):
                 raise NotImplementedError(
                     "data split only supports train/test")
             print(f"\tAssigned self.data to unique split ({self.split})")
+            if self.debug:
+                self.data = self.data[:100]
+                self.labels = self.labels[:100]
 
             # Handle NaN filtering more memory efficiently when using mmap
             if self.use_mmap:
@@ -139,6 +151,10 @@ class Feeder(Dataset):
                 self.data = np.array(self.A) @ self.data
             print("\tFinished loading data!")
 
+            # Here is where we need to get the mean map (npz data loaded here)
+            if self.normalisation:
+                self.get_mean_map(npz_data)
+
     def get_n_per_class(self):
         self.n_per_cls = np.zeros(len(self.labels), dtype=int)
         for labels in self.labels:
@@ -150,19 +166,15 @@ class Feeder(Dataset):
         self.data = self.data[sorted_idx]
         self.labels = self.labels[sorted_idx]
 
-    def get_mean_map(self):
-        data = self.data
-        N, C, T, V, M = data.shape
-        self.mean_map = (
-            data.mean(axis=2, keepdims=True).mean(
-                axis=4, keepdims=True).mean(axis=0)
-        )
-        self.std_map = (
-            data.transpose((0, 2, 4, 1, 3))
-            .reshape((N * T * M, C * V))
-            .std(axis=0)
-            .reshape((C, 1, V, 1))
-        )
+    def get_mean_map(self, npz_data):
+        try:
+            # TODO: remove this reshaping etc. this should be dealt with in data_gen
+            C = (53 if self.data.shape[-1] > 150 else 3)
+            self.mean_map = npz_data['mean_map'].reshape((C, 1, 25, 1))
+            self.std_map = npz_data['std_map'].reshape((C, 1, 25, 1))
+        except KeyError as e:
+            print("Feeder failed to obtain mean map")
+            print(f"Data does not contain key: {e}")
 
     def __len__(self):
         self.load_data()
@@ -191,6 +203,7 @@ class Feeder(Dataset):
         label = self.labels[index]
         data_numpy = np.array(data_numpy)
 
+        # Find the first non-zero frame and crop to it
         valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
         valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
         # reshape Tx(MVC) to CTVM
@@ -198,13 +211,16 @@ class Feeder(Dataset):
             data_numpy, valid_frame_num, self.p_interval, self.window_size
         )
         mask = abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0
+
         # Apply optional transforms
+        if self.normalisation:
+            data_numpy = (data_numpy - self.mean_map) / self.std_map
         if self.random_shift:
             data_numpy = tools.random_shift(data_numpy)
         if self.random_choose:
             data_numpy = tools.random_choose(data_numpy, self.window_size)
         elif self.window_size > 0:
-            data_numpy = tools.auto_padding(data_numpy, self.window_size)
+            data_numpy = tools.auto_padding(data_numpy, self.window_size, self.pad_method)
         if self.random_move:
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
@@ -220,6 +236,11 @@ class Feeder(Dataset):
             data_numpy = tools.absolute_flow(
                 data_numpy, window_mean=self.absolute_flow["window_mean"]
             )
+        # Mask input data if observation ratio != 1.0
+        if self.obs_ratio < 1.0:
+            data_numpy = data_numpy[:, :int(self.window_size*self.obs_ratio), ...]
+            data_numpy = tools.auto_padding(data_numpy, self.window_size)
+
         return data_numpy, label, mask, index
 
     def top_k(self, score, top_k):
@@ -243,65 +264,192 @@ if __name__ == "__main__":
     import logging
     import argparse
     import os.path as osp
+    from einops import rearrange
+
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename='./logs/debug/feeders/ntu_feeder.log',
+        encoding="utf-8",
+        filemode="w",
+        level=logging.DEBUG
+    )
 
     # Argparser to test data moved to the slurm jobfs directory
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--data_overwrite",
-        help="Overwrite dataset path to full file"
+        "-d",
+        dest="dataset",
+        default="ntu",
+        help="Config dictionary location (default=ucf101)",
+    )
+    parser.add_argument(
+        "-f",
+        dest="flow_embedding",
+        default="base",
+        help="Flow embedding, either base or cnn (default=base)"
+    )
+    parser.add_argument(
+        "-e",
+        dest="evaluation",
+        help="Evaluation"
+    )
+    parser.add_argument(
+        "--debug", help="Use to debug, only take first 100 samples",
+        action="store_true"
+    )
+    parser.add_argument(
+        "--data_path_overwrite", help="Overwrite dataset path.\
+        This overwrites `config['data_paths'][arg.evaluation]` completely (must be a file)."
     )
     parsed = parser.parse_args()
 
-    # Create logger
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(filename='./logs/debug/data_feeder_test.log', level=logging.DEBUG)
+    assert parsed.evaluation in ['CV', 'CS', 'CSub', 'CSet']
+    assert parsed.flow_embedding in ['base', 'cnn']
 
     # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
-    dataset = 'ntu'
-    embed = 'cnn_D3'
-    evaluation = 'CS'
-    arg = ArgClass(f"config/{dataset}/{embed}.yaml")
+    model_type = "msg3d"
+    dataset = parsed.dataset
+    evaluation = parsed.evaluation
+    flow_embedding = parsed.flow_embedding
+
+
+    arg = ArgClass(f"config/{model_type}/{dataset}/{flow_embedding}.yaml", verbose=True)
     arg.feeder_args['eval'] = evaluation
-    arg.feeder_args['use_mmap'] = True
+    arg.feeder_args['normalisation'] = False
+    arg.feeder_args['data_paths'][parsed.evaluation] = \
+        arg.feeder_args['data_paths'][parsed.evaluation].replace("_mean", "")
 
     # Pass root path for the dataset objects
-    if parsed.data_overwrite is not None:
-        for arg_key, arg_val in arg.feeder_args['data_paths'].items():
-            arg.feeder_args['data_paths'][arg_key] = osp.join(
-                f"data/{dataset}/aligned_data",
-                parsed.data_overwrite
-                )
+    if parsed.data_path_overwrite is not None:
+        arg.feeder_args['use_mmap'] = True
+        arg.feeder_args['data_paths'][parsed.evaluation] = parsed.data_path_overwrite
+
     logger.debug(f"Feeder testing for dataset: {dataset}")
-    logger.debug(f"\tEmbed: {embed}")
+    logger.debug(f"\tFlow embedding: {flow_embedding}")
     logger.debug(f"\tEvaluation: {evaluation}")
     logger.debug(f"\tData path: {arg.feeder_args['data_paths'][evaluation]}")
 
     # Create the dataset objects
-    train_feeder = Feeder(**arg.feeder_args, split="train")
-    test_feeder = Feeder(**arg.feeder_args, split="test")
+    train_feeder = Feeder(
+        **arg.feeder_args,
+        split="train",
+        debug=parsed.debug
+    )
+    logger.debug(f"\tTrain feeder length: {len(train_feeder)}")
+    test_feeder = Feeder(
+        **arg.feeder_args,
+        split="test",
+        debug=parsed.debug)
+    logger.debug(f"\tTest feeder length: {len(test_feeder)}")
 
-    # Create a dataloader
-    dataloader = DataLoader(train_feeder,
-                            batch_size=64,
-                            num_workers=4,
+    # Calculate the number of iterations per epoch (used for cosine annealing)
+    cal_epoch_iters = math.ceil(len(train_feeder) / arg.batch_size)
+    logger.debug(f"Calculated epoch iters: {cal_epoch_iters}")
+
+    # Log the overall shape of data in one of the feeders...
+    logger.debug(f"Full data shape: {train_feeder.data.shape}")
+
+    # Create a dataloaders
+    train_dataloader = DataLoader(train_feeder,
+                            batch_size=arg.batch_size,
+                            num_workers=1,
+                            shuffle=False,
+                            pin_memory=True)
+    test_dataloader = DataLoader(test_feeder,
+                            batch_size=arg.batch_size,
+                            num_workers=1,
                             shuffle=False,
                             pin_memory=True)
 
-    start = time.time()
-    for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
-        logger.debug(f"Full data shape: {train_feeder.data.shape}")
-        break
+    # This is to log the number of samples of each class (checking for class imbalance)
+    debug_labels = {'train': [0 for i in range(120)], 'test': [0 for i in range(120)]}
+    debug_means = {
+        'train': {'total_count': 0},
+        'test': {'total_count': 0}
+    }
 
-    # Log the shapes of the data and mask log
-    # and the first two frames of the first two persons
-    logger.debug(f"Feeder path: {arg.feeder_args['data_paths'][evaluation]}")
-    logger.debug(f"Total samples: {len(train_feeder)}")
-    logger.debug(
-        f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
-    logger.debug(f"Data shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
-    logger.debug(f"Mask shape: {mask.shape}")
+    C = 3 if flow_embedding=='base' else 53
+    V = 25
 
-    logger.debug(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
-    logger.debug(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
-    logger.debug(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
-    logger.debug(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")
+    sum_map = np.zeros((C, V), dtype=np.float64)
+    total = 0
+
+    # iterate over the train dataloader
+    for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
+        # data_numpy shape: (B, C, T, V, M)
+        for sample_label in label:
+            debug_labels['train'][sample_label] += 1
+        batch_sum = data_numpy.sum(axis=2, keepdims=False).sum(axis=3, keepdims=False)
+        sum_map += batch_sum.sum(axis=0).numpy()
+        total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
+
+    # iterate over the test dataloader
+    for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
+        # data_numpy shape: (B, C, T, V, M)
+        for sample_label in label:
+            debug_labels['test'][sample_label] += 1
+        batch_sum = data_numpy.sum(axis=2, keepdims=False).sum(axis=3, keepdims=False)
+        sum_map += batch_sum.sum(axis=0).numpy()
+        total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
+
+    mean_map = (sum_map / total).reshape(C, 1, V, 1)
+    print("Mean calculated")
+
+
+    # After mean map calculations, we can calculate standard deviation map
+    sq_diff_sum = np.zeros((C * V), dtype=np.float64)
+
+    # iterate over the train dataloader again for standard deviation map
+    for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
+        # data_numpy shape: (B, C, T, V, M)
+        B, C, T, V, M = data_numpy.shape
+        data_numpy_t = rearrange(data_numpy, 'B C T V M -> (B T M) (C V)')
+        mean_flat = rearrange(mean_map, 'C 1 V 1 -> 1 (C V)')
+        sq_diff = (data_numpy_t - mean_flat) ** 2
+        sq_diff_sum += sq_diff.sum(axis=0).numpy()
+
+    # iterate over the test dataloader again for standard deviation map
+    for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
+        # data_numpy shape: (B, C, T, V, M)
+        B, C, T, V, M = data_numpy.shape
+        data_numpy_t = rearrange(data_numpy, 'B C T V M -> (B T M) (C V)')
+        mean_flat = rearrange(mean_map, 'C 1 V 1 -> 1 (C V)')
+        sq_diff = (data_numpy_t - mean_flat) ** 2
+        sq_diff_sum += sq_diff.sum(axis=0).numpy()
+
+    std_flat = np.sqrt(sq_diff_sum / total)
+    std_map = std_flat.reshape(C, 1, V, 1)
+    print("STD calculated")
+
+    logger.debug("TRAIN DATA:")
+    logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
+    logger.debug(f"\tMask shape: {mask.shape}")
+    logger.debug(f"\tLabel shape: {label.shape}")
+
+    logger.debug("TEST DATA:")
+    logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
+    logger.debug(f"\tMask shape: {mask.shape}")
+    logger.debug(f"\tLabel shape: {label.shape}")
+
+    logger.debug(f"mean map shape: {mean_map.shape}")
+    logger.debug(f"mean map: {mean_map}")
+    logger.debug(f"standard deviation map shape: {std_map.shape}")
+    logger.debug(f"standard deviation map: {std_map}")
+    logger.debug(f"train labels: {debug_labels['train']}")
+    logger.debug(f"test labels: {debug_labels['test']}")
+
+
+    if not parsed.debug:
+        npz_data = mmnpz.load(arg.feeder_args['data_paths'][parsed.evaluation], mmap_mode='r')
+        filename = arg.feeder_args['data_paths'][parsed.evaluation].split('/')[-1]
+        with mmnpz.NpzWriter(
+                f"./data/{dataset}/aligned_data/{filename.replace('aligned', 'aligned_mean')}") as f:
+            f.write("x_train", npz_data['x_train'])
+            f.write("x_test", npz_data['x_test'])
+            f.write("y_train", npz_data['y_train'])
+            f.write("y_test", npz_data['y_test'])
+            f.write("mean_map", mean_map)
+            f.write("std_map", std_map)
+
+        print(f"Saved data to: ./data/{dataset}/aligned_data/{filename.replace('aligned', 'aligned_mean')}")
