@@ -108,12 +108,6 @@ test_dataloader = DataLoader(test_feeder,
                         shuffle=False,
                         pin_memory=True)
 
-# This is to log the number of samples of each class (checking for class imbalance)
-debug_labels = {'train': [0 for i in range(120)], 'test': [0 for i in range(120)]}
-debug_means = {
-    'train': {'total_count': 0},
-    'test': {'total_count': 0}
-}
 
 C = 3 if flow_embedding=='base' else 53
 V = 25
@@ -124,8 +118,6 @@ total = 0
 # iterate over the train dataloader
 for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
     # data_numpy shape: (B, C, T, V, M)
-    for sample_label in label:
-        debug_labels['train'][sample_label] += 1
     batch_sum = data_numpy.sum(axis=2, keepdims=False).sum(axis=3, keepdims=False)
     sum_map += batch_sum.sum(axis=0).numpy()
     total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
@@ -133,8 +125,6 @@ for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader)
 # iterate over the test dataloader
 for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
     # data_numpy shape: (B, C, T, V, M)
-    for sample_label in label:
-        debug_labels['test'][sample_label] += 1
     batch_sum = data_numpy.sum(axis=2, keepdims=False).sum(axis=3, keepdims=False)
     sum_map += batch_sum.sum(axis=0).numpy()
     total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
@@ -181,8 +171,6 @@ logger.debug(f"mean map shape: {mean_map.shape}") # (3/53, 1, 25, 1)
 logger.debug(f"mean map: {mean_map}")
 logger.debug(f"standard deviation map shape: {std_map.shape}") # (3/53, 1, 25, 1)
 logger.debug(f"standard deviation map: {std_map}")
-logger.debug(f"train labels: {debug_labels['train']}")
-logger.debug(f"test labels: {debug_labels['test']}")
 
 
 if not parsed.debug:

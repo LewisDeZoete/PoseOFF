@@ -42,4 +42,4 @@ echo "Evaluation: ${evaluation}"
 echo "Flow embedding: ${flow_embedding}"
 
 
-python feeders/ntu_rgb_d.py -d "${dataset}" -f "${flow_embedding}" -e "${evaluation}" --data_path_overwrite ${data_path}
+srun python feeders/ntu_rgb_d.py -d "${dataset}" -f "${flow_embedding}" -e "${evaluation}" --data_path_overwrite ${data_path}

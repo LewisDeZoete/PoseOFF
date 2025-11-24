@@ -308,7 +308,7 @@ if __name__ == "__main__":
     assert parsed.flow_embedding in ['base', 'cnn']
 
     # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
-    model_type = "msg3d"
+    model_type = "stgcn2"
     dataset = parsed.dataset
     evaluation = parsed.evaluation
     flow_embedding = parsed.flow_embedding
@@ -316,9 +316,9 @@ if __name__ == "__main__":
 
     arg = ArgClass(f"config/{model_type}/{dataset}/{flow_embedding}.yaml", verbose=True)
     arg.feeder_args['eval'] = evaluation
-    arg.feeder_args['normalisation'] = False
-    arg.feeder_args['data_paths'][parsed.evaluation] = \
-        arg.feeder_args['data_paths'][parsed.evaluation].replace("_mean", "")
+    # arg.feeder_args['normalisation'] = False
+    # arg.feeder_args['data_paths'][parsed.evaluation] = \
+    #     arg.feeder_args['data_paths'][parsed.evaluation].replace("_mean", "")
 
     # Pass root path for the dataset objects
     if parsed.data_path_overwrite is not None:
@@ -372,55 +372,18 @@ if __name__ == "__main__":
     C = 3 if flow_embedding=='base' else 53
     V = 25
 
-    sum_map = np.zeros((C, V), dtype=np.float64)
-    total = 0
-
     # iterate over the train dataloader
     for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
         # data_numpy shape: (B, C, T, V, M)
         for sample_label in label:
             debug_labels['train'][sample_label] += 1
-        batch_sum = data_numpy.sum(axis=2, keepdims=False).sum(axis=3, keepdims=False)
-        sum_map += batch_sum.sum(axis=0).numpy()
-        total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
 
     # iterate over the test dataloader
     for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
         # data_numpy shape: (B, C, T, V, M)
         for sample_label in label:
             debug_labels['test'][sample_label] += 1
-        batch_sum = data_numpy.sum(axis=2, keepdims=False).sum(axis=3, keepdims=False)
-        sum_map += batch_sum.sum(axis=0).numpy()
-        total += data_numpy.shape[0] * data_numpy.shape[1] * data_numpy.shape[2]
 
-    mean_map = (sum_map / total).reshape(C, 1, V, 1)
-    print("Mean calculated")
-
-
-    # After mean map calculations, we can calculate standard deviation map
-    sq_diff_sum = np.zeros((C * V), dtype=np.float64)
-
-    # iterate over the train dataloader again for standard deviation map
-    for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
-        # data_numpy shape: (B, C, T, V, M)
-        B, C, T, V, M = data_numpy.shape
-        data_numpy_t = rearrange(data_numpy, 'B C T V M -> (B T M) (C V)')
-        mean_flat = rearrange(mean_map, 'C 1 V 1 -> 1 (C V)')
-        sq_diff = (data_numpy_t - mean_flat) ** 2
-        sq_diff_sum += sq_diff.sum(axis=0).numpy()
-
-    # iterate over the test dataloader again for standard deviation map
-    for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
-        # data_numpy shape: (B, C, T, V, M)
-        B, C, T, V, M = data_numpy.shape
-        data_numpy_t = rearrange(data_numpy, 'B C T V M -> (B T M) (C V)')
-        mean_flat = rearrange(mean_map, 'C 1 V 1 -> 1 (C V)')
-        sq_diff = (data_numpy_t - mean_flat) ** 2
-        sq_diff_sum += sq_diff.sum(axis=0).numpy()
-
-    std_flat = np.sqrt(sq_diff_sum / total)
-    std_map = std_flat.reshape(C, 1, V, 1)
-    print("STD calculated")
 
     logger.debug("TRAIN DATA:")
     logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
@@ -432,24 +395,5 @@ if __name__ == "__main__":
     logger.debug(f"\tMask shape: {mask.shape}")
     logger.debug(f"\tLabel shape: {label.shape}")
 
-    logger.debug(f"mean map shape: {mean_map.shape}")
-    logger.debug(f"mean map: {mean_map}")
-    logger.debug(f"standard deviation map shape: {std_map.shape}")
-    logger.debug(f"standard deviation map: {std_map}")
     logger.debug(f"train labels: {debug_labels['train']}")
     logger.debug(f"test labels: {debug_labels['test']}")
-
-
-    if not parsed.debug:
-        npz_data = mmnpz.load(arg.feeder_args['data_paths'][parsed.evaluation], mmap_mode='r')
-        filename = arg.feeder_args['data_paths'][parsed.evaluation].split('/')[-1]
-        with mmnpz.NpzWriter(
-                f"./data/{dataset}/aligned_data/{filename.replace('aligned', 'aligned_mean')}") as f:
-            f.write("x_train", npz_data['x_train'])
-            f.write("x_test", npz_data['x_test'])
-            f.write("y_train", npz_data['y_train'])
-            f.write("y_test", npz_data['y_test'])
-            f.write("mean_map", mean_map)
-            f.write("std_map", std_map)
-
-        print(f"Saved data to: ./data/{dataset}/aligned_data/{filename.replace('aligned', 'aligned_mean')}")

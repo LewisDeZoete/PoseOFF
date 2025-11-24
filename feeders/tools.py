@@ -133,30 +133,31 @@ def auto_padding(data_numpy, window_size:int=64, pad_method:str='last_frame'):
         data_numpy (numpy.ndarray): Input data array with shape (C, T, V, M).
         window_size (int, optional): The size of the window to pad to. Default is 64.
         pad_method (str, optional): Pad data_numpy time dimension using either
-            ['last_frame', 'replay'](default = 'last_frame').
+            ['last_frame', 'replay', 'zero_pad'](default = 'last_frame').
 
     Returns:
         numpy.ndarray: Padded data array with shape (C, window_size, V, M) if T < window_size,
             otherwise returns the original data array.
     """
     C, T, V, M = data_numpy.shape
-    assert pad_method in ['last_frame', 'replay'], \
+    assert pad_method in ['last_frame', 'replay', 'zero_pad'], \
         "Pad method must be either 'last_frame' or 'replay'"
     if T < window_size:
-        if pad_method == 'last_frame':
+        if pad_method == 'replay':
+            data_numpy_paded = np.concatenate(
+                [data_numpy for i in range(math.ceil(window_size/T))],
+                axis=1
+                )[:, :window_size]
+        else:
             data_numpy_paded = np.zeros((C, window_size, V, M))
             data_numpy_paded[:, :T, ...] = data_numpy
+            if pad_method == 'zero_pad':
+                return data_numpy_paded
             data_numpy_paded[:, T:, ...] = np.repeat(
                 np.expand_dims(data_numpy[:, -1, ...], axis=1),
                 window_size-T,
                 axis=1
             )
-        else:
-            data_numpy_paded = np.concatenate(
-                [data_numpy for i in range(math.ceil(window_size/T))],
-                axis=1
-                )[:, :window_size]
-            pass
         return data_numpy_paded
     else:
         return data_numpy
@@ -448,7 +449,7 @@ if __name__ == "__main__":
     model_type = "stgcn2"
     dataset = "ntu"
     evaluation = "CV"
-    flow_embedding = "cnn"
+    flow_embedding = "base"
     obs_ratio = 0.6
 
     arg = ArgClass(f"config/{model_type}/{dataset}/{flow_embedding}.yaml")
@@ -465,6 +466,7 @@ if __name__ == "__main__":
 
     data_pad_last_frame = auto_padding(data, 100)
     data_pad_replay = auto_padding(data, 100, pad_method="replay")
+    data_pad_zero_pad = auto_padding(data, 100, pad_method="zero_pad")
 
     logger.debug(f"Last frame padding shape: {data_pad_last_frame.shape}")
     logger.debug(f"Last frame padding (first frame): {data_pad_last_frame[:3, 0, 0, 0]}")
@@ -472,14 +474,21 @@ if __name__ == "__main__":
     logger.debug(f"Last frame padding (last valid frame+1): {data_pad_last_frame[:3, 15, 0, 0]}")
     logger.debug(f"Last frame padding (last frame): {data_pad_last_frame[:3, -1, 0, 0]}\n")
 
-    logger.debug(f"Relay padding shape: {data_pad_replay.shape}")
+    logger.debug(f"Replay padding shape: {data_pad_replay.shape}")
     logger.debug(f"Replay padding (first frame): {data_pad_replay[:3, 0, 0, 0]}")
     logger.debug(f"Replay padding (last valid frame-1): {data_pad_replay[:3, 13, 0, 0]}")
     logger.debug(f"Replay padding (last valid frame): {data_pad_replay[:3, 14, 0, 0]}")
     logger.debug(f"Replay padding (last valid frame+1): {data_pad_replay[:3, 15, 0, 0]}")
     logger.debug(f"Replay padding (last frame-1): {data_pad_replay[:3, -2, 0, 0]}")
-    logger.debug(f"Replay padding (last frame): {data_pad_replay[:3, -1, 0, 0]}")
+    logger.debug(f"Replay padding (last frame): {data_pad_replay[:3, -1, 0, 0]}\n")
 
+    logger.debug(f"Zero pad padding shape: {data_pad_zero_pad.shape}")
+    logger.debug(f"Zero pad padding (first frame): {data_pad_zero_pad[:3, 0, 0, 0]}")
+    logger.debug(f"Zero pad padding (last valid frame-1): {data_pad_zero_pad[:3, 13, 0, 0]}")
+    logger.debug(f"Zero pad padding (last valid frame): {data_pad_zero_pad[:3, 14, 0, 0]}")
+    logger.debug(f"Zero pad padding (last valid frame+1): {data_pad_zero_pad[:3, 15, 0, 0]}")
+    logger.debug(f"Zero pad padding (last frame-1): {data_pad_zero_pad[:3, -2, 0, 0]}")
+    logger.debug(f"Zero pad padding (last frame): {data_pad_zero_pad[:3, -1, 0, 0]}")
 
     # data = np.load("data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy")
     # C, T, V, M = data.shape

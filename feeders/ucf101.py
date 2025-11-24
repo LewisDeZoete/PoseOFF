@@ -25,6 +25,8 @@ class Feeder(Dataset):
         random_shift (bool): If true, randomly pad zeros at the beginning or end of sequence.
         random_move (bool): If true, apply random movement transformations.
         window_size (int): The length of the output sequence.
+        pad_method (str): Method used for auto-padding data to correct window_size,
+            either "last_frame" or "replay" (default="last_frame")
         use_mmap (bool): If true, use mmap mode to load data, which can save the running memory.
         p_interval (list): List of intervals for cropping in valid_crop_resize.
         random_rot (bool): If true, rotate skeleton around xyz axis.
@@ -43,29 +45,31 @@ class Feeder(Dataset):
     """
 
     def __init__(
-        self,
-        data_paths: str,
-        eval: int = 1,
-        label_path=None,
-        labels=None,
-        split: str = "train",
-        random_choose=False,
-        random_shift: bool = False,
-        random_move: bool = False,
-        random_rot: bool = False,
-        p_interval: list[float] = [1.0],
-        window_size: int = 64,
-        average_flow: bool = False,
-        absolute_flow: bool = False,
-        no_flow: bool = False,
-        no_conf: bool = False,
-        # normalisation=False,
-        debug: bool = False,
-        use_mmap: bool = True,
-        vel: bool = False,
-        sort: bool = False,
-        A=None,
-    ):
+            self,
+            data_paths: str,
+            eval: int = 1,
+            label_path=None,
+            labels=None,
+            split: str = "train",
+            random_choose=False,
+            random_shift: bool = False,
+            random_move: bool = False,
+            random_rot: bool = False,
+            p_interval: list[float] = [1.0],
+            window_size: int = 64,
+            pad_method: str = "last_frame",
+            average_flow: bool = False,
+            absolute_flow: bool = False,
+            no_flow: bool = False,
+            no_conf: bool = False,
+            obs_ratio: float = 1.0,
+            # normalisation=False,
+            debug: bool = False,
+            use_mmap: bool = True,
+            vel: bool = False,
+            sort: bool = False,
+            A=None,
+            ):
         self.eval = int(eval)
         self.data_path = data_paths[self.eval]
         # self.label_path = label_path
@@ -78,13 +82,15 @@ class Feeder(Dataset):
             self.random_shift = random_shift
             self.random_choose = random_choose
             self.window_size = window_size
+            self.pad_method = pad_method
             self.random_move = random_move
             self.random_rot = random_rot
         else:
             self.p_interval = [0.95]
             self.random_shift = False
             self.random_choose = False
-            self.window_size = 64
+            self.window_size = window_size
+            self.pad_method = pad_method
             self.random_move = False
             self.random_rot = False
         if average_flow and absolute_flow:
@@ -96,11 +102,11 @@ class Feeder(Dataset):
         )
         self.no_flow = no_flow
         self.no_conf = no_conf
+        self.obs_ratio = float(obs_ratio)
         self.debug = debug
         self.use_mmap = use_mmap
         self.vel = vel
         self.A = A
-        # self.load_data()
         self.data = None # defer loading (lazy loading)
         if sort:
             self.get_n_per_class()
@@ -129,6 +135,9 @@ class Feeder(Dataset):
                 raise NotImplementedError(
                     "data split only supports train/test")
             print(f"\tAssigned self.data to unique split ({self.split})")
+            if self.debug:
+                self.data = self.data[:200]
+                self.labels = self.labels[:200]
 
             # Handle NaN filtering more memory efficiently when using mmap
             if self.use_mmap:
@@ -231,84 +240,135 @@ class Feeder(Dataset):
 if __name__ == "__main__":
     from config.argclass import ArgClass
     import time
+    import math
     from torch.utils.data import DataLoader
     import logging
     import argparse
     import os.path as osp
+    from einops import rearrange
 
-
-    # Argparser to test data moved to the slurm jobfs directory
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--data_overwrite",
-        help="Overwrite dataset path to full file"
-    )
-    parser.add_argument(
-        "-embed", "--embed",
-        help="Embedding type (base, abs, avg, cnn) for loading config"
-    )
-    parsed = parser.parse_args()
-
-    # Create logger
-    logger = logging.getLogger(__name__)
     # Create logger
     logger = logging.getLogger(__name__)
     logging.basicConfig(
-        filename='./logs/debug/ucf_feeder_test.log',
+        filename='./logs/debug/feeders/ucf101_feeder.log',
         encoding="utf-8",
         filemode="w",
         level=logging.DEBUG
     )
 
-    # Change this to test different embedding configs
-    dataset = "ucf101"
-    if parsed.embed == None:
-        embed =  'base'
-    else:
-        embed = parsed.embed
-    evaluation = 1
-    arg = ArgClass(f"./config/ucf101/{embed}.yaml")
+    # Argparser to test data moved to the slurm jobfs directory
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-f",
+        dest="flow_embedding",
+        default="base",
+        help="Flow embedding, either base or cnn (default=base)"
+    )
+    parser.add_argument(
+        "-e",
+        dest="evaluation",
+        default="1",
+        help="Evaluation"
+    )
+    parser.add_argument(
+        "--debug", help="Use to debug, only take first 100 samples",
+        action="store_true"
+    )
+    parser.add_argument(
+        "--data_path_overwrite", help="Overwrite dataset path.\
+        This overwrites `config['data_paths'][arg.evaluation]` completely (must be a file)."
+    )
+    parsed = parser.parse_args()
+
+    assert int(parsed.evaluation) in [1, 2, 3]
+    assert parsed.flow_embedding in ['base', 'cnn']
+
+    # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
+    model_type = "infogcn2"
+    evaluation = int(parsed.evaluation)
+    flow_embedding = parsed.flow_embedding
+
+
+    arg = ArgClass(f"config/{model_type}/ucf101/{flow_embedding}.yaml", verbose=True)
     arg.feeder_args['eval'] = evaluation
-    arg.feeder_args['use_mmap'] = True
+    # arg.feeder_args['normalisation'] = False
+    # arg.feeder_args['data_paths'][parsed.evaluation] = \
+    #     arg.feeder_args['data_paths'][parsed.evaluation].replace("_mean", "")
 
     # Pass root path for the dataset objects
-    if parsed.data_overwrite is not None:
-        for arg_key, arg_val in arg.feeder_args['data_paths'].items():
-            arg.feeder_args['data_paths'][arg_key] = osp.join(
-                f"data/{dataset}/aligned_data",
-                parsed.data_overwrite
-                )
-    logger.debug(f"Feeder testing for dataset: {dataset}")
-    logger.debug(f"\tEmbed: {embed}")
+    if parsed.data_path_overwrite is not None:
+        arg.feeder_args['use_mmap'] = True
+        arg.feeder_args['data_paths'][parsed.evaluation] = parsed.data_path_overwrite
+
+    logger.debug(f"Feeder testing for UCF-101")
+    logger.debug(f"\tFlow embedding: {flow_embedding}")
     logger.debug(f"\tEvaluation: {evaluation}")
     logger.debug(f"\tData path: {arg.feeder_args['data_paths'][evaluation]}")
 
     # Create the dataset objects
-    train_feeder = Feeder(**arg.feeder_args, split="train")
-    test_feeder = Feeder(**arg.feeder_args, split="test")
+    train_feeder = Feeder(
+        **arg.feeder_args,
+        split="train",
+        debug=parsed.debug
+    )
+    logger.debug(f"\tTrain feeder length: {len(train_feeder)}")
+    test_feeder = Feeder(
+        **arg.feeder_args,
+        split="test",
+        debug=parsed.debug)
+    logger.debug(f"\tTest feeder length: {len(test_feeder)}")
 
-    dataloader = DataLoader(train_feeder, 
-                            batch_size=64,
-                            num_workers=4,
+    # Calculate the number of iterations per epoch (used for cosine annealing)
+    cal_epoch_iters = math.ceil(len(train_feeder) / arg.batch_size)
+    logger.debug(f"Calculated epoch iters: {cal_epoch_iters}")
+
+    # Log the overall shape of data in one of the feeders...
+    logger.debug(f"Full data shape: {train_feeder.data.shape}")
+
+    # Create a dataloaders
+    train_dataloader = DataLoader(train_feeder,
+                            batch_size=arg.batch_size,
+                            num_workers=1,
+                            shuffle=False,
+                            pin_memory=True)
+    test_dataloader = DataLoader(test_feeder,
+                            batch_size=arg.batch_size,
+                            num_workers=1,
                             shuffle=False,
                             pin_memory=True)
 
-    start = time.time()
-    for epoch, (data_numpy, label, mask, index) in enumerate(dataloader):
-        logger.debug(f"Full data shape: {train_feeder.data.shape}")
-        break
+    # This is to log the number of samples of each class (checking for class imbalance)
+    debug_labels = {'train': [0 for i in range(101)], 'test': [0 for i in range(101)]}
+    debug_means = {
+        'train': {'total_count': 0},
+        'test': {'total_count': 0}
+    }
 
-    # Log the shapes of the data and mask log
-    # and the first two frames of the first two persons
-    logger.debug(f"Feeder path: {arg.feeder_args['data_paths'][evaluation]}")
-    logger.debug(f"Total samples: {len(train_feeder)}")
-    logger.debug(
-        f"Time taken for one epoch loading: {time.time() - start:.2f} seconds")
-    logger.debug(f"Data shape: {data_numpy.shape}")  # (B, C, T, V, M)
-    logger.debug(f"Label shape: {label.shape}") # (B)
-    logger.debug(f"Mask shape: {mask.shape}") # (B, 1, 64, 1, 2)
+    C = 3 if flow_embedding=='base' else 53
+    V = 17
 
-    logger.debug(f"Frame 0, person 0: {data_numpy[0, :, 0, 0, 0]}")
-    logger.debug(f"Frame 0, person 1: {data_numpy[0, :, 0, 0, 1]}\n")
-    logger.debug(f"Frame 1, person 0: {data_numpy[0, :, 1, 0, 0]}")
-    logger.debug(f"Frame 1, person 1: {data_numpy[0, :, 1, 0, 1]}")
+    # iterate over the train dataloader
+    for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
+        # data_numpy shape: (B, C, T, V, M)
+        for sample_label in label:
+            debug_labels['train'][sample_label] += 1
+
+    # iterate over the test dataloader
+    for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
+        # data_numpy shape: (B, C, T, V, M)
+        for sample_label in label:
+            debug_labels['test'][sample_label] += 1
+
+
+    logger.debug("TRAIN DATA:")
+    logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 17, 2)
+    logger.debug(f"\tMask shape: {mask.shape}")
+    logger.debug(f"\tLabel shape: {label.shape}")
+
+    logger.debug("TEST DATA:")
+    logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 17, 2)
+    logger.debug(f"\tMask shape: {mask.shape}")
+    logger.debug(f"\tLabel shape: {label.shape}")
+
+    logger.debug(f"train labels: {debug_labels['train']}")
+    logger.debug(f"test labels: {debug_labels['test']}")
