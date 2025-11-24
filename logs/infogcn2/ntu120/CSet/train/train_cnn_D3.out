@@ -1,0 +1,168 @@
+Mon Nov 24 11:43:07 AM AEDT 2025
+Copying file: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu120_CSet-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu120_CSet-flowpose_D3_aligned.npz
+Run name: infogcn2_ntu120_CSet_cnn_D3
+
+Python script run command arguments:
+python main.py -m infogcn2 -d ntu120 -p train -f cnn -e CSet -o 1.0 -r infogcn2_ntu120_CSet_cnn_D3 --desc infogcn2_train ntu120 CSet cnn observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ntu120_CSet-flowpose_D3_aligned.npz -v
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CSet': './data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz', 'CSub': './data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.infogcn2.sode.SODE
+model_args:
+  num_class: 120
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  embed_channels: 64
+  num_head: 3
+  ode_method: euler
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  SAGC_proj: True
+  num_cls: 10
+  n_sample: 1
+  backbone: transformer
+  cnn: True
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0003
+  nesterov: True
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [50, 60]
+  gamma: 0.1
+training_function: training.train_infogcn.train_network
+testing_function: training.eval_infogcn.eval_network
+num_epoch: 70
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/ntu120/
+model_type: infogcn2
+dataset: ntu120
+flow_embedding: cnn
+evaluation: CSet
+obs_ratio: 1.0
+run_name: infogcn2_ntu120_CSet_cnn_D3
+description: infogcn2_train ntu120 CSet cnn observation ratio 1.0, retraining model with mean and std norm
+data_path_overwrite: /var/tmp/jobfs/data/ntu120_CSet-flowpose_D3_aligned.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 697848
+	Loading weights from ./results/infogcn2/ntu120/CSet/train/infogcn2_ntu120_CSet_cnn_D3.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/infogcn2/ntu120/CSet/train/infogcn2_ntu120_CSet_cnn_D3.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+	Created new checkpoint file: ./results/infogcn2/ntu120/CSet/train/infogcn2_ntu120_CSet_cnn_D3.pt
+		1 EPOCH BEST TRAIN AUC: 0.009230189956724644
+			Train time: 611.66 seconds
+		2 EPOCH BEST TRAIN AUC: 0.022212009876966476
+			Train time: 635.68 seconds
+		3 EPOCH BEST TRAIN AUC: 0.0730256736278534
+			Train time: 644.92 seconds
+		4 EPOCH BEST TRAIN AUC: 0.15993048250675201
+			Train time: 647.10 seconds
+		5 EPOCH BEST TRAIN AUC: 0.2684440314769745
+			Train time: 645.04 seconds
+		6 EPOCH BEST TRAIN AUC: 0.35062098503112793
+			Train time: 678.45 seconds
+		7 EPOCH BEST TRAIN AUC: 0.40507298707962036
+			Train time: 619.21 seconds
+		8 EPOCH BEST TRAIN AUC: 0.4449527859687805
+			Train time: 600.32 seconds
+		9 EPOCH BEST TRAIN AUC: 0.4818021059036255
+			Train time: 646.77 seconds
+		10 EPOCH BEST TRAIN AUC: 0.5116025805473328
+			Train time: 648.15 seconds
+		11 EPOCH BEST TRAIN AUC: 0.5350134372711182
+			Train time: 626.18 seconds
+		12 EPOCH BEST TRAIN AUC: 0.5538966059684753
+			Train time: 644.21 seconds
+		13 EPOCH BEST TRAIN AUC: 0.5716208815574646
+			Train time: 664.91 seconds
+		14 EPOCH BEST TRAIN AUC: 0.584608793258667
+			Train time: 655.60 seconds
+		15 EPOCH BEST TRAIN AUC: 0.5979921817779541
+			Train time: 618.89 seconds
+		16 EPOCH BEST TRAIN AUC: 0.6071681380271912
+			Train time: 716.90 seconds
+		17 EPOCH BEST TRAIN AUC: 0.6164763569831848
+			Train time: 691.17 seconds
+		18 EPOCH BEST TRAIN AUC: 0.6248031854629517
+			Train time: 823.36 seconds
+		19 EPOCH BEST TRAIN AUC: 0.6342370510101318
+			Train time: 835.33 seconds
+		20 EPOCH BEST TRAIN AUC: 0.6398851871490479
+			Train time: 784.03 seconds
+		21 EPOCH BEST TRAIN AUC: 0.6456867456436157
+			Train time: 625.18 seconds
+		22 EPOCH BEST TRAIN AUC: 0.6537315845489502
+			Train time: 605.47 seconds
+		23 EPOCH BEST TRAIN AUC: 0.658820629119873
+			Train time: 614.52 seconds
+		24 EPOCH BEST TRAIN AUC: 0.6619167327880859
+			Train time: 611.93 seconds
+		25 EPOCH BEST TRAIN AUC: 0.6665909290313721
+			Train time: 603.02 seconds

@@ -1,0 +1,331 @@
+Mon Nov 24 10:39:27 AM AEDT 2025
+Copying file: ./data/ntu120/aligned_data/ntu120_CSub-pose_aligned_mean.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu120_CSub-pose_aligned_mean.npz
+Data path: /var/tmp/jobfs/data/ntu120_CSub-pose_aligned_mean.npz
+Run name: infogcn2_ntu120_CSub_base
+
+Python script run command arguments:
+python main.py -m infogcn2 -d ntu120 -p train -f base -e CSub -o 1.0 -r infogcn2_ntu120_CSub_base --desc infogcn2_train ntu120 CSub base observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ntu120_CSub-pose_aligned_mean.npz -v
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CSet': './data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz', 'CSub': './data/ntu120/aligned_data/ntu120_CSub-pose_aligned.npz'}
+  label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.infogcn2.sode.SODE
+model_args:
+  num_class: 120
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 0
+  embed_channels: 64
+  num_head: 3
+  ode_method: euler
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  SAGC_proj: True
+  num_cls: 10
+  n_sample: 1
+  backbone: transformer
+  cnn: False
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0003
+  nesterov: True
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [50, 60]
+  gamma: 0.1
+training_function: training.train_infogcn.train_network
+testing_function: training.eval_infogcn.eval_network
+num_epoch: 70
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/ntu120/
+model_type: infogcn2
+dataset: ntu120
+flow_embedding: base
+evaluation: CSub
+obs_ratio: 1.0
+run_name: infogcn2_ntu120_CSub_base
+description: infogcn2_train ntu120 CSub base observation ratio 1.0, retraining model with mean and std norm
+data_path_overwrite: /var/tmp/jobfs/data/ntu120_CSub-pose_aligned_mean.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 691147
+	Loading weights from ./results/infogcn2/ntu120/CSub/train/infogcn2_ntu120_CSub_base.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/infogcn2/ntu120/CSub/train/infogcn2_ntu120_CSub_base.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_AUC
+		test_AUC
+		train_cls_loss
+		test_cls_loss
+		train_feature_loss
+		test_feature_loss
+		train_recon_loss
+		test_recon_loss
+	Created new checkpoint file: ./results/infogcn2/ntu120/CSub/train/infogcn2_ntu120_CSub_base.pt
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+		1 EPOCH BEST TEST AUC: 0.013216149061918259
+			Train time: 248.97 seconds
+			Test time: 72.10 seconds
+		2 EPOCH BEST TEST AUC: 0.03866250813007355
+			Train time: 238.91 seconds
+			Test time: 69.05 seconds
+		3 EPOCH BEST TEST AUC: 0.07243090867996216
+			Train time: 238.92 seconds
+			Test time: 68.73 seconds
+		4 EPOCH BEST TEST AUC: 0.16777747869491577
+			Train time: 239.09 seconds
+			Test time: 69.31 seconds
+		5 EPOCH BEST TEST AUC: 0.20690764486789703
+			Train time: 238.99 seconds
+			Test time: 70.03 seconds
+		6 EPOCH BEST TEST AUC: 0.3037342429161072
+			Train time: 239.05 seconds
+			Test time: 70.18 seconds
+		7 EPOCH BEST TEST AUC: 0.33835047483444214
+			Train time: 239.18 seconds
+			Test time: 70.26 seconds
+		8 EPOCH BEST TEST AUC: 0.3804034888744354
+			Train time: 239.26 seconds
+			Test time: 70.35 seconds
+		9 EPOCH BEST TEST AUC: 0.3967827558517456
+			Train time: 239.21 seconds
+			Test time: 70.21 seconds
+		10 EPOCH BEST TEST AUC: 0.4138779044151306
+			Train time: 239.39 seconds
+			Test time: 70.68 seconds
+		11 EPOCH BEST TEST AUC: 0.4326927065849304
+			Train time: 239.43 seconds
+			Test time: 70.17 seconds
+		12 EPOCH BEST TEST AUC: 0.4590756297111511
+			Train time: 239.22 seconds
+			Test time: 70.43 seconds
+		13 EPOCH BEST TEST AUC: 0.4590756297111511
+			Train time: 239.28 seconds
+			Test time: 70.49 seconds
+		14 EPOCH BEST TEST AUC: 0.45993420481681824
+			Train time: 239.31 seconds
+			Test time: 70.27 seconds
+		15 EPOCH BEST TEST AUC: 0.47925010323524475
+			Train time: 239.43 seconds
+			Test time: 70.99 seconds
+		16 EPOCH BEST TEST AUC: 0.47925010323524475
+			Train time: 239.30 seconds
+			Test time: 70.37 seconds
+		17 EPOCH BEST TEST AUC: 0.48574572801589966
+			Train time: 239.28 seconds
+			Test time: 70.41 seconds
+		18 EPOCH BEST TEST AUC: 0.48574572801589966
+			Train time: 239.46 seconds
+			Test time: 70.29 seconds
+		19 EPOCH BEST TEST AUC: 0.48574572801589966
+			Train time: 239.31 seconds
+			Test time: 70.29 seconds
+		20 EPOCH BEST TEST AUC: 0.48574572801589966
+			Train time: 239.32 seconds
+			Test time: 70.50 seconds
+		21 EPOCH BEST TEST AUC: 0.5042331218719482
+			Train time: 239.16 seconds
+			Test time: 70.15 seconds
+		22 EPOCH BEST TEST AUC: 0.5042331218719482
+			Train time: 239.22 seconds
+			Test time: 70.48 seconds
+		23 EPOCH BEST TEST AUC: 0.5042331218719482
+			Train time: 239.26 seconds
+			Test time: 70.44 seconds
+		24 EPOCH BEST TEST AUC: 0.513595700263977
+			Train time: 239.25 seconds
+			Test time: 70.79 seconds
+		25 EPOCH BEST TEST AUC: 0.513595700263977
+			Train time: 239.31 seconds
+			Test time: 70.31 seconds
+		26 EPOCH BEST TEST AUC: 0.513595700263977
+			Train time: 239.50 seconds
+			Test time: 70.69 seconds
+		27 EPOCH BEST TEST AUC: 0.513595700263977
+			Train time: 239.37 seconds
+			Test time: 70.43 seconds
+		28 EPOCH BEST TEST AUC: 0.5140612125396729
+			Train time: 239.14 seconds
+			Test time: 70.78 seconds
+		29 EPOCH BEST TEST AUC: 0.5140612125396729
+			Train time: 239.56 seconds
+			Test time: 70.83 seconds
+		30 EPOCH BEST TEST AUC: 0.5140612125396729
+			Train time: 239.40 seconds
+			Test time: 70.92 seconds
+		31 EPOCH BEST TEST AUC: 0.5140612125396729
+			Train time: 239.44 seconds
+			Test time: 70.42 seconds
+		32 EPOCH BEST TEST AUC: 0.5140612125396729
+			Train time: 239.16 seconds
+			Test time: 70.43 seconds
+		33 EPOCH BEST TEST AUC: 0.5166716575622559
+			Train time: 239.28 seconds
+			Test time: 70.58 seconds
+		34 EPOCH BEST TEST AUC: 0.5187177658081055
+			Train time: 239.32 seconds
+			Test time: 71.03 seconds
+		35 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.42 seconds
+			Test time: 70.87 seconds
+		36 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.40 seconds
+			Test time: 70.87 seconds
+		37 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.49 seconds
+			Test time: 71.12 seconds
+		38 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.39 seconds
+			Test time: 70.86 seconds
+		39 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.37 seconds
+			Test time: 70.88 seconds
+		40 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.47 seconds
+			Test time: 70.51 seconds
+		41 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.32 seconds
+			Test time: 70.66 seconds
+		42 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.38 seconds
+			Test time: 70.76 seconds
+		43 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.42 seconds
+			Test time: 70.71 seconds
+		44 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.22 seconds
+			Test time: 70.53 seconds
+		45 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.24 seconds
+			Test time: 70.65 seconds
+		46 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.28 seconds
+			Test time: 70.49 seconds
+		47 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.48 seconds
+			Test time: 70.69 seconds
+		48 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.39 seconds
+			Test time: 70.53 seconds
+		49 EPOCH BEST TEST AUC: 0.5286800265312195
+			Train time: 239.33 seconds
+			Test time: 70.56 seconds
+		50 EPOCH BEST TEST AUC: 0.5303030014038086
+			Train time: 239.59 seconds
+			Test time: 70.87 seconds
+		51 EPOCH BEST TEST AUC: 0.5538999438285828
+			Train time: 239.40 seconds
+			Test time: 70.69 seconds
+		52 EPOCH BEST TEST AUC: 0.5559375286102295
+			Train time: 239.36 seconds
+			Test time: 71.02 seconds
+		53 EPOCH BEST TEST AUC: 0.5581575632095337
+			Train time: 239.33 seconds
+			Test time: 70.70 seconds
+		54 EPOCH BEST TEST AUC: 0.5581575632095337
+			Train time: 239.24 seconds
+			Test time: 70.74 seconds
+		55 EPOCH BEST TEST AUC: 0.5581575632095337
+			Train time: 239.30 seconds
+			Test time: 70.51 seconds
+		56 EPOCH BEST TEST AUC: 0.5590305924415588
+			Train time: 239.35 seconds
+			Test time: 70.96 seconds
+		57 EPOCH BEST TEST AUC: 0.5590305924415588
+			Train time: 239.36 seconds
+			Test time: 70.54 seconds
+		58 EPOCH BEST TEST AUC: 0.5591325163841248
+			Train time: 239.27 seconds
+			Test time: 70.33 seconds
+		59 EPOCH BEST TEST AUC: 0.5607469081878662
+			Train time: 239.41 seconds
+			Test time: 70.66 seconds
+		60 EPOCH BEST TEST AUC: 0.5607469081878662
+			Train time: 239.40 seconds
+			Test time: 70.36 seconds
+		61 EPOCH BEST TEST AUC: 0.5607469081878662
+			Train time: 239.29 seconds
+			Test time: 70.38 seconds
+		62 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.37 seconds
+			Test time: 70.22 seconds
+		63 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.47 seconds
+			Test time: 70.56 seconds
+		64 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.44 seconds
+			Test time: 70.44 seconds
+		65 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.31 seconds
+			Test time: 71.04 seconds
+		66 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.33 seconds
+			Test time: 71.74 seconds
+		67 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.37 seconds
+			Test time: 71.21 seconds
