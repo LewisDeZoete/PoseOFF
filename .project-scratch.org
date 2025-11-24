@@ -6,9 +6,6 @@
 * Feeders:
 - [X] Implement a method in the feeder(s) for specific observation ratios.
   - [X] Implement method for overriding arg.feeder_args['obs_ratio'] in main or within configs...
-  - "The last frame duplication strategy performs best..." (Chi et al. 2023, p.7)
-- Sequence length = 100
-  - "To generate a skeleton sequence of length M (M=100 in PYSKL), we divide the original sequence uniformly into M splits with equal lengths and randomly sample one frame per split."
 
 * Train stgcn
 - [-] ntu
@@ -18,7 +15,6 @@
 
 * Configs
 - [X] add `training_function` and `testing_function` to all configs...
-- [ ] Add arg.feeder_args['normalisation'] option (set True once mean/std calculations are complete)
 - [ ] Change data_path to ...data_path..._mean.npz
 
 * General
@@ -31,15 +27,8 @@
 
 * Data generation
 - [ ] Move mean and standard deviation map calculations to the data_gen
-  - For now it's only implemented for ntu, and is calculated and saved in the feeder class __main__...
-- [-] ntu120 CSet flowpose
-- [ ] ntu120 CSub flowpose
-- [ ] debug problems in the ntu120 mean and std maps...
-
-* Evaluation bugs
-Evaluation pipeline for infogcn2 works...
-Checkpoint saves and continuing *training* also works...
-AverageMeter works...
+- [ ] Must re-perform std/mean map calculations
+  - They are skewed by the auto-padding since they are calculated from the output of the feeder (which ALWAYS uses auto-padding)
 
 * Image export
 Cropping bounds: (250,150) -> (1150, 1050)
@@ -54,6 +43,34 @@ Images 30-38
 
 #+RESULTS:
 : /fred/oz141/ldezoete/environment/bin/python3
+
+#+begin_src python :results output
+import torch
+import os.path as osp
+
+model = "infogcn2"
+dataset = "ucf101"
+evaluation = "1"
+flow_embedding = "base"
+modifier = ""
+
+root_path = './results/'
+checkpoint_path = osp.join(root_path, model, dataset, evaluation, "train", f"{model}_{dataset}_{evaluation}_{flow_embedding}{modifier}.pt")
+
+checkpoint = torch.load(checkpoint_path, map_location="cpu")
+results = checkpoint['results']
+print(f"Checkpoint keys: {checkpoint.keys()}")
+print(f"Epoch (checkpoint): {checkpoint['epoch']}")
+print(f"Result keys: {results.keys()}")
+print(f"Train ACC: {results['train_ACC'][-1]}")
+# print(f"Test ACC: {results['test_ACC']}")
+#+end_src
+
+#+RESULTS:
+: Checkpoint keys: dict_keys(['epoch', 'model_state_dict', 'optimiser_state_dict', 'scheduler_state_dict', 'results'])
+: Epoch (checkpoint): 70
+: Result keys: dict_keys(['epoch', 'train_time', 'train_loss', 'lr', 'test_time', 'test_loss', 'train_ACC', 'test_ACC', 'train_AUC', 'test_AUC', 'train_cls_loss', 'test_cls_loss', 'train_feature_loss', 'test_feature_loss', 'train_recon_loss', 'test_recon_loss'])
+: Train ACC: 70
 
 #+begin_src python :results output
 import torch
