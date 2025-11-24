@@ -176,7 +176,7 @@ def train_network(
             results["lr"].append(scheduler.get_last_lr()[0])
 
         # TEST
-        if test_loader is not None:
+        if test_loader is not None and epoch == epochs:
             model = model.eval()
             with torch.no_grad():
                 test_time = run_epoch(
@@ -192,16 +192,21 @@ def train_network(
                 )
 
             results["test_time"].append(test_time)
-            # Print the results
+            # Print the final
             print(f"\t\t{epoch} EPOCH BEST TEST ACC: {max(results['test_ACC'])}")
             print(f"\t\t\tTrain time: {train_time:.2f} seconds")
             print(f"\t\t\tTest time: {test_time:.2f} seconds")
+        else:
+            # Print results during training
+            print(f"\t\t{epoch} EPOCH BEST TRAIN ACC: {max(results['train_ACC'])}")
+            print(f"\t\t\tTrain time: {train_time:.2f} seconds")
 
         if checkpoint_file is not None:
             if epoch % checkpoint_freq == 0:
                 save_checkpoint(
                     checkpoint_file, epoch, model, optimiser, scheduler, results, device
                 )
+
 
     print(f"\tBest train ACC: {torch.tensor(results['train_ACC']).max().item()}")
     # Get the total training time

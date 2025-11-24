@@ -285,8 +285,8 @@ def train_network(
                 scheduler.step()
             results["lr"].append(scheduler.get_last_lr()[0])
 
-        # TEST
-        if test_loader is not None:
+        # TEST only if we've finished the last epoch of training (curr_epoch==max_epoch)
+        if test_loader is not None and epoch == epochs:
             model = model.eval()
             with torch.no_grad():
                 test_time = run_epoch(
@@ -299,12 +299,16 @@ def train_network(
                     results=results,
                     prefix="test",
                 )
-            
+
             results["test_time"].append(test_time)
             # Print the results
             print(f"\t\t{epoch} EPOCH BEST TEST AUC: {max(results['test_AUC'])}")
             print(f"\t\t\tTrain time: {train_time:.2f} seconds")
             print(f"\t\t\tTest time: {test_time:.2f} seconds")
+        else:
+            # Print results during training
+            print(f"\t\t{epoch} EPOCH BEST TRAIN AUC: {max(results['train_AUC'])}")
+            print(f"\t\t\tTrain time: {train_time:.2f} seconds")
 
         if checkpoint_file is not None:
             if epoch % checkpoint_freq == 0:
@@ -392,9 +396,9 @@ if __name__ == "__main__":
 
     # ------------------------------------------------------------------
     model_type = "infogcn2"
-    dataset = "ntu120"
+    dataset = "ucf101"
     flow_embedding = "base"
-    evaluation = "CSub"
+    evaluation = "1"
     # ------------------------------------------------------------------
 
     logger = logging.getLogger(__name__)
@@ -455,22 +459,21 @@ if __name__ == "__main__":
     feeder_class = arg.import_class(arg.feeder)
     train_dataset = feeder_class(
         **arg.feeder_args,
-        split="train"
+        split="train",
+        debug=True
     )
-    # Reduce the size of the training dataset for the sake of speed...
-    # indices = list(range(arg.batch_size*4))
-    # sampler = SubsetRandomSampler(indices)
     train_dataloader = DataLoader(
         train_dataset,
-        # sampler=sampler,
         batch_size=arg.batch_size,
         num_workers=4,
         pin_memory=True,
     )
     test_dataset = feeder_class(
         **arg.feeder_args,
-        split="test"
+        split="test",
+        debug=True
     )
+
     test_dataloader = DataLoader(
         test_dataset,
         batch_size=arg.batch_size,
