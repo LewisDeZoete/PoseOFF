@@ -5,18 +5,6 @@ feeder_args:
     CS: ./data/ntu/aligned_data/ntu_CS-pose_aligned_mean.npz
     CV: ./data/ntu/aligned_data/ntu_CV-pose_aligned_mean.npz
   label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
-  # p_interval: [0.5, 1]
-  # random_choose: True
-  # random_shift: True
-  # window_size: 300
-  # random_move: True
-  # random_rot: True
-  # average_flow: False # model_args.flow_channels = 2
-  # absolute_flow: False
-  #   # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
-  # no_flow: True
-  # no_Z: False
-  # normalisation: True
   p_interval: [0.5, 1]
   random_choose: False
   random_shift: False
@@ -29,7 +17,6 @@ feeder_args:
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: True
   no_Z: False
-  normalisation: True
 
 extractor:
   preprocessed: True

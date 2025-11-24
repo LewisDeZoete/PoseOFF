@@ -16,6 +16,7 @@ feeder_args:
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: False
   no_Z: False
+  normalisation: True
 
 extractor:
   preprocessed: True

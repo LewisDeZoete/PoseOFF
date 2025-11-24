@@ -6,11 +6,12 @@ feeder_args:
     CSub: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz
   label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
   p_interval: [0.5, 1]
-  random_choose: True
-  random_shift: True
+  random_choose: False
+  random_shift: False
   window_size: 100
-  random_move: True
-  random_rot: True
+  pad_method: zero_pad
+  random_move: False
+  random_rot: False
   average_flow: False # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)

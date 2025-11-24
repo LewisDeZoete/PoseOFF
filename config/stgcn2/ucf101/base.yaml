@@ -7,15 +7,17 @@ feeder_args:
     3: ./data/ucf101/aligned_data/ucf101_03_D1.npz
   label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
   p_interval: [0.5, 1]
-  random_shift: True
-  random_choose: True
+  random_choose: False
+  random_shift: False
   window_size: 100
-  random_move: True
-  random_rot: True
+  pad_method: zero_pad
+  random_move: False
+  random_rot: False
   average_flow: False # model_args.flow_channels = 2
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: True
+  no_Z: False # NOTE: Should ordinarily be false
 
 extractor:
   data_paths:
@@ -78,9 +80,7 @@ training_function: training.train_msg3d.train_network
 testing_function: training.eval_msg3d.eval_network
 num_epoch: 16
 device: 0
-batch_size: 256
-forward_batch_size: 128
-test_batch_size: 256
+batch_size: 128
 half: False
 
 checkpoint_freq: 1 # how often to save the model and training state
