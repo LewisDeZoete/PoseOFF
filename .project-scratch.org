@@ -44,96 +44,48 @@ Images 30-38
 #+RESULTS:
 : /fred/oz141/ldezoete/environment/bin/python3
 
-#+begin_src python :results output
-import torch
-import os.path as osp
 
-model = "infogcn2"
-dataset = "ucf101"
-evaluation = "1"
-flow_embedding = "base"
-modifier = ""
-
-root_path = './results/'
-checkpoint_path = osp.join(root_path, model, dataset, evaluation, "train", f"{model}_{dataset}_{evaluation}_{flow_embedding}{modifier}.pt")
-
-checkpoint = torch.load(checkpoint_path, map_location="cpu")
-results = checkpoint['results']
-print(f"Checkpoint keys: {checkpoint.keys()}")
-print(f"Epoch (checkpoint): {checkpoint['epoch']}")
-print(f"Result keys: {results.keys()}")
-print(f"Train ACC: {results['train_ACC'][-1]}")
-# print(f"Test ACC: {results['test_ACC']}")
-#+end_src
-
-#+RESULTS:
-: Checkpoint keys: dict_keys(['epoch', 'model_state_dict', 'optimiser_state_dict', 'scheduler_state_dict', 'results'])
-: Epoch (checkpoint): 70
-: Result keys: dict_keys(['epoch', 'train_time', 'train_loss', 'lr', 'test_time', 'test_loss', 'train_ACC', 'test_ACC', 'train_AUC', 'test_AUC', 'train_cls_loss', 'test_cls_loss', 'train_feature_loss', 'test_feature_loss', 'train_recon_loss', 'test_recon_loss'])
-: Train ACC: 70
-
-#+begin_src python :results output
-import torch
-import mmnpz
-
-# NTU60
-CS_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned_mean.npz"
-CS_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CS-pose_aligned_mean.npz"
-CV_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned_mean.npz"
-CV_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CV-pose_aligned_mean.npz"
-
-# NTU120
-CSet_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned_mean.npz"
-CSet_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSet-pose_aligned_mean.npz"
-CSub_flow = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned_mean.npz"
-CSub_pose = "/fred/oz141/ldezoete/MS-G3D/data/ntu120/aligned_data/ntu120_CSub-pose_aligned_mean.npz"
-
-path_dict = {
-    'CS flowpose': CS_flow, 'CS pose': CS_pose, 'CV flowpose': CV_flow, 'CV pose': CV_pose,
-    'CSet flowpose': CSet_flow, 'CSet pose': CSet_pose, 'CSub flowpose': CSub_flow, 'CSub pose': CSub_pose,
-}
-
-error_dict = {}
-
-for name, path in path_dict.items():
-    try:
-        dat = mmnpz.load(path)
-        print(f"Mean map shape: {dat['mean_map'].shape}")
-        print(f"Std map shape: {dat['std_map'].shape}")
-        if "CSub-pose" in path:
-            print(dat['mean_map'])
-            print(dat['mean_map'])
-    except Exception as e:
-        error_dict[name] = e
-
-print(error_dict)
-#+end_src
-
-#+RESULTS:
-#+begin_example
-Mean map shape: (53, 25)
-Std map shape: (53, 1, 25, 1)
-Mean map shape: (3, 25)
-Std map shape: (3, 1, 25, 1)
-Mean map shape: (53, 25)
-Std map shape: (53, 1, 25, 1)
-Mean map shape: (3, 25)
-Std map shape: (3, 1, 25, 1)
-Mean map shape: (3, 25)
-Std map shape: (3, 1, 25, 1)
-Mean map shape: (3, 25)
-Std map shape: (3, 1, 25, 1)
-[[nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
-  nan nan nan nan nan nan nan]
- [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
-  nan nan nan nan nan nan nan]
- [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
-  nan nan nan nan nan nan nan]]
-[[nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
-  nan nan nan nan nan nan nan]
- [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
-  nan nan nan nan nan nan nan]
- [nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan nan
-  nan nan nan nan nan nan nan]]
-{'CSet flowpose': FileNotFoundError(2, 'No such file or directory'), 'CSub flowpose': FileNotFoundError(2, 'No such file or directory')}
-#+end_example
+infogcn2_ntu_CS_cnn_D3: 0.8888214826583862
+infogcn2_ntu_CS_base: 0.8352034687995911
+infogcn2_ntu_CV_base: 0.9138495922088623
+infogcn2_ntu_CV_cnn_D3: 0.9368265271186829
+infogcn2_ntu120_CSub_cnn_D3: None
+infogcn2_ntu120_CSub_base: 0.7571829557418823
+infogcn2_ntu120_CSet_base: 0.7760814428329468
+infogcn2_ntu120_CSet_cnn_D3: None
+infogcn2_ucf101_1_base: None
+infogcn2_ucf101_1_cnn_D1: None
+infogcn2_ucf101_2_base: None
+infogcn2_ucf101_2_cnn_D1: None
+infogcn2_ucf101_3_cnn_D1: None
+infogcn2_ucf101_3_base: None
+msg3d_ntu_CS_base: 0.9839614629745483
+msg3d_ntu_CS_cnn_D3: None
+msg3d_ntu_CV_cnn_D3: None
+msg3d_ntu_CV_base_LR_fix: 0.9721617698669434
+msg3d_ntu_CV_cnn_LR_fix: 0.7958880066871643
+msg3d_ntu_CV_base: 0.9739680290222168
+msg3d_ntu120_CSub_base: None
+msg3d_ntu120_CSub_cnn_D3: None
+msg3d_ntu120_CSet_cnn_D3: None
+msg3d_ntu120_CSet_base: None
+msg3d_ucf101_1_base: None
+msg3d_ucf101_1_cnn: None
+msg3d_ucf101_2_base: None
+msg3d_ucf101_2_cnn: None
+msg3d_ucf101_3_cnn: None
+msg3d_ucf101_3_base: None
+stgcn2_ntu_CS_cnn_D3: 0.9966077208518982
+stgcn2_ntu_CS_base: 0.9830635190010071
+stgcn2_ntu_CV_cnn_D3_obs0.2: 0.4922701120376587
+stgcn2_ntu_CV_cnn_D3_obs0.6: 0.8540615439414978
+stgcn2_ntu_CV_cnn_D3_obs0.5: 0.9462094306945801
+stgcn2_ntu_CV_cnn_D3_obs0.4: 0.5520905256271362
+stgcn2_ntu_CV_base_obs0.5: 0.8912500739097595
+stgcn2_ntu_CV_base: 0.98114013671875
+stgcn2_ntu_CV_cnn_D3: 0.9941827058792114
+stgcn2_ntu_CV_cnn_D3_obs0.8: 0.7845189571380615
+stgcn2_ntu120_CSub_cnn_D3: 0.9792783856391907
+stgcn2_ntu120_CSub_base: 0.9433408379554749
+stgcn2_ntu120_CSet_base: 0.9368436336517334
+stgcn2_ntu120_CSet_cnn_D3: 0.980043351650238
