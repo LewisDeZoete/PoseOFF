@@ -329,3 +329,33 @@ debug: False
 		67 EPOCH BEST TEST AUC: 0.5607833862304688
 			Train time: 239.37 seconds
 			Test time: 71.21 seconds
+		68 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.40 seconds
+			Test time: 70.96 seconds
+		69 EPOCH BEST TEST AUC: 0.5607833862304688
+			Train time: 239.25 seconds
+			Test time: 70.87 seconds
+		70 EPOCH BEST TEST AUC: 0.5611697435379028
+			Train time: 239.31 seconds
+			Test time: 71.09 seconds
+	Best train AUC: 0.7646799087524414
+	Best test AUC: 0.5611697435379028
+	Training time:         6:01:41
+
++------------------ Job Report: 7160606 (COMPLETED) -------------------+
+| Memory (RAM)  [#                   ]  8.2% (1.2 GB peak / 15 GB)     |
+| CPU           [#################   ] 87.4% average                   |
+| GPU           [##################  ] 94.0% average                   |
+| Time          [----------------->  ] 86.9% (0-06:04:55 / 0-07:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   6.9 MB        0 B            234                           |
+|   /fred   19.4 GB       40.4 MB        7.6 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      24.8 MB       0 B            768                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
++----------------------------------------------------------------------+

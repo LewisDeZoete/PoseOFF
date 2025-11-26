@@ -168,3 +168,113 @@ debug: False
 			Train time: 755.86 seconds
 		26 EPOCH BEST TRAIN AUC: 0.6864867806434631
 			Train time: 746.90 seconds
+		27 EPOCH BEST TRAIN AUC: 0.6901893615722656
+			Train time: 757.42 seconds
+		28 EPOCH BEST TRAIN AUC: 0.6938674449920654
+			Train time: 791.91 seconds
+		29 EPOCH BEST TRAIN AUC: 0.6966554522514343
+			Train time: 755.66 seconds
+		30 EPOCH BEST TRAIN AUC: 0.6972564458847046
+			Train time: 740.04 seconds
+		31 EPOCH BEST TRAIN AUC: 0.700276255607605
+			Train time: 727.56 seconds
+		32 EPOCH BEST TRAIN AUC: 0.7030652761459351
+			Train time: 730.27 seconds
+		33 EPOCH BEST TRAIN AUC: 0.7041796445846558
+			Train time: 717.58 seconds
+		34 EPOCH BEST TRAIN AUC: 0.7065610885620117
+			Train time: 712.35 seconds
+		35 EPOCH BEST TRAIN AUC: 0.7073135375976562
+			Train time: 707.06 seconds
+		36 EPOCH BEST TRAIN AUC: 0.7091914415359497
+			Train time: 701.88 seconds
+		37 EPOCH BEST TRAIN AUC: 0.7105485200881958
+			Train time: 702.44 seconds
+		38 EPOCH BEST TRAIN AUC: 0.7106266021728516
+			Train time: 699.34 seconds
+		39 EPOCH BEST TRAIN AUC: 0.713194727897644
+			Train time: 716.37 seconds
+		40 EPOCH BEST TRAIN AUC: 0.7148061990737915
+			Train time: 727.97 seconds
+		41 EPOCH BEST TRAIN AUC: 0.7170832753181458
+			Train time: 727.74 seconds
+		42 EPOCH BEST TRAIN AUC: 0.7175602912902832
+			Train time: 730.62 seconds
+		43 EPOCH BEST TRAIN AUC: 0.7189741134643555
+			Train time: 732.94 seconds
+		44 EPOCH BEST TRAIN AUC: 0.719502866268158
+			Train time: 727.75 seconds
+		45 EPOCH BEST TRAIN AUC: 0.719990074634552
+			Train time: 726.52 seconds
+		46 EPOCH BEST TRAIN AUC: 0.7209270000457764
+			Train time: 743.79 seconds
+		47 EPOCH BEST TRAIN AUC: 0.7220425605773926
+			Train time: 742.90 seconds
+		48 EPOCH BEST TRAIN AUC: 0.7235399484634399
+			Train time: 744.62 seconds
+		49 EPOCH BEST TRAIN AUC: 0.7257364392280579
+			Train time: 748.60 seconds
+		50 EPOCH BEST TRAIN AUC: 0.7257364392280579
+			Train time: 748.96 seconds
+		51 EPOCH BEST TRAIN AUC: 0.7670236825942993
+			Train time: 741.74 seconds
+		52 EPOCH BEST TRAIN AUC: 0.7782006859779358
+			Train time: 735.83 seconds
+		53 EPOCH BEST TRAIN AUC: 0.7825850248336792
+			Train time: 751.33 seconds
+		54 EPOCH BEST TRAIN AUC: 0.7835581302642822
+			Train time: 751.96 seconds
+		55 EPOCH BEST TRAIN AUC: 0.7857600450515747
+			Train time: 747.76 seconds
+		56 EPOCH BEST TRAIN AUC: 0.7873960137367249
+			Train time: 754.69 seconds
+		57 EPOCH BEST TRAIN AUC: 0.7894294261932373
+			Train time: 749.16 seconds
+		58 EPOCH BEST TRAIN AUC: 0.7902314066886902
+			Train time: 760.29 seconds
+		59 EPOCH BEST TRAIN AUC: 0.7920597791671753
+			Train time: 749.26 seconds
+		60 EPOCH BEST TRAIN AUC: 0.7922228574752808
+			Train time: 754.23 seconds
+		61 EPOCH BEST TRAIN AUC: 0.8005168437957764
+			Train time: 759.21 seconds
+		62 EPOCH BEST TRAIN AUC: 0.8011319637298584
+			Train time: 744.45 seconds
+		63 EPOCH BEST TRAIN AUC: 0.8015788793563843
+			Train time: 760.25 seconds
+		64 EPOCH BEST TRAIN AUC: 0.8016359210014343
+			Train time: 748.07 seconds
+		65 EPOCH BEST TRAIN AUC: 0.8017678260803223
+			Train time: 745.94 seconds
+		66 EPOCH BEST TRAIN AUC: 0.8025799989700317
+			Train time: 697.48 seconds
+		67 EPOCH BEST TRAIN AUC: 0.8025799989700317
+			Train time: 698.16 seconds
+		68 EPOCH BEST TRAIN AUC: 0.8028950691223145
+			Train time: 697.83 seconds
+		69 EPOCH BEST TRAIN AUC: 0.8028950691223145
+			Train time: 742.97 seconds
+		70 EPOCH BEST TRAIN AUC: 0.8032347559928894
+			Train time: 806.20 seconds
+	Best train AUC: 0.8032347559928894
+
++-------------------- Job Report: 7160627 (FAILED) --------------------+
+| Memory (RAM)  [##                  ] 12.8% (4.5 GB peak / 35 GB)     |
+| CPU           [###########         ] 56.2% average                   |
+| GPU           [######              ] 34.7% average                   |
+| Time          [------------>       ] 60.4% (0-14:29:08 / 1-00:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   29.9 MB       0 B            201                           |
+|   /fred   339.3 GB      43.9 MB        1.2 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      1.9 MB        0 B            441                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

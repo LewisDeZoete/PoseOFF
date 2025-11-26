@@ -1,0 +1,176 @@
+Tue Nov 25 19:21:54 AEDT 2025
+Copying file: ./data/ucf101/aligned_data/ucf101_01_D1.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ucf101_01_D1.npz
+Data path: /var/tmp/jobfs/data/ucf101_01_D1.npz
+Run name: msg3d_ucf101_1_base
+
+Python script run command arguments:
+python main.py -m msg3d -d ucf101 -p train -f base -e 1 -o 1.0 -r msg3d_ucf101_1_base --desc msg3d_train ucf101 1 base observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ucf101_01_D1.npz -v
+### Libraries loaded
+feeder: feeders.ucf101.Feeder
+feeder_args:
+  data_paths: {1: './data/ucf101/aligned_data/ucf101_01_D1.npz', 2: './data/ucf101/aligned_data/ucf101_02_D1.npz', 3: './data/ucf101/aligned_data/ucf101_03_D1.npz'}
+  label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 300
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+extractor:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/ucf101/pose/', 'flow_path': './data/ucf101/flow/', 'flowpose_path': './data/ucf101/flowpose/'}
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': False, 'dilation': 3}
+model: models.msg3d.TEST_MODEL
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 0
+  cnn: False
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 50]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 50
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 128
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ucf101/
+model_type: msg3d
+dataset: ucf101
+flow_embedding: base
+evaluation: 1
+obs_ratio: 1.0
+run_name: msg3d_ucf101_1_base
+description: msg3d_train ucf101 1 base observation ratio 1.0, retraining model with mean and std norm
+data_path_overwrite: /var/tmp/jobfs/data/ucf101_01_D1.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 569997
+	Loading weights from ./results/msg3d/ucf101/1/train/msg3d_ucf101_1_base.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/msg3d/ucf101/1/train/msg3d_ucf101_1_base.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/msg3d/ucf101/1/train/msg3d_ucf101_1_base.pt
+		1 EPOCH BEST TRAIN ACC: 0.09917884320020676
+			Train time: 136.05 seconds
+		2 EPOCH BEST TRAIN ACC: 0.20827557146549225
+			Train time: 209.46 seconds
+		3 EPOCH BEST TRAIN ACC: 0.2925242483615875
+			Train time: 224.34 seconds
+		4 EPOCH BEST TRAIN ACC: 0.36578863859176636
+			Train time: 222.41 seconds
+		5 EPOCH BEST TRAIN ACC: 0.4155913293361664
+			Train time: 234.33 seconds
+		6 EPOCH BEST TRAIN ACC: 0.4605950713157654
+			Train time: 216.07 seconds
+		7 EPOCH BEST TRAIN ACC: 0.500799834728241
+			Train time: 217.22 seconds
+		8 EPOCH BEST TRAIN ACC: 0.5404713749885559
+			Train time: 217.86 seconds
+		9 EPOCH BEST TRAIN ACC: 0.5655326843261719
+			Train time: 219.62 seconds
+		10 EPOCH BEST TRAIN ACC: 0.5986989140510559
+			Train time: 225.16 seconds
+		11 EPOCH BEST TRAIN ACC: 0.6149088144302368
+			Train time: 233.63 seconds
+		12 EPOCH BEST TRAIN ACC: 0.6360242962837219
+			Train time: 228.78 seconds
+		13 EPOCH BEST TRAIN ACC: 0.6453023552894592
+			Train time: 236.18 seconds
+		14 EPOCH BEST TRAIN ACC: 0.6611922979354858
+			Train time: 238.83 seconds
+		15 EPOCH BEST TRAIN ACC: 0.6765490174293518
+			Train time: 237.31 seconds
+		16 EPOCH BEST TRAIN ACC: 0.6811347007751465
+			Train time: 235.69 seconds
+		17 EPOCH BEST TRAIN ACC: 0.7016103267669678
+			Train time: 223.84 seconds
+		18 EPOCH BEST TRAIN ACC: 0.7087554335594177
+			Train time: 235.65 seconds
+		19 EPOCH BEST TRAIN ACC: 0.7173936367034912
+			Train time: 239.27 seconds
+		20 EPOCH BEST TRAIN ACC: 0.7334968447685242
+			Train time: 237.56 seconds
+		21 EPOCH BEST TRAIN ACC: 0.7334968447685242
+			Train time: 240.66 seconds
+		22 EPOCH BEST TRAIN ACC: 0.7428815364837646
+			Train time: 235.68 seconds
+		23 EPOCH BEST TRAIN ACC: 0.7465074062347412
+			Train time: 277.17 seconds
+		24 EPOCH BEST TRAIN ACC: 0.7532259821891785
+			Train time: 239.70 seconds
+		25 EPOCH BEST TRAIN ACC: 0.7596246004104614
+			Train time: 234.66 seconds
+		26 EPOCH BEST TRAIN ACC: 0.7710354924201965
+			Train time: 237.38 seconds
+		27 EPOCH BEST TRAIN ACC: 0.7710354924201965
+			Train time: 240.82 seconds
+		28 EPOCH BEST TRAIN ACC: 0.7797803282737732
+			Train time: 239.92 seconds
+		29 EPOCH BEST TRAIN ACC: 0.7797803282737732
+			Train time: 254.81 seconds
+		30 EPOCH BEST TRAIN ACC: 0.781166672706604
+			Train time: 236.72 seconds
+
++-------------------- Job Report: 7193370 (TIMEOUT) --------------------+
+| Memory (RAM)  [#########           ] 46.1% (2.3 GB peak / 5 GB)       |
+| CPU           [####                ] 23.0% average                    |
+| GPU           [#####               ] 25.9% average                    |
+| Time          [------------------->] 100.0% (0-02:00:02 / 0-02:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write      Total IOPS                   |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   13.5 MB       0 B                    250                    |
+|   /fred   26.5 GB       14.1 MB                 51                    |
+|   /home   0 B           0 B                      1                    |
+|   OS      17.6 MB       0 B                    136                    |
+|                                                                       |
+| Warnings:                                                             |
+|   - Too much memory requested                                         |
+|   - CPU usage is low                                                  |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+

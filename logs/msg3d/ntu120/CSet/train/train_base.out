@@ -1,0 +1,128 @@
+Wed Nov 26 04:44:19 AEDT 2025
+Copying file: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu120_CSet-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu120_CSet-flowpose_D3_aligned.npz
+Run name: msg3d_ntu120_CSet_base
+
+Python script run command arguments:
+python main.py -m msg3d -d ntu120 -p train -f base -e CSet -o 1.0 -r msg3d_ntu120_CSet_base --desc msg3d_train ntu120 CSet base observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ntu120_CSet-flowpose_D3_aligned.npz -v
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CSet': './data/ntu120/aligned_data/ntu120_CSet-pose_aligned.npz', 'CSub': './data/ntu120/aligned_data/ntu120_CSub-pose_aligned.npz'}
+  label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: True
+  random_shift: True
+  window_size: 300
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.msg3d.TEST_MODEL
+model_args:
+  num_class: 120
+  num_point: 25
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 0
+  cnn: False
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 50]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 60
+device: 0
+batch_size: 128
+forward_batch_size: 128
+test_batch_size: 128
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ntu120/
+model_type: msg3d
+dataset: ntu120
+flow_embedding: base
+evaluation: CSet
+obs_ratio: 1.0
+run_name: msg3d_ntu120_CSet_base
+description: msg3d_train ntu120 CSet base observation ratio 1.0, retraining model with mean and std norm
+data_path_overwrite: /var/tmp/jobfs/data/ntu120_CSet-flowpose_D3_aligned.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 643648
+	Loading weights from ./results/msg3d/ntu120/CSet/train/msg3d_ntu120_CSet_base.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/msg3d/ntu120/CSet/train/msg3d_ntu120_CSet_base.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/msg3d/ntu120/CSet/train/msg3d_ntu120_CSet_base.pt
+		1 EPOCH BEST TRAIN ACC: 0.16266432404518127
+			Train time: 544.83 seconds
+		2 EPOCH BEST TRAIN ACC: 0.3384189009666443
+			Train time: 531.32 seconds
+		3 EPOCH BEST TRAIN ACC: 0.421274870634079
+			Train time: 538.48 seconds
+		4 EPOCH BEST TRAIN ACC: 0.47774839401245117
+			Train time: 548.44 seconds
+		5 EPOCH BEST TRAIN ACC: 0.5204707384109497
+			Train time: 542.45 seconds
+		6 EPOCH BEST TRAIN ACC: 0.5546926856040955
+			Train time: 561.10 seconds
+
++-------------------- Job Report: 7193336 (FAILED) --------------------+
+| Memory (RAM)  [####################] 108.9% (16.3 GB peak / 15 GB)   |
+| CPU           [##########          ] 50.9% average                   |
+| GPU           [###############     ] 78.2% average                   |
+| Time          [->                  ]  8.0% (0-01:12:03 / 0-15:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   5.8 MB        0 B            402                           |
+|   /fred   339.4 GB      32.2 KB        3.6 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      1.6 MB        0 B            162                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

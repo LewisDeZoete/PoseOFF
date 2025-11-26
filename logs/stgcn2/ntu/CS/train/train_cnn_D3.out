@@ -1,0 +1,284 @@
+Tue Nov 25 17:45:07 AEDT 2025
+Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CS-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+Run name: stgcn2_ntu_CS_cnn_D3
+
+Python script run command arguments:
+python main.py -m stgcn2 -d ntu -p train -f cnn -e CS -o 1.0 -r stgcn2_ntu_CS_cnn_D3 --desc stgcn2_train ntu CS cnn observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz -v
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: False
+  random_shift: False
+  window_size: 100
+  pad_method: zero_pad
+  random_move: False
+  random_rot: False
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.stgcn2.stgcn2.TEST_MODEL
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  base_channels: 64
+  data_bn_type: MVC
+  ch_ratio: 2
+  num_stages: 10
+  inflate_stages: ['5 8']
+  down_stages: [5, 8]
+  cnn: True
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.CosineAnnealingLR
+scheduler_params:
+  eta_min: 0
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 80
+device: 0
+batch_size: 128
+half: False
+checkpoint_freq: 10
+save_location: ./results/stgcn2/ntu/
+model_type: stgcn2
+dataset: ntu
+flow_embedding: cnn
+evaluation: CS
+obs_ratio: 1.0
+run_name: stgcn2_ntu_CS_cnn_D3
+description: stgcn2_train ntu CS cnn observation ratio 1.0, retraining model with mean and std norm
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 488584
+	Loading weights from ./results/stgcn2/ntu/CS/train/stgcn2_ntu_CS_cnn_D3.pt
+	Checkpoint file does not yet exist
+		([Errno 2] No such file or directory: './results/stgcn2/ntu/CS/train/stgcn2_ntu_CS_cnn_D3.pt')
+### Model created
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+### Dataloaders created
+	Tracking:
+		epoch
+		train_time
+		train_loss
+		lr
+		test_time
+		test_loss
+		train_ACC
+		test_ACC
+		train_cls_loss
+		test_cls_loss
+	Created new checkpoint file: ./results/stgcn2/ntu/CS/train/stgcn2_ntu_CS_cnn_D3.pt
+		1 EPOCH BEST TRAIN ACC: 0.3635229766368866
+			Train time: 264.60 seconds
+		2 EPOCH BEST TRAIN ACC: 0.6107854843139648
+			Train time: 271.41 seconds
+		3 EPOCH BEST TRAIN ACC: 0.6989099979400635
+			Train time: 271.81 seconds
+		4 EPOCH BEST TRAIN ACC: 0.7337557077407837
+			Train time: 273.93 seconds
+		5 EPOCH BEST TRAIN ACC: 0.7583248019218445
+			Train time: 275.62 seconds
+		6 EPOCH BEST TRAIN ACC: 0.773440420627594
+			Train time: 270.87 seconds
+		7 EPOCH BEST TRAIN ACC: 0.7832431197166443
+			Train time: 273.90 seconds
+		8 EPOCH BEST TRAIN ACC: 0.790900707244873
+			Train time: 274.59 seconds
+		9 EPOCH BEST TRAIN ACC: 0.8020004630088806
+			Train time: 274.36 seconds
+		10 EPOCH BEST TRAIN ACC: 0.8079119920730591
+			Train time: 275.60 seconds
+		11 EPOCH BEST TRAIN ACC: 0.8133994936943054
+			Train time: 274.71 seconds
+		12 EPOCH BEST TRAIN ACC: 0.8179391622543335
+			Train time: 278.25 seconds
+		13 EPOCH BEST TRAIN ACC: 0.8213813304901123
+			Train time: 276.54 seconds
+		14 EPOCH BEST TRAIN ACC: 0.8245242238044739
+			Train time: 274.00 seconds
+		15 EPOCH BEST TRAIN ACC: 0.8299369215965271
+			Train time: 278.98 seconds
+		16 EPOCH BEST TRAIN ACC: 0.8338779211044312
+			Train time: 277.53 seconds
+		17 EPOCH BEST TRAIN ACC: 0.8355242013931274
+			Train time: 275.58 seconds
+		18 EPOCH BEST TRAIN ACC: 0.8386171460151672
+			Train time: 275.16 seconds
+		19 EPOCH BEST TRAIN ACC: 0.8432815074920654
+			Train time: 279.90 seconds
+		20 EPOCH BEST TRAIN ACC: 0.8455513715744019
+			Train time: 273.17 seconds
+		21 EPOCH BEST TRAIN ACC: 0.845975399017334
+			Train time: 273.49 seconds
+		22 EPOCH BEST TRAIN ACC: 0.8494924306869507
+			Train time: 277.89 seconds
+		23 EPOCH BEST TRAIN ACC: 0.8530343770980835
+			Train time: 273.77 seconds
+		24 EPOCH BEST TRAIN ACC: 0.8530343770980835
+			Train time: 278.43 seconds
+		25 EPOCH BEST TRAIN ACC: 0.8555536270141602
+			Train time: 273.12 seconds
+		26 EPOCH BEST TRAIN ACC: 0.8582724332809448
+			Train time: 274.14 seconds
+		27 EPOCH BEST TRAIN ACC: 0.8603177666664124
+			Train time: 283.62 seconds
+		28 EPOCH BEST TRAIN ACC: 0.8647576570510864
+			Train time: 277.84 seconds
+		29 EPOCH BEST TRAIN ACC: 0.8654810190200806
+			Train time: 282.29 seconds
+		30 EPOCH BEST TRAIN ACC: 0.8691726326942444
+			Train time: 277.61 seconds
+		31 EPOCH BEST TRAIN ACC: 0.8698959946632385
+			Train time: 278.67 seconds
+		32 EPOCH BEST TRAIN ACC: 0.8744356632232666
+			Train time: 280.33 seconds
+		33 EPOCH BEST TRAIN ACC: 0.8744605779647827
+			Train time: 280.81 seconds
+		34 EPOCH BEST TRAIN ACC: 0.8782769441604614
+			Train time: 279.55 seconds
+		35 EPOCH BEST TRAIN ACC: 0.8821431398391724
+			Train time: 284.20 seconds
+		36 EPOCH BEST TRAIN ACC: 0.8847870826721191
+			Train time: 276.58 seconds
+		37 EPOCH BEST TRAIN ACC: 0.8852859735488892
+			Train time: 279.45 seconds
+		38 EPOCH BEST TRAIN ACC: 0.8883540034294128
+			Train time: 281.30 seconds
+		39 EPOCH BEST TRAIN ACC: 0.8916714787483215
+			Train time: 279.30 seconds
+		40 EPOCH BEST TRAIN ACC: 0.8931431174278259
+			Train time: 278.76 seconds
+		41 EPOCH BEST TRAIN ACC: 0.8969095349311829
+			Train time: 280.86 seconds
+		42 EPOCH BEST TRAIN ACC: 0.8982315063476562
+			Train time: 277.52 seconds
+		43 EPOCH BEST TRAIN ACC: 0.9007508158683777
+			Train time: 279.03 seconds
+		44 EPOCH BEST TRAIN ACC: 0.9042428731918335
+			Train time: 279.34 seconds
+		45 EPOCH BEST TRAIN ACC: 0.9079594016075134
+			Train time: 289.93 seconds
+		46 EPOCH BEST TRAIN ACC: 0.9115761518478394
+			Train time: 295.71 seconds
+		47 EPOCH BEST TRAIN ACC: 0.9140455722808838
+			Train time: 293.49 seconds
+		48 EPOCH BEST TRAIN ACC: 0.9176373481750488
+			Train time: 291.97 seconds
+		49 EPOCH BEST TRAIN ACC: 0.9203063249588013
+			Train time: 285.99 seconds
+		50 EPOCH BEST TRAIN ACC: 0.9231997132301331
+			Train time: 289.16 seconds
+		51 EPOCH BEST TRAIN ACC: 0.9259434938430786
+			Train time: 290.34 seconds
+		52 EPOCH BEST TRAIN ACC: 0.9284128546714783
+			Train time: 284.30 seconds
+		53 EPOCH BEST TRAIN ACC: 0.9324287176132202
+			Train time: 282.71 seconds
+		54 EPOCH BEST TRAIN ACC: 0.9361951351165771
+			Train time: 290.27 seconds
+		55 EPOCH BEST TRAIN ACC: 0.9387393593788147
+			Train time: 282.85 seconds
+		56 EPOCH BEST TRAIN ACC: 0.9412835836410522
+			Train time: 289.93 seconds
+		57 EPOCH BEST TRAIN ACC: 0.9452745318412781
+			Train time: 287.32 seconds
+		58 EPOCH BEST TRAIN ACC: 0.94929039478302
+			Train time: 284.09 seconds
+		59 EPOCH BEST TRAIN ACC: 0.9522087574005127
+			Train time: 295.18 seconds
+		60 EPOCH BEST TRAIN ACC: 0.9547778964042664
+			Train time: 284.18 seconds
+		61 EPOCH BEST TRAIN ACC: 0.9588186740875244
+			Train time: 287.04 seconds
+		62 EPOCH BEST TRAIN ACC: 0.961362898349762
+			Train time: 281.85 seconds
+		63 EPOCH BEST TRAIN ACC: 0.9645057320594788
+			Train time: 280.42 seconds
+		64 EPOCH BEST TRAIN ACC: 0.9677484035491943
+			Train time: 274.80 seconds
+		65 EPOCH BEST TRAIN ACC: 0.9721384048461914
+			Train time: 273.46 seconds
+		66 EPOCH BEST TRAIN ACC: 0.9731610417366028
+			Train time: 275.08 seconds
+		67 EPOCH BEST TRAIN ACC: 0.9750816822052002
+			Train time: 277.65 seconds
+		68 EPOCH BEST TRAIN ACC: 0.9781996011734009
+			Train time: 272.43 seconds
+		69 EPOCH BEST TRAIN ACC: 0.9810680747032166
+			Train time: 290.77 seconds
+		70 EPOCH BEST TRAIN ACC: 0.9845850467681885
+			Train time: 283.41 seconds
+		71 EPOCH BEST TRAIN ACC: 0.9849342703819275
+			Train time: 287.41 seconds
+		72 EPOCH BEST TRAIN ACC: 0.9861066341400146
+			Train time: 279.37 seconds
+		73 EPOCH BEST TRAIN ACC: 0.9874036312103271
+			Train time: 288.40 seconds
+		74 EPOCH BEST TRAIN ACC: 0.9888004660606384
+			Train time: 283.79 seconds
+		75 EPOCH BEST TRAIN ACC: 0.9905964136123657
+			Train time: 280.41 seconds
+		76 EPOCH BEST TRAIN ACC: 0.991793692111969
+			Train time: 281.46 seconds
+		77 EPOCH BEST TRAIN ACC: 0.9918684959411621
+			Train time: 275.26 seconds
+		78 EPOCH BEST TRAIN ACC: 0.9920430779457092
+			Train time: 275.95 seconds
+		79 EPOCH BEST TRAIN ACC: 0.9925170540809631
+			Train time: 288.21 seconds
+		80 EPOCH BEST TEST ACC: 0.9966077208518982
+			Train time: 282.84 seconds
+			Test time: 275.74 seconds
+	Best train ACC: 0.9925170540809631
+	Best test ACC: 0.9966077208518982
+	Training time:         6:18:11
+
++------------------ Job Report: 7193441 (COMPLETED) -------------------+
+| Memory (RAM)  [#######             ] 36.5% (7.3 GB peak / 20 GB)     |
+| CPU           [########            ] 41.8% average                   |
+| GPU           [##                  ] 14.8% average                   |
+| Time          [------->            ] 40.0% (0-06:23:55 / 0-16:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   82.7 MB       0 B                    246                   |
+|   /fred   167.6 GB      31.8 MB                561                   |
+|   /home   0 B           0 B                      3                   |
+|   OS      2.2 MB        0 B                    375                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

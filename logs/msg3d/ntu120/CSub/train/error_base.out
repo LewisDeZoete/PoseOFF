@@ -1,0 +1,7 @@
+/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+Epoch:   0%|          | 0/60 [00:00<?, ?it/s]/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/utils/data/dataloader.py:558: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(_create_warning_msg(
+Epoch:   2%|▏         | 1/60 [10:10<10:00:32, 610.72s/it]Epoch:   3%|▎         | 2/60 [20:16<9:47:35, 607.85s/it] Epoch:   5%|▌         | 3/60 [30:23<9:37:06, 607.48s/it]Epoch:   7%|▋         | 4/60 [40:32<9:27:33, 608.10s/it]Epoch:   8%|▊         | 5/60 [50:39<9:17:09, 607.81s/it]Epoch:  10%|█         | 6/60 [1:00:48<9:07:22, 608.19s/it]slurmstepd: error: Detected 1 oom_kill event in StepId=7193337.0. Some of the step tasks have been OOM Killed.
+srun: error: gina11: task 0: Out Of Memory
+srun: Terminating StepId=7193337.0

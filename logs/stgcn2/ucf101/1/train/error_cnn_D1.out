@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/main.py", line 141, in <module>
+    train_dataset = FeederClass(
+TypeError: __init__() got an unexpected keyword argument 'no_Z'
+srun: error: gina13: task 0: Exited with exit code 1
+srun: Terminating StepId=7193571.0
