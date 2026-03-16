@@ -21,10 +21,10 @@ body = [trunk_joints, arm_joints, leg_joints]
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--size",
-    dest="size",
-    default="small",
-    help="extracted size - small or full (default=small)",
+    "--sample_name",
+    dest="sample_name",
+    default="S019C001P051R001A113",
+    help="Name of a pre-computed sample (run data/visualisations/get_flow_samples.py...)"
 )
 parser.add_argument(
     "--live",
@@ -33,69 +33,126 @@ parser.add_argument(
     help="Display an ourput image live (need x11 forwarding or something)",
 )
 parser.add_argument(
+    "--save_ims",
+    dest="save_ims",
+    action="store_true",
+    help="Instead of live display, write all frames to `data/visualisations/flow_pose_frames/<sample_name>`",
+)
+parser.add_argument(
     "--crop",
     dest="crop",
     action="store_true",
-    help="If passed, crops all of the images within the data/visualisations/flow_pose_frames folder"
+    help="If passed, crops all of the images within the data/visualisations/flow_pose_frames/<sample_name> folder"
 )
 args = parser.parse_args()
 
-assert args.size in ['small', 'full'], '--size argument must be either `small` or `full`'
 # Optionally show live display or save to file
+sample_name = args.sample_name
 live = True if args.live else False
+save_ims = True if args.save_ims else False
 crop = True if args.crop else False
 
-# Root path for data
-root_path = "./data/visualisations/RAW"
+# Define data and save paths
+data_root = "./data/visualisations/RAW"
+save_root = "./data/visualisations/flow_pose_frames"
 
-# Load flow, rgb and poses
-flow_full = np.load(osp.join(root_path, "FLOW_full-S001C003P008R001A050.npy"))
-flow_small = np.load(osp.join(root_path, "FLOW_small-S001C003P008R001A050.npy"))
 
-# (T, C, H, W) - (T, 3, 240/1080, 320/1920)
-rgb_full = np.load(osp.join(root_path, "RGB_full-S001C003P008R001A050.npy"))[1:]
-rgb_small = np.load(osp.join(root_path, "RGB_small-S001C003P008R001A050.npy"))[1:]
+def load_data(data_root, sample_name):
+    # Attempt to load the data
+    try:
+        data = np.load(osp.join(data_root, f"{sample_name}.npz"))
+    except FileNotFound:
+        print("File not found, may need to be generated...")
+        print("Run ./data/visualisations/get_flow_samples.py to generate the data.")
+        quit()
 
-poses = np.load(osp.join(root_path, "POSE_small-S001C003P008R001A050.npy"))
-poses = poses[:, 1:]  # C, T-1, V, M
-C, T, V, M = poses.shape
-poses = rearrange(poses, "C T V M -> T (M V) C", C=C, T=T, V=V, M=M)
-
-flowpose = np.load(osp.join(root_path, 'flowpose_full_data.npy')) # C, T, V, M
-flowpose = rearrange(flowpose, "C T V M -> T (M V) C", C=52, T=T, V=V, M=M)
-
-# Depending on argument, use either small or full videos
-if args.size == 'full':
-    T, C, H, W = rgb_full.shape
+    # Put the data into a list (excluding pose for whatever reason)
+    T, C, H, W = data['rgb'][1:].shape
     videos = [
-        flow_full,
-        rgb_full,
-        np.zeros((T, 4, H, W), dtype=np.uint8)
-    ]
-else:
-    T, C, H, W = rgb_small.shape
-    videos = [
-        flow_small,
-        rgb_small,
-        np.zeros((T, 4, H, W), dtype=np.uint8)
-    ]
+        data['flow'],
+        data['rgb'][1:],
+        # np.ones((T, 4, H, W), dtype=np.uint8)*255,
+        np.zeros((T, 4, H, W), dtype=np.uint8),
+        ]
+    # Change the dimensions to be channel last (H,W,C)
+    for no, vid in enumerate(videos):
+        videos[no] = np.transpose(vid, (0, 2, 3, 1))  # TCHW -> THWC
 
-for no, vid in enumerate(videos):
-    videos[no] = np.transpose(vid, (0, 2, 3, 1))  # TCHW -> THWC
+    # Get and reshape the pose array
+    poses = rearrange(data['pose'][1:], 'T M V C -> T (M V) C')
+
+    # Get the poseoff samples
+    poseoff = data['flowpose']
+
+    return videos, poses, poseoff
+
 
 def get_frame_count(video):
     """Get the total number of frames in a video."""
     return video.shape[0]
 
 
-def draw_flowpose(flowpose_frame, pose_frame, frame, window_size=5):
+def draw_poseoff(frame, poseoff, pose, frame_num=0, flow_scale=5.0, window_size=5, dilation=2, skip_points=[], average_flow=False):
+    frame=frame.copy()
     k = window_size // 2
-    flowpose_frame = rearrange(flowpose_frame, 'MV (C H W) -> MV H W C', C=2, H=window_size, W=window_size)
-    for keypoint_num, flow_window in enumerate(flowpose_frame):
-        img = flow2image(flow_window)
-        centre = [int(pose_frame[keypoint_num][1]), 
-                  int(pose_frame[keypoint_num][0])]
-        frame[centre[0]-k:centre[0]+k+1, centre[1]-k:centre[1]+k+1] = img
+    poseoff_frame = rearrange(
+        poseoff[:,frame_num],
+        "(H W C) V M -> (M V) H W C",
+        C=2, H=window_size, W=window_size
+    )
+    h,w,_ = frame.shape
+    for keypoint_num, flow_window in enumerate(poseoff_frame):
+        if keypoint_num in skip_points:
+            continue
+        x_pose=int(pose[keypoint_num][0])
+        y_pose=int(pose[keypoint_num][1])
+        if average_flow:
+            # avg_window = flow_window.mean(axis=(0,1))
+            # u,v = avg_window
+            u,v = flow_window[2,2]
+
+            x0 = int(round(x_pose))
+            y0 = int(round(y_pose))
+            x1 = int(round(x0 + u*flow_scale))
+            y1 = int(round(y0 + v*flow_scale))
+            cv2.arrowedLine(
+                frame,
+                (x0, y0),
+                (x1, y1),
+                # color=(0, 0, 0) if frame.shape[-1] == 3 else (0, 0, 0, 255),
+                color=(0, 255, 0) if frame.shape[-1] == 3 else (0, 255, 0, 255),
+                thickness=3,
+                tipLength=0.6
+            )
+        else:
+            for col_num, col in enumerate(flow_window):
+                for row_num, vector in enumerate(col):
+                    u,v = vector
+
+                    # Window offset with dilation
+                    dx = (col_num - k) * dilation
+                    dy = (row_num - k) * dilation
+
+                    x0 = int(round(x_pose + dx))
+                    y0 = int(round(y_pose + dy))
+
+                    # Scale flow for visibility
+                    x1 = int(round(x0 + u * flow_scale))
+                    y1 = int(round(y0 + v * flow_scale))
+
+                    # Check if in image bounds
+                    if (
+                            0 <= x0 < w and 0 <= y0 < h and
+                            0 <= x1 < w and 0 <= y1 < h
+                    ):
+                        cv2.arrowedLine(
+                            frame,
+                            (x0, y0),
+                            (x1, y1),
+                            color=(0, 255, 0) if frame.shape[-1] == 3 else (0, 255, 0, 255),
+                            thickness=1,
+                            tipLength=0.4
+                        )
     return frame
 
 
@@ -115,6 +172,33 @@ def generate_sample_points(center, dilation=1):
     grid_x, grid_y = np.meshgrid(offsets, offsets)  # Create a 5x5 grid of offsets
     points = np.stack([grid_x.ravel() + x, grid_y.ravel() + y], axis=-1)  # Add offsets to center
     return points
+
+
+def draw_bones(frame, pose, person_num=None): 
+    frame = frame.copy()
+    pose = rearrange(pose, '(M V) C -> M V C', M=2, V=25)
+    joint_connections = [
+        [0,1], [1,2], [2,3], [1,20], [0,12], # Trunk/head
+        [0,16], [12,13], [13,14], [14,15], # Right leg
+        [0,16], [16,17],[17,18], [18,19],  # Left leg
+        [20,4], [4,5], [5,6], [6,7], [7,21], [7,22], # Right arm
+        [20,8], [8,9], [9,10], [10,11], [11,23], [11,24], # Left arm
+    ]
+    # Check if alpha channel exists in frame
+    color = (255,0,0) if frame.shape[-1] == 3 else (255,0,0,255)
+    # Get individual person's specific pose (if person_num specified)
+    if person_num in [0,1]:
+        pose = pose[person_num].reshape((1, 25, 2))
+
+    for person in pose:
+        for joint_connection in joint_connections:
+            p1, p2 = joint_connection
+            cv2.line(frame,
+                    (int(person[p1,0]), int(person[p1,1])),
+                    (int(person[p2,0]), int(person[p2,1])),
+                    color, 3
+                    )
+    return frame
 
 
 def draw_skel(frame, pose, person_num=None, skip_points=[], debug=False):  # Poses shape: (M V) C
@@ -178,45 +262,6 @@ def mpl_draw_skel(videos, poses, frame_num, video_num=2, show_frame=False):
     else: plt.savefig(f'./data/visualisations/flow_pose_frames/POSE-frame-{frame_num}.png', transparent=True)
 
 
-def flow_pose_sample(flows, poses, window_size=5):
-    """
-    Samples the optical flow in windows surrounding the pose keypoints.
-    flows: (T C H W)
-    poses: (T (M V) C)
-    Returns array of shape:
-        ((window_size**2)*2,
-        frames, 
-        keypoints, 
-        num_people)
-    """
-    half_k=window_size//2
-
-    # Get the shape of the input tensors
-    num_frames, _, height, width = flows.shape
-    num_pose_frames, keypoints, channels = poses.shape
-
-    # The keypoints are already scaled
-    pose_points = np.nan_to_num(poses, nan=0).astype(int)
-
-    # Prepare tensor to stack flow windows
-    stacker = np.zeros((num_pose_frames, keypoints, window_size**2*2,))
-    print(stacker.shape)
-
-    # Create a grid of valid indices (filter out points close to the image border)
-    valid_indices = ((pose_points[:, :, 0] >= half_k) & (pose_points[:, :, 0] < width - half_k) & 
-                        (pose_points[:, :, 1] >= half_k) & (pose_points[:, :, 1] < height - half_k))
-                    
-    # Loop through the frames and sample flow in window around each valid keypoint
-    for frame_no, flow in enumerate(flows):
-        for keypoint_num in range(keypoints):
-            if valid_indices[frame_no, keypoint_num]:
-                x, y = pose_points[frame_no, keypoint_num, 0], pose_points[frame_no, keypoint_num, 1]
-                # Get the window of optical flow
-                flow_window = flow[:, y - half_k : y + half_k + 1, x - half_k : x + half_k + 1]
-                
-                
-                stacker[frame_no, keypoint_num, :] = flow_window.flatten()
-    return stacker
 
 
 def flow2image(flow_frame):
@@ -232,7 +277,7 @@ def flow2image(flow_frame):
     return img
 
 
-def draw_optical_flow_arrows(flow, frame=None, step=16, scale=1, color=(0, 255, 0)):
+def draw_optical_flow_arrows(flow, frame=None, step=16, scale=1.0, color=(0, 0, 0), thickness=1, threshold=2.0):
     """
     Draws optical flow vectors as arrows on a frame.
 
@@ -240,8 +285,11 @@ def draw_optical_flow_arrows(flow, frame=None, step=16, scale=1, color=(0, 255, 
         flow (np.ndarray): Optical flow of shape (2, H, W) — (u,v).
         frame (np.ndarray or None): Background image to draw on (H, W, 3). If None, a blank canvas is used.
         step (int): Sampling step for arrows. Larger = fewer arrows.
-        scale (float): Scale multiplier for flow vectors.
-        color (tuple): BGR color for the arrows.
+        scale (float): Scale multiplier for flow vectors (default=1.0)
+        color (tuple): BGR color for the arrows (default=(0,0,0))
+        thickness (int): Width of drawn optical flow arrows (default=1.0)
+        threshold (float): Magnitude threshold below which arrows will not be drawn (default=0.0)
+        
 
     Returns:
         np.ndarray: Image with arrows drawn.
@@ -250,7 +298,7 @@ def draw_optical_flow_arrows(flow, frame=None, step=16, scale=1, color=(0, 255, 
     H, W = u.shape
 
     if frame is None:
-        vis = np.zeros((H, W, 3), dtype=np.uint8)
+        vis = np.ones((H, W, 3), dtype=np.uint8)*255
     else:
         vis = frame.copy()
 
@@ -262,39 +310,43 @@ def draw_optical_flow_arrows(flow, frame=None, step=16, scale=1, color=(0, 255, 
     for (x1, y1, dx, dy) in zip(x.ravel(), y.ravel(), fx.ravel(), fy.ravel()):
         x2 = int(x1 + scale * dx)
         y2 = int(y1 + scale * dy)
-        cv2.arrowedLine(vis, (x1, y1), (x2, y2), color, 1, tipLength=0.3)
+        mag = ((x2-x1)**2+(y2-y1)**2)**(0.5)
+        if ((x2-x1)**2+(y2-y1)**2)**(0.5) < threshold:
+            continue
+        cv2.arrowedLine(vis, (x1, y1), (x2, y2), color, thickness, tipLength=0.1)
 
     return vis
 
-def display_videos(videos, save_path="./data/visualisations/flow_pose_frames"):
+
+def display_videos(data_root, sample_name, save_path="./data/visualisations/flow_pose_frames"):
+    print("Loading data...")
+    videos, poses, poseoff = load_data(data_root, sample_name)
+
     print("Viewport opening...")
     # Initialize variables
     current_video_index = 0
     current_frame_index = 0
     show_skel = False
-    cc = cycle(range(3))
-    flow_windows = next(cc)
+    flow_windows = False
     while True:
         # Get the current frame from the current video
         frame = videos[current_video_index][current_frame_index]
 
         # If the video is not RGB (e.g., flow or pose), normalize and convert to RGB
         if frame.shape[-1] == 2:  # Channels-first format
-            # frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-            # frame = flow2image(frame)
-            frame = draw_optical_flow_arrows(frame, step=20, scale=3)
+            frame = draw_optical_flow_arrows(frame, step=16, scale=3, thickness=2, threshold=0.0)
         elif frame.shape[-1] == 3:
             frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_BGR2RGB)
 
         # If show_skel is toggled on, display skeleton
         if show_skel:
+            frame = draw_bones(frame, pose=poses[current_frame_index]) 
             frame = draw_skel(frame, pose=poses[current_frame_index])
 
         # Show flow windows
-        if flow_windows == 1:
-            draw_flowpose(flowpose_frame=flowpose[current_frame_index], frame=frame)
-        if flow_windows == 2:
-            frame = draw_flowpose(flowpose_frame=flowpose[current_frame_index], frame=np.zeros((frame.shape)))
+        if flow_windows:
+            frame = draw_bones(frame, pose=poses[current_frame_index])
+            frame = draw_poseoff(frame, pose=poses[current_frame_index], poseoff=poseoff, frame_num=current_frame_index, flow_scale=5.0, window_size=5, dilation=2, average_flow=True)
 
         # Display the frame
         cv2.imshow("Video Player", frame.astype(np.uint8))
@@ -319,92 +371,73 @@ def display_videos(videos, save_path="./data/visualisations/flow_pose_frames"):
             cv2.imwrite(
                 osp.join(
                     save_path,
-                    f"{ {0:'FLOW', 1:'RGB', 2:'POSE'}[current_video_index] }"\
+                    f"{ {0:'FLOW', 1:'RGB', 2:'POSE'}[current_video_index] if not flow_windows else 'PoseOFF'}"\
                     f"-frame-{current_frame_index}.png",
                     ),
                 frame,
             )
         elif key == ord("f"): # Cycle flow windows on frame, or blank background
-            flow_windows = next(cc)
+            flow_windows = not flow_windows
 
 
     cv2.destroyAllWindows()
 
 
-def write_videos(videos):
-    size = (videos[0].shape[2], videos[0].shape[1])
-    flow_video = cv2.VideoWriter('data/visualisations/videos/flow_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
-                         10, size)
-    flow_skel_video = cv2.VideoWriter('data/visualisations/videos/flow_skels_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
-                         10, size)
+def save_im_frames(data_root, sample_name, save_path="./data/visualisations/flow_pose_frames"):
+    print("Loading data...")
+    videos, poses, poseoff = load_data(data_root, sample_name)
 
-    RGB_video = cv2.VideoWriter('data/visualisations/videos/RGB_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
-                         10, size)
-    RGB_skel_video = cv2.VideoWriter('data/visualisations/videos/RGB_skels_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
-                         10, size)
-    
-    flowpose_video = cv2.VideoWriter('data/visualisations/videos/flowpose_video.avi', cv2.VideoWriter_fourcc(*'MJPG'),
-                         10, size)
-    current_frame_index = 0
-    flowpose = flow_pose_sample(flow_full, poses, window_size=19) # T, MV, C
-    while True:
-        # Get the flow and RGB frames
-        flow_frame = videos[0][current_frame_index]
-        RGB_frame = videos[1][current_frame_index]
-
-        # frame = cv2.cvtColor(frame.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-        flow_frame = flow2image(flow_frame)
-        RGB_frame = cv2.cvtColor(RGB_frame.astype(np.uint8), cv2.COLOR_BGR2RGB)
-
-        # Write normal videos
-        flow_video.write(flow_frame.astype(np.uint8))
-        RGB_video.write(RGB_frame.astype(np.uint8))
-
-        # Draw skeletons
-        flow_skel_frame = draw_skel(flow_frame, pose=poses[current_frame_index])
-        RGB_skel_frame = draw_skel(RGB_frame, pose=poses[current_frame_index])
-
-        # Write skeleton videos
-        flow_skel_video.write(flow_skel_frame.astype(np.uint8))
-        RGB_skel_video.write(RGB_skel_frame.astype(np.uint8))
-
-        # Draw flowpose
-        flowpose_frame = draw_flowpose(flowpose_frame=flowpose[current_frame_index],
-                                       pose_frame=poses[current_frame_index],
-                                       frame=flow_frame,
-                                       window_size=19)
-        flowpose_video.write(flowpose_frame.astype(np.uint8))
+    total_frames = get_frame_count(videos[0]) - 1
+    print(f"Writing {total_frames} frames...")
+    for frame_num in range(total_frames):
+        # Create flow frame
+        flow_frame = videos[0][frame_num]
+        flow_frame = draw_optical_flow_arrows(flow_frame, step=16, scale=3, thickness=2, threshold=0.0)
         
-        current_frame_index += 1
-        if current_frame_index >= get_frame_count(videos[0]):
-            break
-    
-    flow_video.release()
-    flow_skel_video.release()
-    RGB_video.release()
-    RGB_skel_video.release()
-    flowpose_video.release()
+        # Save rgb frame
+        rgb_frame = videos[1][frame_num]
+        rgb_frame = cv2.cvtColor(rgb_frame.astype(np.uint8), cv2.COLOR_BGR2RGB)
+
+        # Draw and save poses
+        pose = poses[frame_num]
+        pose_frame = videos[2][frame_num]
+        pose_frame = draw_bones(pose_frame, pose)
+        pose_frame = draw_skel(pose_frame, pose, debug=False)
+
+        for frame_type, frame in zip(["FLOW", "RGB", "POSE"], [flow_frame, rgb_frame, pose_frame]):
+            cv2.imwrite(
+                osp.join(
+                    save_path,
+                    f"{frame_type}-frame-{frame_num}.png"
+                    ),
+                frame,
+            )
 
 
-def crop_large_imgs(x_origin=250, y_origin=150, size=900):
-    original_img_path = "/fred/oz141/ldezoete/MS-G3D/data/visualisations/flow_pose_frames/"
-    cropped_img_path = "/fred/oz141/ldezoete/MS-G3D/data/visualisations/flow_pose_frames/cropped"
+
+def crop_large_imgs(x_origin=250, y_origin=150, size=900, sample_name=""):
+    original_img_path = f"/fred/oz141/ldezoete/MS-G3D/data/visualisations/flow_pose_frames/{sample_name}"
+    cropped_img_path = f"/fred/oz141/ldezoete/MS-G3D/data/visualisations/flow_pose_frames/{sample_name}/cropped"
+
+    # Make the cropped image path if it doesn't exist
+    os.makedirs(cropped_img_path, exist_ok=True)
     
     img_names = os.listdir(original_img_path)
     for img_name in img_names:
         if not osp.isfile(osp.join(original_img_path, img_name)):
             continue
-        if not img_name[:4] == "POSE": # Don't crop pose diagrams drawn with matplotlib...
-            img_in_path = osp.join(original_img_path, img_name)
-            img_out_path = osp.join(original_img_path, 'cropped', img_name)
+        print(f"Cropping: {img_name}")
+        # if not img_name[:4] == "POSE": # Don't crop pose diagrams drawn with matplotlib...
+        img_in_path = osp.join(original_img_path, img_name)
+        img_out_path = osp.join(original_img_path, 'cropped', img_name)
 
-            # Read the image
-            img = cv2.imread(img_in_path, cv2.IMREAD_UNCHANGED)
-            if img_name[:2] == "CV":
-                print(img.shape)
-            cropped = img[y_origin:y_origin+size, x_origin:x_origin+size]
+        # Read the image
+        img = cv2.imread(img_in_path, cv2.IMREAD_UNCHANGED)
+        if img_name[:2] == "CV":
+            print(img.shape)
+        cropped = img[y_origin:y_origin+size, x_origin:x_origin+size]
 
-            cv2.imwrite(img_out_path, cropped)
+        cv2.imwrite(img_out_path, cropped)
 
 
 def crop_to_joint(
@@ -437,53 +470,40 @@ def crop_to_joint(
     return cropped
 
 
-def draw_bones(pose, frame, person_num=None): 
-    pose = rearrange(pose, '(M V) C -> M V C', M=2, V=25)
-    joint_connections = [
-        [0,1], [1,2], [2,3], [1,20], [0,12], # Trunk/head
-        [0,16], [12,13], [13,14], [14,15], # Right leg
-        [0,16], [16,17],[17,18], [18,19],  # Left leg
-        [20,4], [4,5], [5,6], [6,7], [7,21], [7,22], # Right arm
-        [20,8], [8,9], [9,10], [10,11], [11,23], [11,24], # Left arm
-    ]
-    # Check if alpha channel exists in frame
-    color = (255,0,0) if frame.shape[-1] == 3 else (255,0,0,255)
-    # Get individual person's specific pose (if person_num specified)
-    if person_num in [0,1]:
-        pose = pose[person_num].reshape((1, 25, 2))
-
-    for person in pose:
-        for joint_connection in joint_connections:
-            p1, p2 = joint_connection
-            cv2.line(frame,
-                    (int(person[p1,0]), int(person[p1,1])),
-                    (int(person[p2,0]), int(person[p2,1])),
-                    color, 3
-                    )
-    return frame
+def quick_view(img):
+    frame = img.copy()
+    while True:
+        cv2.imshow("Video player", frame.astype(np.uint8))
+        key=cv2.waitKey(0) & 0xFF
+        if key == ord("q"):
+            break
+    cv2.destroyAllWindows()
             
 
 if __name__ == '__main__':
+    save_path = osp.join(save_root, sample_name)
+    os.makedirs(save_path, exist_ok=True)
     if crop:
-        crop_large_imgs()
-        # frame_numbers = [i for i in range(30,40)]
-        # print(frame_numbers)
-        # for frame_num in frame_numbers:
-        #     mpl_draw_skel(videos, poses, frame_num, video_num=2, show_frame=False)
-    # if live:
-    #     display_videos(videos)
-    # else:
-    #     write_videos(videos)
+        crop_large_imgs(
+            x_origin=440,
+            y_origin=380,
+            size=700,
+            sample_name=sample_name
+        )
+        quit()
+    if live:
+        display_videos(data_root, sample_name, save_path=save_path)
+        quit()
+    if save_ims:
+        save_im_frames(data_root, sample_name, save_path=save_path)
+        quit()
 
+    # Get data
+    # pose; (53, 50, 2)
+    # poseoff: (50, 53, 25, 2)
+    videos, poses, poseoff = load_data(data_root, sample_name)
 
-    # # Display a single image...
-    # original_img_path = "/fred/oz141/ldezoete/MS-G3D/data/visualisations/flow_pose_frames/"
-    # im_names = os.listdir(original_img_path)
-    # rgb_imgs = [name for name in im_names if "RBD" in name]
-    # img = cv2.imread(osp.join(original_img_path, rgb_imgs[0]))
-    # cv2.imwrite('data/visualisations/flow_pose_frames/TMP.png', img)
-
-    frame_num = 38
+    frame_num = 17
 
     flow_frame = videos[0][frame_num]
 
@@ -491,49 +511,58 @@ if __name__ == '__main__':
     rgb_frame = cv2.cvtColor(rgb_frame.astype(np.uint8), cv2.COLOR_BGR2RGB)
     H,W,C = rgb_frame.shape
 
-
     pose = poses[frame_num]
-    pose[11, 0] = pose[11, 0]-50
-    pose[23, 0] = pose[23, 0]-50
-    pose[24, 0] = pose[24, 0]-50
+    # # Slight pose adjustments...
+    # pose[11, 0] = pose[11, 0]+5
 
-    pose[11, 1] = pose[11, 1]-25
-    pose[23, 1] = pose[23, 1]-30
-    pose[24, 1] = pose[24, 1]-20
+    # pose[10, 1] = pose[10, 1]+10
+    # pose[11, 1] = pose[11, 1]+15 # palm
+    # pose[23, 1] = pose[23, 1]+15 # Fingers
+    # pose[24, 1] = pose[24, 1]+5 # Thumb
+    # pose[22, 1] = pose[22, 1]-10
 
-
-    # First, draw the flowpose arrows on the full frame (may take time)
-    frame = draw_optical_flow_arrows(flow_frame, frame=rgb_frame, step=10, scale=1, color=(0, 255, 0))
-    full_frame = draw_optical_flow_arrows(flow_frame, step=20, scale=3)
-    frame_transparent = np.zeros((H, W, 4), dtype=np.uint8)
-
-    # Then, we draw the skeleton lines we want
-    frame = draw_bones(pose, frame)
-    full_frame = draw_bones(pose, full_frame)
-    frame_transparent = draw_bones(pose, frame_transparent)
-
-    # Finally, draw the skeleton keypoints themselves
-    frame = draw_skel(frame, pose, person_num=0, skip_points=[4,5], debug=False)
-    full_frame = draw_skel(full_frame, pose, debug=False)
-    frame_transparent = draw_skel(frame_transparent, pose, debug=False)
+    # Introduce keypoints to skip drawing PoseOFF windows for...
+    skip_points=[1, 2, 21, 9, 11, 12, 24, 25]
+    skip_points = [22,23,24,25]
+    skip_points = [point-1 for point in skip_points]
+    skip_points = skip_points + [point+25 for point in skip_points]
 
 
-    cropped_flow = crop_to_joint(
-        videos=None,
-        frame=frame,
-        poses=poses,
+    background_frame = np.zeros((1080, 1920, 4))
+    poseoff_frame = draw_bones(background_frame, pose=poses[frame_num])
+    poseoff_frame = draw_poseoff(
+        poseoff_frame,
+        pose=poses[frame_num],
+        poseoff=poseoff,
         frame_num=frame_num,
-        video_num=0,
-        person_num=0,
-        joint_num=11,
-        window_size=150
+        flow_scale=5.0,
+        window_size=5,
+        dilation=15,
+        skip_points=skip_points,
+        average_flow=True
     )
-    cropped_flow = cv2.resize(cropped_flow, (cropped_flow.shape[1]*2,cropped_flow.shape[0]*2))
+    quick_view(poseoff_frame)
+    cv2.imwrite(
+        f'data/visualisations/flow_pose_frames/{sample_name}/PoseOFF-frame-{frame_num}.png',
+        poseoff_frame
+    )
 
-    cv2.imwrite('data/visualisations/flow_pose_frames/TMP.png', cropped_flow)
-    cv2.imwrite(f'data/visualisations/flow_pose_frames/FLOWPOSE-frame-{frame_num}.png', full_frame)
-    cv2.imwrite(f'data/visualisations/flow_pose_frames/CVPose-frame-{frame_num}.png', frame_transparent)
+    quit()
 
-    cv2.imshow('cropped', frame_transparent)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # # Crop into one particular joint
+    # cropped_flow = crop_to_joint(
+    #     videos=None,
+    #     frame=poseoff_frame,
+    #     poses=poses,
+    #     frame_num=frame_num,
+    #     video_num=0,
+    #     person_num=0,
+    #     joint_num=9,
+    #     window_size=120
+    # )
+    # cropped_flow = cv2.resize(cropped_flow, (cropped_flow.shape[1]*2,cropped_flow.shape[0]*2))
+    # quick_view(cropped_flow)
+    # cv2.imwrite(
+    #     f'data/visualisations/flow_pose_frames/{sample_name}/cropped/closeup-{frame_num}.png',
+    #     cropped_flow
+    # )

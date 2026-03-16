@@ -1,0 +1,20 @@
+Improved 81 classes
+No change in 1 classes
+Accuracy losses in 19 classes
+Percentage of classes improved: 80.20%
+Median gain: 0.07650273224043724
+Interquartile range (IQR): [0.02867384 0.12424242]
+BEST:
+	Class TrampolineJumping: recall=38.94%
+	Class BodyWeightSquats: recall=30.43%
+	Class HulaHoop: recall=25.40%
+	Class BenchPress: recall=22.39%
+	Class HighJump: recall=22.22%
+WORST:
+	Class Rowing: recall=-9.35%
+	Class Mixing: recall=-4.76%
+	Class BreastStroke: recall=-4.42%
+	Class PlayingDhol: recall=-4.35%
+	Class FrontCrawl: recall=-4.20%
+Wilcoxon statistic: 4719.0
+	P-value: 2.2843748279438193e-14

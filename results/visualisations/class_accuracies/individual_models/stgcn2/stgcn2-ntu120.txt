@@ -1,0 +1,20 @@
+Improved 118 classes
+No change in 0 classes
+Accuracy losses in 2 classes
+Percentage of classes improved: 98.33%
+Median gain: 0.05294871794871797
+Interquartile range (IQR): [0.02987587 0.08783225]
+BEST:
+	Class cutting nails: recall=19.24%
+	Class staple book: recall=18.98%
+	Class take off a shoe: recall=18.81%
+	Class clapping: recall=18.76%
+	Class reading: recall=17.21%
+WORST:
+	Class thumb up: recall=-5.45%
+	Class make ok sign: recall=-3.10%
+	Class take off a hat/cap: recall=0.52%
+	Class put on a hat/cap: recall=0.52%
+	Class standing up (from sitting position): recall=0.52%
+Wilcoxon statistic: 7167.0
+	P-value: 9.943216453608181e-21

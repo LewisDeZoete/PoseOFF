@@ -119,26 +119,4 @@ axs[1,3].bar(np.linspace(1,25,25), np.mean(np.mean(attn[50], axis=0), axis=mean_
 for i in range(4):
     axs[1,i].set_xlabel("Limb number (1-25)")
     axs[1,i].set_ylim(0,0.35)
-# plt.show()
 plt.savefig('./TMP.png')
-
-
-
-
-# # Define the matplotlib style
-# plt.style.use('./results/visualisations/plot_styles.mplstyles')
-
-# fig, axs = plt.subplots(2,4, figsize=(10,10))
-# axs[0,0].imshow(grad_importance[0], cmap="hot")
-# axs[1,0].bar(np.linspace(1,25,25), np.mean(grad_importance[0], axis=0))
-
-# axs[0,1].imshow(grad_importance[1], cmap="hot")
-# axs[1,1].bar(np.linspace(1,25,25), np.mean(grad_importance[1], axis=0))
-
-# axs[0,2].imshow(grad_importance[2], cmap="hot")
-# axs[1,2].bar(np.linspace(1,25,25), np.mean(grad_importance[2], axis=0))
-
-# axs[0,3].imshow(grad_importance.mean(axis=0), cmap="hot")
-# axs[1,3].bar(np.linspace(1,25,25), grad_importance.mean(axis=0).mean(axis=0))
-
-# plt.savefig('./TMP.png')

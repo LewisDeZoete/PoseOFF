@@ -1,0 +1,20 @@
+Improved 37 classes
+No change in 2 classes
+Accuracy losses in 21 classes
+Percentage of classes improved: 61.67%
+Median gain: 0.01097972972972977
+Interquartile range (IQR): [-0.00338557  0.03087986]
+BEST:
+	Class wear a shoe: recall=15.82%
+	Class typing on a keyboard: recall=9.48%
+	Class writing: recall=8.69%
+	Class eat meal/snack: recall=7.28%
+	Class wipe face: recall=6.93%
+WORST:
+	Class touch head (headache): recall=-6.76%
+	Class rub two hands together: recall=-4.56%
+	Class clapping: recall=-2.89%
+	Class pat on back of other person: recall=-2.70%
+	Class take off a hat/cap: recall=-1.87%
+Wilcoxon statistic: 1292.5
+	P-value: 0.00035783128523010947

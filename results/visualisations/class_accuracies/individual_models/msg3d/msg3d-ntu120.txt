@@ -1,0 +1,20 @@
+Improved 118 classes
+No change in 0 classes
+Accuracy losses in 2 classes
+Percentage of classes improved: 98.33%
+Median gain: 0.055699855699855694
+Interquartile range (IQR): [0.03408025 0.09161075]
+BEST:
+	Class cutting nails: recall=24.29%
+	Class apply cream on face: recall=21.64%
+	Class wear a shoe: recall=20.39%
+	Class rub two hands together: recall=18.74%
+	Class wipe face: recall=18.12%
+WORST:
+	Class make ok sign: recall=-1.97%
+	Class carry something with other person: recall=-0.28%
+	Class standing up (from sitting position): recall=0.26%
+	Class sitting down: recall=0.26%
+	Class shoot at other person with a gun: recall=0.28%
+Wilcoxon statistic: 7238.0
+	P-value: 1.7121831869729803e-21
