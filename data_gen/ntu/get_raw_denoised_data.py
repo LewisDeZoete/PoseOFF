@@ -382,8 +382,7 @@ def get_two_actors_points(bodies_data):
 
 
 def get_raw_denoised_data():
-    """
-    Get denoised data (joints positions and color locations) from raw skeleton sequences.
+    """Get denoised data (joints positions and color locations) from raw skeleton sequences.
 
     For each frame of a skeleton sequence, an actor's 3D positions of 25 joints represented
     by an 2D array (shape: 25 x 3) is reshaped into a 75-dim vector by concatenating each

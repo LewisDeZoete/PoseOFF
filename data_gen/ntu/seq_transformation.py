@@ -6,30 +6,46 @@ import os.path as osp
 import numpy as np
 import pickle
 import yaml
-from data_gen.utils import create_aligned_dataset
+from data_gen.utils import create_aligned_dataset, get_mean_map
 import argparse
 
 parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
-parser.add_argument('--dataset', 
-                    dest='dataset', 
-                    default='ntu', 
-                    help='Dataset, either `ntu` or `ntu120` (default=ntu)')
-parser.add_argument('--mod', 
-                    dest='mod', 
-                    default='', 
-                    help='Modification to be appended at the end of the file save name')
-parser.add_argument('--flow', 
-                    action='store_true', 
-                    help='If passed, add flow to the pose array') 
-parser.add_argument('--split', 
-                    action='store_true', 
-                    help='If passed, split the dataset. \
-                        WILL NOT CREATE ALIGNED DATASET, \
-                        Run this again without --split to align (store_true)')
+parser.add_argument(
+    '--dataset',
+    dest='dataset',
+    default='ntu',
+    help='Dataset, either `ntu` or `ntu120` (default=ntu)'
+)
+parser.add_argument(
+    '--dilation',
+    dest='dilation',
+    type=int,
+    default=3,
+    help="Dilation factor of the extracted PoseOFF features (default=3)"
+)
+parser.add_argument(
+    '--flow',
+    action='store_true',
+    help='If passed, add flow to the pose array'
+)
+parser.add_argument(
+    '--flow_type',
+    default='RAFT',
+    help="The type of flow used to generate the data. (default=RAFT)"
+)
+parser.add_argument(
+    '--split',
+    action='store_true',
+    help='If passed, creates the dataset splits (train/test). \
+    WILL NOT CREATE ALIGNED DATASET, \
+    Run this again without --split to align (store_true)'
+)
 args = parser.parse_args()
 dataset = args.dataset
 assert dataset in ['ntu', 'ntu120']
-mod = args.mod
+dilation = args.dilation
+flow_type = args.flow_type
+mod = f"_{flow_type}_D{dilation}"
 
 # Paths
 root_path = f'./data/{dataset}'
@@ -37,17 +53,15 @@ save_path = osp.join(root_path, 'aligned_data')
 save_name = "{dataset}_{evaluation}-{data_type}{mod}.npz"
 stat_path = osp.join(root_path, 'statistics')
 denoised_path = osp.join(root_path, 'denoised_data')
-flow_path = osp.join(root_path, 'flow_data')
+flow_path = osp.join(root_path, 'flow_data', flow_type)
 # Info files and folders
 skes_name_file = osp.join(stat_path, f'ntu_rgbd{120 if dataset == "ntu120" else ""}-available.txt')
 frames_file = osp.join(stat_path, 'frames_cnt.txt')
-# Files
+# Data file paths
 raw_skes_joints_pkl = osp.join(denoised_path, 'raw_denoised_joints.pkl')
-raw_flow_joints_pkl = osp.join(flow_path, f"flow_data{mod}.pkl")
-raw_flowpose_pkl = osp.join(flow_path, f"raw_flowpose_data{mod}.pkl") # This is the file that is saved TO
+raw_flow_joints_pkl = osp.join(flow_path, f"flow_data_{flow_type}_D{dilation}.pkl")
+raw_poseoff_pkl = osp.join(flow_path, f"raw_poseoff_data_{flow_type}_D{dilation}.pkl") # This is the file that is saved TO
 
-if not osp.exists(save_path):
-    os.mkdir(save_path)
 
 def get_details(skes_name, frames_cnt):
     details: dict = {} # Create and populate details dict
@@ -180,7 +194,7 @@ def one_hot_vector(labels):
     return labels_vector
 
 
-def split_dataset(joints, details: dict, evaluation: str, save_path: str, data_type='pose', mod=''):
+def split_dataset(joints, details: dict, evaluation: str, save_name: str, save_path: str, data_type='pose', mod=''):
     """
     Splits the numpy array of joints into the specified train/test split.
     Saves the split array as a .npz file, with keys:
@@ -194,7 +208,7 @@ def split_dataset(joints, details: dict, evaluation: str, save_path: str, data_t
             See `get_details` function for detail.
         evaluation: String indicating which evaluation to use (see `get_indices` function).
         save_path: The root path where .npz files are saved to.
-        data_type: Type of data being split, either 'pose' or 'flowpose'.
+        data_type: Type of data being split, either 'pose' or 'poseoff'.
         mod: Modifier to append to the end of the name of the file being saved.
     """
     train_indices, test_indices = get_indices(
@@ -212,14 +226,23 @@ def split_dataset(joints, details: dict, evaluation: str, save_path: str, data_t
     test_x = joints[test_indices]
     test_y = one_hot_vector(test_labels)
 
-
-    file_save_path = osp.join(save_path,
-                              save_name.format(
-                                  dataset=dataset,
-                                  evaluation=evaluation,
-                                  data_type=data_type,
-                                  mod=mod)
-                              )
+    # Define the save name and full path
+    # (e.g. data/ntu/aligned_data/poseoff/RAFT/ntu_CV-poseoff_RAFT_D3_aligned.npz)
+    # The files are saved in the save path under their own pose/poseoff sub-directories
+    os.makedirs(
+        osp.join(save_path, data_type, flow_type if data_type=="poseoff" else ""),
+        exist_ok=True
+    )
+    file_save_path = osp.join(
+        save_path, # ./data/ntu(120)/aligned_data/
+        data_type, # ./data/ntu(120)/aligned_data/pose/
+        flow_type if data_type=="poseoff" else "", # ./data/ntu(120)/aligned_data/poseoff/RAFT/
+        save_name.format(
+            dataset=dataset,
+            evaluation=evaluation,
+            data_type=data_type,
+            mod=mod)
+    )
     np.savez(file_save_path, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
     return file_save_path
 
@@ -288,9 +311,9 @@ def get_indices(performer, camera, setup, evaluation='CS'):
     return train_indices, test_indices
 
 
-def concat_flowpose(skes_joints, flow_joints):
+def concat_poseoff(skes_joints, flow_joints):
     """
-    Concatenate the flow data to the pose data to create the flowpose data.
+    Concatenate the flow data to the pose data to create the poseoff data.
     NOTE: First frame of skeleton data is removed and sequence is shifted by 1 frame.
     """
     N, T, MVC = skes_joints.shape
@@ -337,10 +360,12 @@ if __name__ == '__main__':
     # If this split=True, create the train/test splits for the dataset
     if args.split:
         # Load the ntu skeleton data regardless of the dataset
+        # NOTE: cant use paths defined at top of file (in the event that it's the ntu120 dataset)
+        # So you must load the flow_data from the ntu dataset before anything else
         with open('./data/ntu/denoised_data/raw_denoised_joints.pkl', 'rb') as fr:
             skes_joints = pickle.load(fr)
         if args.flow:
-            with open(f"./data/ntu/flow_data/flow_data{mod}.pkl", 'rb') as fr:
+            with open(f"./data/ntu/flow_data/{flow_type}/flow_data_{flow_type}_D{dilation}.pkl", 'rb') as fr:
                 flow_joints = pickle.load(fr)
         else:
             flow_joints = None
@@ -358,8 +383,10 @@ if __name__ == '__main__':
                 print(f'\tFlow joints dtype: {flow_joints[0].dtype}', flush=True)
             else:
                 flow_joints = None
-        print(f'\tLoaded {len(skes_joints)} skeleton \
-        sequences and {len(flow_joints)} flow sequences', flush=True)
+        print(
+            f'\tLoaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences',
+              flush=True
+        )
 
         # Translates the sequence to a new origin first non-zero frame of the first actor
         skes_joints = seq_translation(skes_joints, flow_joints)
@@ -370,49 +397,65 @@ if __name__ == '__main__':
             flow_joints = align_frames(flow_joints, frames_cnt, MVC=2500)
             print(f'\tFull flow sequence shape: {flow_joints.shape}', flush=True)
             print(f'\tFull skeleton sequence shape: {skes_joints.shape}', flush=True)
-            flow_joints = concat_flowpose(skes_joints, flow_joints)
-            print(f'\tFull flowpose sequence shape: {flow_joints.shape}', flush=True)
-            with open(raw_flowpose_pkl, 'wb') as f:
+            flow_joints = concat_poseoff(skes_joints, flow_joints)
+            print(f'\tFull poseoff sequence shape: {flow_joints.shape}', flush=True)
+            print(f'\tPose only approximate size: {sys.getsizeof(skes_joints, 5)/1e9:.2f} GB', flush=True)
+            print(f'\tPoseoff approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
+            with open(raw_poseoff_pkl, 'wb') as f:
                 pickle.dump(flow_joints, f, pickle.HIGHEST_PROTOCOL)
 
-        print(f'\tFlowpose approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
         # Generate train-test splits and save the data
         file_list = []
         for evaluation in evaluations:
-            # Split the pose joints, this will be the same array regardless of dilation
+            # Split the pose joints, this will be the same array shape regardless of dilation
             # saves as: {dataset}_{evaluation}-{data_type}{mod}.npz
             file_save_path = split_dataset(skes_joints, details, evaluation,
-                                           save_path, data_type='pose', mod='')
+                                           save_name, save_path,
+                                           data_type='pose', mod='')
             print(f'\tSaved pose {evaluation}', flush=True)
             file_list.append(file_save_path)
-            # If flow arg is passed, also split the flowpose dataset
+            # If flow arg is passed, also split the poseoff dataset
             if args.flow:
                 file_save_path = split_dataset(flow_joints, details, evaluation,
-                                               save_path, data_type='flowpose', mod=mod)
-                print(f'\tSaved flowpose {evaluation}', flush=True)
+                                               save_name, save_path,
+                                               data_type='poseoff', mod=mod)
+                print(f'\tSaved poseoff {evaluation}', flush=True)
                 file_list.append(file_save_path)
 
     else:
         file_list = []
         file_list += [
-            osp.join(save_path,
-                     save_name.format(
-                         dataset=dataset,
-                         evaluation=evaluation,
-                         data_type='pose',
-                         mod=''))
+            osp.join(
+                save_path, # ./data/ntu(120)/aligned_data/
+                'pose', # ./data/ntu(120)/aligned_data/pose/
+                save_name.format(
+                    dataset=dataset,
+                    evaluation=evaluation,
+                    data_type='pose',
+                    mod=''
+                )
+            )
                      for evaluation in evaluations]
         if args.flow:
-                      file_list += [
-                          osp.join(save_path,
-                                   save_name.format(
-                                       dataset=dataset,
-                                       evaluation=evaluation,
-                                       data_type='flowpose',
-                                       mod=mod))
-                                   for evaluation in evaluations]
+            file_list += [
+                osp.join(
+                    save_path, # ./data/ntu(120)/aligned_data/
+                    'poseoff', # ./data/ntu(120)/aligned_data/poseoff/
+                    flow_type, # ./data/ntu(120)/aligned_data/poseoff/(RAFT, LK...)/
+                    save_name.format(
+                        dataset=dataset,
+                        evaluation=evaluation,
+                        data_type='poseoff',
+                        mod=mod
+                    )
+                )
+                for evaluation in evaluations]
         print(file_list, flush=True)
 
         # Create the aligned dataset
         create_aligned_dataset(file_list=file_list)
         print('\tAligned datasets created successfully!', flush=True)
+
+        # Get mean map for dataset...
+        aligned_file_list = [file_name.replace(".npz", "_aligned.npz") for file_name in file_list]
+        get_mean_map(file_list=aligned_file_list)

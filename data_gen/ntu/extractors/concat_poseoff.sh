@@ -8,7 +8,7 @@
 # Activate the environment
 source ../environment/bin/activate
 
-srun python ./data_gen/ntu/concat_flowpose.py --dataset $dataset --dilation $dilation
+srun python ./data_gen/ntu/concat_poseoff.py --dataset $dataset --dilation $dilation --flow_type $flow_type
 
-# Can remove the flow data, but it takes so long to reextract...
-# rm -rf ./data/${dataset}/flow_data/export_tmp
+# Can remove the flow data...
+rm -rf ./data/${dataset}/flow_data/export_tmp

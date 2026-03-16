@@ -119,8 +119,9 @@ def stack_frames(frames: torch.Tensor):
 
 
 class LoadVideo:
-    """
-    Load a video from the specified path and return a tensor of frames.
+    #TODO: Move this to data_gen/utils/extractors.py
+    """Load a video from the specified path and return a tensor of frames.
+
     Args:
         video_path (str): Path to the video file.
         max_frames (int): Maximum number of frames to load from the video.
@@ -142,7 +143,7 @@ class LoadVideo:
             # output = torch.tensor(vr.get_batch(np.linspace(0, len(vr)-1, len(vr))).asnumpy())
             video = vr.get_batch(np.linspace(0, len(vr) - 1, len(vr)))
 
-        # RGB Colour format
+        # N, C, H, W
         video = torch.permute(video, (0, 3, 1, 2))
 
         return video

@@ -13,23 +13,26 @@ import argparse
 
 parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
 parser.add_argument(
-    '--dataset', 
-    dest='dataset', 
+    '--dataset',
+    dest='dataset',
     default='ntu',
-    help='Dataset, either `ntu` or `ntu120` (default=ntu)')
+    help='Dataset, either `ntu` or `ntu120` (default=ntu)'
+)
 parser.add_argument(
     '--batch_size',
     dest='batch_size',
     default=2000,
     type=int,
     help='Processing batch size (default 2000), \
-        processes from (batch_number-1)*batch_size - batch_number*batch_size')
+        processes from (batch_number-1)*batch_size - batch_number*batch_size'
+)
 parser.add_argument(
     '--batch_number',
     dest='batch_number',
     default=1,
     type=int,
-    help='Batch number for processing')
+    help='Batch number for processing'
+)
 parser.add_argument(
     '--dilation',
     dest='dilation',
@@ -52,7 +55,7 @@ print(f'Start index: {idx_start}')
 print(f'End index: {idx_end}')
 
 # Get the argparse object
-arg = ArgClass(arg=f"./config/ntu{'120' if dataset == 'ntu120' else ''}/cnn.yaml")
+arg = ArgClass(arg=f"./config/infogcn2/ntu{'120' if dataset == 'ntu120' else ''}/cnn.yaml")
 transform_args = arg.extractor
 if args.dilation: # If a commandline argument is passed, overwrite the yaml config
     transform_args['flowpose']['dilation'] = args.dilation
@@ -113,14 +116,16 @@ def get_raw_flowpose_data(idx_start=0, idx_end=20000):
     # Assuming we've already denoised all the pose data
     with open(denoised_skes_data_file, 'rb') as fr:  # load raw skeletons data
         denoised_skes_data = pickle.load(fr)
-    
+
     # Get the frame drop dictionary to trip the flow data
     with open(frames_drop_file, 'rb') as fr:
         frames_drop_skes = pickle.load(fr)
 
     # Create an enumerate object for the skeleton names
     enum = enumerate(skes_names[idx_start:idx_end])
-    start = time.time()
+    # Start timing (time_tmp for printing times during inference)
+    start_time = time.time()
+    start_time_tmp = time.time()
     for ske_number, ske_name in enum:
         ske_number += idx_start
         # Get the flow data
@@ -130,7 +135,7 @@ def get_raw_flowpose_data(idx_start=0, idx_end=20000):
         # Get the pose data
         poses = denoised_skes_data[ske_number]
         poses = poses.transpose(3, 0, 2, 1)
-        
+
         # Remove the frame drops from flow_data
         if ske_name in frames_drop_skes:
             flow_data = remove_frame_drops(flow_data, frames_drop_skes[ske_name])
@@ -141,20 +146,24 @@ def get_raw_flowpose_data(idx_start=0, idx_end=20000):
                 poses = np.concatenate([np.zeros((C, 1, V, M)), poses], axis=1)
 
         # Get the flowpose data and reshape!
-        flowpose = flowPoseTransform(flow_data, poses) 
+        flowpose = flowPoseTransform(flow_data, poses)
         flowpose_data.append(rearrange(flowpose, 'C T V M -> T (M V C)'))
 
         if (ske_number+1) % 500 == 0:
-            print(f'Processed {ske_number-499}-{ske_number} in {time.time()-start:0.2f} seconds', flush=True)
-            start = time.time()
+            print(f'Processed {ske_number-499}-{ske_number} in {time.time()-start_time_tmp:0.2f} seconds', flush=True)
+            start_time_tmp = time.time()
+    # Print the time it took to process this batch of data
+    print(f"Processed {idx_end-idx_start} in: {time.time()-start_time:0.2f} seconds", flush=True)
 
     # Save the data
     data_name = f"flow_{human_k(idx_start)}-{human_k(idx_end)}"
-    flowpose_pkl = osp.join(save_path, f'{data_name}.pkl')
-    with open(flowpose_pkl, 'wb') as f:
+    flowpose_filename = osp.join(save_path, f'{data_name}.pkl')
+    with open(flowpose_filename, 'wb') as f:
         pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
 
-    
+    return flowpose_filename
+
+
 if __name__ == '__main__':
     # Define paths
     root_path = f'./data/{dataset}'
@@ -169,10 +178,10 @@ if __name__ == '__main__':
     skes_names = np.loadtxt(skes_name_file, dtype=str)
     num_files = skes_names.size
     print('Found %d available skeleton files.\n' % num_files, flush=True)
-    
-    if not osp.exists(save_path):
-        os.makedirs(save_path)
-    
+
+    # Create the save path (if it doesn't exist already)
+    os.makedirs(save_path, exist_ok=True)
+
     # Print processing information before processing...
     print(f'Processing flowpose samples for {dataset} dataset...', flush=True)
     print(f'\tIndex {idx_start} to {idx_end}')
@@ -180,8 +189,9 @@ if __name__ == '__main__':
         print(f'\tSkeleton {skes_names[idx_start]} to {skes_names[idx_end-1]}')
     except IndexError:
         print(f'\tSkeleton {skes_names[idx_start]} to {skes_names[-1]}')
-    
+
     # Generate the data
-    get_raw_flowpose_data(idx_start=idx_start, idx_end=idx_end)
+    flowpose_filename = get_raw_flowpose_data(idx_start=idx_start, idx_end=idx_end)
     print(f'Flowpose samples for {dataset} dataset generated successfully!', flush=True)
     print(f'Data saved to {save_path}', flush=True)
+    print(f"Full filename path: {flowpose_filename}", flush=True)

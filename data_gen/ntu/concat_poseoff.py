@@ -12,33 +12,44 @@ parser.add_argument(
     '--dataset', 
     dest='dataset', 
     default='ntu',
-    help='Dataset, either `ntu` or `ntu120` (default=ntu)')
+    help='Dataset, either `ntu` or `ntu120` (default=ntu)'
+)
 parser.add_argument(
     '--dilation',
     dest='dilation',
     default=1,
-    help='Flowpose extraction window dilation amount (mostly used for debug)')
+    help='Poseoff extraction window dilation amount (mostly used for debug)'
+)
+parser.add_argument(
+    '--flow_type',
+    dest='flow_type',
+    default='RAFT',
+    help='Type of flow used to extract the PoseOFF windows.'
+)
 args = parser.parse_args()
 
 # Parsed command line arguments
 dataset = args.dataset
+flow_type = args.flow_type
 
 # Printing for debug
-print(f"Concatenating {args.dataset} flowpose.")
+print(f"Concatenating {args.dataset} - {args.flow_type} PoseOFF.")
 print(f"\tDILATION: {args.dilation}\n\n")
 
 # Paths
 root_path = f'./data/{dataset}'
 in_path = osp.join(root_path, 'flow_data', 'export_tmp')
-save_path = osp.join(root_path, 'flow_data')
+save_path = osp.join(root_path, 'flow_data', flow_type)
+# Ensure the save_path exists...
+os.makedirs(save_path, exist_ok=True)
 # Give the flow data a more meaningful name to reflect the dilation value
-save_name = f"flow_data_D{args.dilation}.pkl"
+save_name = f"flow_data_{flow_type}_D{args.dilation}.pkl"
 files = os.listdir(in_path)
 
 flow_file_names = {} # Dictionary to hold file names
 flow_data = [] # List to hold flow data
 
-# Iterate over the files
+# Verify filenames
 for file_name in files:
     # Check if the file name matches 'flow_...(number)k.pkl
     x = re.search(r'^flow_.*(\d)k\.pkl$', file_name)
@@ -64,4 +75,4 @@ for _, file in flow_file_names.items():
 with open(osp.join(save_path, save_name), 'wb') as f:
     pickle.dump(flow_data, f, pickle.HIGHEST_PROTOCOL)
 
-print(f"Saved flowpose file to: {osp.join(save_path, save_name)}")
+print(f"Saved poseoff file to: {osp.join(save_path, save_name)}")

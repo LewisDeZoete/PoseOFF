@@ -1,6 +1,7 @@
+import time
+import os.path as osp
 import numpy as np
-# import torch
-
+import mmnpz
 
 def loop_graph(data):
     """
@@ -120,7 +121,7 @@ def align_skeleton(data):
         M - Number of people in the frame
 
     Returns:
-    numpy.ndarray: A 5-dimensional array with the same shape as the input, containing the transformed skeleton data.
+        numpy.ndarray: A 5-dimensional array with the same shape as the input, containing the transformed skeleton data.
     """
     N, C, T, V, M = data.shape
     trans_data = np.zeros_like(data)
@@ -151,7 +152,7 @@ def align_skeleton(data):
 
 
 def create_aligned_dataset(
-    file_list=["data/ntu/ntu_CS-pose.npz", "data/ntu/ntu_CV-pose.npz"]
+    file_list=["data/ntu/aligned_data/pose/ntu_CS-pose.npz", "data/ntu/aligned_data/pose/ntu_CV-pose.npz"]
 ):
     """
     Create an aligned dataset from the given list of .npz files.
@@ -162,9 +163,7 @@ def create_aligned_dataset(
 
     Parameters:
     file_list (list of str): List of file paths to the .npz files containing the original datasets.
-                             Default is ['data/ntu/NTU60_CS.npz', 'data/ntu/NTU60_CV.npz'].
-    data_type (str): Type of data to align, either 'pose' or 'flowpose'. If 'pose', perform `align_skeleton`.
-                     Default is 'pose'.
+                             Default is ['data/ntu/pose/ntu_CS-pose.npz', 'data/ntu/pose/ntu_CV-pose.npz'].
 
     The function expects the .npz files to contain the following keys:
     - 'x_train': Training data
@@ -179,10 +178,11 @@ def create_aligned_dataset(
     - 'y_test': Testing labels (unchanged)
     """
     for file in file_list:
+        start = time.time()
         org_data = np.load(file)
         splits = ["x_train", "x_test"]
         aligned_set = {}
-        if 'flowpose' in file:
+        if 'poseoff' in file:
             for split in splits:
                 data = org_data[split]
                 N, T, _ = data.shape
@@ -210,4 +210,78 @@ def create_aligned_dataset(
             x_test=aligned_set["x_test"],
             y_test=org_data["y_test"],
         )
-        print(f'\t\tAligned {file}')
+        print(f'\t\tAligned {file} in {time.time()-start: 0.2f} seconds', flush=True)
+
+
+def get_mean_map(
+        file_list=["data/nt/aligned_data/pose/ntu_CS-pose_aligned.npz", "data/ntu/aligned_data/pose/ntu_CV-pose_aligned.npz"],
+        batch_size=64
+):
+    for file in file_list:
+        if not osp.exists(file):
+            print(f"File: \t{file}\nDoes not exist. Regenerate the aligned dataset and retry.")
+        start_time = time.time()
+        org_data = mmnpz.load(file)
+        splits = ["x_train", "x_test"]
+
+        count = None
+        mean = None # shape (V, C)
+        M2 = None # shape (V, C)
+
+        # Original splits are arrays of shape (N, T, M*V*C)
+        M, V = 2, 25
+        C = 53 if "poseoff" in file else 3
+
+        # Process the splits :)
+        for split in splits:
+            data = org_data[split]
+            N, T, _ = data.shape
+            # Batch the data
+            for start in range(0, N, batch_size):
+                # Load and reshape batch
+                batch = data[start:start+batch_size].astype(np.float64)
+                batch = batch.reshape(batch.shape[0], T, M, V, C)
+                # batch shape: (B, T, M, V, C)
+
+                # A frame is "real" if any of (M, V, C) is non-zero
+                valid_mask = (batch != 0).any(axis=(3,4)) # (B, T, M) - True if a frame is real!
+                batch_count = valid_mask.sum()
+
+                if batch_count == 0:
+                    continue
+
+                # Extract mean and var only for valid frames
+                valid_frames = batch[valid_mask]
+                batch_mean = valid_frames.mean(axis=0) # V, C
+                batch_var = valid_frames.var(axis=0) # V, C
+
+                if count is None:
+                    count = batch_count
+                    mean = batch_mean
+                    M2 = batch_var * batch_count
+                else:
+                    new_count = count + batch_count
+                    delta = batch_mean - mean
+                    mean = mean + delta * (batch_count / new_count)
+                    M2 = M2 + batch_var * batch_count + (delta ** 2) * (count*batch_count/new_count)
+                    count = new_count
+
+        # Calculate standard deviation after mean calculation
+        variance = M2 / count
+        std = np.sqrt(variance)
+        # Reshape (V, C) -> (C, 1, V, 1)
+        mean_map = mean.T[:, np.newaxis, :, np.newaxis]
+        std_map = std.T[:, np.newaxis, :, np.newaxis]
+        print(f"\t\tMean and standard deviation maps took {time.time()-start_time: 0.2f} seconds", flush=True)
+
+        # Save the array again with new keys "mean_map" and "std_map"
+        start_time = time.time()
+        with mmnpz.NpzWriter(file.replace("aligned", "aligned_mean")) as f:
+            f.write("x_train", org_data['x_train'])
+            f.write("x_test", org_data['x_test'])
+            f.write("y_train", org_data['y_train'])
+            f.write("y_test", org_data['y_test'])
+            f.write("mean_map", mean_map)
+            f.write("std_map", std_map)
+        print(f"\t\tSaved data to: {file.replace('aligned', 'aligned_mean')}", flush=True)
+        print(f"\t\tSaving took {time.time()-start_time:0.2f} seconds", flush=True)

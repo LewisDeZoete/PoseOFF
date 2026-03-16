@@ -6,7 +6,9 @@
 
 source ../environment/bin/activate
 
+echo "Dataset: $dataset"
 echo "Dilation: $dilation"
+echo "Flow type: $flow_type"
 
-srun python ./data_gen/ntu/seq_transformation.py --dataset $dataset --mod "_D${dilation}" --flow --split
-srun python ./data_gen/ntu/seq_transformation.py --dataset $dataset --mod "_D${dilation}" --flow
+srun python ./data_gen/ntu/seq_transformation.py --dataset $dataset --dilation $dilation --flow --flow_type $flow_type --split
+srun python ./data_gen/ntu/seq_transformation.py --dataset $dataset --dilation $dilation --flow --flow_type $flow_type
