@@ -21,22 +21,22 @@ def valid_crop_resize(
         - T: Number of frames (temporal dimension)
         - V: Number of joints (spatial dimension)
         - M: Number of bodies (e.g., multiple people)
-    The function crops the temporal dimension based on a specified interval and 
+    The function crops the temporal dimension based on a specified interval and
     resizes the data to a fixed window size.
     Args:
         data_numpy (np.array): Input data with shape (C, T, V, M).
         valid_frame_num (int): Number of valid frames in the input data.
-        p_interval (list): Interval for cropping. If it contains one value, 
-            center cropping is performed. If it contains two values, random cropping 
+        p_interval (list): Interval for cropping. If it contains one value,
+            center cropping is performed. If it contains two values, random cropping
             is performed within the range [p_interval[0], p_interval[1]].
         window_size (int): Target size for the temporal dimension after resizing.
     Returns:
         np.array: Processed data with shape (C, window_size, V, M).
     Notes:
         - If `p_interval` contains one value, the function performs center cropping.
-        - If `p_interval` contains two values, the function performs random cropping 
+        - If `p_interval` contains two values, the function performs random cropping
           with constraints on the cropped length (minimum of 64 frames).
-        - Resizing is performed using bilinear interpolation, which can handle both 
+        - Resizing is performed using bilinear interpolation, which can handle both
           up-sampling and down-sampling.
     """
     # input: C,T,V,M
@@ -79,6 +79,7 @@ def valid_crop_resize(
     )
 
     return data
+
 
 
 def obs_mask(data_numpy, obs_ratio: float = 1.0):
@@ -467,6 +468,7 @@ if __name__ == "__main__":
     data_pad_last_frame = auto_padding(data, 100)
     data_pad_replay = auto_padding(data, 100, pad_method="replay")
     data_pad_zero_pad = auto_padding(data, 100, pad_method="zero_pad")
+    data_valid_crop = valid_crop_resize(data, 29, [0.5,1], 100)
 
     logger.debug(f"Last frame padding shape: {data_pad_last_frame.shape}")
     logger.debug(f"Last frame padding (first frame): {data_pad_last_frame[:3, 0, 0, 0]}")
@@ -489,6 +491,8 @@ if __name__ == "__main__":
     logger.debug(f"Zero pad padding (last valid frame+1): {data_pad_zero_pad[:3, 15, 0, 0]}")
     logger.debug(f"Zero pad padding (last frame-1): {data_pad_zero_pad[:3, -2, 0, 0]}")
     logger.debug(f"Zero pad padding (last frame): {data_pad_zero_pad[:3, -1, 0, 0]}")
+
+    logger.debug(f"Valid crop resize shape: {data_valid_crop.shape}")
 
     # data = np.load("data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy")
     # C, T, V, M = data.shape

@@ -317,7 +317,11 @@ def train_network(
                 )
 
     print(f"\tBest train AUC: {torch.tensor(results['train_AUC']).max().item()}")
-    print(f"\tBest test AUC: {torch.tensor(results['test_AUC']).max().item()}")
+    # Get the total training time
+    total_time = results['train_time']
+    if test_loader is not None:
+        total_time += results['test_time']
+        print(f"\tBest test AUC: {torch.tensor(results['test_AUC']).max().item()}")
     print(f"\tTraining time: \
         {datetime.timedelta(seconds=int(sum(results['train_time']+results['test_time'])))}")
     return results
@@ -346,9 +350,9 @@ def load_checkpoint(checkpoint_file: str, device, verbose: bool=False) -> dict:
         results = checkpoint['results']
         if verbose:
             for i in range(len(results['epoch'])):
-                print(f"\t\t{i+1} EPOCH BEST TEST ACC: {results['test_AUC'][i]}")
+                # Print previous results...
+                print(f"\t\t{i+1} EPOCH BEST TRAIN AUC: {max(results['train_AUC'][i])}")
                 print(f"\t\t\tTrain time: {results['train_time'][i]:.2f} seconds")
-                print(f"\t\t\tTest time: {results['test_time'][i]:.2f} seconds")
     except FileNotFoundError:
         os.makedirs( # Create the folders in the case that they don't exist...
             os.path.dirname(checkpoint_file),

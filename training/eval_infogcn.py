@@ -9,6 +9,9 @@ from einops import rearrange, repeat
 from tqdm import tqdm
 from training.loss import AverageMeter
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 def run_epoch(
     arg,
@@ -45,6 +48,7 @@ def run_epoch(
     log_pred = torch.tensor([]).to(device)
 
     start = time.time()
+    inference_time = 0.0 # Timing epoch inference time
     for x, y, mask, index in data_loader:
         cls_loss, recon_loss, feature_loss = (
             torch.tensor(0.0),
@@ -55,7 +59,15 @@ def run_epoch(
         x = x.float().to(device)
         y = y.long().to(device)
         mask = mask.long().to(device)
-        y_hat, x_hat, z_0, z_hat, kl_div = model(x)
+
+        # If training on GPU, get cuda inference time...
+        if torch.cuda.is_available():
+            y_hat, x_hat, z_0, z_hat, kl_div, elapsed_ms = time_cuda(model, x)
+            inference_time += elapsed_ms
+        else:
+            inference_start = time.time()
+            y_hat, x_hat, z_0, z_hat, kl_div = model(x)
+            inference_time += time.time() - start
         N_cls = y_hat.size(0) // B
 
         # Class loss (EQ. 13)
@@ -128,7 +140,7 @@ def run_epoch(
         log_feature_loss.update(feature_loss.data.item(), B)
         log_recon_loss.update(recon_loss.data.item(), B)
 
-        # Append the true and predicted labels to our logs (batch_size, 64)
+        # Append the true and predicted labels to our logs (batch_size, frames(64))
         log_truth = torch.cat((log_truth, y.data[0]))
         log_pred = torch.cat((log_pred, predict_label))
 
@@ -162,7 +174,7 @@ def run_epoch(
     results["pred"].append(log_pred)
 
     end = time.time()
-    return end - start  # time spent on epoch
+    return end - start, inference_time  # time spent on epoch
 
 
 def eval_network(
@@ -187,7 +199,7 @@ def eval_network(
         device: the compute lodation to perform training
     """
     # to_track contains the keys of the tracked items in the results dict
-    to_track = ["epoch", "test_time", "loss", "lr", "truth", "pred"]
+    to_track = ["epoch", "test_time", "inference_time", "loss", "lr", "truth", "pred"]
     if score_funcs is not None:
         for eval_score in score_funcs:
             to_track.append(eval_score)
@@ -206,7 +218,7 @@ def eval_network(
     # TEST
     model = model.eval()
     with torch.no_grad():
-        test_time = run_epoch(
+        test_time, inference_time = run_epoch(
             arg=arg,
             model=model,
             data_loader=test_loader,
@@ -217,74 +229,77 @@ def eval_network(
         )
 
     results["test_time"].append(test_time)
+    results["inference_time"].append(inference_time/len(test_loader))
+
+    print(f"\tBest test ACC: {torch.tensor(results['ACC']).max().item()*100:.2f}%")
+    print(f"\tTest AUC: {results['AUC']}")
+
+    # Print out time it took for the whole epoch, and average inference time
+    print(f"Total epoch time: {results['test_time']}")
+    print(f"Average batch inference time: {results['inference_time'][0]}")
+    print(f"Average sample inference time: {results['inference_time'][0]/arg.batch_size}")
 
     return results
 
 
+def time_cuda(model, x):
+    # For model timing! This is the inference...
+    start_event = torch.cuda.Event(enable_timing=True)
+    end_event = torch.cuda.Event(enable_timing=True)
+    start_event.record()
+    y_hat, x_hat, z_0, z_hat, kl_div = model(x)
+    end_event.record()
+    torch.cuda.synchronize()
+    elapsed_ms = start_event.elapsed_time(end_event)
+
+    return y_hat, x_hat, z_0, z_hat, kl_div, elapsed_ms
+
+
 if __name__ == "__main__":
     from config.argclass import ArgClass
-    from model import ModelLoader
+    from model_utils import ModelLoader
     from torch.utils.data import DataLoader
     from training.loss import LabelSmoothingCrossEntropy, masked_recon_loss
     import torch.optim as optim
-    import argparse
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-d",
-        dest="dataset",
-        default="ucf101",
-        help="config dictionary location (default=ucf101)",
-    )
-    parser.add_argument(
-        "-m",
-        dest="model_type",
-        default="base",
-        help="model type [base, cnn, avg, abs] (default=base)"
-    )
-    parser.add_argument(
-        "-e",
-        dest="evaluation",
-        help="Evaluation benchmark used for specific dataset \
-        (eg. 1-3 for ucf101, CV/CS for NTU_RGB+D)"
-    )
-    parser.add_argument(
-        "-r",
-        dest="run_name",
-        default="",
-        help="name to save the results dictionary as after training",
-    )
-    parser.add_argument(
-        "-s",
-        dest="save_name",
-        default="",
-        help="Where to save the results dictionary",
-    )
-    parser.add_argument(
-        "--data_path_overwrite", help="Overwrite dataset path"
-    )
-    parser.add_argument(
-        "-v", dest="verbose", action="store_true", help="Print verbose output for argparse"
-    )
 
-    parsed = parser.parse_args()
+    logging.basicConfig(
+        filename='./logs/debug/train_eval/eval_infogcn_debug.log',
+        encoding='utf-8',
+        filemode='w',
+        level=logging.DEBUG
+    )
+    logging.info("Started eval_infogcn debug located at:")
+    logging.info("\t./training/eval_msg3d.py")
+
+
+    # -----------------------------------
+    model = "infogcn2"
+    dataset = "ntu"
+    flow_embedding = "cnn"
+    evaluation = "CS"
+    obs_ratio = 1.0
+    modifier = "D3"
+    # -----------------------------------
+
+    if flow_embedding == "base":
+        run_name=f"{model}_{dataset}_{evaluation}_{flow_embedding}"
+    else:
+        run_name=f"{model}_{dataset}_{evaluation}_{flow_embedding}_{modifier}" # May need to adjust this
+    logging.info(f"Run name: {run_name}")
+
     # Create arg object
-    arg = ArgClass(arg=parsed)
-
-    # Assign some additional values needed for evaluation
-    arg.feeder_args['use_mmap'] = True
-    if arg.data_path_overwrite is not None:
-        for arg_key, arg_val in arg.feeder_args['data_paths'].items():
-            arg.feeder_args['data_paths'][arg_key] = osp.join(arg.data_path_overwrite,
-                                                              arg_val.split('/')[-1])
-        print(f"Data paths: {arg.feeder_args['data_paths']}")
+    arg = ArgClass(f"./config/{model}/{dataset}/{flow_embedding}.yaml")
+    arg.feeder_args['eval'] = evaluation
+    arg.feeder_args['obs_ratio'] = obs_ratio
+    arg.batch_size=16 # reduce the batch size for speed...
 
     # Trained model checkpoint to load...
     arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
         arg.save_location,
-        arg.evaluation,
+        evaluation,
         "train",
-        arg.run_name + ".pt"
+        run_name + ".pt"
     )
 
     # Model
@@ -295,8 +310,8 @@ if __name__ == "__main__":
     feeder_class = arg.import_class(arg.feeder)
     test_dataset = feeder_class(
         **arg.feeder_args,
-        eval=arg.evaluation,
-        split="test"
+        split="test",
+        debug=False if torch.cuda.is_available() else True,
     )
     test_dataloader = DataLoader(
         test_dataset,
@@ -305,7 +320,7 @@ if __name__ == "__main__":
         shuffle=False,
         pin_memory=True,
     )
-    print(f"\tDataset contains {len(test_dataset)} samples")
+    logging.info(f"\tDataset contains {len(test_dataset)} samples")
 
     # Create the loss function(s)
     cls_loss = LabelSmoothingCrossEntropy(T=arg.model_args["T"])
@@ -328,5 +343,11 @@ if __name__ == "__main__":
         device=device,
         save_attention=False,
     )
+    logging.info(f"Total test time: {results['test_time']}")
+    logging.info(f"Averag inference time per batch: {results['inference_time'][0]}")
+    logging.info(f"Average sample inference time: {results['inference_time'][0]/arg.batch_size}")
+    print(f"Total test time: {results['test_time']}")
+    print(f"Averag inference time per batch: {results['inference_time'][0]}")
+    print(f"Average sample inference time: {results['inference_time'][0]/arg.batch_size}")
 
-    torch.save(results, arg.save_name)
+    # torch.save(results, arg.save_name)

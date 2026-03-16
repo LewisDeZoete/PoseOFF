@@ -16,6 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+
 def run_epoch(
     arg,
     model,
@@ -29,7 +30,7 @@ def run_epoch(
         'acc': AverageMeter object per video frame
         'cls_loss': AverageMeter object
     """
-    # model.eval()
+    model.eval()
 
     # AverageMeter objects track values (n_values, mean, etc)
     log_acc = AverageMeter() # accuracy
@@ -40,13 +41,22 @@ def run_epoch(
     log_pred = torch.tensor([]).to(device)
 
     start = time.time()
+    inference_time = 0.0 # Timing epoch inference time
     for x, y, mask, index in data_loader:
         loss = torch.tensor(0.0)
 
         B, C, T, V, M = x.shape
         x = x.float().to(device)
         y = y.long().to(device)
-        y_hat = model(x)
+
+        # If training on GPU, get cuda inference time...
+        if torch.cuda.is_available():
+            y_hat, elapsed_ms = time_cuda(model, x)
+            inference_time += elapsed_ms
+        else:
+            inference_start = time.time()
+            y_hat = model(x)
+            inference_time += time.time() - start
 
         # Calculate the loss and correct predictions
         loss = loss_funcs["cls_loss"](y_hat, y)
@@ -70,7 +80,7 @@ def run_epoch(
     results["pred"].append(log_pred)
 
     end = time.time()
-    return end - start  # time spent on epoch
+    return end - start, inference_time  # time spent on epoch
 
 
 def eval_network(
@@ -95,7 +105,7 @@ def eval_network(
         device: the compute lodation to perform training
     """
     # to_track contains the keys of the tracked items in the results dict
-    to_track = ["epoch", "test_time", "loss", "lr", "truth", "pred"]
+    to_track = ["epoch", "test_time", "inference_time", "loss", "lr", "truth", "pred"]
     if score_funcs is not None:
         for eval_score in score_funcs:
             to_track.append(eval_score)
@@ -114,7 +124,7 @@ def eval_network(
     # TEST
     model = model.eval()
     with torch.no_grad():
-        test_time = run_epoch(
+        test_time, inference_time = run_epoch(
             arg=arg,
             model=model,
             data_loader=test_loader,
@@ -124,13 +134,32 @@ def eval_network(
         )
 
     results["test_time"].append(test_time)
+    results["inference_time"].append(inference_time/len(test_loader))
 
     # Print out the score functions at the end of training
     if score_funcs is not None:
         for eval_score in score_funcs:
             print(f"Results for {eval_score}: {results[eval_score]}")
 
+    # Print out time it took for the whole epoch, and average inference time
+    print(f"Total epoch time: {results['test_time']}")
+    print(f"Average batch inference time: {results['inference_time'][0]}")
+    print(f"Average sample inference time: {results['inference_time'][0]/arg.batch_size}")
+
     return results
+
+
+def time_cuda(model, x):
+    # For model timing! This is the inference...
+    start_event = torch.cuda.Event(enable_timing=True)
+    end_event = torch.cuda.Event(enable_timing=True)
+    start_event.record()
+    y_hat = model(x)
+    end_event.record()
+    torch.cuda.synchronize()
+    elapsed_ms = start_event.elapsed_time(end_event)
+
+    return y_hat, elapsed_ms
 
 
 if __name__ == "__main__":
@@ -150,13 +179,19 @@ if __name__ == "__main__":
     logging.info("Started eval_msg3d debug")
     logging.info("./training/eval_msg3d.py")
 
+    # -----------------------------------
     model = "stgcn2"
     dataset = "ntu"
     flow_embedding = "cnn"
     evaluation = "CS"
     obs_ratio = 1.0
     modifier = "D3"
-    run_name=f"{model}_{dataset}_{evaluation}_{flow_embedding}_{modifier}" # May need to adjust this
+    # -----------------------------------
+
+    if flow_embedding == "base":
+        run_name=f"{model}_{dataset}_{evaluation}_{flow_embedding}"
+    else:
+        run_name=f"{model}_{dataset}_{evaluation}_{flow_embedding}_{modifier}" # May need to adjust this
     logging.info(f"Run name: {run_name}")
 
 
@@ -176,11 +211,6 @@ if __name__ == "__main__":
     assert osp.isfile(arg.checkpoint_file)
     logging.info(f"Checkpoint file: {arg.checkpoint_file}")
 
-    # # Assign some additional values needed for evaluation
-    # if arg.data_path_overwrite is not None:
-    #     arg.feeder_args['data_paths'][arg.evaluation] = arg.data_path_overwrite
-    #     logging.info(f"Data paths: {arg.feeder_args['data_paths']}")
-
 
     # Model
     modelLoader = ModelLoader(arg)
@@ -191,7 +221,8 @@ if __name__ == "__main__":
     test_dataset = feeder_class(
         **arg.feeder_args,
         split="test",
-        debug=True
+        debug=False if torch.cuda.is_available() else True,
+        # debug=True,
     )
     test_dataloader = DataLoader(
         test_dataset,
@@ -220,7 +251,12 @@ if __name__ == "__main__":
         checkpoint_file=arg.checkpoint_file,
         score_funcs=score_funcs,
         device=device,
-        # save_attention=False,
     )
+    logging.info(f"Total test time: {results['test_time']}")
+    logging.info(f"Averag inference time per batch: {results['inference_time'][0]}")
+    logging.info(f"Average sample inference time: {results['inference_time'][0]/arg.batch_size}")
+    print(f"Total test time: {results['test_time']}")
+    print(f"Averag inference time per batch: {results['inference_time'][0]}")
+    print(f"Average sample inference time: {results['inference_time'][0]/arg.batch_size}")
 
     # torch.save(results, arg.save_name)

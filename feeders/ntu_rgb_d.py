@@ -168,10 +168,8 @@ class Feeder(Dataset):
 
     def get_mean_map(self, npz_data):
         try:
-            # TODO: remove this reshaping etc. this should be dealt with in data_gen
-            C = (53 if self.data.shape[-1] > 150 else 3)
-            self.mean_map = npz_data['mean_map'].reshape((C, 1, 25, 1))
-            self.std_map = npz_data['std_map'].reshape((C, 1, 25, 1))
+            self.mean_map = npz_data['mean_map']
+            self.std_map = npz_data['std_map']
         except KeyError as e:
             print("Feeder failed to obtain mean map")
             print(f"Data does not contain key: {e}")
@@ -206,11 +204,11 @@ class Feeder(Dataset):
         # Find the first non-zero frame and crop to it
         valid_frame = data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)
         valid_frame_num = np.sum(np.squeeze(valid_frame).sum(-1) != 0)
-        # reshape Tx(MVC) to CTVM
         data_numpy = tools.valid_crop_resize(
             data_numpy, valid_frame_num, self.p_interval, self.window_size
         )
         mask = abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0
+
 
         # Apply optional transforms
         if self.normalisation:
@@ -236,10 +234,11 @@ class Feeder(Dataset):
             data_numpy = tools.absolute_flow(
                 data_numpy, window_mean=self.absolute_flow["window_mean"]
             )
+
         # Mask input data if observation ratio != 1.0
         if self.obs_ratio < 1.0:
             data_numpy = data_numpy[:, :int(self.window_size*self.obs_ratio), ...]
-            data_numpy = tools.auto_padding(data_numpy, self.window_size)
+            data_numpy = tools.auto_padding(data_numpy, self.window_size, self.pad_method)
 
         return data_numpy, label, mask, index
 

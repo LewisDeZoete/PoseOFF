@@ -215,7 +215,7 @@ class Feeder(Dataset):
         if self.random_choose:
             data_numpy = tools.random_choose(data_numpy, self.window_size)
         elif self.window_size > 0:
-            data_numpy = tools.auto_padding(data_numpy, self.window_size)
+            data_numpy = tools.auto_padding(data_numpy, self.window_size, self.pad_method)
         if self.random_move:
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
@@ -228,6 +228,9 @@ class Feeder(Dataset):
             data_numpy = tools.absolute_flow(
                 data_numpy, window_mean=self.absolute_flow["window_mean"]
             )
+        if self.obs_ratio < 1.0:
+            data_numpy = data_numpy[:, :int(self.window_size*self.obs_ratio), ...]
+            data_numpy = tools.auto_padding(data_numpy, self.window_size, self.pad_method)
         
         return data_numpy, label, mask, index
 

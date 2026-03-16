@@ -55,7 +55,7 @@ parser.add_argument(
     "-o",
     dest="obs_ratio",
     default="1.0",
-    help="Observation ratio, used for both training and testing."
+    help="Observation ratio, used for training or evaluation."
 )
 parser.add_argument(
     "-r",
@@ -120,7 +120,7 @@ if arg.phase == "eval":
         arg.save_location,
         arg.evaluation,
         "eval",
-        arg.run_name + ".pt"
+        arg.run_name + f"_obs{arg.obs_ratio}.pt"
     )
 
 print("### Arguments loaded")

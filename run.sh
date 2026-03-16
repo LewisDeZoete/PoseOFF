@@ -6,21 +6,27 @@
 # bash run.sh
 # ```
 
-export model="msg3d" # (infogcn2, msg3d, stgcn2)
+export model="stgcn2" # (infogcn2, msg3d, stgcn2)
 export dataset="ntu" # (ntu, ntu120, ucf101)
 export phase="train" # (train/eval)
-export flow_embedding="base" # (base, cnn, abs, avg)
-export dilation=3
-export evaluation="CV" # (CS/CV, CSub/CSet, 1/2/3)
+export flow_embedding="cnn" # (base, cnn, abs, avg)
+export flow_type="LK" # (RAFT, LK, norm, ???)
+export dilation=4
+export evaluation="CS" # (CS/CV, CSub/CSet, 1/2/3)
 export obs_ratio="1.0"
 export debug=false
 
-export modifier="LR_fix" # still loads ${dataset}/{flow_embedding}.yaml config... adds to run_name
+# ALWAYS START MODIFIER WITH "_"
+# still loads ${dataset}/{flow_embedding}.yaml config... adds to run_name
+export modifier=""
+if ! [[ $flow_embedding == "base" ]]; then
+    export modifier="_${flow_type}_D${dilation}"
+fi
+# export modifier="_BLANK_EVAL" # Only used for timing model inference...
 
-export run_name="${model}_${dataset}_${evaluation}_${flow_embedding}_${modifier}"
-# export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} observation ratio ${obs_ratio}, retraining model with mean and std norm" # Can change this as you need!
-# export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} Fixed LR Scheduler, original model with no data augmentation using the REPLAY padding method" # Can change this as you need!
-export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} Fixed LR Scheduler, STGC layers=2 no data augmentation using the REPLAY padding method" # Can change this as you need!
+export run_name="${model}_${dataset}_${evaluation}_${flow_embedding}${modifier}" # save/load name
+export job_name="${phase}-${run_name}"
+export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} observation ratio ${obs_ratio}" # Can change this as you need!
 
 
 # ---------------------------------------------------------
@@ -28,11 +34,6 @@ export desc="${model}_${phase} ${dataset} ${evaluation} ${flow_embedding} Fixed 
 mkdir -p ./results/${model}/${dataset}/${evaluation}/${phase}
 mkdir -p ./logs/${model}/${dataset}/${evaluation}/${phase}
 # e.g. ./results/infogcn2/ntu/CS/train/
-
-# # Base does not need a modifier at the end...
-# if [ $flow_embedding == "base" ]; then
-#     export run_name="${model}_${dataset}_${evaluation}_${flow_embedding}"
-# fi
 
 case $dataset in
     # -------------------------------------------------------------
@@ -45,7 +46,7 @@ case $dataset in
         fi
         case $flow_embedding in
             "base")
-                export copy_file="./data/ntu/aligned_data/${dataset}_${evaluation}-pose_aligned_mean.npz"
+                export copy_file="./data/ntu/aligned_data/pose/ntu_${evaluation}-pose_aligned.npz"
                 if [ $model == "msg3d" ]; then
                     time=10:00:00
                     mem=35GB
@@ -55,7 +56,7 @@ case $dataset in
                 fi
                 tmp=15GB;;
             "abs" | "avg")
-                export copy_file="./data/${dataset}/aligned_data/${dataset}_${evaluation}-flowpose_D${dilation}_aligned_mean.npz"
+                export copy_file="./data/ntu/aligned_data/poseoff/${flow_type}/ntu_${evaluation}-poseoff_${flow_type}_D${dilation}_aligned.npz"
                 if [ $model == "msg3d" ]; then
                     time=18:00:00
                 else
@@ -65,7 +66,7 @@ case $dataset in
                 mem=25GB
                 tmp=200GB;;
             "cnn")
-                export copy_file="./data/${dataset}/aligned_data/${dataset}_${evaluation}-flowpose_D${dilation}_aligned_mean.npz"
+                export copy_file="./data/ntu/aligned_data/poseoff/${flow_type}/ntu_${evaluation}-poseoff_${flow_type}_D${dilation}_aligned.npz"
                 if [ $model == "msg3d" ]; then
                     time=20:00:00
                 else
@@ -94,23 +95,28 @@ case $dataset in
         fi
         case $flow_embedding in
             "base")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-pose_aligned_mean.npz"
-                time=7:00:00
-                mem=15GB
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-pose_aligned.npz"
+                if [ $model == "msg3d" ]; then
+                    time=15:00:00
+                    mem=50GB
+                else
+                    time=7:00:00
+                    mem=10GB
+                fi
                 tmp=30GB
                 if [[ $evaluation == "CSet" ]]; then
-                    export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D3_aligned_mean.npz"
+                    export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D3_aligned.npz"
                     time=15:00:00
                     tmp=400GB
                 fi
                 ;;
             "abs" | "avg")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned_mean.npz"
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned.npz"
                 time=21:00:00
                 mem=17GB
                 tmp=400GB;;
             "cnn")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned_mean.npz"
+                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned.npz"
                 time=24:00:00
                 mem=35GB
                 tmp=400GB;;
@@ -128,8 +134,8 @@ case $dataset in
            exit 1
         fi
         export copy_file="./data/ucf101/aligned_data/ucf101_0${evaluation}_D${dilation}.npz"
-        time=2:00:00
-        mem=5GB
+        time=3:00:00
+        mem=10GB
         tmp=30GB
         # case $flow_embedding in
         #     "base")
@@ -150,11 +156,21 @@ esac
 # Check if results file exists (must exist for eval, check if you want to continue for train)
 if [ $phase = "eval" ]; then
     mem=15GB
-    time=0:10:00
+    time=0:30:00
     if ! [[ -f results/$model/$dataset/$evaluation/train/$run_name.pt ]]; then
         echo -e "Run ${run_name} does not exist..."
-        exit 1;
+        read -r -p "Do you want to evaluate a randomised model? [y/N] " response
+        case "$response" in
+            [yY][eE][sS]|[yY])
+                echo -e "\tContinuing eval of fresh model ${run_name}";;
+            *)
+                echo "Cancelling job batching..."
+                exit 1;;
+        esac
     fi
+    error="logs/${model}/${dataset}/${evaluation}/${phase}/error_${flow_embedding}${modifier}_obs${obs_ratio}.out"
+    output="logs/${model}/${dataset}/${evaluation}/${phase}/${phase}_${flow_embedding}${modifier}_obs${obs_ratio}.out"
+    job_name="${job_name}_obs${obs_ratio}"
 elif [ $phase == "train" ]; then
     if [[ -f results/$model/$dataset/$evaluation/train/$run_name.pt ]]; then
         echo -e "RUN ALREADY EXISTS: ${run_name}"
@@ -167,6 +183,8 @@ elif [ $phase == "train" ]; then
                 exit 1;;
         esac
     fi
+    error="logs/${model}/${dataset}/${evaluation}/${phase}/error_${flow_embedding}${modifier}.out"
+    output="logs/${model}/${dataset}/${evaluation}/${phase}/${phase}_${flow_embedding}${modifier}.out"
 fi
 
 # Check if copy file exists
@@ -175,10 +193,8 @@ if [ ! -f $copy_file ]; then
     exit 1
 fi
 
-error="logs/${model}/${dataset}/${evaluation}/${phase}/error_${flow_embedding}_${modifier}.out"
-output="logs/${model}/${dataset}/${evaluation}/${phase}/${phase}_${flow_embedding}_${modifier}.out"
 
-echo "${phase} ${model} ${dataset} ${evaluation} ${flow_embedding} variables:"
+echo "${phase} ${model} ${dataset} ${evaluation} ${flow_embedding} ${flow_type} variables:"
 echo -e "\tmodel: ${model}"
 echo -e "\terror: ${error}"
 echo -e "\toutput: ${output}"
@@ -189,15 +205,17 @@ echo -e "\tcopy file: ${copy_file}"
 
 echo -e "\tdataset: ${dataset}" # (ntu, ntu120, ucf101)
 echo -e "\tmodel type: ${flow_embedding}" # (base, cnn, abs, avg)
+echo -e "\tflow type: ${flow_type}" # (RAFT, LK, norm...)
 echo -e "\tdilation: ${dilation}"
 echo -e "\tevaluation: ${evaluation}" # (CS/CV, CSub/CSet, 1/2/3)
 echo -e "\tobservation ratio: ${obs_ratio}"
 echo -e "\tdebug: ${debug}"
 echo -e "\trun name: ${run_name}"
+echo -e "\tjob name: ${job_name}"
 
 # SBATCH using the variables set by this file
 sbatch --export=ALL \
-       --job-name=$run_name \
+       --job-name=$job_name \
        --time=$time \
        --mem=$mem \
        --tmp=$tmp \
@@ -205,11 +223,6 @@ sbatch --export=ALL \
        --error=$error \
        ./train.sh
 
-
-
-# # TMP TESTING
-# data_path="/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz"
-#     # -f "${flow_embedding}" \
 
 # python main.py \
 #     -m "${model}" \

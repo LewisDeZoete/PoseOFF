@@ -49,7 +49,6 @@ echo -e "Run name: ${run_name}\n"
 # --data_path_overwrite : overwrites the path to the dataset
 # -v : verbose
 # --debug: debug the main file (creates a log file and only runs on epoch)
-# TODO: Make debug only run one epoch
 
 args=(
      "-m" "${model}"

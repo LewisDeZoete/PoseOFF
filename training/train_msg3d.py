@@ -183,7 +183,7 @@ def train_network(
                     arg=arg,
                     model=model,
                     loss_funcs=loss_funcs,
-                    data_loader=train_loader,
+                    data_loader=test_loader,
                     device=device,
                     optimiser=optimiser,
                     results=results,
@@ -241,9 +241,9 @@ def load_checkpoint(checkpoint_file: str, device, verbose: bool=False) -> dict:
         results = checkpoint['results']
         if verbose:
             for i in range(len(results['epoch'])):
-                print(f"\t\t{i+1} EPOCH BEST TEST ACC: {results['test_ACC'][i]}")
+                # Print previous results...
+                print(f"\t\t{i+1} EPOCH BEST TRAIN ACC: {results['train_ACC'][i]}")
                 print(f"\t\t\tTrain time: {results['train_time'][i]:.2f} seconds")
-                print(f"\t\t\tTest time: {results['test_time'][i]:.2f} seconds")
     except FileNotFoundError:
         os.makedirs( # Create the folders in the case that they don't exist...
             osp.dirname(checkpoint_file),
