@@ -1,3 +1,7 @@
+# Outline
+## What is PoseOFF?
+PoseOFF is an acronym - Pose-guided Optical Flow Features.
+
 # UCF-101 Data Generation
 First, prepare for optical flow and pose extraction:
 - Download the data [link](https://www.crcv.ucf.edu/data/UCF101.php)
@@ -86,9 +90,9 @@ with open(osp.join(data_path, 'flow_data.pkl'), 'wb') as f:
     pickle.dump(flow_data, f, pickle.HIGHEST_PROTOCOL)
 ```
 
-## NW-UCLA extract
-- Download the data (put it in any folder you like...)
-- The val_labels.pkl are already in the `./data/nucla/statistics/` folder
+<!-- ## NW-UCLA extract -->
+<!-- - Download the data (put it in any folder you like...) -->
+<!-- - The val_labels.pkl are already in the `./data/nucla/statistics/` folder -->
 
 ## Graphing data extraction
 - Find a good video sample using `data/visualisations/data_vis.py`
