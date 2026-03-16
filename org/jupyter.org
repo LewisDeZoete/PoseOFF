@@ -1,0 +1,449 @@
+#+title: Jupyter
+
+* Always run this code!
+#+begin_src emacs-lisp
+(setq org-babel-python-command "/fred/oz141/ldezoete/environment/bin/python3")
+#+end_src
+
+#+RESULTS:
+: /fred/oz141/ldezoete/environment/bin/python3
+
+* Quick tests...
+#+begin_src python :results output
+# import torch
+import mmnpz
+from einops import rearrange
+import numpy as np
+import os.path as osp
+
+# Load and access datasets
+path_RAFT = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/poseoff/RAFT/ntu_CS-poseoff_RAFT_D1_aligned.npz"
+path_LK = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/poseoff/LK/ntu_CS-poseoff_LK_D1_aligned.npz"
+dat_RAFT = mmnpz.load(path_RAFT)
+dat_LK = mmnpz.load(path_LK)
+
+
+for file_name, file_data in {"RAFT":dat_RAFT, "LK":dat_LK}.items():
+    print(file_name)
+    batch_size=64
+
+    org_data = file_data
+    splits = ["x_train", "x_test"]
+
+    count = None
+    mean = None
+    M2 = None
+
+    # Original splits are arrays of shape (N, T, M*V*C)
+    M, V = 2, 25
+    C = 53 if "poseoff" in path_RAFT else 3
+
+    # Process the splits :)
+    for split in splits:
+        data = org_data[split]
+        N, T, _ = data.shape
+        # Batch the data
+        for start in range(0, N, batch_size):
+            # Load and reshape batch
+            batch = data[start:start+batch_size].astype(np.float64)
+            batch = batch.reshape(batch.shape[0], T, M, V, C)
+            # batch shape: (B, T, M, V, C)
+
+            # A frame is "real" if any of (M, V, C) is non-zero
+            valid_mask = (batch != 0).any(axis=(3,4)) # (B, T, M) - True if a frame is real!
+            batch_count = valid_mask.sum()
+
+            if batch_count == 0:
+                continue
+
+            # Extract mean and var only for valid frames
+            valid_frames = batch[valid_mask]
+            batch_mean = valid_frames.mean(axis=0) # V, C
+            batch_var = valid_frames.var(axis=0) # V, C
+
+            if count is None:
+                count = batch_count
+                mean = batch_mean
+                M2 = batch_var * batch_count
+            else:
+                new_count = count + batch_count
+                delta = batch_mean - mean
+                mean = mean + delta * (batch_count / new_count)
+                M2 = M2 + batch_var * batch_count + (delta ** 2) * (count*batch_count/new_count)
+                count = new_count
+            break
+    # Calculate standard deviation after mean calculation
+    variance = M2 / count
+    std = np.sqrt(variance)
+    # Reshape (V, C) -> (C, 1, V, 1)
+    mean_map = mean.T[:, np.newaxis, :, np.newaxis]
+    std_map = std.T[:, np.newaxis, :, np.newaxis]
+
+    print(f"Mean map shape: {mean_map.shape}")
+    print(f"Mean map zero {mean_map[:, 0, 0, 0]}")
+    print(f"Standard deviation map shape: {std_map.shape}")
+    print(f"Standard deviation map 0 {std_map[:, 0, 0, 0]}")
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+RAFT
+Mean map shape: (53, 1, 25, 1)
+Mean map zero [-0.07825112 -0.27549694  0.06472365 -0.1191591  -0.11746353 -0.11686155
+ -0.11682939 -0.11807437 -0.11665109 -0.11493206 -0.11435198 -0.11407653
+ -0.1154685  -0.11403932 -0.11236353 -0.11176455 -0.11160575 -0.11292712
+ -0.11198357 -0.11091766 -0.11062709 -0.11043068 -0.11163444 -0.11040037
+ -0.10996102 -0.10993914 -0.11024519 -0.11058876 -0.01394332 -0.0174198
+ -0.01966334 -0.0216778  -0.02450611 -0.01179387 -0.01486582 -0.01758604
+ -0.01987032 -0.0228398  -0.00975098 -0.01216121 -0.01541182 -0.01820687
+ -0.02001334 -0.00790924 -0.00967034 -0.01212489 -0.01534141 -0.01824996
+ -0.0066194  -0.0086051  -0.01088272 -0.01455935 -0.01736756]
+Standard deviation map shape: (53, 1, 25, 1)
+Standard deviation map 0 [0.42290012 0.07531417 0.12802799 2.22686529 2.23050483 2.23563238
+ 2.24816389 2.25229804 2.22605856 2.22944378 2.23352299 2.2432173
+ 2.2457528  2.22641046 2.22942182 2.2322324  2.23800359 2.23889891
+ 2.22389441 2.2273301  2.22934467 2.2338433  2.23604848 2.2237325
+ 2.22445379 2.22620038 2.23046635 2.23253794 1.80270092 1.81938303
+ 1.82986754 1.8346831  1.84133891 1.77919749 1.79165902 1.80697786
+ 1.81044396 1.81452313 1.7590403  1.76519102 1.78020096 1.78430727
+ 1.77828595 1.73866147 1.7423249  1.75160181 1.7602152  1.75771199
+ 1.72032349 1.72331341 1.72728444 1.74363227 1.74241706]
+LK
+Mean map shape: (53, 1, 25, 1)
+Mean map zero [-7.82511240e-02 -2.75496940e-01  6.47236492e-02 -5.82133434e-03
+ -5.36270767e-03 -1.25196905e-03 -7.00628354e-03 -8.41005252e-03
+ -6.79270843e-03 -2.72507589e-03 -1.92618657e-03 -6.65707823e-03
+ -3.09625011e-03 -6.58944969e-03 -3.43788439e-03 -1.26892674e-03
+ -4.72319556e-03 -2.22562988e-03 -6.59342073e-03 -6.07420082e-03
+ -2.35556514e-03 -8.65336350e-03 -3.95782346e-03 -7.35796944e-03
+ -7.19894868e-03 -3.03268433e-03 -5.45169851e-03 -3.62783964e-04
+ -5.44065882e-03 -7.34749466e-03 -9.24620707e-03 -1.19142772e-02
+ -4.69839169e-03 -4.78246095e-03 -3.81818261e-03 -5.44148013e-03
+ -1.27739495e-02 -8.88256219e-03 -7.82622457e-03 -3.77846181e-03
+ -1.14426535e-03 -6.67447783e-03 -3.07960927e-03 -3.21940229e-03
+ -4.78107473e-03 -9.88317187e-04 -6.62965827e-03 -6.25287457e-03
+ -1.81908946e-04 -3.51807641e-03 -8.74304850e-03 -8.16804855e-03
+ -6.63948476e-03]
+Standard deviation map shape: (53, 1, 25, 1)
+Standard deviation map 0 [0.42290012 0.07531417 0.12802799 1.06893405 1.05464174 1.04763098
+ 1.16008169 1.17342136 1.08213955 1.06490179 1.05880552 1.1731566
+ 1.1748765  1.09033395 1.06933396 1.08427992 1.19709086 1.21809325
+ 1.07978849 1.08714738 1.08717028 1.21705962 1.22859908 1.09349126
+ 1.09203091 1.11162719 1.23135663 1.25319176 0.63506958 0.6303152
+ 0.65221593 0.66486803 0.67990289 0.55799543 0.58538495 0.71609258
+ 0.72907842 0.56803082 0.61269098 0.62611216 0.56582527 0.65213765
+ 0.63246987 0.52010825 0.51807838 0.54793388 0.57460555 0.56092555
+ 0.50439204 0.48703074 0.57013578 0.57268229 0.55549558]
+#+end_example
+
+
+#+begin_src python :results outut file :exports both
+import matplotlib.pyplot as plt
+
+fname = "imgs/TMP.png"
+
+def get_num_samples(N):
+    return 100*2*25*(3+2*(N**2))
+
+num_samples = [get_num_samples(i) for i in range(11)]
+N_values = [i for i in range(11)]
+
+plt.plot(N_values, num_samples)
+plt.savefig(fname, dpi=300)
+print(fname) # return filename to org-mode
+plt.close()
+#+end_src
+
+* NTU Dataset video frame viewing/saving
+
+#+begin_src python :results output :session class_examples
+import matplotlib.pyplot as plt
+import numpy as np
+from data_gen.utils import LoadVideo
+import yaml
+import os
+import os.path as osp
+import cv2
+from einops import rearrange
+
+dataset = "ntu"
+class_number = 10 # Change this to pick a different class (1-60, not zero indexed)
+example_number = 20 # Change this to pick a different example of the given class
+frame_numbers = [20, 60] # Picks the frame you want to sample and draw
+
+# Load the names of the skeleton files
+dataset_extn = '' if dataset == 'ntu' else '120'
+skes_names = np.loadtxt(
+    f"../data/ntu{dataset_extn}/statistics/ntu_rgbd{dataset_extn}-available.txt",
+    dtype=str
+)
+
+# Get the printable class names...
+with open(f"../data/ntu{dataset_extn}/statistics/class_names.yaml", 'r') as file:
+    class_names = yaml.safe_load(file)
+class_name = class_names[class_number-1]
+
+# Get a list of all examples for the particular class number
+class_examples = [cls_name for cls_name in skes_names if cls_name.endswith((str(class_number).zfill(3)))] # ensure it's 00X etc.
+print(f"There are a total of {len(class_examples)} examples for class {class_number} - {class_names[class_number]}.")
+
+# Define the sample name to load and draw
+sample_name = class_examples[example_number]
+print(f"Sample with name {sample_name} at frame numbers {frame_numbers} will be drawn.")
+
+# This is the name of the file to be written...
+save_path = osp.join("./imgs/class_examples", f"{class_number}-{class_name}")
+os.makedirs(save_path, exist_ok=True)
+fname = "{class_number}-{class_name}-f{frame_number}.png"
+
+# Create the transform that loads the given video
+rgb_transform = LoadVideo(max_frames=300)
+# Define video path
+video_path = f"../../Datasets/NTU_RGBD{dataset_extn}/nturgb+d_rgb{dataset_extn}/{sample_name}_rgb.avi"
+
+# Get the RGB data!
+rgb_data = rgb_transform(video_path).to("cpu")
+rgb_data = rearrange(rgb_data, 'T C H W -> T H W C').numpy()
+print(f"Sample has a total of {rgb_data.shape[0]} frames.")
+
+for frame_number in frame_numbers:
+    save_name = osp.join(
+        save_path,
+        fname.format(class_number=class_number, class_name=class_name, frame_number=frame_number)
+    )
+    print(f"Writing frame to: {save_name}")
+    frame = cv2.cvtColor(rgb_data[frame_number], cv2.COLOR_BGR2RGB)
+    cv2.imwrite(save_name, frame)
+#+end_src
+
+#+RESULTS:
+: There are a total of 936 examples for class 9 - clapping.
+: Sample with name S001C002P003R001A009 at frame numbers [20, 60] will be drawn.
+: Sample has a total of 103 frames.
+: Writing frame to: ./imgs/class_examples/9-standing up (from sitting position)/9-standing up (from sitting position)-f20.png
+: Writing frame to: ./imgs/class_examples/9-standing up (from sitting position)/9-standing up (from sitting position)-f60.png
+
+#+begin_src python :results output file :exports both :session class_examples
+
+
+bottom=np.zeros(3)
+
+p = ax.bar(classes, weight_counts['base'], width, label="base", bottom=bottom)
+bottom += weight_counts['base']
+colors=['green' if value >= 0 else 'red' for value in weight_counts['diff']]
+p = ax.bar(classes, weight_counts['diff'], width, label="diff", bottom=bottom, color=colors)
+
+ax.legend(loc="upper right")
+plt.tight_layout()
+plt.savefig(fname, dpi=300)
+plt.close()
+print(fname) # return filename to org-mode
+
+#+end_src
+
+* Class accuracy testing
+#+begin_src python :results output :session class_perf
+def get_class_categories(dataset, split_name="default"):
+    all_splits = {
+        'ntu': {
+            'default': {
+                'daily_actions': {
+                    'numbers': list(range(40)),
+                    'color': '#4C72B0'
+                },
+                'medical_conditions': {
+                    'numbers': list(range(40,49)),
+                    'color': '#C44E52'
+                },
+                'two_person_interactions': {
+                    'numbers': list(range(49,60)),
+                    'color': '#CCB974'
+                }
+            },
+            'custom': {
+                'object_interactions': {
+                    'numbers': [0,1,2,3,5,10,11,12,13,14,15,16,17,18,19,20,24],
+                    'color': '#4C72B0'
+                },
+                'dynamic_body_movements': {
+                    'numbers': [7,8,9],
+                    'color': '#55A868'
+                },
+                'gestures': {
+                    'numbers': [21,22,23,25,26,30,33,34,35,36,37,38,39,53],
+                    'color': '#C44E52'
+                },
+                'computer_device_interactions': {
+                    'numbers': [27,28,29,31,32],
+                    'color': '#8172B2'
+                },
+                'throwing_objects': {
+                    'numbers': [4,6],
+                    'color': '#CCB974'
+                },
+                'two_person_violent': {
+                    'numbers': [49,50,51],
+                    'color': '#E15759'
+                },
+                'two_person_friendly': {
+                    'numbers': [52,54,57],
+                    'color': '#64B5CD'
+                },
+                'two_person_neutral': {
+                    'numbers': [55,56,58,59],
+                    'color': '#8C8C8C'
+                },
+                'medical': {
+                    'numbers': [40,41,42,43,44,45,46,47,48],
+                    'color': '#B07AA1'
+                }
+            }
+        },
+        'ntu120': {
+            'default': {
+                'daily_actions': {
+                    'numbers': list(range(40))+list(range(60,102)),
+                    'color': '#4C72B0'
+                },
+                'medical_conditions': {
+                    'numbers': list(range(40,49))+list(range(102,105)),
+                    'color': '#C44E52'
+                },
+                'two_person_interactions': {
+                    'numbers': list(range(49,60))+list(range(105,120)),
+                    'color': '#CCB974'
+                }
+            },
+            'custom': {
+                'object_interactions': {
+                    'numbers': [0, 1, 2, 3, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 72, 73, 74, 75, 76, 77, 78, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91],
+                    'color': '#4C72B0'
+                },
+                'dynamic_body_movements':{
+                    'numbers': [7, 8, 9, 79, 98, 99, 100, 101],
+                    'color': '#55A868'
+                },
+                'gestures': {
+                    'numbers': [21, 22, 23, 25, 26, 30, 33, 34, 35, 36, 37, 38, 39, 53, 66, 67, 68, 69, 70, 71, 92, 94, 95, 96, 97],
+                    'color': '#C44E52'
+                },
+                'computer_device_interactions': {
+                    'numbers': [27, 28, 29, 31, 32, 60, 61, 114],
+                    'color': '#8172B2'
+                },
+                'throwing_objects': {
+                    'numbers': [4, 6, 62, 63, 64, 65, 80, 93],
+                    'color': '#CCB974'
+                },
+                'two_person_violent': {
+                    'numbers': [49, 50, 51, 105, 106, 107, 108, 109, 110],
+                    'color': '#E15759'
+                },
+                'two_person_friendly': {
+                    'numbers': [52, 54, 57, 111, 112, 118],
+                    'color': '#64B5CD'
+                },
+                'two_person_neutral': {
+                    'numbers': [55, 56, 58, 59, 113, 115, 116, 117, 119],
+                    'color': '#8C8C8C'
+                },
+                'medical': {
+                    'numbers': [40, 41, 42, 43, 44, 45, 46, 47, 48, 102, 103, 104],
+                    'color': '#B07AA1'
+                }
+            }
+        },
+        'ucf101': {
+            # Brutally, I'm coping the class categories from here:
+            # https://www.crcv.ucf.edu/wp-content/uploads/2019/03/UCF101_CRCV-TR-12-01.pdf
+            'default': {
+                'human_object_interation': {
+                    'numbers': [0,1,12,19,24,35,42,45,46,49,53,54,55,57,77,79,83,94,99,100],
+                    'color': '#4C72B0'
+                },
+                'body_motion_only': {
+                    'numbers': [3,13,14,36,37,47,51,69,71,73,74,88,90,93,97,98,],
+                    'color': '#55A868'
+                },
+                'human_human_interactions': {
+                    'numbers': [5,33,38,52,76],
+                    'color': '#C44E52'
+                },
+                'playing_musical_instruments': {
+                    'numbers': [26,58,59,60,61,62,63,64,65,66],
+                    'color': '#CCB974'
+                },
+                'sports': {
+                    'numbers': [2,4,6,7,8,9,10,11,15,16,17,18,20,21,22,23,25,27,28,29,30,31,32,34,39,40,41,43,44,48,50,56,67,68,70,72,75,78,80,81,82,84,85,86,87,89,91,92,95,96],
+                    'color': '#8C8C8C'
+                }
+            }
+        }
+    }
+    return all_splits[dataset][split_name]
+
+dataset='ucf101'
+split_name='default'
+
+class_split = get_class_categories(dataset, split_name)
+
+ordered_indices=[]
+ordered_categories=[]
+class_colors={}
+for cat, vals in class_split.items():
+    idxs=vals['numbers']
+    ordered_indices.extend(sorted(idxs))
+    ordered_categories.extend([cat]*len(idxs))
+    class_colors[cat]=vals['color']
+print(len(ordered_indices))
+#+end_src
+
+#+RESULTS:
+: 101
+
+** Categories performance
+#+begin_src python :results output :session class_perf
+category_changes = {
+    category: per_class_recall_improvement[class_nums] for category, class_nums in default_class_categories.items()
+}
+for category, acc_changes in category_changes.items():
+    print(f"{category} average improvement: {np.average(acc_changes)*100:.2f}%")
+#+end_src
+
+#+RESULTS:
+: daily_actions average improvement: 7.76%
+: medical_conditions average improvement: 7.21%
+: two_person_interactions average improvement: 3.33%
+
+** Plotting improvement bar chart
+#+BEGIN_SRC python :session class_perf :results output file :exports both
+import matplotlib.pyplot as plt
+import numpy as np
+
+fname="./imgs/BAR_stack.png"
+
+classes = ("jumping", "skiing", "sleeping")
+weight_counts = {
+    'base': np.array([70, 15, 30]),
+    'diff': np.array([-8, 15, 5])
+}
+width = 0.5
+
+fig, ax = plt.subplots()
+bottom=np.zeros(3)
+
+p = ax.bar(classes, weight_counts['base'], width, label="base", bottom=bottom)
+bottom += weight_counts['base']
+colors=['green' if value >= 0 else 'red' for value in weight_counts['diff']]
+p = ax.bar(classes, weight_counts['diff'], width, label="diff", bottom=bottom, color=colors)
+
+ax.legend(loc="upper right")
+plt.tight_layout()
+plt.savefig(fname, dpi=300)
+plt.close()
+print(fname) # return filename to org-mode
+#+end_src
+
+#+RESULTS:
+[[file:./imgs/BAR_stack.png]]

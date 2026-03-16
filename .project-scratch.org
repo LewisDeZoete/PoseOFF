@@ -2,38 +2,36 @@
 # When underneath a checklist item:
 # M-RET: insert new dotpoint
 # s-M-RET: insert todo item
-
-* Feeders:
-- [X] Implement a method in the feeder(s) for specific observation ratios.
-  - [X] Implement method for overriding arg.feeder_args['obs_ratio'] in main or within configs...
-
-* Train stgcn
-- [-] ntu
-- [-] ntu120
-- [-] ucf101
-
-
-* Configs
-- [X] add `training_function` and `testing_function` to all configs...
-- [ ] Change data_path to ...data_path..._mean.npz
+# z M: close all folds
+# z R: open all folds
 
 * General
 - [X] Implement normalisation in ntu feeder
   - The generation for mean_maps is in `data_gen/utils/get_mean_map.py`
-- [X] Determine cause of accuracy drops MS-G3D
 - [-] fix ntu120 CSet
   - It seems to be the dataset
     - Retraining *infogcn2 ntu120 CSet*
+- *NOTE:* Testing the inference time (for now) on
+  - stgcn2_ucf101_1_cnn_D1    |    stgcn2_ntu_CV_cnn_D3
+  - NEED TO IMPLEMENT AND TEST PROPERLY IN INFOGCN++ EVAL!!
+
+
+* TODO
+- [X] Implement alternate flow calcs
+  - =data/utils/extractors.py= has a =GetFlow= class, I can make a drop in replacement for the =__call__= method to put in CV2 LK method or normal flow...
+  - This will hopefully work since flow and flowpose are calculated in the same python file
+  - [X] Normal flow
+  - [X] LK flow
+    - This method requires flow window sampling natively (to select the points...)
+- [ ] Code tidying
+  - [ ] Change all instances of flowpose to PoseOFF/poseoff
+  - _Find the files that need changing using:_
+    - git grep --name-only flowpose -- ':!*.out'
 
 * Data generation
 - [ ] Move mean and standard deviation map calculations to the data_gen
 - [ ] Must re-perform std/mean map calculations
   - They are skewed by the auto-padding since they are calculated from the output of the feeder (which ALWAYS uses auto-padding)
-
-* Image export
-Cropping bounds: (250,150) -> (1150, 1050)
-                # (x1, y1) -> (x2, y2)
-Images 30-38
 
 
 * Python testing...
@@ -44,48 +42,3 @@ Images 30-38
 #+RESULTS:
 : /fred/oz141/ldezoete/environment/bin/python3
 
-
-infogcn2_ntu_CS_cnn_D3: 0.8888214826583862
-infogcn2_ntu_CS_base: 0.8352034687995911
-infogcn2_ntu_CV_base: 0.9138495922088623
-infogcn2_ntu_CV_cnn_D3: 0.9368265271186829
-infogcn2_ntu120_CSub_cnn_D3: None
-infogcn2_ntu120_CSub_base: 0.7571829557418823
-infogcn2_ntu120_CSet_base: 0.7760814428329468
-infogcn2_ntu120_CSet_cnn_D3: None
-infogcn2_ucf101_1_base: None
-infogcn2_ucf101_1_cnn_D1: None
-infogcn2_ucf101_2_base: None
-infogcn2_ucf101_2_cnn_D1: None
-infogcn2_ucf101_3_cnn_D1: None
-infogcn2_ucf101_3_base: None
-msg3d_ntu_CS_base: 0.9839614629745483
-msg3d_ntu_CS_cnn_D3: None
-msg3d_ntu_CV_cnn_D3: None
-msg3d_ntu_CV_base_LR_fix: 0.9721617698669434
-msg3d_ntu_CV_cnn_LR_fix: 0.7958880066871643
-msg3d_ntu_CV_base: 0.9739680290222168
-msg3d_ntu120_CSub_base: None
-msg3d_ntu120_CSub_cnn_D3: None
-msg3d_ntu120_CSet_cnn_D3: None
-msg3d_ntu120_CSet_base: None
-msg3d_ucf101_1_base: None
-msg3d_ucf101_1_cnn: None
-msg3d_ucf101_2_base: None
-msg3d_ucf101_2_cnn: None
-msg3d_ucf101_3_cnn: None
-msg3d_ucf101_3_base: None
-stgcn2_ntu_CS_cnn_D3: 0.9966077208518982
-stgcn2_ntu_CS_base: 0.9830635190010071
-stgcn2_ntu_CV_cnn_D3_obs0.2: 0.4922701120376587
-stgcn2_ntu_CV_cnn_D3_obs0.6: 0.8540615439414978
-stgcn2_ntu_CV_cnn_D3_obs0.5: 0.9462094306945801
-stgcn2_ntu_CV_cnn_D3_obs0.4: 0.5520905256271362
-stgcn2_ntu_CV_base_obs0.5: 0.8912500739097595
-stgcn2_ntu_CV_base: 0.98114013671875
-stgcn2_ntu_CV_cnn_D3: 0.9941827058792114
-stgcn2_ntu_CV_cnn_D3_obs0.8: 0.7845189571380615
-stgcn2_ntu120_CSub_cnn_D3: 0.9792783856391907
-stgcn2_ntu120_CSub_base: 0.9433408379554749
-stgcn2_ntu120_CSet_base: 0.9368436336517334
-stgcn2_ntu120_CSet_cnn_D3: 0.980043351650238

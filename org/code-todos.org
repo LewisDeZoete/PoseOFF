@@ -16,6 +16,7 @@
 #+RESULTS:
 : "/ssh:nt:/fred/oz141/ldezoete/MS-G3D/"
 
+
 * Data extraction, training, evaluation and graphing
 dataset -> evaluation -> dilation -> model_type
 ** Data extraction:
