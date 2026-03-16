@@ -202,14 +202,14 @@ class TEST_MODEL(nn.Module):
         Graph = import_class(graph)()
         A_binary = Graph.A_binary
 
-        self.data_bn = nn.BatchNorm1d(num_person * 
+        self.data_bn = nn.BatchNorm1d(num_person *
                                      (pose_channels + flow_channels) *
                                       num_point)
 
         # channels
         c1 = 96
         c2 = c1 * 2     # 192
-        # c3 = c2 * 2     # 384
+        c3 = c2 * 2     # 384
 
         if cnn:
             assert flow_channels > 2
@@ -219,14 +219,19 @@ class TEST_MODEL(nn.Module):
             #                            flow_window = flow_window,
             #                            original_channels=in_channels,
             #                            out_channels=self.flow_channels)
-            joint_embed_channels = 16
-            self.to_joint_embedding = Flow_conv(
-                kernel_size=3,
-                flow_window=int(
-                    math.sqrt(flow_channels / 2)
-                ),
-                pose_channels=pose_channels,
-                out_channels=joint_embed_channels,
+            joint_embed_channels = 3
+            self.to_joint_embedding = nn.Sequential(
+                Flow_conv(
+                    kernel_size=3,
+                    flow_window=int(
+                        math.sqrt(flow_channels / 2)
+                    ),
+                    pose_channels=pose_channels,
+                    out_channels=joint_embed_channels,
+                    ),
+                nn.Linear(
+                    joint_embed_channels, joint_embed_channels
+                    )
             )
         else:
             joint_embed_channels = 3
@@ -251,16 +256,16 @@ class TEST_MODEL(nn.Module):
         self.sgcn2[-1].act = nn.Identity()
         self.tcn2 = MS_TCN(c2, c2)
 
-        # self.gcn3d3 = MultiWindow_MS_G3D(c2, c3, A_binary, num_g3d_scales, window_stride=2)
-        # self.sgcn3 = nn.Sequential(
-        #     MS_GCN(num_gcn_scales, c2, c2, A_binary, disentangled_agg=True),
-        #     MS_TCN(c2, c3, stride=2),
-        #     MS_TCN(c3, c3))
-        # self.sgcn3[-1].act = nn.Identity()
-        # self.tcn3 = MS_TCN(c3, c3)
+        self.gcn3d3 = MultiWindow_MS_G3D(c2, c3, A_binary, num_g3d_scales, window_stride=2)
+        self.sgcn3 = nn.Sequential(
+            MS_GCN(num_gcn_scales, c2, c2, A_binary, disentangled_agg=True),
+            MS_TCN(c2, c3, stride=2),
+            MS_TCN(c3, c3))
+        self.sgcn3[-1].act = nn.Identity()
+        self.tcn3 = MS_TCN(c3, c3)
 
-        self.fc = nn.Linear(c2, num_class)
-        # self.fc = nn.Linear(c3, num_class)
+        # self.fc = nn.Linear(c2, num_class)
+        self.fc = nn.Linear(c3, num_class)
 
     def forward(self, x):
         N, C, T, V, M = x.size()
@@ -282,8 +287,8 @@ class TEST_MODEL(nn.Module):
         x = F.relu(self.sgcn2(x) + self.gcn3d2(x), inplace=True)
         x = self.tcn2(x)
 
-        # x = F.relu(self.sgcn3(x) + self.gcn3d3(x), inplace=True)
-        # x = self.tcn3(x)
+        x = F.relu(self.sgcn3(x) + self.gcn3d3(x), inplace=True)
+        x = self.tcn3(x)
 
         out = x
         out_channels = out.size(1)
@@ -310,9 +315,9 @@ if __name__ == "__main__":
     )
 
     model_type="msg3d"
-    dataset = "ntu120"
-    flow_embedding = "base"
-    evaluation = "CSet"
+    dataset = "ntu"
+    flow_embedding = "cnn"
+    evaluation = "CS"
 
     run_name = f"{model_type}_{dataset}_{evaluation}_{flow_embedding}"
 

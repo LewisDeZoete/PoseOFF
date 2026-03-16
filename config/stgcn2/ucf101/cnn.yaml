@@ -17,7 +17,6 @@ feeder_args:
   absolute_flow: False
     # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
   no_flow: False
-  no_Z: False # NOTE: Should ordinarily be false
 
 extractor:
   data_paths: 
@@ -75,10 +74,10 @@ scheduler_params:
 # training
 training_function: training.train_msg3d.train_network
 testing_function: training.eval_msg3d.eval_network
-num_epoch: 16
+num_epoch: 50
 device: 0
 batch_size: 128
 half: False
 
-checkpoint_freq: 1 # how often to save the model and training state
+checkpoint_freq: 10 # how often to save the model and training state
 save_location: ./results/stgcn2/ucf101/ # where to save the checkpoints

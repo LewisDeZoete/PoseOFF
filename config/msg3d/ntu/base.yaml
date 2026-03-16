@@ -36,8 +36,8 @@ extractor:
     dilation: 3
 
 # model
-# model: models.msg3d.TEST_MODEL
-model: models.msg3d.Model
+model: models.msg3d.TEST_MODEL
+# model: models.msg3d.Model
 model_args:
   num_class: 60
   num_point: 25
@@ -46,9 +46,9 @@ model_args:
   num_g3d_scales: 3
   graph: graph.ntu_rgb_d.Graph
   in_channels: 3
-  # pose_channels: 3
-  # flow_channels: 0
-  # cnn: False
+  pose_channels: 3
+  flow_channels: 0
+  cnn: False
 ignore_weights: []
 phase: train
 

@@ -221,6 +221,7 @@ class TEST_MODEL(nn.Module):
 
         modules = []
         if self.in_channels != self.base_channels:
+            intermediate_channels = in_channels
             # Channel embeddings...
             if cnn:
                 modules.append(
@@ -230,9 +231,10 @@ class TEST_MODEL(nn.Module):
                             math.sqrt(flow_channels / 2)
                         ),
                         pose_channels=pose_channels,
-                        out_channels=base_channels,
+                        out_channels=in_channels,
                     )
                 )
+                modules.append(STGCNBlock(in_channels, base_channels, A.clone(), 1, residual=False, **lw_kwargs[0]))
             else:
                 modules.append(STGCNBlock(in_channels, base_channels, A.clone(), 1, residual=False, **lw_kwargs[0]))
 
@@ -307,8 +309,8 @@ if __name__ == '__main__':
     )
 
     model_type = "stgcn2"
-    dataset = "ntu120"
-    flow_embedding = "base"
+    dataset = "ntu"
+    flow_embedding = "cnn"
 
     # Get the config file and use the model arguments defined within
     arg = ArgClass(f'config/{model_type}/{dataset}/{flow_embedding}.yaml', verbose=True)
