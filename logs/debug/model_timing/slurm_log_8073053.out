@@ -1,0 +1,71 @@
+Copying file: ./data/ntu/aligned_data/ntu_CS-pose_aligned.npz to /var/tmp/jobfs/data
+infogcn2 - base
+Started time infogcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 613747
+Number of trainable model params: 613747
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Dataset contains 16487 samples
+Timing using cuda
+Total inference time (ms): 21131.638702392578
+Average per-sample inference time (ms): 1.282
+Average FPS: 780.2 sequences / second
+
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 516454
+Number of trainable model params: 516454
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Dataset contains 16487 samples
+Timing using cuda
+Total inference time (ms): 4949.622791290283
+Average per-sample inference time (ms): 0.300
+Average FPS: 3331.0 sequences / second
+
+msg3d - base
+Started time msg3d base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 2194476
+Number of trainable model params: 2194476
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Dataset contains 16487 samples
+Timing using cuda
+Total inference time (ms): 79894.54347229004
+Average per-sample inference time (ms): 4.846
+Average FPS: 206.4 sequences / second
+
+
++------------------ Job Report: 8073053 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  3.8% (590 MB peak / 15 GB)     |
+| CPU           [##############      ] 70.3% average                   |
+| GPU           [########            ] 42.0% average                   |
+| Time          [-->                 ] 11.2% (0-00:03:22 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            11                            |
+|   /fred   12.3 GB       6.4 KB         6.4 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      3.7 MB        0 B            676                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

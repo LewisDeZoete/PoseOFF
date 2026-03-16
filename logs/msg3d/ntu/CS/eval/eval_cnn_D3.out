@@ -1,19 +1,23 @@
+Fri Nov 28 14:58:24 AEDT 2025
 Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
 Dataset copied to JOBFS: ntu_CS-flowpose_D3_aligned.npz
 Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
 Run name: msg3d_ntu_CS_cnn_D3
 
+Python script run command arguments:
+python main.py -m msg3d -d ntu -p eval -f cnn -e CS -o 1.0 -r msg3d_ntu_CS_cnn_D3 --desc msg3d_eval ntu CS cnn observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz -v
 ### Libraries loaded
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
   data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
   label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
   p_interval: [0.5, 1]
-  random_choose: True
-  random_shift: True
-  window_size: 64
-  random_move: True
-  random_rot: True
+  random_choose: False
+  random_shift: False
+  window_size: 300
+  pad_method: replay
+  random_move: False
+  random_rot: False
   average_flow: False
   absolute_flow: False
   no_flow: False
@@ -36,21 +40,21 @@ model_args:
   cnn: True
 ignore_weights: []
 phase: eval
-optim:
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
   momentum: 0.9
-  base_lr: 0.05
+  weight_decay: 0.0005
   nesterov: True
-  weight_decay: 0.0003
-  step: [30, 40]
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 40]
   gamma: 0.1
-lambda_1: 1
 training_function: training.train_msg3d.train_network
 testing_function: training.eval_msg3d.eval_network
 num_epoch: 50
 device: 0
-batch_size: 128
-forward_batch_size: 128
-test_batch_size: 128
+batch_size: 32
 half: False
 checkpoint_freq: 10
 save_location: ./results/msg3d/ntu/
@@ -60,9 +64,10 @@ flow_embedding: cnn
 evaluation: CS
 obs_ratio: 1.0
 run_name: msg3d_ntu_CS_cnn_D3
-description: msg3d_eval ntu CS cnn observation ratio 1.0, dilation 3...
+description: msg3d_eval ntu CS cnn observation ratio 1.0, retraining model with mean and std norm
 data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
 verbose: True
+debug: False
 ### Arguments loaded
 	Output device: cuda:0
 	Model total number of params: 582813
@@ -70,11 +75,6 @@ verbose: True
 	Total number of weights removed: 0
 	Pretrained model loaded
 ### Model created
-	Loaded data using mmap mode
-	Assigned self.data to unique split (test)
-	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
-	Finished loading data!
-test feeder length: 16487
 ### Dataloaders created
 	Tracking:
 		epoch
@@ -85,25 +85,38 @@ test feeder length: 16487
 		pred
 		ACC
 		cls_loss
-Results for ACC: [[tensor(0.9041, device='cuda:0')]]
-Results for cls_loss: [tensor(0.3411, device='cuda:0')]
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+Results for ACC: [[tensor(0.9048, device='cuda:0')]]
+Results for cls_loss: [tensor(0.3078, device='cuda:0')]
 
-+------------------ Job Report: 6556432 (COMPLETED) -------------------+
-| Memory (RAM)  [###                 ] 15.9% (2.4 GB peak / 15 GB)     |
-| CPU           [##                  ] 12.4% average                   |
-| GPU           [                    ]  0.0% average                   |
-| Time          [-------------->     ] 72.7% (0-00:07:16 / 0-00:10:00) |
++------------------ Job Report: 7246197 (COMPLETED) -------------------+
+| Memory (RAM)  [##                  ] 10.9% (1.6 GB peak / 15 GB)     |
+| CPU           [#####               ] 25.0% average                   |
+| GPU           [###                 ] 16.6% average                   |
+| Time          [----->              ] 28.6% (0-00:08:35 / 0-00:30:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
 |   Path    Total Read    Total Write    Total IOPS                    |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   4.9 MB        0 B            212                           |
-|   /fred   167.6 GB      5.1 KB         6.2 K                         |
-|   /home   0 B           0 B            1                             |
-|   OS      456 KB        0 B            61                            |
+|   /apps   21.1 MB       0 B            37                            |
+|   /fred   167.8 GB      6.6 KB         3.2 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      7.2 MB        0 B            878                           |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |
 |   - CPU usage is low                                                 |
 |   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
 +----------------------------------------------------------------------+

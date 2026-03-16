@@ -1,0 +1,47 @@
+Mon Mar  9 13:04:37 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 10
+Start index: 18000
+End index: 20000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 18000 to 20000
+	Skeleton S007C001P018R002A006 to S007C002P028R001A040
+	Frames dropped for S007C001P026R002A001: 23
+		Frame 0 in skip list, add blank frame to poses
+Processed 18000-18499 in 1259.20 seconds
+	Frames dropped for S007C002P007R001A014: 68
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S007C002P007R001A020: 17
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S007C002P008R001A050: 18
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S007C002P008R001A060: 1
+Processed 18500-18999 in 943.46 seconds
+Processed 19000-19499 in 837.10 seconds
+	Frames dropped for S007C002P019R001A055: 36
+Processed 19500-19999 in 827.32 seconds
+Processed 2000 in: 3867.08 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_18k-20k.pkl
+
++------------------ Job Report: 10286604 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.2% (4.9 GB peak / 27 GB)     |
+| CPU           [###############     ] 76.8% average                   |
+| Time          [---------->         ] 54.2% (0-01:05:02 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   672 KB        0 B            197                           |
+|   /fred   4.9 GB        6.5 KB         8 K                           |
+|   /home   0 B           0 B            1                             |
+|   OS      484 KB        0 B            277                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

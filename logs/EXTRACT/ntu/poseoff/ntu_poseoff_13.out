@@ -1,0 +1,68 @@
+Mon Mar  9 13:04:39 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 13
+Start index: 24000
+End index: 26000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 24000 to 26000
+	Skeleton S008C002P029R002A048 to S008C003P032R002A050
+	Frames dropped for S008C002P031R002A055: 6
+	Frames dropped for S008C002P031R002A059: 42
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C002P032R002A059: 41
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C002P033R002A059: 47
+		Frame 0 in skip list, add blank frame to poses
+Processed 24000-24499 in 1243.39 seconds
+	Frames dropped for S008C002P035R002A055: 27
+	Frames dropped for S008C002P035R002A059: 53
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C002P036R002A055: 27
+	Frames dropped for S008C003P001R002A060: 2
+	Frames dropped for S008C003P007R001A008: 21
+	Frames dropped for S008C003P007R001A024: 32
+		Frame 0 in skip list, add blank frame to poses
+Processed 24500-24999 in 847.97 seconds
+	Frames dropped for S008C003P007R002A060: 2
+	Frames dropped for S008C003P015R001A060: 14
+	Frames dropped for S008C003P025R001A055: 8
+	Frames dropped for S008C003P025R001A059: 44
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C003P025R001A060: 3
+	Frames dropped for S008C003P025R002A007: 4
+		Frame 0 in skip list, add blank frame to poses
+Processed 25000-25499 in 847.08 seconds
+	Frames dropped for S008C003P025R002A014: 58
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C003P025R002A024: 30
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C003P031R001A059: 51
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S008C003P032R001A055: 38
+	Frames dropped for S008C003P032R001A059: 43
+		Frame 0 in skip list, add blank frame to poses
+Processed 25500-25999 in 823.08 seconds
+Processed 2000 in: 3761.52 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_24k-26k.pkl
+
++------------------ Job Report: 10286851 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.4% (4.7 GB peak / 27 GB)     |
+| CPU           [###############     ] 78.6% average                   |
+| Time          [---------->         ] 52.8% (0-01:03:18 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            34                            |
+|   /fred   3.8 GB        24.6 KB        7.9 K                         |
+|   OS      360 KB        0 B            171                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

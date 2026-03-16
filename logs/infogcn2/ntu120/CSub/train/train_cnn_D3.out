@@ -1,4 +1,4 @@
-Mon Nov 24 10:57:30 AM AEDT 2025
+Thu Nov 27 11:37:19 AM AEDT 2025
 Copying file: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
 Dataset copied to JOBFS: ntu120_CSub-flowpose_D3_aligned.npz
 Data path: /var/tmp/jobfs/data/ntu120_CSub-flowpose_D3_aligned.npz
@@ -88,8 +88,8 @@ debug: False
 	Temporal encoder: transformer
 	Model total number of params: 697848
 	Loading weights from ./results/infogcn2/ntu120/CSub/train/infogcn2_ntu120_CSub_cnn_D3.pt
-	Checkpoint file does not yet exist
-		([Errno 2] No such file or directory: './results/infogcn2/ntu120/CSub/train/infogcn2_ntu120_CSub_cnn_D3.pt')
+	Total number of weights removed: 0
+	Pretrained model loaded
 ### Model created
 	Loaded data using mmap mode
 	Self.data assigned
@@ -115,162 +115,21 @@ debug: False
 		test_feature_loss
 		train_recon_loss
 		test_recon_loss
-	Created new checkpoint file: ./results/infogcn2/ntu120/CSub/train/infogcn2_ntu120_CSub_cnn_D3.pt
-		1 EPOCH BEST TRAIN AUC: 0.013965466991066933
-			Train time: 702.59 seconds
-		2 EPOCH BEST TRAIN AUC: 0.05055428668856621
-			Train time: 762.72 seconds
-		3 EPOCH BEST TRAIN AUC: 0.13866400718688965
-			Train time: 766.52 seconds
-		4 EPOCH BEST TRAIN AUC: 0.2455732524394989
-			Train time: 770.79 seconds
-		5 EPOCH BEST TRAIN AUC: 0.34742259979248047
-			Train time: 785.98 seconds
-		6 EPOCH BEST TRAIN AUC: 0.41656172275543213
-			Train time: 790.74 seconds
-		7 EPOCH BEST TRAIN AUC: 0.4679584205150604
-			Train time: 776.60 seconds
-		8 EPOCH BEST TRAIN AUC: 0.5084623098373413
-			Train time: 711.44 seconds
-		9 EPOCH BEST TRAIN AUC: 0.5426368713378906
-			Train time: 676.88 seconds
-		10 EPOCH BEST TRAIN AUC: 0.5684816837310791
-			Train time: 676.59 seconds
-		11 EPOCH BEST TRAIN AUC: 0.5862017869949341
-			Train time: 694.78 seconds
-		12 EPOCH BEST TRAIN AUC: 0.6022752523422241
-			Train time: 734.49 seconds
-		13 EPOCH BEST TRAIN AUC: 0.613957941532135
-			Train time: 705.00 seconds
-		14 EPOCH BEST TRAIN AUC: 0.6242416501045227
-			Train time: 726.58 seconds
-		15 EPOCH BEST TRAIN AUC: 0.6345479488372803
-			Train time: 742.46 seconds
-		16 EPOCH BEST TRAIN AUC: 0.6419248580932617
-			Train time: 739.66 seconds
-		17 EPOCH BEST TRAIN AUC: 0.6491472721099854
-			Train time: 754.94 seconds
-		18 EPOCH BEST TRAIN AUC: 0.654915988445282
-			Train time: 738.79 seconds
-		19 EPOCH BEST TRAIN AUC: 0.6604635715484619
-			Train time: 717.22 seconds
-		20 EPOCH BEST TRAIN AUC: 0.6643807888031006
-			Train time: 691.69 seconds
-		21 EPOCH BEST TRAIN AUC: 0.6703250408172607
-			Train time: 702.22 seconds
-		22 EPOCH BEST TRAIN AUC: 0.6734225153923035
-			Train time: 722.97 seconds
-		23 EPOCH BEST TRAIN AUC: 0.6786767840385437
-			Train time: 746.48 seconds
-		24 EPOCH BEST TRAIN AUC: 0.6817511320114136
-			Train time: 728.68 seconds
-		25 EPOCH BEST TRAIN AUC: 0.6852077841758728
-			Train time: 755.86 seconds
-		26 EPOCH BEST TRAIN AUC: 0.6864867806434631
-			Train time: 746.90 seconds
-		27 EPOCH BEST TRAIN AUC: 0.6901893615722656
-			Train time: 757.42 seconds
-		28 EPOCH BEST TRAIN AUC: 0.6938674449920654
-			Train time: 791.91 seconds
-		29 EPOCH BEST TRAIN AUC: 0.6966554522514343
-			Train time: 755.66 seconds
-		30 EPOCH BEST TRAIN AUC: 0.6972564458847046
-			Train time: 740.04 seconds
-		31 EPOCH BEST TRAIN AUC: 0.700276255607605
-			Train time: 727.56 seconds
-		32 EPOCH BEST TRAIN AUC: 0.7030652761459351
-			Train time: 730.27 seconds
-		33 EPOCH BEST TRAIN AUC: 0.7041796445846558
-			Train time: 717.58 seconds
-		34 EPOCH BEST TRAIN AUC: 0.7065610885620117
-			Train time: 712.35 seconds
-		35 EPOCH BEST TRAIN AUC: 0.7073135375976562
-			Train time: 707.06 seconds
-		36 EPOCH BEST TRAIN AUC: 0.7091914415359497
-			Train time: 701.88 seconds
-		37 EPOCH BEST TRAIN AUC: 0.7105485200881958
-			Train time: 702.44 seconds
-		38 EPOCH BEST TRAIN AUC: 0.7106266021728516
-			Train time: 699.34 seconds
-		39 EPOCH BEST TRAIN AUC: 0.713194727897644
-			Train time: 716.37 seconds
-		40 EPOCH BEST TRAIN AUC: 0.7148061990737915
-			Train time: 727.97 seconds
-		41 EPOCH BEST TRAIN AUC: 0.7170832753181458
-			Train time: 727.74 seconds
-		42 EPOCH BEST TRAIN AUC: 0.7175602912902832
-			Train time: 730.62 seconds
-		43 EPOCH BEST TRAIN AUC: 0.7189741134643555
-			Train time: 732.94 seconds
-		44 EPOCH BEST TRAIN AUC: 0.719502866268158
-			Train time: 727.75 seconds
-		45 EPOCH BEST TRAIN AUC: 0.719990074634552
-			Train time: 726.52 seconds
-		46 EPOCH BEST TRAIN AUC: 0.7209270000457764
-			Train time: 743.79 seconds
-		47 EPOCH BEST TRAIN AUC: 0.7220425605773926
-			Train time: 742.90 seconds
-		48 EPOCH BEST TRAIN AUC: 0.7235399484634399
-			Train time: 744.62 seconds
-		49 EPOCH BEST TRAIN AUC: 0.7257364392280579
-			Train time: 748.60 seconds
-		50 EPOCH BEST TRAIN AUC: 0.7257364392280579
-			Train time: 748.96 seconds
-		51 EPOCH BEST TRAIN AUC: 0.7670236825942993
-			Train time: 741.74 seconds
-		52 EPOCH BEST TRAIN AUC: 0.7782006859779358
-			Train time: 735.83 seconds
-		53 EPOCH BEST TRAIN AUC: 0.7825850248336792
-			Train time: 751.33 seconds
-		54 EPOCH BEST TRAIN AUC: 0.7835581302642822
-			Train time: 751.96 seconds
-		55 EPOCH BEST TRAIN AUC: 0.7857600450515747
-			Train time: 747.76 seconds
-		56 EPOCH BEST TRAIN AUC: 0.7873960137367249
-			Train time: 754.69 seconds
-		57 EPOCH BEST TRAIN AUC: 0.7894294261932373
-			Train time: 749.16 seconds
-		58 EPOCH BEST TRAIN AUC: 0.7902314066886902
-			Train time: 760.29 seconds
-		59 EPOCH BEST TRAIN AUC: 0.7920597791671753
-			Train time: 749.26 seconds
-		60 EPOCH BEST TRAIN AUC: 0.7922228574752808
-			Train time: 754.23 seconds
-		61 EPOCH BEST TRAIN AUC: 0.8005168437957764
-			Train time: 759.21 seconds
-		62 EPOCH BEST TRAIN AUC: 0.8011319637298584
-			Train time: 744.45 seconds
-		63 EPOCH BEST TRAIN AUC: 0.8015788793563843
-			Train time: 760.25 seconds
-		64 EPOCH BEST TRAIN AUC: 0.8016359210014343
-			Train time: 748.07 seconds
-		65 EPOCH BEST TRAIN AUC: 0.8017678260803223
-			Train time: 745.94 seconds
-		66 EPOCH BEST TRAIN AUC: 0.8025799989700317
-			Train time: 697.48 seconds
-		67 EPOCH BEST TRAIN AUC: 0.8025799989700317
-			Train time: 698.16 seconds
-		68 EPOCH BEST TRAIN AUC: 0.8028950691223145
-			Train time: 697.83 seconds
-		69 EPOCH BEST TRAIN AUC: 0.8028950691223145
-			Train time: 742.97 seconds
-		70 EPOCH BEST TRAIN AUC: 0.8032347559928894
-			Train time: 806.20 seconds
-	Best train AUC: 0.8032347559928894
+	Resuming from checkpoint at epoch 70
 
-+-------------------- Job Report: 7160627 (FAILED) --------------------+
-| Memory (RAM)  [##                  ] 12.8% (4.5 GB peak / 35 GB)     |
-| CPU           [###########         ] 56.2% average                   |
-| GPU           [######              ] 34.7% average                   |
-| Time          [------------>       ] 60.4% (0-14:29:08 / 1-00:00:00) |
++-------------------- Job Report: 7219059 (FAILED) --------------------+
+| Memory (RAM)  [                    ]  0.0% (2 MB peak / 35 GB)       |
+| CPU           [                    ]  2.1% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  0.7% (0-00:09:24 / 1-00:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
+|   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   29.9 MB       0 B            201                           |
-|   /fred   339.3 GB      43.9 MB        1.2 K                         |
-|   /home   0 B           0 B            2                             |
-|   OS      1.9 MB        0 B            441                           |
+|   /apps   5.3 MB        0 B                    256                   |
+|   /fred   338.5 GB      5.9 KB                   5                   |
+|   /home   0 B           0 B                      2                   |
+|   OS      960 KB        0 B                      6                   |
 |                                                                      |
 | Warnings:                                                            |
 |   - Too much memory requested                                        |

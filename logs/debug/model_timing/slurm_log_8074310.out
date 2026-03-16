@@ -1,0 +1,162 @@
+infogcn2 - base
+Started time infogcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 613747
+Number of trainable model params: 613747
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+X shape: torch.Size([1, 3, 64, 25, 2])
+Average latency: 14.46 ms
+FPS: 69.2
+
+infogcn2 - cnn
+Started time infogcn2 cnn
+./training/model_timer.py
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 620448
+Number of trainable model params: 620448
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+X shape: torch.Size([1, 53, 64, 25, 2])
+Average latency: 14.84 ms
+FPS: 67.4
+
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 516454
+Number of trainable model params: 516454
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+X shape: torch.Size([1, 3, 100, 25, 2])
+Average latency: 4.58 ms
+FPS: 218.2
+
+stgcn2 - cnn
+Started time stgcn2 cnn
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 537648
+Number of trainable model params: 537648
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+X shape: torch.Size([1, 53, 100, 25, 2])
+Average latency: 4.57 ms
+FPS: 218.8
+
+msg3d - base
+Started time msg3d base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 2194476
+Number of trainable model params: 2194476
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+X shape: torch.Size([1, 3, 300, 25, 2])
+Average latency: 16.19 ms
+FPS: 61.8
+
+msg3d - cnn
+/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/init.py:452: UserWarning: Initializing zero-element tensors is a no-op
+  warnings.warn("Initializing zero-element tensors is a no-op")
+Started time msg3d cnn
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 2204420
+Number of trainable model params: 2204420
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+X shape: torch.Size([1, 53, 300, 25, 2])
+Average latency: 16.25 ms
+FPS: 61.5
+
+
++------------------ Job Report: 8074310 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  0.0% (5 MB peak / 15 GB)       |
+| CPU           [###############     ] 76.0% average                   |
+| GPU           [#######             ] 36.8% average                   |
+| Time          [->                  ]  9.5% (0-00:02:51 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   2.8 MB        0 B            16                            |
+|   /fred   134.3 MB      13.5 KB        5.8 K                         |
+|   /home   0 B           0 B            4                             |
+|   OS      960 KB        0 B            689                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

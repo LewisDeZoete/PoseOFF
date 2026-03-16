@@ -1,0 +1,49 @@
+Mon Mar  9 13:04:37 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 21
+Start index: 40000
+End index: 42000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 40000 to 42000
+	Skeleton S012C003P008R001A011 to S013C001P019R002A047
+	Frames dropped for S012C003P008R001A060: 1
+	Frames dropped for S012C003P008R002A006: 37
+	Frames dropped for S012C003P008R002A059: 25
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C003P008R002A060: 7
+Processed 40000-40499 in 702.29 seconds
+	Frames dropped for S012C003P019R001A059: 19
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C003P019R001A060: 1
+Processed 40500-40999 in 677.38 seconds
+	Frames dropped for S012C003P037R001A059: 31
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C003P037R001A060: 38
+	Frames dropped for S012C003P037R002A055: 42
+Processed 41000-41499 in 702.87 seconds
+	Frames dropped for S013C001P018R002A001: 16
+Processed 41500-41999 in 676.27 seconds
+Processed 2000 in: 2758.82 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_40k-42k.pkl
+
++------------------ Job Report: 10286859 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.4% (5.2 GB peak / 27 GB)     |
+| CPU           [################    ] 84.7% average                   |
+| Time          [------->            ] 38.8% (0-00:46:34 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   4.3 MB        0 B            64                            |
+|   /fred   4.6 GB        8.9 KB         8.3 K                         |
+|   OS      2.4 MB        0 B            372                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

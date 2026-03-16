@@ -1,0 +1,82 @@
+Started time infogcn2 base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 613747
+Timing using cuda
+Total inference time (ms): 84483.37375640869
+Average per-batch (n_samples=1000, B=64) inference time (ms): 84.4833737564087
+Average per-sample inference time (ms): 1.3200527149438859
+Started time infogcn2 cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 620448
+Timing using cuda
+Total inference time (ms): 84848.47850036621
+Average per-batch (n_samples=1000, B=64) inference time (ms): 84.84847850036621
+Average per-sample inference time (ms): 1.325757476568222
+Started time stgcn2 base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 516454
+Timing using cuda
+Total inference time (ms): 18429.182523727417
+Average per-batch (n_samples=1000, B=64) inference time (ms): 18.429182523727416
+Average per-sample inference time (ms): 0.2879559769332409
+Started time stgcn2 cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 540123
+Timing using cuda
+Total inference time (ms): 22337.751264572144
+Average per-batch (n_samples=1000, B=64) inference time (ms): 22.337751264572145
+Average per-sample inference time (ms): 0.34902736350893976
+Started time msg3d base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 2194464
+Timing using cuda
+Total inference time (ms): 276156.9786376953
+Average per-batch (n_samples=1000, B=64) inference time (ms): 276.1569786376953
+Average per-sample inference time (ms): 4.314952791213989
+Started time msg3d cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 2145221
+Timing using cuda
+Total inference time (ms): 283247.19619750977
+Average per-batch (n_samples=1000, B=64) inference time (ms): 283.24719619750977
+Average per-sample inference time (ms): 4.42573744058609
+
++------------------ Job Report: 8034200 (COMPLETED) -------------------+
+| Memory (RAM)  [#                   ]  5.0% (772 MB peak / 15 GB)     |
+| CPU           [##################  ] 93.6% average                   |
+| GPU           [###########         ] 57.6% average                   |
+| Time          [------------->      ] 69.3% (0-00:20:48 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   2.8 MB        0 B            21                            |
+|   /fred   96 KB         7.8 KB         8.3 K                         |
+|   /home   0 B           0 B            5                             |
+|   OS      960 KB        0 B            284                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

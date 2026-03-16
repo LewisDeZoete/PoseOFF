@@ -1,0 +1,59 @@
+Mon Mar  9 13:04:38 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 4
+Start index: 6000
+End index: 8000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 6000 to 8000
+	Skeleton S002C003P014R001A014 to S003C002P017R002A036
+	Frames dropped for S002C003P014R001A055: 25
+	Frames dropped for S002C003P014R002A055: 26
+	Frames dropped for S003C001P001R002A059: 26
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C001P002R001A059: 52
+		Frame 0 in skip list, add blank frame to poses
+Processed 6000-6499 in 647.83 seconds
+	Frames dropped for S003C001P008R001A059: 40
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C001P008R001A060: 6
+	Frames dropped for S003C001P008R002A060: 18
+Processed 6500-6999 in 663.80 seconds
+	Frames dropped for S003C001P019R001A059: 39
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C002P002R001A059: 38
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C002P002R002A017: 5
+	Frames dropped for S003C002P007R001A059: 44
+		Frame 0 in skip list, add blank frame to poses
+Processed 7000-7499 in 696.21 seconds
+	Frames dropped for S003C002P008R001A008: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C002P008R001A059: 38
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S003C002P015R002A055: 24
+	Frames dropped for S003C002P017R001A055: 29
+Processed 7500-7999 in 714.56 seconds
+Processed 2000 in: 2722.40 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_6k-8k.pkl
+
++------------------ Job Report: 10286598 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 17.8% (4.8 GB peak / 27 GB)     |
+| CPU           [################    ] 84.5% average                   |
+| Time          [------->            ] 38.3% (0-00:45:58 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   516 KB        0 B            30                            |
+|   /fred   5 GB          16.2 KB        8 K                           |
+|   OS      484 KB        0 B            167                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

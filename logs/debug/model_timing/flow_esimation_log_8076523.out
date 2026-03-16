@@ -1,0 +1,22 @@
+Found 56578 available skeleton files.
+
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 8076523 ON gina3 CANCELLED AT 2025-12-30T18:25:20 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 8076523.0 ON gina3 CANCELLED AT 2025-12-30T18:25:20 DUE TO TIME LIMIT ***
+
++-------------------- Job Report: 8076523 (TIMEOUT) --------------------+
+| Memory (RAM)  [############        ] 62.6% (16.9 GB peak / 27 GB)     |
+| CPU           [#################   ] 89.5% average                    |
+| GPU           [#############       ] 66.3% average                    |
+| Time          [------------------->] 100.6% (0-01:00:22 / 0-01:00:00) |
+|                                                                       |
+| Lustre Filesystem:                                                    |
+|   Path    Total Read    Total Write      Total IOPS                   |
+|   ------  ------------  -------------  ------------                   |
+|   /apps   0 B           0 B                      7                    |
+|   /fred   296.2 MB      39 B                   473                    |
+|   OS      0 B           0 B                      4                    |
+|                                                                       |
+| Warnings:                                                             |
+|   - GPU usage is low                                                  |
++-----------------------------------------------------------------------+

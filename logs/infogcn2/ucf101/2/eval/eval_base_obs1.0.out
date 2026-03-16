@@ -1,0 +1,135 @@
+Tue Dec 23 11:12:02 AEDT 2025
+Copying file: ./data/ucf101/aligned_data/ucf101_02_D1.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ucf101_02_D1.npz
+Data path: /var/tmp/jobfs/data/ucf101_02_D1.npz
+Run name: infogcn2_ucf101_2_base
+
+Python script run command arguments:
+python main.py -m infogcn2 -d ucf101 -p eval -f base -e 2 -o 1.0 -r infogcn2_ucf101_2_base --desc infogcn2_eval ucf101 2 base observation ratio 1.0 --data_path_overwrite /var/tmp/jobfs/data/ucf101_02_D1.npz -v
+### Libraries loaded
+feeder: feeders.ucf101.Feeder
+feeder_args:
+  data_paths: {1: './data/ucf101/aligned_data/ucf101_01_D1.npz', 2: './data/ucf101/aligned_data/ucf101_02_D1.npz', 3: './data/ucf101/aligned_data/ucf101_03_D1.npz'}
+  label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
+  p_interval: [0.5, 1]
+  random_shift: True
+  random_choose: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+extractor:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/ucf101/pose/', 'flow_path': './data/ucf101/flow/', 'flowpose_path': './data/ucf101/flowpose/'}
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': False, 'dilation': 3}
+model: models.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 0
+  embed_channels: 64
+  num_head: 3
+  ode_method: euler
+  depth: 4
+  device: 0
+  T: 64
+  n_step: 3
+  SAGC_proj: True
+  num_cls: 10
+  n_sample: 1
+  backbone: transformer
+  cnn: False
+ignore_weights: []
+phase: eval
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0003
+  nesterov: True
+lambda_1: 1
+lambda_2: 0.1
+lambda_3: 0.001
+lambda_4: 0.0
+lambda_5: 0.0
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [50, 60]
+  gamma: 0.1
+training_function: training.train_infogcn.train_network
+testing_function: training.eval_infogcn.eval_network
+num_epoch: 70
+device: 0
+batch_size: 256
+forward_batch_size: 128
+test_batch_size: 256
+half: False
+checkpoint_freq: 10
+save_location: ./results/infogcn2/ucf101/
+model_type: infogcn2
+dataset: ucf101
+flow_embedding: base
+evaluation: 2
+obs_ratio: 1.0
+run_name: infogcn2_ucf101_2_base
+description: infogcn2_eval ucf101 2 base observation ratio 1.0
+data_path_overwrite: /var/tmp/jobfs/data/ucf101_02_D1.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 658061
+	Loading weights from ./results/infogcn2/ucf101/2/train/infogcn2_ucf101_2_base.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+### Model created
+### Dataloaders created
+	Tracking:
+		epoch
+		test_time
+		inference_time
+		loss
+		lr
+		truth
+		pred
+		ACC
+		AUC
+		cls_loss
+		feature_loss
+		recon_loss
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Best test ACC: 57.82%
+	Test AUC: [0.5169096]
+Total epoch time: [9.380495548248291]
+Average batch inference time: 305.2969741821289
+Average sample inference time: 1.192566305398941
+
++------------------ Job Report: 7984734 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  0.0% (1 MB peak / 15 GB)       |
+| CPU           [###                 ] 18.6% average                   |
+| GPU           [#################   ] 85.5% average                   |
+| Time          [>                   ]  2.4% (0-00:00:43 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                      1                   |
++----------------------------------------------------------------------+

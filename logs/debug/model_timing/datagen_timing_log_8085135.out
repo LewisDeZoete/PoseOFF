@@ -1,0 +1,22 @@
+RGB flow padded shape: torch.Size([100, 3, 1080, 1920])
+RGB pose padded shape: torch.Size([100, 3, 384, 640])
+{'flow': [], 'pose': []}
+
++------------------ Job Report: 8085135 (COMPLETED) -------------------+
+| Memory (RAM)  [#######             ] 37.1% (10 GB peak / 27 GB)      |
+| CPU           [#################   ] 85.7% average                   |
+| GPU           [###############     ] 78.4% average                   |
+| Time          [---->               ] 20.2% (0-00:24:16 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   828 KB        10.7 KB        2.8 K                         |
+|   /home   8 KB          511 B          15                            |
+|   OS      0 B           0 B            257                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

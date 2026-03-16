@@ -1,0 +1,44 @@
+Mon Mar  9 13:01:31 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 1
+Start index: 0
+End index: 2000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 0 to 2000
+	Skeleton S001C001P001R001A001 to S001C003P001R002A022
+Processed 0-499 in 558.97 seconds
+Processed 500-999 in 520.59 seconds
+	Frames dropped for S001C002P001R002A059: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S001C002P001R002A060: 11
+	Frames dropped for S001C002P004R001A055: 42
+	Frames dropped for S001C002P004R002A055: 32
+Processed 1000-1499 in 566.01 seconds
+	Frames dropped for S001C002P008R002A060: 6
+	Frames dropped for S001C003P001R001A055: 6
+Processed 1500-1999 in 514.01 seconds
+Processed 2000 in: 2159.58 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_0-2k.pkl
+
++------------------ Job Report: 10286595 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.0% (4.9 GB peak / 27 GB)     |
+| CPU           [###############     ] 79.7% average                   |
+| Time          [------>             ] 33.1% (0-00:39:42 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   5.5 MB        0 B            276                           |
+|   /fred   4.6 GB        4.8 KB         13 K                          |
+|   /home   0 B           0 B            1                             |
+|   OS      3 MB          0 B            542                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

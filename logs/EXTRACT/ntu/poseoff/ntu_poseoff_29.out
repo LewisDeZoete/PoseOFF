@@ -1,0 +1,37 @@
+Mon Mar  9 13:04:38 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 29
+Start index: 56000
+End index: 58000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 56000 to 58000
+	Skeleton S017C003P009R001A020 to S017C003P020R002A060
+	Frames dropped for S017C003P009R001A059: 39
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S017C003P009R001A060: 12
+Processed 56000-56499 in 594.06 seconds
+	Frames dropped for S017C003P020R001A060: 6
+Processed 2000 in: 692.49 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_56k-58k.pkl
+
++------------------ Job Report: 10286592 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 10.5% (2.8 GB peak / 27 GB)     |
+| CPU           [###############     ] 78.7% average                   |
+| Time          [-->                 ] 10.1% (0-00:12:07 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   652 KB        0 B            47                            |
+|   /fred   1.1 GB        1.8 KB         5.2 K                         |
+|   OS      992 KB        0 B            331                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

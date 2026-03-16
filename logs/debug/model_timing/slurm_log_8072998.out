@@ -1,0 +1,32 @@
+Copying file: ./data/ntu/aligned_data/ntu_CS-pose_aligned.npz to /var/tmp/jobfs/data
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 516454
+Number of trainable model params: 516454
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Dataset contains 16487 samples
+Timing using cuda
+Total inference time (ms): 4773.482482910156
+Average per-sample inference time (ms): 0.290
+Average FPS: 3453.9 sequences / second
+
+
++------------------ Job Report: 8072998 (COMPLETED) -------------------+
+| Memory (RAM)  No data available                                      |
+| CPU           [#########           ] 46.5% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  2.4% (0-00:00:43 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            7                             |
+|   /fred   9.5 GB        898 B          1.7 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      0 B           0 B            210                           |
++----------------------------------------------------------------------+

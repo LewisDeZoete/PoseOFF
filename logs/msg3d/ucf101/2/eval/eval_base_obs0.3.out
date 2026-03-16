@@ -1,0 +1,121 @@
+Wed Dec  3 14:36:52 AEDT 2025
+Copying file: ./data/ucf101/aligned_data/ucf101_02_D1.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ucf101_02_D1.npz
+Data path: /var/tmp/jobfs/data/ucf101_02_D1.npz
+Run name: msg3d_ucf101_2_base
+
+Python script run command arguments:
+python main.py -m msg3d -d ucf101 -p eval -f base -e 2 -o 0.3 -r msg3d_ucf101_2_base --desc msg3d_eval ucf101 2 base observation ratio 0.3 --data_path_overwrite /var/tmp/jobfs/data/ucf101_02_D1.npz -v
+### Libraries loaded
+feeder: feeders.ucf101.Feeder
+feeder_args:
+  data_paths: {1: './data/ucf101/aligned_data/ucf101_01_D1.npz', 2: './data/ucf101/aligned_data/ucf101_02_D1.npz', 3: './data/ucf101/aligned_data/ucf101_03_D1.npz'}
+  label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: False
+  random_shift: False
+  window_size: 300
+  pad_method: replay
+  random_move: False
+  random_rot: False
+  average_flow: False
+  absolute_flow: False
+  no_flow: True
+extractor:
+  data_paths: {'rgb_path': '../Datasets/UCF-101/', 'pose_path': './data/ucf101/pose/', 'flow_path': './data/ucf101/flow/', 'flowpose_path': './data/ucf101/flowpose/'}
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [240, 320], 'minibatch_size': 16}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': False, 'dilation': 3}
+model: models.msg3d.TEST_MODEL
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 0
+  cnn: False
+ignore_weights: []
+phase: eval
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 40]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 50
+device: 0
+batch_size: 32
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ucf101/
+model_type: msg3d
+dataset: ucf101
+flow_embedding: base
+evaluation: 2
+obs_ratio: 0.3
+run_name: msg3d_ucf101_2_base
+description: msg3d_eval ucf101 2 base observation ratio 0.3
+data_path_overwrite: /var/tmp/jobfs/data/ucf101_02_D1.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 569997
+	Loading weights from ./results/msg3d/ucf101/2/train/msg3d_ucf101_2_base.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+### Model created
+### Dataloaders created
+	Tracking:
+		epoch
+		test_time
+		loss
+		lr
+		truth
+		pred
+		ACC
+		cls_loss
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+Results for ACC: [[tensor(0.5171, device='cuda:0')]]
+Results for cls_loss: [tensor(2.1453, device='cuda:0')]
+
++------------------ Job Report: 7373894 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  0.0% (1 MB peak / 15 GB)       |
+| CPU           [###                 ] 16.4% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  4.1% (0-00:01:13 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B                     21                   |
+|   /fred   0 B           111 B                  868                   |
+|   /home   0 B           0 B                      1                   |
+|   OS      0 B           0 B                    197                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

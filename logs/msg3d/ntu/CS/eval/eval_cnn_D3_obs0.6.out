@@ -1,0 +1,122 @@
+Mon Dec  1 02:25:17 PM AEDT 2025
+Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CS-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+Run name: msg3d_ntu_CS_cnn_D3
+
+Python script run command arguments:
+python main.py -m msg3d -d ntu -p eval -f cnn -e CS -o 0.6 -r msg3d_ntu_CS_cnn_D3 --desc msg3d_eval ntu CS cnn observation ratio 0.6 --data_path_overwrite /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz -v
+### Libraries loaded
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: False
+  random_shift: False
+  window_size: 300
+  pad_method: replay
+  random_move: False
+  random_rot: False
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.msg3d.TEST_MODEL
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  cnn: True
+ignore_weights: []
+phase: eval
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 40]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 50
+device: 0
+batch_size: 32
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ntu/
+model_type: msg3d
+dataset: ntu
+flow_embedding: cnn
+evaluation: CS
+obs_ratio: 0.6
+run_name: msg3d_ntu_CS_cnn_D3
+description: msg3d_eval ntu CS cnn observation ratio 0.6
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+verbose: True
+debug: False
+### Arguments loaded
+	Output device: cuda:0
+	Model total number of params: 582813
+	Loading weights from ./results/msg3d/ntu/CS/train/msg3d_ntu_CS_cnn_D3.pt
+	Total number of weights removed: 0
+	Pretrained model loaded
+### Model created
+### Dataloaders created
+	Tracking:
+		epoch
+		test_time
+		loss
+		lr
+		truth
+		pred
+		ACC
+		cls_loss
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+Results for ACC: [[tensor(0.7602, device='cuda:0')]]
+Results for cls_loss: [tensor(0.8139, device='cuda:0')]
+
++------------------ Job Report: 7294510 (COMPLETED) -------------------+
+| Memory (RAM)  [##                  ] 13.4% (2 GB peak / 15 GB)       |
+| CPU           [#####               ] 26.6% average                   |
+| GPU           [###                 ] 19.1% average                   |
+| Time          [----->              ] 27.8% (0-00:08:20 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.4 MB        0 B            131                           |
+|   /fred   167.8 GB      5.9 KB         2.1 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      460 KB        0 B            62                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

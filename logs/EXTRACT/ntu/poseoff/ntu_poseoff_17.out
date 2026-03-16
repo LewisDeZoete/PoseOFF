@@ -1,0 +1,41 @@
+Mon Mar  9 13:04:39 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 17
+Start index: 32000
+End index: 34000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 32000 to 34000
+	Skeleton S010C003P017R001A027 to S011C001P028R002A049
+	Frames dropped for S010C003P019R002A055: 19
+Processed 32000-32499 in 1300.58 seconds
+	Frames dropped for S010C003P025R001A060: 5
+	Frames dropped for S011C001P007R001A060: 6
+	Frames dropped for S011C001P007R002A060: 1
+Processed 32500-32999 in 983.41 seconds
+Processed 33000-33499 in 889.37 seconds
+	Frames dropped for S011C001P025R001A060: 10
+Processed 33500-33999 in 879.88 seconds
+Processed 2000 in: 4053.24 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_32k-34k.pkl
+
++------------------ Job Report: 10286855 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.4% (5.2 GB peak / 27 GB)     |
+| CPU           [###############     ] 77.8% average                   |
+| Time          [----------->        ] 56.8% (0-01:08:08 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   448 KB        0 B            30                            |
+|   /fred   6.4 GB        4.4 KB         8 K                           |
+|   OS      188 KB        0 B            174                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,0 +1,52 @@
+Concatenating ntu - LK PoseOFF.
+	DILATION: 5
+
+
+Flow data samples: 2000
+Flow data samples: 4000
+Flow data samples: 6000
+Flow data samples: 8000
+Flow data samples: 10000
+Flow data samples: 12000
+Flow data samples: 14000
+Flow data samples: 16000
+Flow data samples: 18000
+Flow data samples: 20000
+Flow data samples: 22000
+Flow data samples: 24000
+Flow data samples: 26000
+Flow data samples: 28000
+Flow data samples: 30000
+Flow data samples: 32000
+Flow data samples: 34000
+Flow data samples: 36000
+Flow data samples: 38000
+Flow data samples: 40000
+Flow data samples: 42000
+Flow data samples: 44000
+Flow data samples: 46000
+Flow data samples: 48000
+Flow data samples: 50000
+Flow data samples: 52000
+Flow data samples: 54000
+Flow data samples: 56000
+Flow data samples: 56578
+Saved poseoff file to: ./data/ntu/flow_data/LK/flow_data_LK_D5.pkl
+
++------------------ Job Report: 10286593 (COMPLETED) ------------------+
+| Memory (RAM)  [#################   ] 86.9% (52.1 GB peak / 60 GB)    |
+| CPU           [#                   ]  8.3% average                   |
+| Time          [----->              ] 28.0% (0-00:02:48 / 0-00:10:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.4 MB        0 B                    193                   |
+|   /fred   33 GB         34.8 GB                 63                   |
+|   /home   0 B           0 B                      1                   |
+|   OS      0 B           0 B                     36                   |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

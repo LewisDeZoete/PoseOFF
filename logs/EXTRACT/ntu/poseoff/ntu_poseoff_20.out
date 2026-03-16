@@ -1,0 +1,50 @@
+Mon Mar  9 13:04:38 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 20
+Start index: 38000
+End index: 40000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 38000 to 40000
+	Skeleton S012C001P019R001A046 to S012C003P008R001A010
+	Frames dropped for S012C001P028R001A001: 1
+	Frames dropped for S012C001P028R001A009: 28
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C001P028R002A060: 4
+Processed 38000-38499 in 701.56 seconds
+	Frames dropped for S012C002P007R002A059: 24
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C002P007R002A060: 15
+	Frames dropped for S012C002P008R002A059: 29
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C002P008R002A060: 17
+Processed 38500-38999 in 750.42 seconds
+Processed 39000-39499 in 746.07 seconds
+	Frames dropped for S012C002P025R002A059: 22
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S012C002P028R002A060: 15
+	Frames dropped for S012C002P037R002A055: 11
+Processed 39500-39999 in 705.50 seconds
+Processed 2000 in: 2903.55 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_38k-40k.pkl
+
++------------------ Job Report: 10286858 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.2% (4.9 GB peak / 27 GB)     |
+| CPU           [#################   ] 85.4% average                   |
+| Time          [-------->           ] 40.8% (0-00:48:59 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   164 KB        0 B            41                            |
+|   /fred   4.2 GB        8.5 KB         8.3 K                         |
+|   OS      268 KB        0 B            239                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

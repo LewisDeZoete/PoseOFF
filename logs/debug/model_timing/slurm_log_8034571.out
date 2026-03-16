@@ -1,0 +1,46 @@
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 516454
+Number of trainable model params: 516454
+Timing using cuda
+Total inference time (ms): 19317.04073905945
+Average per-batch (n_samples=1000, B=64) inference time (ms): 19.317040739059447
+Average per-sample inference time (ms): 0.30182876154780386
+
+stgcn2 - cnn
+Started time stgcn2 cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 537648
+Number of trainable model params: 537648
+Timing using cuda
+Total inference time (ms): 22384.593675613403
+Average per-batch (n_samples=1000, B=64) inference time (ms): 22.384593675613402
+Average per-sample inference time (ms): 0.3497592761814594
+
+
++------------------ Job Report: 8034571 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  3.9% (598 MB peak / 15 GB)     |
+| CPU           [###############     ] 78.8% average                   |
+| GPU           [###                 ] 15.0% average                   |
+| Time          [->                  ]  8.9% (0-00:02:40 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.7 MB        0 B            39                            |
+|   /fred   4 KB          1.1 KB         1.7 K                         |
+|   /home   0 B           0 B            1                             |
+|   OS      15.6 MB       0 B            228                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,0 +1,46 @@
+msg3d - base
+Started time msg3d base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 2194476
+Timing using cuda
+Total inference time (ms): 281711.96130371094
+Average per-batch (n_samples=1000, B=64) inference time (ms): 281.71196130371095
+Average per-sample inference time (ms): 4.401749395370484
+
+msg3d - cnn
+/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/init.py:452: UserWarning: Initializing zero-element tensors is a no-op
+  warnings.warn("Initializing zero-element tensors is a no-op")
+Started time msg3d cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 2204420
+Timing using cuda
+Total inference time (ms): 284520.8754272461
+Average per-batch (n_samples=1000, B=64) inference time (ms): 284.5208754272461
+Average per-sample inference time (ms): 4.44563867855072
+
+
++------------------ Job Report: 8034491 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  4.3% (653 MB peak / 15 GB)     |
+| CPU           [##################  ] 93.6% average                   |
+| GPU           [#############       ] 67.4% average                   |
+| Time          [--------->          ] 47.4% (0-00:14:13 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   2.8 MB        0 B            29                            |
+|   /fred   40 KB         1 KB           1.7 K                         |
+|   /home   0 B           0 B            2                             |
+|   OS      0 B           0 B            221                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

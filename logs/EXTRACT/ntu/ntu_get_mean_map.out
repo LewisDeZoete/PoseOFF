@@ -1,0 +1,89 @@
+Wed Mar 11 09:32:41 AEDT 2026
+Dataset: ntu
+Evaluation: CS
+Flow embedding: cnn
+Flow type: LK
+Dilation: 5
+Data path: /var/tmp/jobfs/data/ntu_CS-poseoff_LK_D5_aligned.npz
+Copy file (where will the output of this be saved): ./data/ntu/aligned_data/poseoff/LK/ntu_CS-poseoff_LK_D5_aligned.npz
+feeder: feeders.ntu_rgb_d.Feeder
+feeder_args:
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned.npz'}
+  label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
+  p_interval: [0.5, 1]
+  random_choose: False
+  random_shift: False
+  window_size: 300
+  pad_method: replay
+  random_move: False
+  random_rot: False
+  average_flow: False
+  absolute_flow: False
+  no_flow: False
+  no_Z: False
+extractor:
+  preprocessed: True
+  pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
+  flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
+  flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
+model: models.msg3d.TEST_MODEL
+model_args:
+  num_class: 60
+  num_point: 25
+  num_person: 2
+  num_gcn_scales: 2
+  num_g3d_scales: 3
+  graph: graph.ntu_rgb_d.Graph
+  pose_channels: 3
+  flow_channels: 50
+  cnn: True
+ignore_weights: []
+phase: train
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 0.0005
+  nesterov: True
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [30, 40]
+  gamma: 0.1
+training_function: training.train_msg3d.train_network
+testing_function: training.eval_msg3d.eval_network
+num_epoch: 50
+device: 0
+batch_size: 32
+half: False
+checkpoint_freq: 10
+save_location: ./results/msg3d/ntu/
+	Loaded data using mmap mode
+	Self.data assigned
+	Self.labels assigned
+	Assigned self.data to unique split (train)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+Saved data to: ./data/ntu/aligned_data/poseoff/LK/ntu_CS-poseoff_LK_D5_aligned_mean.npz
+
++------------------ Job Report: 10353383 (COMPLETED) ------------------+
+| Memory (RAM)  [##                  ] 12.9% (2.6 GB peak / 20 GB)     |
+| CPU           [#######             ] 36.8% average                   |
+| Time          [->                  ]  8.9% (0-00:42:44 / 0-08:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   79 MB         0 B            236                           |
+|   /fred   167.6 GB      163.2 GB       14.2 K                        |
+|   /home   0 B           0 B            1                             |
+|   OS      10 MB         0 B            615                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

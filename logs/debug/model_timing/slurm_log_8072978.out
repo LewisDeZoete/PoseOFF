@@ -1,0 +1,25 @@
+Copying file: ./data/ntu/aligned_data/ntu_CS-pose_aligned.npz to /var/tmp/jobfs/data
+stgcn2 - 
+Started time stgcn2 
+./training/model_timer.py
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 99, in <module>
+    arg = ArgClass(f"./config/{model}/{dataset}/{flow_embedding}.yaml")
+  File "/fred/oz141/ldezoete/MS-G3D/config/argclass.py", line 24, in __init__
+    with open(arg, 'r') as file:
+FileNotFoundError: [Errno 2] No such file or directory: './config/stgcn2/ntu/.yaml'
+srun: error: gina13: task 0: Exited with exit code 1
+srun: Terminating StepId=8072978.0
+
+
++------------------ Job Report: 8072978 (COMPLETED) -------------------+
+| Memory (RAM)  No data available                                      |
+| CPU           [                    ]  3.7% average                   |
+| Time          [>                   ]  1.5% (0-00:00:27 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /fred   3.4 GB        0 B                      5                   |
+|   OS      0 B           0 B                      1                   |
++----------------------------------------------------------------------+

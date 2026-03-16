@@ -1,11 +1,15 @@
-Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_dilation3_aligned.npz to /var/tmp/jobfs/data
-Dataset copied to JOBFS: ntu_CS-flowpose_dilation3_aligned.npz
-Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_dilation3_aligned.npz
+Fri Nov 28 12:07:32 AEDT 2025
+Copying file: ./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz to /var/tmp/jobfs/data
+Dataset copied to JOBFS: ntu_CS-flowpose_D3_aligned.npz
+Data path: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
+Run name: infogcn2_ntu_CS_cnn_D3
 
+Python script run command arguments:
+python main.py -m infogcn2 -d ntu -p eval -f cnn -e CS -o 1.0 -r infogcn2_ntu_CS_cnn_D3 --desc infogcn2_eval ntu CS cnn observation ratio 1.0, retraining model with mean and std norm --data_path_overwrite /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz -v
 ### Libraries loaded
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
-  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_dilation3_aligned.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_dilation3_aligned.npz'}
+  data_paths: {'CS': './data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned_mean.npz', 'CV': './data/ntu/aligned_data/ntu_CV-flowpose_D3_aligned_mean.npz'}
   label_path: ./data/ntu/statistics/ntu_rgbd-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: True
@@ -16,12 +20,14 @@ feeder_args:
   average_flow: False
   absolute_flow: False
   no_flow: False
+  no_Z: False
+  normalisation: False
 extractor:
   preprocessed: True
   pose: {'weights': 'pretrained_models/yolo11x-pose.pt'}
   flow: {'weights': 'pretrained_models/raft_large.pt', 'imsize': [1080, 1920], 'minibatch_size': 3}
   flowpose: {'window_size': 5, 'threshold': 0.05, 'loop': False, 'norm': False, 'match_pose': False, 'ntu': True, 'dilation': 3}
-model: model.infogcn2.sode.SODE
+model: models.infogcn2.sode.SODE
 model_args:
   num_class: 60
   num_point: 25
@@ -44,17 +50,23 @@ model_args:
   use_mask: True
 ignore_weights: []
 phase: eval
-optim:
-  base_lr: 0.1
-  nesterov: True
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
   weight_decay: 0.0003
-  step: [50, 60]
-  gamma: 0.1
+  nesterov: True
 lambda_1: 1
 lambda_2: 0.1
 lambda_3: 0.001
 lambda_4: 0.0
 lambda_5: 0.0
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [50, 60]
+  gamma: 0.1
+training_function: training.train_infogcn.train_network
+testing_function: training.eval_infogcn.eval_network
 num_epoch: 70
 device: 0
 batch_size: 256
@@ -62,26 +74,25 @@ forward_batch_size: 128
 test_batch_size: 256
 half: False
 checkpoint_freq: 10
-save_location: ./results/ntu/
+save_location: ./results/infogcn2/ntu/
+model_type: infogcn2
 dataset: ntu
-model_type: cnn
+flow_embedding: cnn
 evaluation: CS
-run_name: ntu_CS_cnn_D3
-description: eval ntu CS cnn_D3 re-running to check that base model still performs as expected after the dilation3 extraction
-data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_dilation3_aligned.npz
+obs_ratio: 1.0
+run_name: infogcn2_ntu_CS_cnn_D3
+description: infogcn2_eval ntu CS cnn observation ratio 1.0, retraining model with mean and std norm
+data_path_overwrite: /var/tmp/jobfs/data/ntu_CS-flowpose_D3_aligned.npz
 verbose: True
+debug: False
 ### Arguments loaded
 	Output device: cuda:0
 	Temporal encoder: transformer
 	Model total number of params: 620448
-	Loading weights from ./results/ntu/CS/train/ntu_CS_cnn_D3.pt
+	Loading weights from ./results/infogcn2/ntu/CS/train/infogcn2_ntu_CS_cnn_D3.pt
 	Total number of weights removed: 0
 	Pretrained model loaded
 ### Model created
-	Loaded data using mmap mode
-	Assigned self.data to unique split (test)
-	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
-	Finished loading data!
 ### Dataloaders created
 	Tracking:
 		epoch
@@ -95,16 +106,38 @@ verbose: True
 		cls_loss
 		feature_loss
 		recon_loss
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Loaded data using mmap mode	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
 
-+------------------ Job Report: 2829674 (COMPLETED) -------------------+
-| Memory (RAM)  [################### ] 100.0% (15 GB peak / 15 GB)     |
-| CPU           [##                  ] 10.8% average                   |
-| Time          [---->               ] 20.1% (0-00:08:03 / 0-00:40:00) |
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+	Best test ACC: 88.88%
+	Test AUC: [0.7168366]
+
++------------------ Job Report: 7244964 (COMPLETED) -------------------+
+| Memory (RAM)  [##                  ] 14.8% (2.2 GB peak / 15 GB)     |
+| CPU           [##                  ] 13.5% average                   |
+| GPU           [#                   ]  9.1% average                   |
+| Time          [----->              ] 25.5% (0-00:07:39 / 0-00:30:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   No data available                                                  |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   35.5 MB       0 B                    259                   |
+|   /fred   167.7 GB      8 MB                    14                   |
+|   /home   0 B           0 B                      4                   |
+|   OS      17.1 MB       0 B                    106                   |
 |                                                                      |
 | Warnings:                                                            |
+|   - Too much memory requested                                        |
 |   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
 |   - Too much time requested                                          |
 +----------------------------------------------------------------------+

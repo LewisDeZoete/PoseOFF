@@ -1,0 +1,109 @@
+infogcn2 - base
+Started time infogcn2 base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 613747
+Timing using cuda
+Total inference time (ms): 83887.2631225586
+Average per-batch (n_samples=1000, B=64) inference time (ms): 83.8872631225586
+Average per-sample inference time (ms): 1.310738486289978
+infogcn2 - cnn
+Started time infogcn2 cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 620448
+Timing using cuda
+Total inference time (ms): 85196.69171142578
+Average per-batch (n_samples=1000, B=64) inference time (ms): 85.19669171142579
+Average per-sample inference time (ms): 1.331198307991028
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 516454
+Timing using cuda
+Total inference time (ms): 18659.894540786743
+Average per-batch (n_samples=1000, B=64) inference time (ms): 18.659894540786745
+Average per-sample inference time (ms): 0.2915608521997929
+stgcn2 - cnn
+Started time stgcn2 cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 540123
+Timing using cuda
+Total inference time (ms): 22382.637128829956
+Average per-batch (n_samples=1000, B=64) inference time (ms): 22.382637128829955
+Average per-sample inference time (ms): 0.34972870513796805
+msg3d - base
+Started time msg3d base
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 2199626
+Timing using cuda
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 110, in <module>
+    inference_time, n_samples, batch_size = time_model(
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 35, in time_model
+    y_hat, elapsed_ms = time_cuda(model, x)
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 51, in time_cuda
+    y_hat = model(x)
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/fred/oz141/ldezoete/MS-G3D/models/msg3d/msg3d.py", line 268, in forward
+    x = self.data_bn(x)
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1532, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/modules/module.py", line 1541, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/modules/batchnorm.py", line 175, in forward
+    return F.batch_norm(
+  File "/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/functional.py", line 2509, in batch_norm
+    return torch.batch_norm(
+RuntimeError: running_mean should contain 150 elements not 2650
+srun: error: gina3: task 0: Exited with exit code 1
+srun: Terminating StepId=8034351.4
+msg3d - cnn
+Started time msg3d cnn
+./training/model_timer.py
+Number of samples: 1000
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 2145221
+Timing using cuda
+Total inference time (ms): 284361.44775390625
+Average per-batch (n_samples=1000, B=64) inference time (ms): 284.36144775390625
+Average per-sample inference time (ms): 4.443147621154785
+
++------------------ Job Report: 8034351 (COMPLETED) -------------------+
+| Memory (RAM)  [#                   ]  5.0% (774 MB peak / 15 GB)     |
+| CPU           [##################  ] 93.0% average                   |
+| GPU           [#########           ] 47.7% average                   |
+| Time          [---------->         ] 53.0% (0-00:15:54 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            6                             |
+|   /fred   1.6 MB        9.3 KB         11.1 K                        |
+|   /home   0 B           0 B            6                             |
+|   OS      0 B           0 B            1.3 K                         |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

@@ -1,0 +1,39 @@
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+Number of samples: 10
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 516454
+Number of trainable model params: 516454
+Timing using cuda
+Total inference time (ms): 1407.9366970062256
+Average per-batch (n_samples=10, B=64) inference time (ms): 140.79366970062256
+Average per-sample inference time (ms): 2.1999010890722275
+
+stgcn2 - cnn
+Started time stgcn2 cnn
+./training/model_timer.py
+Number of samples: 10
+Batch size: 64
+	Output device: cuda:0
+	Model total number of params: 529323
+Number of trainable model params: 529323
+Timing using cuda
+Total inference time (ms): 478.21922874450684
+Average per-batch (n_samples=10, B=64) inference time (ms): 47.821922874450685
+Average per-sample inference time (ms): 0.747217544913292
+
+
++------------------ Job Report: 8034568 (COMPLETED) -------------------+
+| Memory (RAM)  No data available                                      |
+| CPU           [######              ] 30.8% average                   |
+| Time          [>                   ]  2.2% (0-00:00:39 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write      Total IOPS                  |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   3.7 MB        0 B                     39                   |
+|   /fred   0 B           0 B                      1                   |
+|   OS      960 KB        0 B                      7                   |
++----------------------------------------------------------------------+

@@ -1,0 +1,42 @@
+Mon Mar  9 13:04:38 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 2
+Start index: 2000
+End index: 4000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 2000 to 4000
+	Skeleton S001C003P001R002A023 to S002C002P003R001A048
+	Frames dropped for S001C003P003R002A011: 34
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S001C003P004R002A009: 25
+Processed 2000-2499 in 688.58 seconds
+Processed 2500-2999 in 649.72 seconds
+Processed 3000-3499 in 703.79 seconds
+	Frames dropped for S002C001P012R002A059: 27
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S002C001P014R001A055: 7
+Processed 3500-3999 in 688.40 seconds
+Processed 2000 in: 2730.49 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_2k-4k.pkl
+
++------------------ Job Report: 10286596 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 18.1% (4.9 GB peak / 27 GB)     |
+| CPU           [#################   ] 85.8% average                   |
+| Time          [------->            ] 38.4% (0-00:46:05 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            32                            |
+|   /fred   3.8 GB        4.1 KB         8 K                           |
+|   OS      164 KB        0 B            189                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

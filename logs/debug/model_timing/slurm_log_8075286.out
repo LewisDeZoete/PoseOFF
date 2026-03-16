@@ -1,0 +1,160 @@
+========== SLURM JOB INFO ==========
+Job ID:        8075286
+Node(s):       gina2
+Hostname:     gina2
+CPUs/node:    1
+GPUs:         
+CUDA devices: 0
+===================================
+
+CPU INFO:
+Architecture:                            x86_64
+CPU(s):                                  64
+On-line CPU(s) list:                     0-63
+Model name:                              AMD EPYC 7543 32-Core Processor
+CPU(s) scaling MHz:                      95%
+NUMA node0 CPU(s):                       0-7
+NUMA node1 CPU(s):                       8-15
+NUMA node2 CPU(s):                       16-23
+NUMA node3 CPU(s):                       24-31
+NUMA node4 CPU(s):                       32-39
+NUMA node5 CPU(s):                       40-47
+NUMA node6 CPU(s):                       48-55
+NUMA node7 CPU(s):                       56-63
+
+GPU INFO:
+name, compute_cap, memory.total [MiB]
+NVIDIA A100-SXM4-80GB, 8.0, 81920 MiB
+infogcn2 - base
+Started time infogcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 613747
+Number of trainable model params: 613747
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 3, 64, 25, 2])
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 104, in <module>
+    times = time_model(
+TypeError: time_model() got an unexpected keyword argument 'x'
+srun: error: gina2: task 0: Exited with exit code 1
+srun: Terminating StepId=8075286.0
+
+infogcn2 - cnn
+Started time infogcn2 cnn
+./training/model_timer.py
+	Output device: cuda:0
+	Temporal encoder: transformer
+	Model total number of params: 620448
+Number of trainable model params: 620448
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 53, 64, 25, 2])
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 104, in <module>
+    times = time_model(
+TypeError: time_model() got an unexpected keyword argument 'x'
+srun: error: gina2: task 0: Exited with exit code 1
+srun: Terminating StepId=8075286.1
+
+stgcn2 - base
+Started time stgcn2 base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 516454
+Number of trainable model params: 516454
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 3, 100, 25, 2])
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 104, in <module>
+    times = time_model(
+TypeError: time_model() got an unexpected keyword argument 'x'
+srun: error: gina2: task 0: Exited with exit code 1
+srun: Terminating StepId=8075286.2
+
+stgcn2 - cnn
+Started time stgcn2 cnn
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 537648
+Number of trainable model params: 537648
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 53, 100, 25, 2])
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 104, in <module>
+    times = time_model(
+TypeError: time_model() got an unexpected keyword argument 'x'
+srun: error: gina2: task 0: Exited with exit code 1
+srun: Terminating StepId=8075286.3
+
+msg3d - base
+Started time msg3d base
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 2194476
+Number of trainable model params: 2194476
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 3, 300, 25, 2])
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 104, in <module>
+    times = time_model(
+TypeError: time_model() got an unexpected keyword argument 'x'
+srun: error: gina2: task 0: Exited with exit code 1
+srun: Terminating StepId=8075286.4
+
+msg3d - cnn
+/fred/oz141/ldezoete/environment/lib64/python3.9/site-packages/torch/nn/init.py:452: UserWarning: Initializing zero-element tensors is a no-op
+  warnings.warn("Initializing zero-element tensors is a no-op")
+Started time msg3d cnn
+./training/model_timer.py
+	Output device: cuda:0
+	Model total number of params: 2204420
+Number of trainable model params: 2204420
+	Loaded data using mmap mode
+	Assigned self.data to unique split (test)
+	Using memory-mapped data - skipping NaN filtering to preserve memory efficiency
+	Finished loading data!
+X shape: torch.Size([1, 53, 300, 25, 2])
+Traceback (most recent call last):
+  File "/fred/oz141/ldezoete/MS-G3D/training/model_timer.py", line 104, in <module>
+    times = time_model(
+TypeError: time_model() got an unexpected keyword argument 'x'
+srun: error: gina2: task 0: Exited with exit code 1
+srun: Terminating StepId=8075286.5
+
+
++------------------ Job Report: 8075286 (COMPLETED) -------------------+
+| Memory (RAM)  [                    ]  0.0% (1 MB peak / 15 GB)       |
+| CPU           [#########           ] 47.9% average                   |
+| GPU           [                    ]  0.0% average                   |
+| Time          [>                   ]  3.9% (0-00:01:11 / 0-00:30:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   1.9 MB        0 B            16                            |
+|   /fred   36.3 MB       14.9 KB        5.6 K                         |
+|   /home   0 B           0 B            3                             |
+|   OS      15.6 MB       0 B            614                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - CPU usage is low                                                 |
+|   - GPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

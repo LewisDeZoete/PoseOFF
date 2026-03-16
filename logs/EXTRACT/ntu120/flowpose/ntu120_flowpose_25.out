@@ -1,36 +1,16 @@
 SLURM_ARRAY_TASK_ID: 25
 Start index: 48000
 End index: 50000
-Extracting flowpose samples for ntu120dataset with dilation 1...
-Found 57367 available skeleton files.
 
-Processing flowpose samples for ntu120 dataset...
-	Index 48000 to 50000
-	Skeleton S030C003P096R002A079 to S031C002P006R001A098
-Processed 48000-48499 in 6239.08 seconds
-	Frames dropped for S031C001P067R002A069: 6
-Processed 48500-48999 in 5584.76 seconds
-Processed 49000-49499 in 5864.95 seconds
-	Frames dropped for S031C001P101R001A092: 23
-Processed 49500-49999 in 5550.51 seconds
-Flowpose samples for ntu120 dataset generated successfully!
-Data saved to ./data/ntu120/flow_data/export_tmp
-
-+------------------ Job Report: 4362568 (COMPLETED) -------------------+
-| Memory (RAM)  [##########          ] 54.7% (14.8 GB peak / 27 GB)    |
-| CPU           [################    ] 83.1% average                   |
-| GPU           [#############       ] 66.1% average                   |
-| Time          [--------->          ] 46.6% (0-06:31:11 / 0-14:00:00) |
++-------------------- Job Report: 9845793 (FAILED) --------------------+
+| Memory (RAM)  No data available                                      |
+| CPU           [                    ]  2.6% average                   |
+| Time          [>                   ]  1.1% (0-00:00:39 / 0-01:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
+|   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   148.4 MB      0 B            25                            |
-|   /fred   6.9 GB        1.5 KB         9.1 K                         |
-|   /home   0 B           0 B            2                             |
-|   OS      1.8 MB        0 B            364                           |
-|                                                                      |
-| Warnings:                                                            |
-|   - GPU usage is low                                                 |
-|   - Too much time requested                                          |
+|   /apps   996 KB        0 B                     24                   |
+|   /fred   696 KB        24 B                   950                   |
+|   OS      44 KB         0 B                    152                   |
 +----------------------------------------------------------------------+

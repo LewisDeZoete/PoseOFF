@@ -1,4 +1,6 @@
+Dataset: ntu
 Dilation: 1
+Flow type: LK
 Dataset: ntu
 Splitting dataset
 Processing optical flow data
@@ -11,15 +13,16 @@ Processing optical flow data
 		Test indices length: 18932
 	Total skes names: 56578
 
-	Loaded 56578 skeleton         sequences and 56578 flow sequences
+	Loaded 56578 skeleton sequences and 56578 flow sequences
 	Full flow sequence shape: (56578, 300, 2500)
 	Full skeleton sequence shape: (56578, 300, 150)
-	Full flowpose sequence shape: (56578, 300, 2650)
-	Flowpose approximate size: 0.00 GB
+	Full poseoff sequence shape: (56578, 300, 2650)
+	Pose only approximate size: 10.18 GB
+	Poseoff approximate size: 0.00 GB
 	Saved pose CS
-	Saved flowpose CS
+	Saved poseoff CS
 	Saved pose CV
-	Saved flowpose CV
+	Saved poseoff CV
 Dataset: ntu
 Processing optical flow data
 
@@ -31,25 +34,25 @@ Processing optical flow data
 		Test indices length: 18932
 	Total skes names: 56578
 
-['./data/ntu/aligned_data/ntu_CS-pose.npz', './data/ntu/aligned_data/ntu_CV-pose.npz', './data/ntu/aligned_data/ntu_CS-flowpose_D1.npz', './data/ntu/aligned_data/ntu_CV-flowpose_D1.npz']
-		Aligned ./data/ntu/aligned_data/ntu_CS-pose.npz
-		Aligned ./data/ntu/aligned_data/ntu_CV-pose.npz
-		Aligned ./data/ntu/aligned_data/ntu_CS-flowpose_D1.npz
-		Aligned ./data/ntu/aligned_data/ntu_CV-flowpose_D1.npz
+['./data/ntu/aligned_data/pose/ntu_CS-pose.npz', './data/ntu/aligned_data/pose/ntu_CV-pose.npz', './data/ntu/aligned_data/poseoff/LK/ntu_CS-poseoff_LK_D1.npz', './data/ntu/aligned_data/poseoff/LK/ntu_CV-poseoff_LK_D1.npz']
+		Aligned ./data/ntu/aligned_data/pose/ntu_CS-pose.npz in  163.47 seconds
+		Aligned ./data/ntu/aligned_data/pose/ntu_CV-pose.npz in  162.35 seconds
+		Aligned ./data/ntu/aligned_data/poseoff/LK/ntu_CS-poseoff_LK_D1.npz in  1044.48 seconds
+		Aligned ./data/ntu/aligned_data/poseoff/LK/ntu_CV-poseoff_LK_D1.npz in  2649.99 seconds
 	Aligned datasets created successfully!
+		Mean and standard deviation maps took  11.51 seconds
 
-+------------------ Job Report: 4324432 (COMPLETED) -------------------+
-| Memory (RAM)  [##########          ] 51.0% (407.9 GB peak / 800 GB)  |
-| CPU           [                    ]  4.6% average                   |
-| Time          [---->               ] 20.4% (0-00:48:56 / 0-04:00:00) |
++------------------- Job Report: 10456428 (FAILED) --------------------+
+| Memory (RAM)  [##########          ] 50.2% (401.8 GB peak / 800 GB)  |
+| CPU           [                    ]  2.7% average                   |
+| Time          [------->            ] 36.6% (0-01:27:56 / 0-04:00:00) |
 |                                                                      |
 | Lustre Filesystem:                                                   |
-|   Path    Total Read    Total Write    Total IOPS                    |
+|   Path    Total Read    Total Write      Total IOPS                  |
 |   ------  ------------  -------------  ------------                  |
-|   /apps   1.6 MB        0 B            240                           |
-|   /fred   569.4 GB      851.8 GB       2.4 K                         |
-|   /home   0 B           0 B            3                             |
-|   OS      2 MB          0 B            367                           |
+|   /apps   451.2 MB      0 B                    361                   |
+|   /fred   676.9 GB      872.2 GB               841                   |
+|   OS      0 B           0 B                     28                   |
 |                                                                      |
 | Warnings:                                                            |
 |   - CPU usage is low                                                 |

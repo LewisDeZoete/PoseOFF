@@ -1,0 +1,54 @@
+Mon Mar  9 13:04:39 AEDT 2026
+Extracting LK flow
+SLURM_ARRAY_TASK_ID: 16
+Start index: 30000
+End index: 32000
+Extracting flowpose samples for ntudataset with dilation 5...
+Found 56578 available skeleton files.
+
+Processing flowpose samples for ntu dataset...
+	Index 30000 to 32000
+	Skeleton S010C001P021R001A058 to S010C003P017R001A026
+	Frames dropped for S010C001P021R002A055: 21
+	Frames dropped for S010C002P007R002A014: 62
+	Frames dropped for S010C002P008R002A059: 31
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C002P008R002A060: 3
+Processed 30000-30499 in 1390.25 seconds
+	Frames dropped for S010C002P017R001A039: 28
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C002P017R001A060: 32
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C002P018R001A055: 24
+Processed 30500-30999 in 950.61 seconds
+	Frames dropped for S010C002P021R002A055: 8
+	Frames dropped for S010C002P025R001A060: 10
+Processed 31000-31499 in 972.42 seconds
+	Frames dropped for S010C003P008R001A016: 10
+	Frames dropped for S010C003P008R001A059: 50
+		Frame 0 in skip list, add blank frame to poses
+	Frames dropped for S010C003P008R001A060: 1
+	Frames dropped for S010C003P008R002A059: 40
+		Frame 0 in skip list, add blank frame to poses
+Processed 31500-31999 in 799.45 seconds
+Processed 2000 in: 4112.74 seconds
+Flowpose samples for ntu dataset generated successfully!
+Data saved to ./data/ntu/flow_data/export_tmp
+Full filename path: ./data/ntu/flow_data/export_tmp/flow_30k-32k.pkl
+
++------------------ Job Report: 10286854 (COMPLETED) ------------------+
+| Memory (RAM)  [###                 ] 19.5% (5.3 GB peak / 27 GB)     |
+| CPU           [###############     ] 76.6% average                   |
+| Time          [----------->        ] 57.6% (0-01:09:07 / 0-02:00:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            35                            |
+|   /fred   6.7 GB        11.6 KB        8.1 K                         |
+|   OS      192 KB        0 B            166                           |
+|                                                                      |
+| Warnings:                                                            |
+|   - Too much memory requested                                        |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+

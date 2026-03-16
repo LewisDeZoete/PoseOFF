@@ -58,3 +58,20 @@ Processed: 97.21% (55000 / 56578), Missing count: 137
 Processed: 98.98% (56000 / 56578), Missing count: 138
 Saved raw denoised positions of 4772570 frames into ./data/ntu/denoised_data/raw_denoised_joints.pkl
 Found 138 files that have missing data
+
++------------------ Job Report: 9903172 (COMPLETED) -------------------+
+| Memory (RAM)  [##########          ] 52.2% (5.2 GB peak / 10 GB)     |
+| CPU           [#                   ]  5.3% average                   |
+| Time          [----->              ] 26.7% (0-00:05:20 / 0-00:20:00) |
+|                                                                      |
+| Lustre Filesystem:                                                   |
+|   Path    Total Read    Total Write    Total IOPS                    |
+|   ------  ------------  -------------  ------------                  |
+|   /apps   0 B           0 B            1                             |
+|   /fred   2.6 GB        2.9 MB         65.1 K                        |
+|   OS      0 B           0 B            87                            |
+|                                                                      |
+| Warnings:                                                            |
+|   - CPU usage is low                                                 |
+|   - Too much time requested                                          |
++----------------------------------------------------------------------+
