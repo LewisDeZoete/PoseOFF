@@ -19,6 +19,9 @@ Model Zoo - weights for each of the above model backbones trained on the dataset
 
 **Before you begin**, if you plan to retrain models using the datasets mentioned above, you should get in touch with the team that maintains the NTU RGB+D/120 datasets to apply for access to the datasets. This can be done by following [this link](https://rose1.ntu.edu.sg/dataset/actionRecognition/), scrolling all the way to the bottom of the page and creating an account in order to apply for access to the data. You will only need the skeleton and RGB data - but be warned, they are very large! If you have access to space on a supercomputer, clone this repo there and put there!
 
+# Demo
+[Follow this link to demo repo for the PoseOFF extraction pipeline](https://github.com/LewisDeZoete/PoseOFF_demo). This demo has been tested on low-power hardware using just a laptop webcam.
+
 # How Does PoseOFF Work?
 ## The extraction pipeline
 The PoseOFF extraction pipeline involves strategically sampling windows of optical flow surrounding human pose keypoints in image space. The figure below provides a high-level overview of how the extraction pipeline functions.
