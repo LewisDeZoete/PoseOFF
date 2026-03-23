@@ -494,7 +494,7 @@ if __name__ == "__main__":
 
     logger.debug(f"Valid crop resize shape: {data_valid_crop.shape}")
 
-    # data = np.load("data/UCF-101/flowpose/Archery/v_Archery_g01_c01.npy")
+    # data = np.load("data/UCF-101/poseoff/Archery/v_Archery_g01_c01.npy")
     # C, T, V, M = data.shape
     # print("(Channels, Time, Joints, Bodies)")
     # print(f"Original shape: {data.shape}")

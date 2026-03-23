@@ -105,7 +105,7 @@ def extract_data(
         arg: Argument object containing feeder arguments and data paths.
         process_number (int): The process number for parallel processing.
         transforms: A function or callable that applies transformations to the data.
-        modality (str): The type of data to process ('flowpose' or other).
+        modality (str): The type of data to process ('poseoff' or other).
         save_as_numpy (bool, optional): Whether to save the processed data as a numpy file. Defaults to True.
         debug (bool, optional): Whether to enable debug mode. Defaults to False.
     Returns:
@@ -119,7 +119,7 @@ def extract_data(
     print("\tTotal videos:", len(video_names))
 
     for video_name in video_names:
-        if modality == "flowpose":
+        if modality == "poseoff":
             poses = np.load(
                 f"{arg.extractor['data_paths']['pose_path']}/{class_name}/{video_name}.npy"
             )

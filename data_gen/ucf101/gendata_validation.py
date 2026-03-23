@@ -23,7 +23,7 @@ for key in annotations.keys():
 
 
 # Now loop over all the modalitys (may as well do this for all modalitys every time)
-incomplete = {'flow': [], 'pose': [], 'flowpose': []}
+incomplete = {'flow': [], 'pose': [], 'poseoff': []}
 for class_name, val in count_dict_ann.items():
     for modality in incomplete.keys():
         if len(os.listdir(f"./data/ucf101/{modality}/{class_name}")) < val:
@@ -41,12 +41,12 @@ for modality, num_incomplete_classes in incomplete.items():
         complete = False
 
 # Count the number of samples removed
-flowpose_path = arg.extractor['data_paths']['flowpose_path']
+poseoff_path = arg.extractor['data_paths']['poseoff_path']
 zero_samples=0
-# Loop through flowpose files and determine which are all zeros
-for class_name in os.listdir(flowpose_path):
-    for sample_name in os.listdir(osp.join(flowpose_path, class_name)):
-        sample_path = osp.join(flowpose_path, class_name, sample_name)
+# Loop through poseoff files and determine which are all zeros
+for class_name in os.listdir(poseoff_path):
+    for sample_name in os.listdir(osp.join(poseoff_path, class_name)):
+        sample_path = osp.join(poseoff_path, class_name, sample_name)
         sample = np.load(sample_path)
         # If video contains all zeros...
         if not sample.any():

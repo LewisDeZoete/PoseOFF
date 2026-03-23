@@ -15,8 +15,8 @@ if [ -z "$SLURM_ARRAY_TASK_ID" ]; then
   exit 1
 fi
 
-# The parameter ${dilation} is only used for flowpose extraction
-if [[ ${modality} = "flowpose" ]]; then
+# The parameter ${dilation} is only used for poseoff extraction
+if [[ ${modality} = "poseoff" ]]; then
   # Main job for each array task
   srun python ./data_gen/ucf101/gendata/${modality}_gendata.py -n $SLURM_ARRAY_TASK_ID --dilation $dilation
 else

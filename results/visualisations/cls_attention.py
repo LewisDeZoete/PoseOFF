@@ -21,6 +21,7 @@ from einops import rearrange
 
 dataset = 'ntu120'  # ntu, ntu120, ucf101
 model_type = 'base' # base, abs, avg, cnn
+flow_type = 'RAFT' # RAFT, LK, norm
 evaluation = 'CSub'  # CS/CV, CSub/CSet, 1/2/3
 dilation = 3
 modifier = f"D{dilation}" # for loading checkpoint (can be "SA-GC")
@@ -46,7 +47,7 @@ cls_loss = LabelSmoothingCrossEntropy(T=arg.model_args["T"])
 arg.feeder_args['eval'] = evaluation
 arg.feeder_args['use_mmap'] = True
 arg.feeder_args['data_paths'][evaluation]=\
-    f"data/{dataset}/aligned_data/{dataset}_{evaluation}-flowpose_D{dilation}_aligned.npz" \
+    f"data/{dataset}/aligned_data/{flow_type}/{dataset}_{evaluation}-poseoff_{flow_type}_D{dilation}_aligned.npz" \
     if model_type != 'base' else \
     f"data/{dataset}/aligned_data/{dataset}_{evaluation}-pose_aligned.npz"
 arg.feeder_args['random_choose']=False

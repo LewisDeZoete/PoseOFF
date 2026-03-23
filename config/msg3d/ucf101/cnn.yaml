@@ -23,14 +23,14 @@ extractor:
     rgb_path: ../Datasets/UCF-101/
     pose_path: ./data/ucf101/pose/
     flow_path: ./data/ucf101/flow/
-    flowpose_path: ./data/ucf101/flowpose/
+    poseoff_path: ./data/ucf101/poseoff/
   pose:
     weights: pretrained_models/yolo11x-pose.pt
   flow:
     weights: pretrained_models/raft_large.pt
     imsize: [240,320]
     minibatch_size: 16
-  flowpose:
+  poseoff:
     window_size: 5
     threshold: 0.05
     loop: False

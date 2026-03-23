@@ -182,7 +182,7 @@ class GetFlow:
         return total_ms
 
 
-class FlowPoseSampler:
+class PoseOFFSampler:
     """
     A class to sample optical flow in windows surrounding pose keypoints.
     Attributes:
@@ -313,7 +313,7 @@ class FlowPoseSampler:
         return flow_pose
 
 
-class FlowPoseSampler_LK(FlowPoseSampler):
+class PoseOFFSampler_LK(PoseOFFSampler):
     def __init__(self, *args, lk_winSize=(15, 15), lk_maxLevel=2, **kwargs):
         super().__init__(*args, **kwargs)
         self.lk_params = {
@@ -329,14 +329,14 @@ class FlowPoseSampler_LK(FlowPoseSampler):
         goodFeaturesToTrack returns list of length `max_corners`, of shape: [max_corners, 1, 2].
         For each corner, you can simply ravel to flatten the array and get (x,y) positions.
         NOTE: The raw poses (from denoised_skes_data) are of shape: (T, M, V, C)
-            In the get_flowpose_samples.py loop, we reshape (poses = poses.transpose(3, 0, 2, 1)) -> (C, T, V, M)
+            In the get_poseoff_samples.py loop, we reshape (poses = poses.transpose(3, 0, 2, 1)) -> (C, T, V, M)
 
         Args:
             video (torch.Tensor): Tensor of shape (n_frames, channels, height, width)
             poses (torch.Tensor): Pose keypoint tensor of shape (C, T, V, M)
 
         Returns:
-            flowpose_aray: Array containing only the flow windows?? of shape:
+            poseoff_aray: Array containing only the flow windows?? of shape:
                 (C*window_size**2, num_pose_frames, total_keypoints)
         '''
         # OpenCV expects numpy arrays...
@@ -467,13 +467,13 @@ def flow_normal(video, alpha=1):
 
 
 
-def flowpose_lk(video, poses, window_size=3, ntu=False, dilation=1, debug_frame=None):
+def poseoff_lk(video, poses, window_size=3, ntu=False, dilation=1, debug_frame=None):
     '''Using the LK method of optical flow calculation...
     CV implementation: https://docs.opencv.org/3.4/d4/dee/tutorial_optical_flow.html
     goodFeaturesToTrack returns list of length `max_corners`, of shape: [max_corners, 1, 2].
     For each corner, you can simply ravel to flatten the array and get (x,y) positions.
     NOTE: The raw poses (from denoised_skes_data) are of shape: (T, M, V, C)
-        In the get_flowpose_samples.py loop, we reshape (poses = poses.transpose(3, 0, 2, 1)) -> (C, T, V, M)
+        In the get_poseoff_samples.py loop, we reshape (poses = poses.transpose(3, 0, 2, 1)) -> (C, T, V, M)
 
     Args:
         video (torch.Tensor): Tensor of shape (n_frames, channels, height, width)
@@ -482,10 +482,10 @@ def flowpose_lk(video, poses, window_size=3, ntu=False, dilation=1, debug_frame=
         ntu (bool): Whether the pose keypoints are from NTU dataset. Default is False.
         dilation (int): The dilation factor for sampling points around keypoints. Default is 1.
         debug_frame (None/int): Optionally return the frame_number, the frame itself and
-            the current state of the flowpose array. Default is None.
+            the current state of the poseoff array. Default is None.
 
     Returns:
-        flowpose_aray: Array containing only the flow windows?? of shape:
+        poseoff_aray: Array containing only the flow windows?? of shape:
             (C*window_size**2, num_pose_frames, total_keypoints)
     '''
     lk_params = {
@@ -673,7 +673,7 @@ if __name__ == '__main__':
     transform_arg = arg.extractor
     # Change the dilation factor for testing
     dilation = 1
-    transform_arg['flowpose']['dilation'] = dilation
+    transform_arg['poseoff']['dilation'] = dilation
 
     data_root = "./data/visualisations/RAW"
     sample_name = "S019C001P051R001A113"
@@ -697,11 +697,11 @@ if __name__ == '__main__':
     # print(f"Normal flows shape: {norm_flows.shape}")
 
 
-    FPS = FlowPoseSampler_LK(**transform_arg['flowpose'])
-    print(vars(FPS))
+    poseOFFSampler = PoseOFFSampler_LK(**transform_arg['poseoff'])
+    print(vars(poseOFFSampler))
     poseoff = FPS(rgb, poses)
     print(f"PoseOFF features shape: {poseoff.shape}")
 
-    frame = draw_poseoff(rgb[debug_frame_num], poseoff, pose, window_size=transform_arg['flowpose']['window_size'])
+    frame = draw_poseoff(rgb[debug_frame_num], poseoff, pose, window_size=transform_arg['poseoff']['window_size'])
     print(f"Poseoff frame shape: {frame.shape}")
     cv.imwrite("./TMP.png", frame)

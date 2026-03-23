@@ -95,7 +95,7 @@ case $dataset in
         fi
         case $flow_embedding in
             "base")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-pose_aligned.npz"
+                export copy_file="./data/ntu120/aligned_data/pose/ntu120_${evaluation}-pose_aligned.npz"
                 if [ $model == "msg3d" ]; then
                     time=15:00:00
                     mem=50GB
@@ -105,18 +105,18 @@ case $dataset in
                 fi
                 tmp=30GB
                 if [[ $evaluation == "CSet" ]]; then
-                    export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D3_aligned.npz"
+                    export copy_file="./data/ntu120/aligned_data/poseoff/${flow_type}/ntu120_${evaluation}-poseoff_${flow_type}_D${dilation}_aligned.npz"
                     time=15:00:00
                     tmp=400GB
                 fi
                 ;;
             "abs" | "avg")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned.npz"
+                export copy_file="./data/ntu120/aligned_data/${flow_type}/ntu120_${evaluation}-poseoff_${flow_type}_D${dilation}_aligned.npz"
                 time=21:00:00
                 mem=17GB
                 tmp=400GB;;
             "cnn")
-                export copy_file="./data/ntu120/aligned_data/ntu120_${evaluation}-flowpose_D${dilation}_aligned.npz"
+                export copy_file="./data/ntu120/aligned_data/${flow_type}/ntu120_${evaluation}-poseoff_${flow_type}_D${dilation}_aligned.npz"
                 time=24:00:00
                 mem=35GB
                 tmp=400GB;;

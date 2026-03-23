@@ -16,7 +16,7 @@ class Feeder(Dataset):
     in naming (eg. HandstandPushups -> HandStandPushups, HandstandWalking etc.)
 
     Attributes:
-        data_path (str): Path to flowpose data.
+        data_path (str): Path to poseoff data.
         eval (int): evaluation benchmark split (ucf101 comes with 3, labeeled 1,2 & 3)
         label_path (str): Path to the label file.
         labels (dict): Dictionary containing the labels of the dataset.
@@ -220,7 +220,7 @@ class Feeder(Dataset):
             data_numpy = tools.random_move(
                 data_numpy, transform_candidate=[-0.1, -0.05, 0.0, 0.05, 0.1]
             )
-        # if self.random_rot: TODO: Fix and test for flowpose data
+        # if self.random_rot: TODO: Fix and test for poseoff data
         #     data_numpy = tools.random_rot(data_numpy)
         if self.average_flow:
             data_numpy = tools.average_flow(data_numpy)
@@ -241,14 +241,13 @@ class Feeder(Dataset):
 
 
 if __name__ == "__main__":
-    from config.argclass import ArgClass
-    import time
     import math
-    from torch.utils.data import DataLoader
     import logging
     import argparse
     import os.path as osp
     from einops import rearrange
+    from config.argclass import ArgClass
+    from torch.utils.data import DataLoader
 
     # Create logger
     logger = logging.getLogger(__name__)
@@ -262,16 +261,34 @@ if __name__ == "__main__":
     # Argparser to test data moved to the slurm jobfs directory
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "-m",
+        dest="model_type",
+        default="infogcn2",
+        help="Base model type ['infogcn2', 'msg3d', 'stgcn2'] (default=infogcn2)"
+    )
+    parser.add_argument(
+        "-d",
+        dest="dataset",
+        default="ucf101",
+        help="Config dataset, for this file it must be 'ucf101' (default=ucf101)",
+    )
+    parser.add_argument(
         "-f",
         dest="flow_embedding",
         default="base",
-        help="Flow embedding, either base or cnn (default=base)"
+        help="Optical flow embedding method [base, cnn, avg, abs] (default=base)"
     )
     parser.add_argument(
         "-e",
         dest="evaluation",
-        default="1",
-        help="Evaluation"
+        help="Evaluation benchmark used for specific dataset \
+            (eg. 1-3 for ucf101, CV/CS for NTU_RGB+D)"
+    )
+    parser.add_argument(
+        "-o",
+        dest="obs_ratio",
+        default="1.0",
+        help="Observation ratio, used for training or evaluation."
     )
     parser.add_argument(
         "--debug", help="Use to debug, only take first 100 samples",
@@ -279,75 +296,78 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--data_path_overwrite", help="Overwrite dataset path.\
-        This overwrites `config['data_paths'][arg.evaluation]` completely (must be a file)."
+        This overwrites `config['data_paths'][arg.evaluation]` completely (must be path to a file)."
     )
     parsed = parser.parse_args()
 
-    assert int(parsed.evaluation) in [1, 2, 3]
-    assert parsed.flow_embedding in ['base', 'cnn']
+    assert parsed.model_type in ['infogcn2', 'msg3d', 'stgcn2']
+    assert parsed.dataset == "ucf101"
+    assert parsed.evaluation in ['1', '2', '3']
 
-    # CHANGE THIS TO TEST DIFFERENT EMBEDDING CONFIGS
-    model_type = "infogcn2"
-    evaluation = int(parsed.evaluation)
-    flow_embedding = parsed.flow_embedding
-
-
-    arg = ArgClass(f"config/{model_type}/ucf101/{flow_embedding}.yaml", verbose=True)
-    arg.feeder_args['eval'] = evaluation
-    # arg.feeder_args['normalisation'] = False
-    # arg.feeder_args['data_paths'][parsed.evaluation] = \
-    #     arg.feeder_args['data_paths'][parsed.evaluation].replace("_mean", "")
+    # Pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
+    # `with open(f'./config/{arg.model_type}/{arg.config}/{arg.flow_embedding}.yaml', 'r')...`
+    arg = ArgClass(arg=parsed)
+    print(arg.feeder_args['data_paths'])
 
     # Pass root path for the dataset objects
     if parsed.data_path_overwrite is not None:
         arg.feeder_args['use_mmap'] = True
         arg.feeder_args['data_paths'][parsed.evaluation] = parsed.data_path_overwrite
 
-    logger.debug(f"Feeder testing for UCF-101")
-    logger.debug(f"\tFlow embedding: {flow_embedding}")
-    logger.debug(f"\tEvaluation: {evaluation}")
-    logger.debug(f"\tData path: {arg.feeder_args['data_paths'][evaluation]}")
+    # Parse the observation ratio
+    if arg.obs_ratio != "1.0":
+        arg.feeder_args['obs_ratio'] = float(arg.obs_ratio)
 
-    # Create the dataset objects
-    train_feeder = Feeder(
+    logger.debug(f"Feeder testing for UCF-101")
+    logger.debug(f"\tFlow embedding: {arg.flow_embedding}")
+    logger.debug(f"\tEvaluation: {arg.evaluation}")
+    logger.debug(f"\tData path: {arg.feeder_args['data_paths'][int(arg.evaluation)]}")
+
+    # Create the datasets and dataloaders objects
+    train_dataset = Feeder(
         **arg.feeder_args,
+        eval=arg.evaluation,
         split="train",
         debug=parsed.debug
     )
-    logger.debug(f"\tTrain feeder length: {len(train_feeder)}")
-    test_feeder = Feeder(
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=arg.batch_size,
+        num_workers=1,
+        shuffle=False,
+        pin_memory=True
+    )
+    logger.debug(f"\tTrain feeder length: {len(train_dataset)}")
+    test_dataset = Feeder(
         **arg.feeder_args,
+        eval=arg.evaluation,
         split="test",
         debug=parsed.debug)
-    logger.debug(f"\tTest feeder length: {len(test_feeder)}")
+    test_dataloader = DataLoader(
+        test_dataset,
+        batch_size=arg.batch_size,
+        num_workers=1,
+        shuffle=False,
+        pin_memory=True
+    )
+    logger.debug(f"\tTest feeder length: {len(test_dataset)}")
 
     # Calculate the number of iterations per epoch (used for cosine annealing)
-    cal_epoch_iters = math.ceil(len(train_feeder) / arg.batch_size)
-    logger.debug(f"Calculated epoch iters: {cal_epoch_iters}")
+    total_scheduler_iters = math.ceil(arg.num_epoch * ((len(train_dataset)) / arg.batch_size))
+    logger.debug(f"Calculated number of iteractions per epoch (used for consine annealing): \
+    {total_scheduler_iters}")
 
     # Log the overall shape of data in one of the feeders...
-    logger.debug(f"Full data shape: {train_feeder.data.shape}")
-
-    # Create a dataloaders
-    train_dataloader = DataLoader(train_feeder,
-                            batch_size=arg.batch_size,
-                            num_workers=1,
-                            shuffle=False,
-                            pin_memory=True)
-    test_dataloader = DataLoader(test_feeder,
-                            batch_size=arg.batch_size,
-                            num_workers=1,
-                            shuffle=False,
-                            pin_memory=True)
+    logger.debug(f"Full data shape: {train_dataset.data.shape}")
 
     # This is to log the number of samples of each class (checking for class imbalance)
-    debug_labels = {'train': [0 for i in range(101)], 'test': [0 for i in range(101)]}
+    debug_labels = {'train': [0 for i in range(120)], 'test': [0 for i in range(120)]}
     debug_means = {
         'train': {'total_count': 0},
         'test': {'total_count': 0}
     }
 
-    C = 3 if flow_embedding=='base' else 53
+    C = 3 if arg.flow_embedding=='base' else 53
     V = 17
 
     # iterate over the train dataloader
@@ -375,3 +395,4 @@ if __name__ == "__main__":
 
     logger.debug(f"train labels: {debug_labels['train']}")
     logger.debug(f"test labels: {debug_labels['test']}")
+    logger.debug("NOTE: The above labels track the number of instances per-class...")

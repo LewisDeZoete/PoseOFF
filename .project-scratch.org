@@ -23,10 +23,42 @@
   - [X] Normal flow
   - [X] LK flow
     - This method requires flow window sampling natively (to select the points...)
-- [ ] Code tidying
-  - [ ] Change all instances of flowpose to PoseOFF/poseoff
-  - _Find the files that need changing using:_
-    - git grep --name-only flowpose -- ':!*.out'
+- [-] Code tidying
+  - [ ] Clean up data_vis.py
+  - [-] Change all instances of flowpose to PoseOFF/poseoff
+    Find the files that need changing using:
+    #+begin_src bash :results output
+    search_string="flowpose"
+    # Just tell me the file name!
+    git grep -l $search_string -- ':!./logs/*'
+    # Tell me how many files there are that need changing
+    echo -e "\nThere are $(git grep -l $search_string -- ':!./logs/*' | wc -l) files containing '${search_string}'"
+    #+end_src
+
+    #+RESULTS:
+    : .project-scratch.org
+    : data_gen/ucla/ucla_gendata.sh
+    :
+    : There are 2 files containing 'flowpose'
+
+    - [ ] data/visualisations/*
+    - [-] data_gen files (Once these are done, change the configs!)
+      - [X] ntu
+      - [ ] ntu120
+      - [ ] ucf101
+- [ ] Code tests
+  - [ ] data_gen/ucf101/extractors/extract.sh
+  - [ ] data_gen/ucf101/gendata/flowpose_gendata.py
+  - [ ] data_gen/ucf101/gendata_validation.py
+  - [ ] data_gen/ucf101/seq_transformation.py
+  - [ ] data_gen/ucf101/ucf101_gendata.sh
+  - [ ] data_gen/ucla/ucla_gendata.sh
+  - [ ] data_gen/utils/extract_utils.py
+  - [ ] feeders/mem_test.sh
+  - [ ] results/visualisations/cls_attention.py
+  - [ ] run.sh
+  - [ ] training/tester.sh
+  - [ ] training/train_infogcn.py
 
 * Data generation
 - [ ] Move mean and standard deviation map calculations to the data_gen

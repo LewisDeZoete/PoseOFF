@@ -20,13 +20,14 @@ mkdir $JOBFS/data
 
 dataset="ntu120"
 flow_embedding="cnn"
+flow_type="RAFT" # RAFT/LK
 evaluation="CSet"
 
 # Define file name (may need to change this depending on the dataset)
 if [ $flow_embedding == "base" ]; then
-    filename=${dataset}_${evaluation}-pose_aligned.npz
+    filename=pose/${dataset}_${evaluation}-pose_aligned.npz
 else
-    filename=${dataset}_${evaluation}-flowpose_D3_aligned.npz
+    filename=poseoff/${flow_type}/${dataset}_${evaluation}-poseoff_${flow_type}_D3_aligned.npz
 fi
 
 # Path to file to copy

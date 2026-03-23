@@ -4,15 +4,17 @@ EXAMPLE:
 srun --time=0:05:00 --gres=gpu:1 --mem-per-cpu=16G \
 python data/visualisations/get_flow_samples.py --dataset ntu --sample_name S001C001P001R001A055
 
+# --------------------------------------
 sss is the setup number
 ccc is the camera ID
 ppp is the performer (subject) ID
 rrr is the replication number (1 or 2)
 aaa is the action class label.
+# --------------------------------------
 '''
 
 from config.argclass import ArgClass
-from data_gen.utils import LoadVideo, GetFlow, FlowPoseSampler
+from data_gen.utils import LoadVideo, GetFlow, PoseOFFSampler
 import numpy as np
 import torch
 from torchvision.models.optical_flow import raft_large
@@ -86,12 +88,12 @@ flow_transforms = v2.Compose([
     GetFlow(model=model, device=device, minibatch_size=transform_args['flow']['minibatch_size'])
     # GetFlow(model=model, device=device, minibatch_size=2) # For non-resized videos
     ])
-transform_args['flowpose']['norm'] = False
-transform_args['flowpose']['match_pose'] = False
-transform_args['flowpose']['ntu'] = True
+transform_args['poseoff']['norm'] = False
+transform_args['poseoff']['match_pose'] = False
+transform_args['poseoff']['ntu'] = True
 
-# Create the FlowPoseSampler transform object
-flowPoseTransform = FlowPoseSampler(**transform_args['flowpose'])
+# Create the PoseOFFSampler transform object
+poseOFFTransform = PoseOFFSampler(**transform_args['poseoff'])
 
 # Load the names of the skeleton files
 dataset_extn = '' if dataset == 'ntu' else '120'
@@ -116,7 +118,7 @@ with open(pose_denoised_path, 'rb') as f:
 pose_data = poses[ske_number]
 rgb_data = rgb_transforms(video_path).to(device)
 flow_data = flow_transforms(rgb_data)
-flowpose_data = flowPoseTransform(flow_data, pose_data.copy().transpose(3,0,2,1)) 
+poseoff_data = poseOFFTransform(flow_data, pose_data.copy().transpose(3,0,2,1))
 
 if not parsed.debug:
     save_path = osp.join(out_path, f"{sample_name}.npz")
@@ -125,6 +127,6 @@ if not parsed.debug:
         pose=pose_data,
         rgb=rgb_data.to('cpu').numpy(),
         flow=flow_data.to('cpu').numpy(),
-        flowpose=flowpose_data
+        poseoff=poseoff_data
         )
     print(f"Saved: {save_path}")

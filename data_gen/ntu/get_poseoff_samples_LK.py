@@ -1,6 +1,6 @@
 import os
 import os.path as osp
-from data_gen.utils import LoadVideo, FlowPoseSampler_LK
+from data_gen.utils import LoadVideo, PoseOFFSampler_LK
 from config.argclass import ArgClass
 import torch
 import torchvision.transforms.v2 as v2
@@ -57,9 +57,9 @@ print(f'End index: {idx_end}')
 arg = ArgClass(arg=f"./config/infogcn2/ntu{'120' if dataset == 'ntu120' else ''}/cnn.yaml")
 transform_args = arg.extractor
 if args.dilation: # If a commandline argument is passed, overwrite the yaml config
-    transform_args['flowpose']['dilation'] = args.dilation
-print(f"Extracting flowpose samples for {dataset}"
-      f"dataset with dilation {transform_args['flowpose']['dilation']}...")
+    transform_args['poseoff']['dilation'] = args.dilation
+print(f"Extracting PoseOFF samples for {dataset}"
+      f"dataset with dilation {transform_args['poseoff']['dilation']}...")
 
 
 # Create the extractor class
@@ -71,12 +71,12 @@ transforms = v2.Compose([
     # v2.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5]),  # map [0, 1] into [-1, 1]
     ])
 # Overwrite a few transform arguments just to be sure...
-transform_args['flowpose']['norm'] = False
-transform_args['flowpose']['match_pose'] = False
-transform_args['flowpose']['ntu'] = True
+transform_args['poseoff']['norm'] = False
+transform_args['poseoff']['match_pose'] = False
+transform_args['poseoff']['ntu'] = True
 
-# Create the FlowPoseSampler_LK transform object
-flowPoseTransform = FlowPoseSampler_LK(**transform_args['flowpose'])
+# Create the PoseOFFSampler_LK transform object
+poseOFFTransform = PoseOFFSampler_LK(**transform_args['poseoff'])
 
 def human_k(n):
     if n<1000:
@@ -102,8 +102,8 @@ def remove_frame_drops(flow_data, frames_drop_list):
     return flow_data[mask]
 
 
-def get_raw_flowpose_data(idx_start=0, idx_end=20000):
-    flowpose_data = []
+def get_raw_poseoff_data(idx_start=0, idx_end=20000):
+    poseoff_data = []
 
     # Assuming we've already denoised all the pose data
     with open(denoised_skes_data_file, 'rb') as fr:  # load raw skeletons data
@@ -138,9 +138,9 @@ def get_raw_flowpose_data(idx_start=0, idx_end=20000):
                 C, _, V, M = poses.shape
                 poses = np.concatenate([np.zeros((C, 1, V, M)), poses], axis=1)
 
-        # Get the flowpose data and reshape!
-        flowpose = flowPoseTransform(rgb_data, poses)
-        flowpose_data.append(rearrange(flowpose, 'C T V M -> T (M V C)'))
+        # Get the poseoff data and reshape!
+        poseoff = poseOFFTransform(rgb_data, poses)
+        poseoff_data.append(rearrange(poseoff, 'C T V M -> T (M V C)'))
 
         if (ske_number+1) % 500 == 0:
             print(f'Processed {ske_number-499}-{ske_number} in {time.time()-start_time_tmp:0.2f} seconds', flush=True)
@@ -150,11 +150,11 @@ def get_raw_flowpose_data(idx_start=0, idx_end=20000):
 
     # Save the data
     data_name = f"flow_{human_k(idx_start)}-{human_k(idx_end)}"
-    flowpose_filename = osp.join(save_path, f'{data_name}.pkl')
-    with open(flowpose_filename, 'wb') as f:
-        pickle.dump(flowpose_data, f, pickle.HIGHEST_PROTOCOL)
+    poseoff_filename = osp.join(save_path, f'{data_name}.pkl')
+    with open(poseoff_filename, 'wb') as f:
+        pickle.dump(poseoff_data, f, pickle.HIGHEST_PROTOCOL)
 
-    return flowpose_filename
+    return poseoff_filename
 
     
 if __name__ == '__main__':
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         os.makedirs(save_path)
     
     # Print processing information before processing...
-    print(f'Processing flowpose samples for {dataset} dataset...', flush=True)
+    print(f'Processing poseoff samples for {dataset} dataset...', flush=True)
     print(f'\tIndex {idx_start} to {idx_end}')
     try:
         print(f'\tSkeleton {skes_names[idx_start]} to {skes_names[idx_end-1]}')
@@ -184,7 +184,7 @@ if __name__ == '__main__':
         print(f'\tSkeleton {skes_names[idx_start]} to {skes_names[-1]}')
     
     # Generate the data
-    flowpose_filename = get_raw_flowpose_data(idx_start=idx_start, idx_end=idx_end)
-    print(f'Flowpose samples for {dataset} dataset generated successfully!', flush=True)
+    poseoff_filename = get_raw_poseoff_data(idx_start=idx_start, idx_end=idx_end)
+    print(f'Poseoff samples for {dataset} dataset generated successfully!', flush=True)
     print(f'Data saved to {save_path}', flush=True)
-    print(f"Full filename path: {flowpose_filename}", flush=True)
+    print(f"Full filename path: {poseoff_filename}", flush=True)

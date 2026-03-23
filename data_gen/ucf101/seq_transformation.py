@@ -5,7 +5,7 @@ from config.argclass import ArgClass
 from einops import rearrange
 import argparse
 
-parser = argparse.ArgumentParser(prog="flowpose_seq_transform")
+parser = argparse.ArgumentParser(prog="poseoff_seq_transform")
 
 parser.add_argument(
     '--dilation',
@@ -21,7 +21,7 @@ labels = arg.feeder_args['labels']
 
 # Define the paths
 data_labels_root = './data/ucf101/statistics/'
-flowpose_path = './data/ucf101/flowpose'
+poseoff_path = './data/ucf101/poseoff'
 save_path = './data/ucf101/aligned_data'
 
 # Create the save directory if it doesn't exist
@@ -29,10 +29,10 @@ os.makedirs(save_path, exist_ok=True)
 
 def combine_data(all_paths):
     """
-    Load and combine all of the flowpose data from the given paths.
+    Load and combine all of the poseoff data from the given paths.
     
     Args:
-        all_paths (list): List of paths to the flowpose data files (numpy).
+        all_paths (list): List of paths to the poseoff data files (numpy).
             These numpy files should be of shape (C, T, V, M) where:
             C is the number of channels (53),
             T is the number of frames (300)
@@ -138,11 +138,11 @@ def split_dataset(joints, labels, evaluation, dilation, save_path, data_labels_r
 
 if __name__ == '__main__':
     from sys import getsizeof
-    # Get the paths for the flowpose data
-    flowpose_paths = [osp.join(flowpose_path, item)+'.npy' for item in list(arg.feeder_args['labels'].keys())]
+    # Get the paths for the poseoff data
+    poseoff_paths = [osp.join(poseoff_path, item)+'.npy' for item in list(arg.feeder_args['labels'].keys())]
 
     # Combine all the data into a single numpy array (N, T, M*V*C)
-    joints = combine_data(flowpose_paths)
+    joints = combine_data(poseoff_paths)
     print(f'Combined data shape: {joints.shape}')
     print(f'Combined data size: {getsizeof(joints)/1e6} MB')
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
                       labels=np.array(list(arg.feeder_args['labels'].values())), 
                       evaluation=evaluation,
                       dilation=parsed.dilation,
-                      save_path=save_path, # I just want to save it inside the flowpose folder...
+                      save_path=save_path, # I just want to save it inside the poseoff folder...
                       data_labels_root=data_labels_root)
         print(f'\tProcessed evaluation {evaluation}.')
         print(f'\t\tSaved to: {save_path}/ucf101_0{evaluation}_D{parsed.dilation}.npz')

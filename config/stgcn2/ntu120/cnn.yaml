@@ -2,8 +2,8 @@
 feeder: feeders.ntu_rgb_d.Feeder
 feeder_args:
   data_paths: 
-    CSet: ./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz
-    CSub: ./data/ntu120/aligned_data/ntu120_CSub-flowpose_D3_aligned.npz
+    CSet: ./data/ntu120/aligned_data/poseoff/RAFT/ntu120_CSet-poseoff_RAFT_D3_aligned.npz
+    CSub: ./data/ntu120/aligned_data/poseoff/RAFT/ntu120_CSub-poseoff_RAFT_D3_aligned.npz
   label_path: ./data/ntu120/statistics/ntu_rgbd120-annotations.yaml
   p_interval: [0.5, 1]
   random_choose: False
@@ -26,7 +26,7 @@ extractor:
     weights: pretrained_models/raft_large.pt
     imsize: [1080,1920]
     minibatch_size: 3 # can be up to 16 for imsize: [240,320]
-  flowpose:
+  poseoff:
     window_size: 5
     threshold: 0.05
     loop: False

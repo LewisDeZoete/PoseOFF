@@ -105,6 +105,7 @@ if arg.data_path_overwrite is not None:
     arg.feeder_args['data_paths'][arg.evaluation] = arg.data_path_overwrite
 
 if arg.obs_ratio != "1.0":
+    assert float(arg.obs_ratio) < 1.0
     arg.feeder_args['obs_ratio'] = float(arg.obs_ratio)
 
 # Define checkpoint file (this is the same for train and eval)

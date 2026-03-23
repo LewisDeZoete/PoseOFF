@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+import numpy as np
+import cv2
 
 def write_videos(videos):
     size = (videos[0].shape[2], videos[0].shape[1])
@@ -13,10 +14,10 @@ def write_videos(videos):
     RGB_skel_video = cv2.VideoWriter('data/visualisations/videos/RGB_skels_video.avi', cv2.VideoWriter_fourcc(*'MJPG'), 
                          10, size)
     
-    flowpose_video = cv2.VideoWriter('data/visualisations/videos/flowpose_video.avi', cv2.VideoWriter_fourcc(*'MJPG'),
+    poseoff_video = cv2.VideoWriter('data/visualisations/videos/poseoff_video.avi', cv2.VideoWriter_fourcc(*'MJPG'),
                          10, size)
     current_frame_index = 0
-    flowpose = flow_pose_sample(flow_full, poses, window_size=19) # T, MV, C
+    poseoff = poseoff_sample(flow_full, poses, window_size=19) # T, MV, C
     while True:
         # Get the flow and RGB frames
         flow_frame = videos[0][current_frame_index]
@@ -38,12 +39,12 @@ def write_videos(videos):
         flow_skel_video.write(flow_skel_frame.astype(np.uint8))
         RGB_skel_video.write(RGB_skel_frame.astype(np.uint8))
 
-        # Draw flowpose
-        flowpose_frame = draw_flowpose(flowpose_frame=flowpose[current_frame_index],
+        # Draw poseoff
+        poseoff_frame = draw_poseoff(poseoff_frame=poseoff[current_frame_index],
                                        pose_frame=poses[current_frame_index],
                                        frame=flow_frame,
                                        window_size=19)
-        flowpose_video.write(flowpose_frame.astype(np.uint8))
+        poseoff_video.write(poseoff_frame.astype(np.uint8))
         
         current_frame_index += 1
         if current_frame_index >= get_frame_count(videos[0]):
@@ -53,10 +54,10 @@ def write_videos(videos):
     flow_skel_video.release()
     RGB_video.release()
     RGB_skel_video.release()
-    flowpose_video.release()
+    poseoff_video.release()
 
 
-def flow_pose_sample(flows, poses, window_size=5):
+def poseoff_sample(flows, poses, window_size=5):
     """
     Samples the optical flow in windows surrounding the pose keypoints.
     flows: (T C H W)
@@ -96,22 +97,3 @@ def flow_pose_sample(flows, poses, window_size=5):
                 stacker[frame_no, keypoint_num, :] = flow_window.flatten()
     return stacker
 
-if __name__=="__main__":
-    pass
-    # quick_view(poseoff_frame)
-    # quit()
-
-    # # First, draw the poseoff arrows on the full frame (may take time)
-    # frame = draw_optical_flow_arrows(flow_frame, frame=rgb_frame, step=10, scale=3, threshold=0.0)
-    # full_frame = draw_optical_flow_arrows(flow_frame, step=20, scale=3)
-    # frame_transparent = np.zeros((H, W, 4), dtype=np.uint8)
-
-    # # Then, we draw the skeleton lines we want
-    # frame = draw_bones(frame, pose)
-    # full_frame = draw_bones(full_frame, pose)
-    # frame_transparent = draw_bones(frame_transparent, pose)
-
-    # # Finally, draw the skeleton keypoints themselves
-    # frame = draw_skel(frame, pose, person_num=0, skip_points=[4,5], debug=False)
-    # full_frame = draw_skel(full_frame, pose, debug=False)
-    # frame_transparent = draw_skel(frame_transparent, pose, debug=False)

@@ -14,7 +14,7 @@
 #+END_SRC
 
 #+RESULTS:
-: "/ssh:nt:/fred/oz141/ldezoete/MS-G3D/"
+: "/ssh:nt:/fred/oz141/ldezoete/MS-G3D/org/"
 
 
 * Data extraction, training, evaluation and graphing

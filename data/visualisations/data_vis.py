@@ -7,7 +7,7 @@ import cv2
 
 # # import decord
 # from decord import VideoReader, cpu
-# from data_gen.utils.extractors import FlowPoseSampler
+# from data_gen.utils.extractors import PoseOFFSampler
 import pickle
 from einops import rearrange
 
@@ -18,7 +18,7 @@ from einops import rearrange
 # # ----------------- #
 
 # ----------------------------------
-# UCF-101 Flowpose Visualisation
+# UCF-101 PoseOFF Visualisation
 # ----------------------------------
 
 # def draw_flow_vectors(flow_data, frame, start_x, start_y, size=5):
@@ -69,10 +69,10 @@ from einops import rearrange
 
 # # Get the frame data
 # window_size = 15
-# arg.extractor['flowpose']['window_size'] = window_size
-# flowPoseTransform = FlowPoseSampler(**arg.extractor['flowpose'])
+# arg.extractor['poseoff']['window_size'] = window_size
+# poseOFFTransform = PoseOFFSampler(**arg.extractor['poseoff'])
 
-# flow_pose = np.array(flowPoseTransform(flow_data, pose_data))
+# flow_pose = np.array(poseOFFTransform(flow_data, pose_data))
 # print(flow_pose.shape)
 
 # skel = flow_pose[:2,...] # (2, 300, 17, 2)
@@ -204,14 +204,14 @@ def vis_video(video_path, draw_skel=False, poses=None):
 
 
 # # ----------------------------------
-# # NTU-RGB+D Flowpose Visualisation
+# # NTU-RGB+D PoseOFF Visualisation
 # # ----------------------------------
 
-# flowpose_file = osp.join('./data/ntu', 'aligned_data', 'MINI_CS_flowpose.npz')
-# flowpose_data = np.load(flowpose_file, allow_pickle=True)['x_train'] # (120, 300, 2650)
+# poseoff_file = osp.join('./data/ntu', 'aligned_data', 'MINI_CS_poseoff.npz')
+# poseoff_data = np.load(poseoff_file, allow_pickle=True)['x_train'] # (120, 300, 2650)
 
 # # Get a single frame
-# data = flowpose_data[0,0] # (2*25*C)
+# data = poseoff_data[0,0] # (2*25*C)
 # data = rearrange(data, '(M V C) -> M V C', M=2, V=25, C=5)
 
 # # Get the pose and flow data
@@ -258,7 +258,7 @@ def vis_video(video_path, draw_skel=False, poses=None):
 
 
 # plt.imshow(frame, cmap='gray')
-# plt.savefig('NTU_flowpose.png')
+# plt.savefig('NTU_poseoff.png')
 
 def get_possible_samples(class_no, skes_names):
     for S in range(30):
@@ -306,7 +306,7 @@ if __name__ == "__main__":
     video_path = f"../Datasets/NTU_RGBD{dataset_extn}/nturgb+d_rgb{dataset_extn}/{video_name}_rgb.avi"
     pose_path = f"./data/ntu{dataset_extn}/raw_data/raw_skes_data.pkl"
     pose_denoised_path = f"./data/ntu{dataset_extn}/denoised_data/raw_denoised_colors.pkl"
-    flowpose_path = f"data/ntu{dataset_extn}/flow_data/flowpose_data.npy"
+    poseoff_path = f"data/ntu{dataset_extn}/flow_data/poseoff_data.npy"
 
     with open(pose_denoised_path, "rb") as f:
         denoised_skes_data = pickle.load(f)
@@ -320,14 +320,14 @@ if __name__ == "__main__":
     vis_video(video_path, draw_skel, denoised)
 
 
-    # # Load the temporary flowpose path
+    # # Load the temporary poseoff path
     # # NOTE: This was found by getting the index of the skeleton video within the skes_names
     # # Then finding the specific index within the train or test set using the: 
     # # get_indices() function from seq_transformation.py, then extracting that specific array
-    # # from the flowpose_aligned.npz
-    # flowpose = np.load(flowpose_path)
-    # flowpose = flowpose.reshape(300, 2, 25, 53)
-    # flows = flowpose.transpose(3, 0, 2, 1)[3:, :denoised.shape[1],...] # C T V M
+    # # from the poseoff_aligned.npz
+    # poseoff = np.load(poseoff_path)
+    # poseoff = poseoff.reshape(300, 2, 25, 53)
+    # flows = poseoff.transpose(3, 0, 2, 1)[3:, :denoised.shape[1],...] # C T V M
 
     # print('(C, T, V, M)')
     # print(f'Denoised skeletons: {denoised.shape}')
@@ -335,6 +335,6 @@ if __name__ == "__main__":
 
     # # # Draw the skeleton on the frame
     # frame_with_skeleton = draw_skeleton_on_frame(video_path, denoised, frame_index=40)
-    # frame_with_flowpose = draw_flow_windows(frame_with_skeleton, flows, denoised, frame_index=40)
+    # frame_with_poseoff = draw_flow_windows(frame_with_skeleton, flows, denoised, frame_index=40)
     # cv2.imwrite("skeleton_from_denoised.png", frame_with_skeleton)
-    # cv2.imwrite("skeleton_from_flowpose.png", frame_with_flowpose)
+    # cv2.imwrite("skeleton_from_poseoff.png", frame_with_poseoff)

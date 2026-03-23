@@ -402,6 +402,7 @@ if __name__ == "__main__":
     model_type = "infogcn2"
     dataset = "ucf101"
     flow_embedding = "base"
+    flow_type = "RAFT"
     evaluation = "1"
     # ------------------------------------------------------------------
 
@@ -418,19 +419,24 @@ if __name__ == "__main__":
 
     run_name = f"{dataset}_{evaluation}_{flow_embedding}"
 
-    # This is just to write the arg verbose output to the logging file... find a better way!
-    buf = io.StringIO()
-    with redirect_stdout(buf):
-        ArgClass(f"./config/{model_type}/{dataset}/{flow_embedding}.yaml", verbose=True)
-    logging.info(buf.getvalue())
 
     arg = ArgClass(f"./config/{model_type}/{dataset}/{flow_embedding}.yaml")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
     arg.feeder_args['eval'] = evaluation
-    arg.feeder_args['data_paths']['CSet'] = "./data/ntu120/aligned_data/ntu120_CSet-flowpose_D3_aligned.npz"
+    arg.feeder_args['data_paths'][evaluation] = f"./data/{dataset}/aligned_data/poseoff/{dataset}_{evaluation}-poseoff_{flow_type}_D{dilation}_aligned.npz"
     arg.checkpoint_file = f"./DELETE_ME_{run_name}.pt"
+
+    # Log the argclass config
+    for key, val in arg.__dict__.items():
+        if isinstance(val, dict):
+            logging.info(key, ":")
+            for sub_key, sub_val in val.items():
+                if not sub_key == "labels":
+                    logging.info(f"\t{sub_key}: {sub_val}")
+        else:
+            logging.info(f"{key}: {val}")
 
     # Model
     modelLoader = ModelLoader(arg)

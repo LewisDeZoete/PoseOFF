@@ -7,7 +7,7 @@
 #SBATCH --output=logs/debug/model_timing/slurm_log_%j.out
 
 # # copy_file="./data/ntu/aligned_data/ntu_CS-pose_aligned.npz"
-# copy_file="./data/ntu/aligned_data/ntu_CS-flowpose_D3_aligned.npz"
+# copy_file="./data/ntu/aligned_data/RAFT/ntu_CS-poseoff_RAFT_D3_aligned.npz"
 
 # # Double check that from this script, ${copy_file} exists!
 # if [ ! -f $copy_file ]; then

@@ -24,7 +24,7 @@ parser.add_argument(
     "--sample_name",
     dest="sample_name",
     default="S019C001P051R001A113",
-    help="Name of a pre-computed sample (run data/visualisations/get_flow_samples.py...)"
+    help="Name of a pre-computed sample (run data/visualisations/get_flow_samples.py, see info in file for how it's run)"
 )
 parser.add_argument(
     "--live",
@@ -82,7 +82,7 @@ def load_data(data_root, sample_name):
     poses = rearrange(data['pose'][1:], 'T M V C -> T (M V) C')
 
     # Get the poseoff samples
-    poseoff = data['flowpose']
+    poseoff = data['poseoff']
 
     return videos, poses, poseoff
 
