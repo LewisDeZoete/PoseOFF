@@ -1,0 +1,123 @@
+Improved 70 classes
+No change in 3 classes
+Accuracy losses in 28 classes
+Percentage of classes improved: 69.31%
+Median gain: 0.05263157894736842
+Interquartile range (IQR): [-0.00892857  0.11538462]
+BEST:
+	Class TrampolineJumping: recall=29.70%
+	Class HighJump: recall=28.43%
+	Class BodyWeightSquats: recall=22.83%
+	Class HandStandWalking: recall=22.83%
+	Class BenchPress: recall=20.15%
+WORST:
+	Class Rowing: recall=-24.30%
+	Class TennisSwing: recall=-13.38%
+	Class PlayingGuitar: recall=-13.14%
+	Class Shotput: recall=-11.02%
+	Class Drumming: recall=-9.56%
+Wilcoxon statistic: 3892.0
+	P-value: 1.0144173397216531e-07
+
+ALL CLASSES:
+	ApplyEyeMakeup: 8.33%
+	ApplyLipstick: 0.00%
+	Archery: 13.76%
+	BabyCrawling: -9.17%
+	BalanceBeam: 8.79%
+	BandMarching: -6.20%
+	BaseballPitch: 8.40%
+	Basketball: 16.36%
+	BasketballDunk: -2.70%
+	BenchPress: 20.15%
+	Biking: 12.28%
+	Billiards: 3.15%
+	BlowDryHair: -8.04%
+	BlowingCandles: 5.49%
+	BodyWeightSquats: 22.83%
+	Bowling: -1.55%
+	BoxingPunchingBag: 2.96%
+	BoxingSpeedBag: 10.53%
+	BreastStroke: 15.66%
+	BrushingTeeth: 12.50%
+	CleanAndJerk: 7.29%
+	CliffDiving: 16.51%
+	CricketBowling: -0.87%
+	CricketShot: -7.09%
+	CuttingInKitchen: -4.35%
+	Diving: 6.45%
+	Drumming: -9.56%
+	Fencing: -5.26%
+	FieldHockeyPenalty: 2.20%
+	FloorGymnastics: 17.14%
+	FrisbeeCatch: 19.79%
+	FrontCrawl: -3.60%
+	GolfSwing: 0.00%
+	Haircut: -4.76%
+	HammerThrow: 3.15%
+	Hammering: 18.10%
+	HandStandPushups: 14.02%
+	HandStandWalking: 22.83%
+	HeadMassage: 5.74%
+	HighJump: 28.43%
+	HorseRace: 1.04%
+	HorseRiding: 0.73%
+	HulaHoop: 15.24%
+	IceDancing: 1.54%
+	JavelinThrow: 5.26%
+	JugglingBalls: 0.98%
+	JumpRope: 6.67%
+	JumpingJack: 11.54%
+	Kayaking: -2.56%
+	Knitting: 4.81%
+	LongJump: 10.43%
+	Lunges: 2.78%
+	MilitaryParade: -8.49%
+	Mixing: -2.52%
+	MoppingFloor: 7.45%
+	Nunchucks: 5.36%
+	ParallelBars: 17.35%
+	PizzaTossing: 15.38%
+	PlayingCello: 2.21%
+	PlayingDaf: -0.79%
+	PlayingDhol: -5.80%
+	PlayingFlute: 3.03%
+	PlayingGuitar: -13.14%
+	PlayingPiano: 12.36%
+	PlayingSitar: 11.28%
+	PlayingTabla: 0.00%
+	PlayingViolin: 8.33%
+	PoleVault: 14.05%
+	PommelHorse: 10.58%
+	PullUps: 8.33%
+	Punch: -1.52%
+	PushUps: 12.79%
+	Rafting: 6.45%
+	RockClimbingIndoor: 12.82%
+	RopeClimbing: 2.97%
+	Rowing: -24.30%
+	SalsaSpin: 8.70%
+	ShavingBeard: 7.46%
+	Shotput: -11.02%
+	SkateBoarding: 14.85%
+	Skiing: -1.79%
+	Skijet: 7.59%
+	SkyDiving: -1.06%
+	SoccerJuggling: 3.31%
+	SoccerPenalty: 3.03%
+	StillRings: -1.08%
+	SumoWrestling: -3.00%
+	Surfing: 5.15%
+	Swing: -0.89%
+	TableTennisShot: 7.14%
+	TaiChi: 3.57%
+	TennisSwing: -13.38%
+	ThrowDiscus: 1.80%
+	TrampolineJumping: 29.70%
+	Typing: 14.17%
+	UnevenBars: 6.90%
+	VolleyballSpiking: -1.00%
+	WalkingWithDog: 11.43%
+	WallPushups: 17.70%
+	WritingOnBoard: 4.84%
+	YoYo: 6.54%

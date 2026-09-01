@@ -1,0 +1,142 @@
+Improved 118 classes
+No change in 0 classes
+Accuracy losses in 2 classes
+Percentage of classes improved: 98.33%
+Median gain: 0.05976464529966774
+Interquartile range (IQR): [0.03526048 0.09415556]
+BEST:
+	Class cutting nails: recall=22.25%
+	Class rub two hands together: recall=18.36%
+	Class apply cream on face: recall=17.81%
+	Class play magic cube: recall=17.06%
+	Class wear a shoe: recall=16.47%
+WORST:
+	Class make ok sign: recall=-5.26%
+	Class thumb up: recall=-2.22%
+	Class walking towards each other: recall=0.22%
+	Class sitting down: recall=0.61%
+	Class standing up (from sitting position): recall=0.73%
+Wilcoxon statistic: 7191.0
+	P-value: 5.507635865319086e-21
+
+ALL CLASSES:
+	drink water: 10.59%
+	eat meal/snack: 12.52%
+	brushing teeth: 9.33%
+	brushing hair: 6.25%
+	drop: 10.60%
+	pickup: 5.06%
+	throw: 3.43%
+	sitting down: 0.61%
+	standing up (from sitting position): 0.73%
+	clapping: 10.09%
+	reading: 14.49%
+	writing: 13.38%
+	tear up paper: 6.23%
+	wear jacket: 1.29%
+	take off jacket: 4.19%
+	wear a shoe: 16.47%
+	take off a shoe: 11.98%
+	wear on glasses: 10.68%
+	take off glasses: 9.68%
+	put on a hat/cap: 4.13%
+	take off a hat/cap: 4.43%
+	cheer up: 4.12%
+	hand waving: 4.80%
+	kicking something: 7.40%
+	reach into pocket: 7.11%
+	hopping (one foot jumping): 3.47%
+	jump up: 1.15%
+	make a phone call/answer phone: 12.50%
+	playing with phone/tablet: 10.17%
+	typing on a keyboard: 12.48%
+	pointing to something with finger: 7.81%
+	taking a selfie: 5.38%
+	check time (from watch): 6.76%
+	rub two hands together: 18.36%
+	nod head/bow: 2.78%
+	shake head: 13.50%
+	wipe face: 15.00%
+	salute: 4.02%
+	put the palms together: 4.49%
+	cross hands in front (say stop): 3.27%
+	sneeze/cough: 13.46%
+	staggering: 2.40%
+	falling: 1.80%
+	touch head (headache): 5.99%
+	touch chest (stomachache/heart pain): 6.41%
+	touch back (backache): 8.12%
+	touch neck (neckache): 9.23%
+	nausea or vomiting condition: 6.86%
+	use a fan (with hand or paper)/feeling warm: 8.61%
+	punching/slapping other person: 6.60%
+	kicking other person: 5.66%
+	pushing other person: 3.34%
+	pat on back of other person: 3.42%
+	point finger at the other person: 4.96%
+	hugging other person: 1.33%
+	giving something to other person: 9.79%
+	touch other person's pocket: 4.97%
+	handshaking: 6.84%
+	walking towards each other: 0.22%
+	walking apart from each other: 2.44%
+	put on headphone: 8.27%
+	take off headphone: 6.95%
+	shoot at the basket: 3.49%
+	bounce ball: 4.56%
+	tennis bat swing: 5.46%
+	juggling table tennis balls: 5.99%
+	hush (quite): 7.98%
+	flick hair: 8.61%
+	thumb up: -2.22%
+	thumb down: 4.48%
+	make ok sign: -5.26%
+	make victory sign: 7.61%
+	staple book: 13.69%
+	counting money: 5.11%
+	cutting nails: 22.25%
+	cutting paper (using scissors): 7.01%
+	snapping fingers: 4.74%
+	open bottle: 11.88%
+	sniff (smell): 10.38%
+	squat down: 2.63%
+	toss a coin: 5.96%
+	fold paper: 12.51%
+	ball up paper: 7.97%
+	play magic cube: 17.06%
+	apply cream on face: 17.81%
+	apply cream on hand back: 13.61%
+	put on bag: 6.41%
+	take off bag: 7.68%
+	put something into a bag: 13.07%
+	take something out of a bag: 10.36%
+	open a box: 14.51%
+	move heavy objects: 4.60%
+	shake fist: 6.29%
+	throw up cap/hat: 4.50%
+	hands up (both hands): 3.20%
+	cross arms: 4.57%
+	arm circles: 1.03%
+	arm swings: 0.75%
+	running on the spot: 6.63%
+	butt kicks (kick backward): 4.54%
+	cross toe touch: 2.50%
+	side kick: 3.00%
+	yawn: 6.90%
+	stretch oneself: 3.96%
+	blow nose: 11.54%
+	hit other person with something: 5.13%
+	wield knife towards other person: 6.62%
+	knock over other person (hit with body): 4.81%
+	grab other person’s stuff: 3.25%
+	shoot at other person with a gun: 1.28%
+	step on foot: 3.94%
+	high-five: 1.09%
+	cheers and drink: 3.84%
+	carry something with other person: 0.87%
+	take a photo of other person: 2.31%
+	follow other person: 4.06%
+	whisper in other person’s ear: 4.10%
+	exchange things with other person: 6.22%
+	support somebody with hand: 3.54%
+	finger-guessing game (playing rock-paper-scissors): 3.43%

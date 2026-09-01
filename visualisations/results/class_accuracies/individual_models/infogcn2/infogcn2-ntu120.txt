@@ -1,0 +1,142 @@
+Improved 114 classes
+No change in 0 classes
+Accuracy losses in 6 classes
+Percentage of classes improved: 95.00%
+Median gain: 0.060587436618364465
+Interquartile range (IQR): [0.0281961  0.10161033]
+BEST:
+	Class cutting nails: recall=23.24%
+	Class wear a shoe: recall=21.94%
+	Class rub two hands together: recall=20.15%
+	Class giving something to other person: recall=18.97%
+	Class apply cream on face: recall=17.87%
+WORST:
+	Class make ok sign: recall=-10.70%
+	Class thumb up: recall=-2.16%
+	Class cross toe touch: recall=-0.85%
+	Class shoot at other person with a gun: recall=-0.66%
+	Class walking towards each other: recall=-0.65%
+Wilcoxon statistic: 7109.0
+	P-value: 4.079295259547079e-20
+
+ALL CLASSES:
+	drink water: 11.50%
+	eat meal/snack: 13.03%
+	brushing teeth: 9.46%
+	brushing hair: 7.76%
+	drop: 12.61%
+	pickup: 11.20%
+	throw: 3.86%
+	sitting down: 0.91%
+	standing up (from sitting position): 1.43%
+	clapping: 2.59%
+	reading: 16.69%
+	writing: 15.45%
+	tear up paper: 7.14%
+	wear jacket: 0.26%
+	take off jacket: 5.00%
+	wear a shoe: 21.94%
+	take off a shoe: 10.57%
+	wear on glasses: 17.25%
+	take off glasses: 10.03%
+	put on a hat/cap: 4.01%
+	take off a hat/cap: 6.71%
+	cheer up: 2.96%
+	hand waving: 4.37%
+	kicking something: 8.22%
+	reach into pocket: 12.72%
+	hopping (one foot jumping): 5.39%
+	jump up: 0.90%
+	make a phone call/answer phone: 12.24%
+	playing with phone/tablet: 17.12%
+	typing on a keyboard: 13.90%
+	pointing to something with finger: 9.27%
+	taking a selfie: 6.28%
+	check time (from watch): 7.57%
+	rub two hands together: 20.15%
+	nod head/bow: 2.82%
+	shake head: 14.40%
+	wipe face: 16.07%
+	salute: 4.36%
+	put the palms together: 4.87%
+	cross hands in front (say stop): 2.84%
+	sneeze/cough: 15.26%
+	staggering: 0.26%
+	falling: 1.93%
+	touch head (headache): 10.65%
+	touch chest (stomachache/heart pain): 5.13%
+	touch back (backache): 9.10%
+	touch neck (neckache): 6.03%
+	nausea or vomiting condition: 3.98%
+	use a fan (with hand or paper)/feeling warm: 10.80%
+	punching/slapping other person: 5.82%
+	kicking other person: 5.53%
+	pushing other person: 2.18%
+	pat on back of other person: 2.82%
+	point finger at the other person: 6.47%
+	hugging other person: 0.53%
+	giving something to other person: 18.97%
+	touch other person's pocket: 7.07%
+	handshaking: 7.44%
+	walking towards each other: -0.65%
+	walking apart from each other: 2.18%
+	put on headphone: 9.04%
+	take off headphone: 6.76%
+	shoot at the basket: 5.38%
+	bounce ball: 4.44%
+	tennis bat swing: 7.16%
+	juggling table tennis balls: 5.17%
+	hush (quite): 1.98%
+	flick hair: 8.54%
+	thumb up: -2.16%
+	thumb down: 1.78%
+	make ok sign: -10.70%
+	make victory sign: 4.32%
+	staple book: 11.61%
+	counting money: 3.98%
+	cutting nails: 23.24%
+	cutting paper (using scissors): 2.36%
+	snapping fingers: 7.06%
+	open bottle: 12.44%
+	sniff (smell): 13.92%
+	squat down: 1.13%
+	toss a coin: 7.06%
+	fold paper: 12.20%
+	ball up paper: 8.26%
+	play magic cube: 16.78%
+	apply cream on face: 17.87%
+	apply cream on hand back: 12.14%
+	put on bag: 5.44%
+	take off bag: 4.96%
+	put something into a bag: 15.01%
+	take something out of a bag: 6.18%
+	open a box: 14.57%
+	move heavy objects: 7.62%
+	shake fist: 1.22%
+	throw up cap/hat: 5.19%
+	hands up (both hands): 3.20%
+	cross arms: 3.66%
+	arm circles: 0.28%
+	arm swings: -0.47%
+	running on the spot: 7.04%
+	butt kicks (kick backward): 1.69%
+	cross toe touch: -0.85%
+	side kick: 2.63%
+	yawn: 6.09%
+	stretch oneself: 5.90%
+	blow nose: 9.29%
+	hit other person with something: 7.41%
+	wield knife towards other person: 9.83%
+	knock over other person (hit with body): 3.75%
+	grab other person’s stuff: 6.09%
+	shoot at other person with a gun: -0.66%
+	step on foot: 6.47%
+	high-five: 0.37%
+	cheers and drink: 5.44%
+	carry something with other person: 0.28%
+	take a photo of other person: 0.47%
+	follow other person: 3.84%
+	whisper in other person’s ear: 2.53%
+	exchange things with other person: 7.97%
+	support somebody with hand: 2.82%
+	finger-guessing game (playing rock-paper-scissors): 1.87%

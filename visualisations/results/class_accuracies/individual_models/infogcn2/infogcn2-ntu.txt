@@ -1,0 +1,82 @@
+Improved 53 classes
+No change in 1 classes
+Accuracy losses in 6 classes
+Percentage of classes improved: 88.33%
+Median gain: 0.02702702702702703
+Interquartile range (IQR): [0.00846024 0.05842734]
+BEST:
+	Class wear a shoe: recall=20.75%
+	Class writing: recall=14.48%
+	Class take off a shoe: recall=14.41%
+	Class typing on a keyboard: recall=11.51%
+	Class make a phone call/answer phone: recall=11.00%
+WORST:
+	Class clapping: recall=-2.21%
+	Class staggering: recall=-1.69%
+	Class point finger at the other person: recall=-1.36%
+	Class salute: recall=-1.18%
+	Class kicking something: recall=-1.01%
+Wilcoxon statistic: 1674.5
+	P-value: 1.2674508338755426e-09
+
+ALL CLASSES:
+	drink water: 3.22%
+	eat meal/snack: 8.97%
+	brushing teeth: 6.11%
+	brushing hair: 4.75%
+	drop: 5.75%
+	pickup: 1.69%
+	throw: 2.03%
+	sitting down: 2.21%
+	standing up (from sitting position): 0.34%
+	clapping: -2.21%
+	reading: 8.84%
+	writing: 14.48%
+	tear up paper: 1.53%
+	wear jacket: 0.85%
+	take off jacket: 1.86%
+	wear a shoe: 20.75%
+	take off a shoe: 14.41%
+	wear on glasses: 2.38%
+	take off glasses: 5.59%
+	put on a hat/cap: -0.34%
+	take off a hat/cap: 1.19%
+	cheer up: 2.37%
+	hand waving: 0.17%
+	kicking something: -1.01%
+	reach into pocket: 8.47%
+	hopping (one foot jumping): 1.86%
+	jump up: 0.00%
+	make a phone call/answer phone: 11.00%
+	playing with phone/tablet: 4.06%
+	typing on a keyboard: 11.51%
+	pointing to something with finger: 1.18%
+	taking a selfie: 2.53%
+	check time (from watch): 3.55%
+	rub two hands together: 7.43%
+	nod head/bow: 1.01%
+	shake head: 8.46%
+	wipe face: 8.61%
+	salute: -1.18%
+	put the palms together: 1.35%
+	cross hands in front (say stop): 0.17%
+	sneeze/cough: 4.22%
+	staggering: -1.69%
+	falling: 0.17%
+	touch head (headache): 2.87%
+	touch chest (stomachache/heart pain): 3.72%
+	touch back (backache): 7.26%
+	touch neck (neckache): 0.34%
+	nausea or vomiting condition: 0.85%
+	use a fan (with hand or paper)/feeling warm: 0.85%
+	punching/slapping other person: 2.90%
+	kicking other person: 3.05%
+	pushing other person: 4.57%
+	pat on back of other person: 3.38%
+	point finger at the other person: -1.36%
+	hugging other person: 0.86%
+	giving something to other person: 9.29%
+	touch other person's pocket: 4.74%
+	handshaking: 6.25%
+	walking towards each other: 0.51%
+	walking apart from each other: 4.75%

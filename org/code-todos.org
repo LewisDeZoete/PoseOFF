@@ -1,0 +1,24 @@
+* FAST PYTHON PACKAGE AND PROJECT MANAGER
+- [[https://github.com/astral-sh/uv][UV Package manager]]
+  - [[https://github.com/z80dev/uv-mode][UV mode for Emacs]]
+
+
+* Code cleanup
+- Consistency across ntu/120 data gen
+  - Only extract ntu{120}_{evaluation}-pose_aligned.npz once!
+- Reformat ./models
+  - ./models/infogcn
+  - ./models/MS-G3D
+  - ./models/utils...
+
+* Visualisation
+- [ ] Look for large optical flow fluctuations
+- [ ] Temporal attention maps
+- [ ] Spatial attention maps
+
+* Skeleton normalisation
+Testing out normalising skeletons (about the centre point), this may be causing a change to the attention of the pose keypoints.
+- [ ] ucf101
+- [ ] ntu
+- [ ] ntu120
+- [ ] nucla

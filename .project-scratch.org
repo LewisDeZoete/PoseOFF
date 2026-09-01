@@ -1,0 +1,493 @@
+#+title:  Project Scratch
+#+STARTUP: fold
+
+* General
+365-390
+- Last seen, ntu120 CSet was broken
+- *NOTE:* Testing the inference time (for now) on
+  - stgcn2_ucf101_1_cnn_D1    |    stgcn2_ntu_CV_cnn_D3
+  - NEED TO IMPLEMENT AND TEST PROPERLY IN INFOGCN++ EVAL!!
+* REWORKING VIS UTILS
+** File and function layout
+*** visualisations/interactive_vis.py
+THIS IS OBVIOUSLY THE MAIN FILE
+- load_data: loads the data from a pre-computer array, returns video, poses and poseoff
+- display_videos: main loop! Loads everything, displays it and can save frames
+- save_im_frames: saves all the frames for a video! Pose, RGB and flow.
+*** visualisations/data_vis.py
+- draw_flow_arrows: draw optical flow vectors as arrows on an image
+- draw_flow_windows: Draws a windows of optical flow vectors on image at pose keypoints
+- vis_video: simple visualisation of a video by passing a video path, optionally poses to draw the skeleton
+- [X] get_possible_samples: function to find potential ntu rgb+d samples (UTIL)
+*** visualisations/3d_skel_display.py
+- Only displays the 3d skeleton data for ntu rgb+d
+*** visualisations/get_flow_samples.py
+- to be run with gpu, calculates flow samples for a given sample name
+
+* TODOs
+** Manual
+**** Data generation
+[[./data_gen/ntu/ntu_gendata.sh][NTU datagen file]] | [[./data_gen/ucf101/ucf101_gendata.sh][UCF101 datagen file]]
+- [ ] Check =./data_gen/ucf101/gendata_validation.py= to see what's going wrong with it not being able to find certain keys in the annotations
+  - Likely to do with the ordering of jobs firing off in gendata launch script...
+- [ ] Must re-perform std/mean map calculations
+  - They are skewed by the auto-padding since they are calculated from the output of the feeder (which ALWAYS uses auto-padding)
+
+***** Normal flow
+- [ ] Gaussian blur pre-gradient calculations 
+- [ ] Temporal Sobel filter
+
+**** Model training
+Training right now:
+- ALL MODELS NTU - CS - LK - D1-5
+  
+I need to conduct the following tests:
+- [ ] Dilation testing (CNN version of each model on a singular split of each dataset ~ 39 models trained in total)
+  - Extension of this is to test each embedding method on each dilation factor
+- [ ] Embedding method training (each embedding method for each model, on at least one split per dataset)
+
+- [-] InfoGCN++ [0/3]
+  - [-] ntu
+    - [-] CS (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [-] LK
+      - [ ] Norm
+    - [-] CV (base, cnn)
+      - [ ] RAFT
+      - [-] LK
+      - [ ] Norm
+  - [ ] ntu120
+    - [ ] CSub (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] CSet (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+  - [ ] ucf101
+    - [ ] 1 (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] 2 (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] 3 (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+- [-] MS-G3D [0/3]
+  - [-] ntu
+    - [-] CS (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [-] LK
+      - [ ] Norm
+    - [-] CV (base, cnn)
+      - [ ] RAFT
+      - [-] LK
+      - [ ] Norm
+  - [ ] ntu120
+    - [ ] CSub (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] CSet (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+  - [ ] ucf101
+    - [ ] 1 (base, cnn, abs, avg)
+    - [ ] 2 (base, cnn)
+    - [ ] 3 (base, cnn)
+- [-] ST-GCN++ [0/3]
+  - [-] ntu
+    - [-] CS (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [-] LK
+      - [ ] Norm
+    - [-] CV (base, cnn)
+      - [ ] RAFT
+      - [-] LK
+      - [ ] Norm
+  - [ ] ntu120
+    - [ ] CSub (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] CSet (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+  - [ ] ucf101
+    - [ ] 1 (base, cnn, abs, avg)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] 2 (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+    - [ ] 3 (base, cnn)
+      - [ ] RAFT
+      - [ ] LK
+      - [ ] Norm
+**** Code tidying
+- [ ] Change arg (loaded from =config=) to configs in all the files😟
+- [ ] data_gen files
+  - [ ] ntu
+  - [ ] ntu120
+  - [ ] ucf101
+- [ ] configs to handle different flow types
+- [ ] Clean up unnecessary files
+  - [ ] ./data/*
+  - [ ] ./logs/*
+  - [ ] ./results/*
+**** Code testing
+- [ ] Norm flow extraction
+- [ ] data_gen/ucf101/extractors/extract.sh
+- [ ] data_gen/ucf101/gendata/flowpose_gendata.py
+- [ ] data_gen/ucf101/gendata_validation.py
+- [ ] data_gen/ucf101/seq_transformation.py
+- [ ] data_gen/ucf101/ucf101_gendata.sh
+- [ ] data_gen/ucla/ucla_gendata.sh
+- [ ] data_gen/utils/extract_utils.py
+- [ ] feeders/mem_test.sh
+- [ ] results/visualisations/cls_attention.py
+- [X] run.sh
+- [ ] training/tester.sh
+- [ ] training/train_infogcn.py
+- [ ] Implement new motion estimation method
+  - [ ] Change the options for flow_type in files (=git grep -l $search_string -- ${excluded_dirs[@]}=)
+- [ ] Train models on simple motion vectors for skeleton keypoint movement
+**** New things to try
+- Top-k classification pruning
+  As the video unfolds, I could prune the classification head (if that's possible) to reduce it down to only the top 5 classes.
+** Scanner
+Run scanner by moving cursor inside codeblock, then executing code =C-c C-c=
+#+NAME: scan-todos
+#+BEGIN_SRC emacs-lisp :results none
+(require 'cl-lib)
+(let* ((root (file-name-directory (buffer-file-name)))
+       (default-directory root)
+       (raw (shell-command-to-string
+             "git grep -n 'TODO:' -- ':!./logs/*' ':!*.pt' ':!*.npz' ':!*.npy' ':!*.pkl'"))
+       (output ""))
+  (dolist (line (split-string raw "\n" t))
+    (when (string-match "^\\([^:]+\\):\\([0-9]+\\):.*TODO:[[:space:]]*\\(.*\\)$" line)
+      (let* ((rel  (match-string 1 line))
+             (lnum (string-to-number (match-string 2 line)))
+             (text (string-trim (match-string 3 line)))
+             (header (format "*** ~%s~\n" rel)))
+        (unless (string-match-p (regexp-quote header) output)
+          (setq output (concat output header)))
+        (setq output (concat output
+                             (format "    - Line %d: %s [[file:%s::%d][→]]\n"
+                                     lnum text rel lnum))))))
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^\\*\\* Items$" nil t)
+      (forward-line 1)
+      (let ((start (point))
+            (end (save-excursion
+                   (if (re-search-forward "^\\* " nil t)
+                       (line-beginning-position)
+                     (point-max)))))
+        (delete-region start end)
+        (insert "\n" (if (string-empty-p output) "   /No TODOs found./\n" output) "\n")))))
+#+END_SRC
+
+** Items
+
+*** ~.project-scratch.org~
+    - Line 56: ' -- ':!./logs/*' ':!*.pt' ':!*.npz' ':!*.npy' ':!*.pkl'")) [[file:.project-scratch.org::56][→]]
+    - Line 59: [[:space:]]*\\(.*\\)$" line) [[file:.project-scratch.org::59][→]]
+*** ~README.md~
+    - Line 81: Create the extraction pipeline for the NW-UCLA dataset --> [[file:README.md::81][→]]
+    - Line 122: Make sure this section makes sense. Is there a better way to go about doing it? [[file:README.md::122][→]]
+*** ~data_gen/ntu/get_raw_denoised_data.py~
+    - Line 157: Consider removing noisy frames for each bodyID [[file:data_gen/ntu/get_raw_denoised_data.py::157][→]]
+    - Line 224: Consider denoising further by integrating motion method [[file:data_gen/ntu/get_raw_denoised_data.py::224][→]]
+*** ~data_gen/ntu/ntu_gendata.sh~
+    - Line 118: Fix get_mean_map.py [[file:data_gen/ntu/ntu_gendata.sh::118][→]]
+*** ~data_gen/ntu/seq_transformation.py~
+    - Line 140: VERY IMPORTANT HERE, Make sure missing frames corresponds to correct [[file:data_gen/ntu/seq_transformation.py::140][→]]
+*** ~data_gen/ucf101/ucf101_gendata.sh~
+    - Line 105: Run validation job before extract scripts? (it just removes empty annotations) [[file:data_gen/ucf101/ucf101_gendata.sh::105][→]]
+*** ~data_gen/ucla/ucla_gendata.sh~
+    - Line 21: align.sh [[file:data_gen/ucla/ucla_gendata.sh::21][→]]
+    - Line 81: Run validation job before extract scripts? (it just removes empty annotations) [[file:data_gen/ucla/ucla_gendata.sh::81][→]]
+*** ~data_gen/ucla/ucla_gendata_test.py~
+    - Line 52: Test whether the correct actor's samples (s08) has more or less frames... [[file:data_gen/ucla/ucla_gendata_test.py::52][→]]
+*** ~data_gen/utils/extractors.py~
+    - Line 197: scalable dilation with z-coordinate or mean joint distance. [[file:data_gen/utils/extractors.py::197][→]]
+    - Line 259: check a) poses array is needed anymore [[file:data_gen/utils/extractors.py::259][→]]
+*** ~data_gen/utils/preprocess.py~
+    - Line 122: Move this to data_gen/utils/extractors.py [[file:data_gen/utils/preprocess.py::122][→]]
+*** ~feeders/ntu_rgb_d.py~
+    - Line 70: Test before removing label_path and labels [[file:feeders/ntu_rgb_d.py::70][→]]
+    - Line 231: Fix and test for poseoff data [[file:feeders/ntu_rgb_d.py::231][→]]
+*** ~feeders/tools.py~
+    - Line 422: Test that this random_rotation works for both keypoint and flow data, implement in feeder.py [[file:feeders/tools.py::422][→]]
+*** ~feeders/ucf101.py~
+    - Line 12: Based on `split` input, split the data based on the 3 train/test splits outlined in [[file:feeders/ucf101.py::12][→]]
+    - Line 223: Fix and test for poseoff data [[file:feeders/ucf101.py::223][→]]
+*** ~graph/yolo_pose.py~
+    - Line 38: REMOVE (after fixing MS-G3D) [[file:graph/yolo_pose.py::38][→]]
+*** ~main.py~
+    - Line 248: handle save_attention for main.py [[file:main.py::248][→]]
+*** ~model_utils/embeds.py~
+    - Line 236: ensure the comments here reflect the correct input shape [[file:model_utils/embeds.py::236][→]]
+*** ~models/infogcn2/sode.py~
+    - Line 13: If changing folder structure, update this import [[file:models/infogcn2/sode.py::13][→]]
+    - Line 290: Allow for configuration of GCN and SA_GC [[file:models/infogcn2/sode.py::290][→]]
+    - Line 308: Allow for configuration of GCN and SA_GC [[file:models/infogcn2/sode.py::308][→]]
+    - Line 389: remove (never called, z_mu and z_std must be torch Distribution's) [[file:models/infogcn2/sode.py::389][→]]
+    - Line 430: Test splitting up flow windows and joints [[file:models/infogcn2/sode.py::430][→]]
+*** ~models/msg3d/msg3d.py~
+    - Line 186: Rename this to something more appropriate, possibly add third layer back [[file:models/msg3d/msg3d.py::186][→]]
+*** ~models/stgcn2/modules.py~
+    - Line 144: For all of these modules, take away the mmcv style of creating layers... [[file:models/stgcn2/modules.py::144][→]]
+*** ~models/stgcn2/stgcn2.py~
+    - Line 170: Rename models and stuff [[file:models/stgcn2/stgcn2.py::170][→]]
+    - Line 277: Cleaner way of handing the embedding layer (possibly using einops Rearrange?) [[file:models/stgcn2/stgcn2.py::277][→]]
+*** ~org/code-todos.org~
+    - Line 8: .*" nil t) [[file:org/code-todos.org::8][→]]
+*** ~results/visualisations/results_vis.py~
+    - Line 344: Make this median line dynamic for each dataset! [[file:results/visualisations/results_vis.py::344][→]]
+*** ~training/eval_infogcn.py~
+    - Line 116: REMOVE (kl_div is always torch.tensor(0.0)) [[file:training/eval_infogcn.py::116][→]]
+*** ~training/loss.py~
+    - Line 42: Move this into it's own file... [[file:training/loss.py::42][→]]
+*** ~training/train_infogcn.py~
+    - Line 11: Check that this logging method works without having it inside train_network() [[file:training/train_infogcn.py::11][→]]
+    - Line 116: REMOVE (kl_div is always torch.tensor(0.0)) [[file:training/train_infogcn.py::116][→]]
+
+* Keybinds
+** Navigation
+*** ] ] - org-next-visible-heading
+Next heading
+*** [ [ - org-previous-visible-heading
+Previous heading
+*** ] h - org-forward-heading-same-level
+Next heading same level
+*** [ h - org-backward-heading-same-level
+Previous heading same level
+*** z u - outline-up-heading
+Backward to higher level heading
+*** C-c C-j - org-goto
+Jump to different place without changing the current outline visibility
+** Visualising
+*** z c - +org/close-fold
+Folds current heading
+*** z M - +org/close-all-folds
+Folds all visual headings
+** Correcting
+*** ] s - +spell/next-error
+Next ispell error
+*** [ s - +spell/previous-error
+Previous ispell error
+** Toggling
+*** SPC m x - org-toggle-checkbox
+Toggle checkbox, from [ ] to [X]
+*** SPC u SPC u SPC m x - [double prefix] org-toggle-checkbox
+Set checkbox to "[-]"
+* Searcher
+Change ~search_string~ value to search for a particular string.
+        e.g. ~search_string="flowpose"~
+Change ~excluded_dirs~ to exclude particular directories from grep search.
+        e.g. ~excluded_dirs=(":!./logs/*" ":!./org/*")~
+#+begin_src bash :results output
+## ----------------------
+search_string="ArgClass"
+excluded_dirs=(":!./logs/*")
+## ----------------------
+
+# Search for the file names
+git grep -l $search_string -- ${excluded_dirs[@]}
+# Provide a file count
+echo -e "\nThere are $(git grep -l $search_string -- ${excluded_dirs[@]} | wc -l) files containing '${search_string}'"
+#+end_src
+
+#+RESULTS:
+#+begin_example
+.project-scratch.org
+config/argclass.py
+data/visualisations/data_vis.py
+data/visualisations/get_flow_samples.py
+data_gen/ntu/get_poseoff_samples.py
+data_gen/ntu/get_poseoff_samples_LK.py
+data_gen/ucf101/gendata/flow_gendata.py
+data_gen/ucf101/gendata/pose_gendata.py
+data_gen/ucf101/gendata/poseoff_gendata.py
+data_gen/ucf101/gendata_validation.py
+data_gen/ucf101/get_ucf101_annotations.py
+data_gen/ucf101/seq_transformation.py
+data_gen/utils/extract_utils.py
+data_gen/utils/extractors.py
+feeders/ntu_rgb_d.py
+feeders/tools.py
+feeders/ucf101.py
+main.py
+model_utils/load_model.py
+model_utils/model_vis.py
+models/infogcn2/sode.py
+models/msg3d/msg3d.py
+models/stgcn2/modules.py
+models/stgcn2/stgcn2.py
+results/visualisations/cls_attention.py
+training/eval_infogcn.py
+training/eval_msg3d.py
+training/loss.py
+training/model_timer.py
+training/train_infogcn.py
+training/train_msg3d.py
+
+There are 31 files containing 'ArgClass'
+#+end_example
+
+
+#+begin_src sh :results output
+models=("msg3d" "infogcn2" "stgcn2")
+declare -A datasets=(["CS"]="ntu", ["CV"]="ntu", ["CSub"]="ntu120", ["CSet"]="ntu120", ["1"]="ucf101", ["2"]="ucf101", ["3"]="ucf101")
+for model in "${models[@]}"; do
+    for evaluation in "${!datasets[@]}"; do
+        dataset=${datasets[$evaluation]}
+        echo "${dataset} - ${evaluation}"
+    done
+done
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+ntu120, - CSub
+ucf101 - 3
+ucf101, - 2
+ucf101, - 1
+ntu, - CV
+ntu, - CS
+ntu120, - CSet
+ntu120, - CSub
+ucf101 - 3
+ucf101, - 2
+ucf101, - 1
+ntu, - CV
+ntu, - CS
+ntu120, - CSet
+ntu120, - CSub
+ucf101 - 3
+ucf101, - 2
+ucf101, - 1
+ntu, - CV
+ntu, - CS
+ntu120, - CSet
+#+end_example
+* What models need to train?
+First, train each model on the NTU-CS and the UCF101-1 splits with each dilation factor:
+** Dilation testing
+- [-] NTU RGB+D / CS
+  - [-] InfoGCN++
+    - [-] cnn
+      - [X] RAFT
+        - [X] D1
+        - [X] D2
+        - [X] D3
+        - [X] D4
+        - [X] D5
+      - [X] LK
+        - [X] D1
+        - [X] D2
+        - [X] D3
+        - [X] D4
+        - [X] D5
+      - [ ] NF
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+  - [-] MS-G3D
+    - [-] cnn
+      - [X] RAFT
+        - [X] D1
+        - [X] D2
+        - [X] D3
+        - [X] D4
+        - [X] D5
+      - [X] LK
+        - [X] D1
+        - [X] D2
+        - [X] D3
+        - [X] D4
+        - [X] D5
+      - [ ] NF
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+  - [-] ST-GCN++
+    - [-] cnn
+      - [X] RAFT
+        - [X] D1
+        - [X] D2
+        - [X] D3
+        - [X] D4
+        - [X] D5
+      - [X] LK
+        - [X] D1
+        - [X] D2
+        - [X] D3
+        - [X] D4
+        - [X] D5
+      - [ ] NF
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+- [-] UCF101 / 1
+  - [-] InfoGCN++
+    - [-] cnn
+      - [X] RAFT
+        - [X] D1
+        - [X] D2
+        - [X] D3
+      - [-] LK
+        - [X] D1
+        - [-] D2
+        - [X] D3
+      - [X] NF
+        - [X] D1
+        - [X] D2
+        - [X] D3
+  - [-] MS-G3D
+    - [-] cnn
+      - [X] RAFT
+        - [X] D1
+        - [X] D2
+        - [X] D3
+      - [-] LK
+        - [X] D1
+        - [-] D2
+        - [X] D3
+      - [X] NF
+        - [X] D1
+        - [X] D2
+        - [X] D3
+  - [-] ST-GCN++
+    - [-] cnn
+      - [X] RAFT
+        - [X] D1
+        - [X] D2
+        - [X] D3
+      - [-] LK
+        - [X] D1
+        - [-] D2
+        - [X] D3
+      - [X] NF
+        - [X] D1
+        - [X] D2
+        - [X] D3

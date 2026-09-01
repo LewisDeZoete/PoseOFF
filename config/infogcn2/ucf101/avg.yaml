@@ -1,0 +1,108 @@
+# Feeder
+feeder: feeders.ucf101.Feeder
+feeder_args:
+  data_paths: 
+    1: ./data/ucf101/aligned_data/RAFT/ucf101_01-poseoff_RAFT_D1.npz
+    2: ./data/ucf101/aligned_data/RAFT/ucf101_02-poseoff_RAFT_D1.npz
+    3: ./data/ucf101/aligned_data/RAFT/ucf101_03-poseoff_RAFT_D1.npz
+  label_path: ./data/ucf101/statistics/ucf101_annotations.yaml
+  p_interval: [0.5, 1]
+  random_shift: True
+  random_choose: True
+  window_size: 64
+  random_move: True
+  random_rot: True
+  average_flow: True # model_args.flow_channels = 2
+  absolute_flow: False
+    # window_mean:  # model_args.flow_channels = 1 if true, else 25 (for 5x5 window)
+  no_flow: False
+
+extractor:
+  data_paths:
+    rgb_path: ../Datasets/UCF-101/
+    pose_path: ./data/ucf101/pose/
+    flow_path: ./data/ucf101/flow/
+    poseoff_path: ./data/ucf101/poseoff/
+  preprocessed: True
+  pose: 
+    weights: pretrained_models/yolo11x-pose.pt
+  flow:
+    weights: pretrained_models/raft_large.pt
+    imsize: [240,320]
+    minibatch_size: 16
+  poseoff:
+    window_size: 5
+    threshold: 0.05
+    loop: False
+    norm: False
+    match_pose: False
+    ntu: False
+    dilation: 3
+    # PoseOFFSampler_LK
+    lk_winSize: (15 15)
+    lk_maxLevel: 3
+    mag_threshold: 100
+    # PoseOFFSampler_NF
+    sobel_ksize: 3
+    gaussian_ksize: 9
+    t_grad_estimator: sobel
+    eps: 1e-6
+    min_mag_threshold: 1.0
+    pad: True
+    dt: 1.0
+
+# model
+model: models.infogcn2.sode.SODE
+model_args:
+  num_class: 101
+  num_point: 17
+  num_person: 2
+  graph: graph.yolo_pose.Graph
+  pose_channels: 3
+  flow_channels: 2
+  embed_channels: 64
+  num_head: 3
+  ode_method: euler
+  depth: 4 # layers of attention heads
+  device: 0
+  T: 64 # Maximum sequence length
+  n_step: 3 # Number of ODE solver steps
+  SAGC_proj: True # Using self-attention graph convolution, (GCN if False)
+  num_cls: 10 # Number of classification heads used
+  n_sample: 1
+  backbone: transformer
+  cnn: False
+  use_mask: True # If true, previous timesteps are masked from attention (default=true)
+ignore_weights: []
+phase: train
+# weights: ./pretrained_models/kinetics_joint.pt
+
+# Optimiser
+optimiser: torch.optim.SGD
+optim_params:
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 0.0003
+  nesterov: True
+lambda_1: 1 # CLS loss (1 from paper)
+lambda_2: 0.1 # Pred/recon loss (1e-1 from paper)
+lambda_3: 0.001 # Feature loss (1e-3 from paper)
+lambda_4: 0.0
+lambda_5: 0.0
+
+# Scheduler
+scheduler: torch.optim.lr_scheduler.MultiStepLR
+scheduler_params:
+  milestones: [50, 60]
+  gamma: 0.1
+
+# training
+training_function: training.train_infogcn.train_network
+testing_function: training.eval_infogcn.eval_network
+num_epoch: 70
+device: 0
+batch_size: 128
+half: False
+
+checkpoint_freq: 10 # how often to save the model and training state
+save_location: ./results/infogcn2/ucf101/ # where to save the checkpoints

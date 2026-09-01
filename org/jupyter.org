@@ -1,0 +1,466 @@
+#+title: Jupyter
+#+STARTUP: fold
+
+* Always run this code!
+#+begin_src emacs-lisp
+(setq org-babel-python-command "/fred/oz141/ldezoete/environment/bin/python3")
+#+end_src
+
+#+RESULTS:
+: /fred/oz141/ldezoete/environment/bin/python3
+
+* Quick tests
+#+begin_src python :results output
+class TMP():
+    def __init__(self, name, *args, **kwargs):
+        self.name = name
+        try:
+            self.age = kwargs['age']
+        except KeyError:
+            print("No age provided")
+
+        print(self.name)
+        print("Args")
+        for arg in args:
+            print(f"\t{ arg }")
+        print(f"\t{ kwargs }")
+
+tmp = TMP("First name", "Second name", age=15)
+#+end_src
+
+#+RESULTS:
+: First name
+: Args
+: 	Second name
+: 	{'age': 15}
+
+* FEEDER: NTU Color skel points data
+#+begin_src python :results output
+import h5py
+import numpy as np
+
+def get_sample_data(name=None, index=None):
+    with h5py.File("../data/ntu/raw_data/raw_skes_data.h5", 'r') as f:
+        assert name != index
+        if name:
+            # Look up by name
+            names = f["names"].asstr()[:]
+            index = np.where(names == "S001C001P001R001A060")[0][0]
+        sample = f["data"][index]
+        name = f["names"][index]
+        T = f["t_lengths"][index]
+
+    return sample, name, T
+
+sample, name, T = get_sample_data(index=15)
+print(sample.shape)
+print(sample[:T].shape)
+print(name)
+#+end_src
+
+#+RESULTS:
+: (300, 2, 25, 2)
+: (205, 2, 25, 2)
+: b'S001C001P001R001A016'
+
+* Check if models have finished training!
+#+begin_src python :session res_check
+import os.path as osp
+import torch
+
+# e.g. /results/stgcn2/ntu/CS/train/stgcn2_ntu_CS_cnn_D1.pt
+root_path = "../results"
+models = ["infogcn2", "stgcn2", "msg3d"]
+flow_types = ["RAFT", "LK", "NF"]
+
+filename = "{model}_{dataset}_{split}_cnn_{flow_type}_D{dilation}.pt"
+
+def get_eval_results(res_path):
+    checkpoint = torch.load(res_path, map_location="cpu")
+    try:
+        res = checkpoint['results']
+        print(f"\t\t{torch.tensor(res['test_ACC']).max()*100:.2f}%")
+    except Exception as e:
+        print("0%")
+    # return float(res['test_ACC'][-1])*100
+
+def print_results(dataset, split):
+    incomplete = {}
+    results = {}
+
+    for flow_type in flow_types:
+        print(flow_type)
+        for model in models:
+            incomplete[model] = {flow_type: []}
+            results[model] = {} # init empty dict for model...
+            for dilation in range(1,4):
+                res_path = osp.join(
+                    root_path,
+                    model,
+                    dataset,
+                    split,
+                    "train",
+                    filename.format(
+                        model=model,
+                        dataset=dataset,
+                        split=split,
+                        flow_type=flow_type,
+                        dilation=dilation
+                    )
+                )
+
+                if osp.exists(res_path):
+                    print(f"\t{model} - D{dilation}")
+                    get_eval_results(res_path)
+                    # results[model][dilation] = get_eval_results(res_path)
+                else:
+                    incomplete[model][flow_type].append(dilation)
+                    # print(f"NO TRAINING DATA FOR: {model} - D{dilation}")
+                    # print(f"Couldn't find file: {res_path}")
+
+        print(incomplete)
+#+end_src
+
+#+RESULTS:
+: None
+
+#+begin_src python :results output :session res_check
+dataset = "ucf101" # ntu, ntu120, ucf101
+split = "1" # CS/CV, CSub/CSet, ucf101
+
+print_results(dataset, split)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+RAFT
+	infogcn2 - D1
+		65.64%
+	infogcn2 - D2
+		66.28%
+	infogcn2 - D3
+		67.55%
+	stgcn2 - D1
+		57.81%
+	stgcn2 - D2
+		58.83%
+	stgcn2 - D3
+		58.54%
+	msg3d - D1
+		63.92%
+	msg3d - D2
+		61.74%
+	msg3d - D3
+		63.65%
+{'infogcn2': {'RAFT': []}, 'stgcn2': {'RAFT': []}, 'msg3d': {'RAFT': []}}
+LK
+	infogcn2 - D1
+		65.99%
+	infogcn2 - D2
+0%
+	infogcn2 - D3
+		65.64%
+	stgcn2 - D1
+		58.70%
+	stgcn2 - D2
+0%
+	stgcn2 - D3
+		59.08%
+	msg3d - D1
+		61.95%
+	msg3d - D2
+0%
+	msg3d - D3
+		63.51%
+{'infogcn2': {'LK': []}, 'stgcn2': {'LK': []}, 'msg3d': {'LK': []}}
+NF
+	infogcn2 - D1
+		56.63%
+	infogcn2 - D2
+		56.92%
+	infogcn2 - D3
+		67.01%
+	stgcn2 - D1
+		47.51%
+	stgcn2 - D2
+		49.33%
+	stgcn2 - D3
+		59.77%
+	msg3d - D1
+		63.98%
+	msg3d - D2
+		63.87%
+	msg3d - D3
+		63.43%
+{'infogcn2': {'NF': []}, 'stgcn2': {'NF': []}, 'msg3d': {'NF': []}}
+#+end_example
+
+* Data extraction validation
+#+begin_src python :results output
+# import torch
+import mmnpz
+from einops import rearrange
+import numpy as np
+import os.path as osp
+
+# Load and access datasets
+path_RAFT = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/poseoff/RAFT/ntu_CS-poseoff_RAFT_D1_aligned.npz"
+path_LK = "/fred/oz141/ldezoete/MS-G3D/data/ntu/aligned_data/poseoff/LK/ntu_CS-poseoff_LK_D1_aligned.npz"
+dat_RAFT = mmnpz.load(path_RAFT)
+dat_LK = mmnpz.load(path_LK)
+
+for file_name, file_data in {"RAFT":dat_RAFT, "LK":dat_LK}.items():
+    print(file_name)
+    batch_size=64
+
+    org_data = file_data
+    splits = ["x_train", "x_test"]
+
+    count = None
+    mean = None
+    M2 = None
+
+    # Original splits are arrays of shape (N, T, M*V*C)
+    M, V = 2, 25
+    C = 53 if "poseoff" in path_RAFT else 3
+
+    # Process the splits :)
+    for split in splits:
+        data = org_data[split]
+        N, T, _ = data.shape
+        # Batch the data
+        for start in range(0, N, batch_size):
+            # Load and reshape batch
+            batch = data[start:start+batch_size].astype(np.float64)
+            batch = batch.reshape(batch.shape[0], T, M, V, C)
+            # batch shape: (B, T, M, V, C)
+
+            # A frame is "real" if any of (M, V, C) is non-zero
+            valid_mask = (batch != 0).any(axis=(3,4)) # (B, T, M) - True if a frame is real!
+            batch_count = valid_mask.sum()
+
+            if batch_count == 0:
+                continue
+
+            # Extract mean and var only for valid frames
+            valid_frames = batch[valid_mask]
+            batch_mean = valid_frames.mean(axis=0) # V, C
+            batch_var = valid_frames.var(axis=0) # V, C
+
+            if count is None:
+                count = batch_count
+                mean = batch_mean
+                M2 = batch_var * batch_count
+            else:
+                new_count = count + batch_count
+                delta = batch_mean - mean
+                mean = mean + delta * (batch_count / new_count)
+                M2 = M2 + batch_var * batch_count + (delta ** 2) * (count*batch_count/new_count)
+                count = new_count
+            break
+    # Calculate standard deviation after mean calculation
+    variance = M2 / count
+    std = np.sqrt(variance)
+    # Reshape (V, C) -> (C, 1, V, 1)
+    mean_map = mean.T[:, np.newaxis, :, np.newaxis]
+    std_map = std.T[:, np.newaxis, :, np.newaxis]
+
+    print(f"Mean map shape: {mean_map.shape}")
+    print(f"Mean map zero {mean_map[:, 0, 0, 0]}")
+    print(f"Standard deviation map shape: {std_map.shape}")
+    print(f"Standard deviation map 0 {std_map[:, 0, 0, 0]}")
+
+#+end_src
+* NTU Dataset video frame viewing/saving
+** Setup
+#+begin_src python :results output :session class_examples
+import matplotlib.pyplot as plt
+import numpy as np
+from data_gen.utils import LoadVideo
+import yaml
+import os
+import shutil
+import os.path as osp
+import cv2
+from einops import rearrange
+#+end_src
+
+#+RESULTS:
+** Calc
+Find the setup by parsing the class_names list...
+class_number - 43 
+setup - 9
+participant 25
+#+begin_src python :results output :session class_examples
+class_number = 43 # Change this to pick a different class (1-120, not zero indexed)
+example_number = 0 # Change this to pick a different example of the given class
+full_video = True
+specific_sample = ""
+specific_sample = "S009C001P025R001A043" # Falling over - Used in the paper!
+specific_sample = "S009C001P025R001A042"
+# specific_sample = "S019C001P051R001A113"
+# specific_sample = "S026C003P075R001A098"
+
+# Get the right class number if specific sample was provided...
+if specific_sample != "":
+    class_number = int(specific_sample[-3:])
+
+# Load the names of the skeleton files
+# dataset_extn = '' if dataset == 'ntu' else '120'
+dataset_extn = '' if class_number <= 60 else '120'
+skes_names = np.loadtxt(
+    f"../data/ntu{dataset_extn}/statistics/ntu_rgbd{dataset_extn}-available.txt",
+    dtype=str
+)
+
+# Get the printable class names...
+with open(f"../data/ntu{dataset_extn}/statistics/class_names.yaml", 'r') as file:
+    class_names = yaml.safe_load(file)
+# Get class name and replace characters (e.g. / and space)
+class_name = class_names[class_number-1].replace("/", "_").replace(" ", "_")
+
+# Get a list of all examples for the particular class number
+class_examples = [cls_name for cls_name in skes_names if cls_name.endswith((str(class_number).zfill(3)))] # ensure it's 00X etc.
+print(f"There are a total of {len(class_examples)} examples for class {class_number} - {class_name}.")
+
+# Define the sample name to load and draw
+sample_name = specific_sample if specific_sample != "" else class_examples[example_number]
+
+# This is the name of the file to be written...
+save_path = osp.join("./imgs/class_examples", f"{class_number}-{class_name}")
+if osp.exists(save_path): # Clear the folder out!
+    shutil.rmtree(save_path)
+os.makedirs(save_path)
+fname = "{class_number}-{class_name}-f{frame_number}.png"
+
+# Create the transform that loads the given video
+rgb_transform = LoadVideo(max_frames=300)
+# Define video path
+video_path = f"../../Datasets/NTU_RGBD{dataset_extn}/nturgb+d_rgb{dataset_extn}/{sample_name}_rgb.avi"
+
+# Get the RGB data!
+rgb_data = rgb_transform(video_path).to("cpu")
+rgb_data = rearrange(rgb_data, 'T C H W -> T H W C').numpy()
+if full_video:
+    frame_numbers = np.linspace(0, rgb_data.shape[0], num=int(rgb_data.shape[0]), endpoint=False, dtype=int)
+else:
+    # Sampling pairs (five frames apart) at start, middle and end of video
+    frame_numbers = np.sort(np.concatenate((
+        np.linspace(0, rgb_data.shape[0]-6, num=3, dtype=int),
+        np.linspace(5, rgb_data.shape[0]-1, num=3, dtype=int)
+        )))
+print(f"Sample with name {sample_name} will be drawn.")
+print(f"Sample has a total of {rgb_data.shape[0]} frames.")
+
+# Iterate over given frame numbers and write them out!
+saved_frame_paths = []
+print(f"Writing frames to: {save_path}")
+for frame_number in frame_numbers:
+    if frame_number >= len(rgb_data):
+        print(f"Frame number {frame_number} is greater than video length -- Exiting.")
+        break
+    save_name = osp.join(
+        save_path,
+        fname.format(
+            class_number=class_number,
+            class_name=class_name,
+            frame_number=frame_number
+        )
+    )
+    frame = cv2.cvtColor(rgb_data[frame_number], cv2.COLOR_BGR2RGB)
+    cv2.imwrite(save_name, frame)
+    saved_frame_paths.append(save_name)
+#+end_src
+
+#+RESULTS:
+: There are a total of 947 examples for class 42 - staggering.
+: Sample with name S009C001P025R001A042 will be drawn.
+: Sample has a total of 107 frames.
+: Writing frames to: ./imgs/class_examples/42-staggering
+
+** View
+#+begin_src python :results file :session class_examples
+num=50
+saved_frame_paths[num]  # last value of save_name from the loop
+#+end_src
+
+#+RESULTS:
+[[file:./imgs/class_examples/43-falling/43-falling-f50.png]]
+
+** Sample finding
+For the PoseOFF presentations, some of the samples I've used are:
+Falling:
+    {'setup': 9, 'participant': 25, 'action': 43} 
+Stumbling:
+    {'setup': 9, 'participant': 25, 'action': 44} 
+
+#+begin_src python :results output :session class_examples
+action_num = "042"
+setup_num = "S009"
+participant = "P025"
+replication = "R002"
+
+# Get action samples
+action_samples = [ex for ex in skes_names if ex.endswith(action_num)]
+# Find sample with setup number provided
+setup_samples = sorted( [ex for ex in action_samples if ex.startswith(setup_num)] )
+if setup_samples == []:
+    print("No examples with this setup")
+# Get the performers that performed this action in this setup
+participants = sorted( set( [int(ex[9:12]) for ex in setup_samples] ) )
+# Show the samples for a specific participant!
+p_samples = [sample for sample in setup_samples if participant in sample]
+
+print(f"Participants: {participants}")
+print(p_samples)
+#+end_src
+
+#+RESULTS:
+: 43
+: Participants: [7, 8, 15, 16, 17, 19, 25]
+: ['S009C001P025R001A042', 'S009C001P025R002A042', 'S009C002P025R001A042', 'S009C002P025R002A042', 'S009C003P025R001A042', 'S009C003P025R002A042']
+
+* UCF-101 Dataset video frame viewing/saving
+#+begin_src python :results output
+import os
+import os.path as osp
+import numpy as np
+from decord import VideoReader, cpu
+import cv2
+from PIL import Image
+
+class_name = "SkateBoarding"
+video_number = 19
+frame_number = 10
+
+root_path = "../../Datasets/UCF-101"
+class_names = sorted([class_name for class_name in os.listdir(root_path) if osp.isdir(osp.join(root_path, class_name))])
+print(class_names)
+class_path = osp.join(root_path, class_name)
+video_names = sorted(os.listdir(class_path))
+video_path = osp.join(class_path, video_names[video_number])
+print(f"Input video path: {video_path}")
+
+# Load the video
+vr = VideoReader(video_path, ctx=cpu(0))
+print(f"Video name: {video_names[video_number]}\nLength: {len(vr)}")
+for frame_num, frame in enumerate(vr):
+    frame = frame.asnumpy()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+# frame = vr[frame_number].asnumpy()
+# frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # Save a video frame...
+    output_path = f"./imgs/class_examples/{video_names[video_number].split('_')[1]}"
+    os.makedirs(output_path, exist_ok=True)
+    output_name = osp.join(output_path, f"{video_names[video_number].split('.')[0]}-F{frame_num}.png")
+    cv2.imwrite(output_name, frame)
+#+end_src
+
+#+RESULTS:
+: ['ApplyEyeMakeup', 'ApplyLipstick', 'Archery', 'BabyCrawling', 'BalanceBeam', 'BandMarching', 'BaseballPitch', 'Basketball', 'BasketballDunk', 'BenchPress', 'Biking', 'Billiards', 'BlowDryHair', 'BlowingCandles', 'BodyWeightSquats', 'Bowling', 'BoxingPunchingBag', 'BoxingSpeedBag', 'BreastStroke', 'BrushingTeeth', 'CleanAndJerk', 'CliffDiving', 'CricketBowling', 'CricketShot', 'CuttingInKitchen', 'Diving', 'Drumming', 'Fencing', 'FieldHockeyPenalty', 'FloorGymnastics', 'FrisbeeCatch', 'FrontCrawl', 'GolfSwing', 'Haircut', 'HammerThrow', 'Hammering', 'HandStandPushups', 'HandStandWalking', 'HeadMassage', 'HighJump', 'HorseRace', 'HorseRiding', 'HulaHoop', 'IceDancing', 'JavelinThrow', 'JugglingBalls', 'JumpRope', 'JumpingJack', 'Kayaking', 'Knitting', 'LongJump', 'Lunges', 'MilitaryParade', 'Mixing', 'MoppingFloor', 'Nunchucks', 'ParallelBars', 'PizzaTossing', 'PlayingCello', 'PlayingDaf', 'PlayingDhol', 'PlayingFlute', 'PlayingGuitar', 'PlayingPiano', 'PlayingSitar', 'PlayingTabla', 'PlayingViolin', 'PoleVault', 'PommelHorse', 'PullUps', 'Punch', 'PushUps', 'Rafting', 'RockClimbingIndoor', 'RopeClimbing', 'Rowing', 'SalsaSpin', 'ShavingBeard', 'Shotput', 'SkateBoarding', 'Skiing', 'Skijet', 'SkyDiving', 'SoccerJuggling', 'SoccerPenalty', 'StillRings', 'SumoWrestling', 'Surfing', 'Swing', 'TableTennisShot', 'TaiChi', 'TennisSwing', 'ThrowDiscus', 'TrampolineJumping', 'Typing', 'UnevenBars', 'VolleyballSpiking', 'WalkingWithDog', 'WallPushups', 'WritingOnBoard', 'YoYo']
+: Input video path: ../../Datasets/UCF-101/SkateBoarding/v_SkateBoarding_g05_c01.avi
+: Video name: v_SkateBoarding_g05_c01.avi
+: Length: 140
+

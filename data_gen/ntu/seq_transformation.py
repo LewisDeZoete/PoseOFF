@@ -1,0 +1,461 @@
+# # Copyright (c) Microsoft Corporation. All rights reserved.
+# # Licensed under the MIT License.
+import sys
+import os
+import os.path as osp
+import numpy as np
+import pickle
+import yaml
+from data_gen.utils import create_aligned_dataset, get_mean_map
+import argparse
+
+parser = argparse.ArgumentParser(description='NTU-RGB-D Data Preparation')
+parser.add_argument(
+    '--dataset',
+    dest='dataset',
+    default='ntu',
+    help='Dataset, either `ntu` or `ntu120` (default=ntu)'
+)
+parser.add_argument(
+    '--dilation',
+    dest='dilation',
+    type=int,
+    default=3,
+    help="Dilation factor of the extracted PoseOFF features (default=3)"
+)
+parser.add_argument(
+    '--flow',
+    action='store_true',
+    help='If passed, add flow to the pose array'
+)
+parser.add_argument(
+    '--flow_type',
+    default='RAFT',
+    help="The type of flow used to generate the data. (default=RAFT)"
+)
+parser.add_argument(
+    '--split',
+    action='store_true',
+    help='If passed, creates the dataset splits (train/test). \
+    WILL NOT CREATE ALIGNED DATASET, \
+    Run this again without --split to align (store_true)'
+)
+args = parser.parse_args()
+dataset = args.dataset
+assert dataset in ['ntu', 'ntu120']
+dilation = args.dilation
+flow_type = args.flow_type
+mod = f"_{flow_type}_D{dilation}"
+
+# Paths
+root_path = f'./data/{dataset}'
+save_path = osp.join(root_path, 'aligned_data')
+save_name = "{dataset}_{evaluation}-{data_type}{mod}.npz"
+stat_path = osp.join(root_path, 'statistics')
+denoised_path = osp.join(root_path, 'denoised_data')
+flow_path = osp.join(root_path, 'flow_data', flow_type)
+# Info files and folders
+skes_name_file = osp.join(stat_path, f'ntu_rgbd{120 if dataset == "ntu120" else ""}-available.txt')
+frames_file = osp.join(stat_path, 'frames_cnt.txt')
+# Data file paths
+raw_skes_joints_pkl = osp.join(denoised_path, 'raw_denoised_joints.pkl')
+raw_flow_joints_pkl = osp.join(flow_path, f"flow_data_{flow_type}_D{dilation}.pkl")
+raw_poseoff_pkl = osp.join(flow_path, f"raw_poseoff_data_{flow_type}_D{dilation}.pkl") # This is the file that is saved TO
+
+
+def get_details(skes_name, frames_cnt):
+    details: dict = {} # Create and populate details dict
+    for key in ['Setup', 'Camera', 'Performer', 'Replication', 'Label', 'Frame_cnt']:
+        details[key] = np.array([], dtype=int)
+    # Get the details from the file names
+    for number, name in enumerate(skes_name):
+        details['Setup'] = np.append(details['Setup'], int(name.split('S')[1][:3]))
+        details['Camera'] = np.append(details['Camera'], int(name.split('C')[1][:3]))
+        details['Performer'] = np.append(details['Performer'], int(name.split('P')[1][:3]))
+        details['Replication'] = np.append(details['Replication'], int(name.split('R')[1][:3]))
+        details['Label'] = np.append(details['Label'], int(name.split('A')[1][:3])-1)
+        details['Frame_cnt'] = np.append(details['Frame_cnt'], int(frames_cnt[number]))
+    
+    return details
+
+def remove_nan_frames(ske_name, ske_joints, nan_logger):
+    num_frames = ske_joints.shape[0]
+    valid_frames = []
+
+    for f in range(num_frames):
+        if not np.any(np.isnan(ske_joints[f])):
+            valid_frames.append(f)
+        else:
+            nan_indices = np.where(np.isnan(ske_joints[f]))[0]
+            nan_logger.info('{}\t{:^5}\t{}'.format(ske_name, f + 1, nan_indices))
+
+    return ske_joints[valid_frames]
+
+
+def seq_translation(skes_joints, flow_joints=None):
+    """
+    Translates the sequence of skeleton joints to a new origin based on the first non-zero frame of the first actor.
+
+    Parameters:
+    skes_joints (list: numpy.ndarray): list of length N containing numpy arrays of shape 
+                                       (T, M*V*C) 
+                                       T is the number of frames, 
+                                       M is the number of actors (1 or 2),
+                                       V is the number of joints, 
+                                       C is the number of coordinates per joint.
+    flow_joints (list: numpy.ndarray): list of length N containing numpy arrays of shape
+                                       (T-1, M*V*C)
+                                       T is the number of frames,
+                                       M is the number of actors (1 or 2),
+                                       V is the number of joints,
+                                       C is the flow data per joint ((flow_window**2)*2).
+
+    Returns:
+    numpy.ndarray: The translated sequence of skeleton joints with the same shape as the input.
+    """
+    for idx, ske_joints in enumerate(skes_joints):
+        num_frames = ske_joints.shape[0]
+        num_bodies = 1 if ske_joints.shape[1] == 75 else 2
+        if num_bodies == 2:
+            missing_frames_1 = np.where(ske_joints[:, :75].sum(axis=1) == 0)[0]
+            missing_frames_2 = np.where(ske_joints[:, 75:].sum(axis=1) == 0)[0]
+            cnt1 = len(missing_frames_1)
+            cnt2 = len(missing_frames_2)
+
+        i = 0  # get the "real" first frame of actor1
+        while i < num_frames:
+            if np.any(ske_joints[i, :75] != 0):
+                break
+            i += 1
+
+        # Set joint 2 (core) as new origin
+        origin = np.copy(ske_joints[i, 3:6])  # new origin: joint-2
+
+        for f in range(num_frames):
+            if num_bodies == 1:
+                ske_joints[f] -= np.tile(origin, 25)
+            else:  # for 2 actors
+                ske_joints[f] -= np.tile(origin, 50)
+
+        # TODO: VERY IMPORTANT HERE, Make sure missing frames corresponds to correct
+        #       Indices in flow data (Should be [missing_frames] - 1 excluding 0)
+        if (num_bodies == 2) and (cnt1 > 0):
+            ske_joints[missing_frames_1, :75] = np.zeros((cnt1, 75), dtype=np.float32)
+            if flow_joints is not None: # Flow data covers frames 2 through T
+                skip_set1 = [frame_no-1 for frame_no in missing_frames_1 if frame_no > 0]
+                flow_joints[idx][skip_set1, :1250] = np.zeros((len(skip_set1), 1250), dtype=np.float32)
+
+        if (num_bodies == 2) and (cnt2 > 0):
+            ske_joints[missing_frames_2, 75:] = np.zeros((cnt2, 75), dtype=np.float32)
+            if flow_joints is not None: # Flow data covers frames 2 through T
+                skip_set2 = [frame_no-1 for frame_no in missing_frames_2 if frame_no > 0]
+                flow_joints[idx][skip_set2, 1250:] = np.zeros((len(skip_set2), 1250), dtype=np.float32)
+
+        skes_joints[idx] = ske_joints  # Update
+
+    return skes_joints
+
+
+def align_frames(joints, frames_cnt, MVC=150):
+    """
+    Align all sequences with the same frame length. 
+        multiplied by the number of joints and the number of channels.
+    
+    Parameters:
+    joints (list: numpy.ndarray): List length N containing arrays of chape (T, MVC).
+                            N is the number of sequences.
+                            T is the number of frames.
+                            MVC is the number of joints and the number of channels.
+    frames_cnt (numpy.ndarray): The number of frames for each sequence.
+    MVC (int, optional): The number of joints and the number of channels. Default is 150.
+    """
+    num_skes = len(joints)
+    max_num_frames = frames_cnt.max()  # 300
+    aligned_joints = np.zeros((num_skes, max_num_frames, MVC), dtype=np.float32)
+
+    for idx, video in enumerate(joints):
+        num_frames = video.shape[0]
+        num_bodies = 1 if video.shape[1] == int(MVC/2) else 2
+        if num_bodies == 1:
+            aligned_joints[idx, :num_frames] = np.hstack((video,
+                                                          np.zeros_like(video)))
+        else:
+            aligned_joints[idx, :num_frames] = video
+
+    return aligned_joints
+
+
+def one_hot_vector(labels):
+    num_skes = len(labels)
+    labels_vector = np.zeros((num_skes, labels.max()+1))
+    for idx, label in enumerate(labels):
+        labels_vector[idx, label] = 1
+
+    return labels_vector
+
+
+def split_dataset(joints, details: dict, evaluation: str, save_name: str, save_path: str, data_type='pose', mod=''):
+    """
+    Splits the numpy array of joints into the specified train/test split.
+    Saves the split array as a .npz file, with keys:
+        ['x_train', 'x_test', 'y_train', 'y_test']
+    where 'x' and 'y' relate to data and labels respectively.
+
+    Args:
+        joints: Numpy array containing all data of shape (N, T, MVC).
+        details: Dictionary containing metadata about all samples with keys such as:
+            ('Setup', 'Camera',...,'Label', 'Frame_cnt)
+            See `get_details` function for detail.
+        evaluation: String indicating which evaluation to use (see `get_indices` function).
+        save_path: The root path where .npz files are saved to.
+        data_type: Type of data being split, either 'pose' or 'poseoff'.
+        mod: Modifier to append to the end of the name of the file being saved.
+    """
+    train_indices, test_indices = get_indices(
+        details['Performer'], 
+        details['Camera'],
+        details['Setup'],
+        evaluation)
+
+    # Save labels and num_frames for each sequence of each data set
+    train_labels = details['Label'][train_indices]
+    test_labels = details['Label'][test_indices]
+
+    train_x = joints[train_indices]
+    train_y = one_hot_vector(train_labels)
+    test_x = joints[test_indices]
+    test_y = one_hot_vector(test_labels)
+
+    # Define the save name and full path
+    # (e.g. data/ntu/aligned_data/poseoff/RAFT/ntu_CV-poseoff_RAFT_D3_aligned.npz)
+    # The files are saved in the save path under their own pose/poseoff sub-directories
+    os.makedirs(
+        osp.join(save_path, data_type, flow_type if data_type=="poseoff" else ""),
+        exist_ok=True
+    )
+    file_save_path = osp.join(
+        save_path, # ./data/ntu(120)/aligned_data/
+        data_type, # ./data/ntu(120)/aligned_data/pose/
+        flow_type if data_type=="poseoff" else "", # ./data/ntu(120)/aligned_data/poseoff/RAFT/
+        save_name.format(
+            dataset=dataset,
+            evaluation=evaluation,
+            data_type=data_type,
+            mod=mod)
+    )
+    np.savez(file_save_path, x_train=train_x, y_train=train_y, x_test=test_x, y_test=test_y)
+    return file_save_path
+
+
+
+def get_indices(performer, camera, setup, evaluation='CS'):
+    test_indices = np.empty(0)
+    train_indices = np.empty(0)
+
+    if evaluation == 'CS':  # Cross Subject (Subject IDs)
+        train_ids = [1,  2,  4,  5,  8,  9,  13, 14, 15, 16,
+                     17, 18, 19, 25, 27, 28, 31, 34, 35, 38]
+        test_ids = [3,  6,  7,  10, 11, 12, 20, 21, 22, 23,
+                    24, 26, 29, 30, 32, 33, 36, 37, 39, 40]
+
+        # Get indices of test data
+        for idx in test_ids:
+            temp = np.where(performer == idx)[0]  # 0-based index
+            test_indices = np.hstack((test_indices, temp)).astype(int)
+
+        # Get indices of training data
+        for train_id in train_ids:
+            temp = np.where(performer == train_id)[0]  # 0-based index
+            train_indices = np.hstack((train_indices, temp)).astype(int)
+    elif evaluation == 'CSub': # Cross Subject (NTU120)
+        train_ids = [1, 2, 4, 5, 8, 9, 13, 14, 15, 16, 17, 18, 19, 25, 27, 28,
+                     31, 34, 35, 38, 45, 46, 47, 49, 50, 52, 53, 54, 55, 56, 57,
+                     58, 59, 70, 74, 78, 80, 81, 82, 83, 84, 85, 86, 89, 91, 92,
+                     93, 94, 95, 97, 98, 100, 103]
+        test_ids = [i for i in range(1, 107) if i not in train_ids]
+
+        # Get indices of test data
+        for idx in test_ids:
+            temp = np.where(performer == idx)[0]  # 0-based index
+            test_indices = np.hstack((test_indices, temp)).astype(int)
+
+        # Get indices of training data
+        for train_id in train_ids:
+            temp = np.where(performer == train_id)[0]  # 0-based index
+            train_indices = np.hstack((train_indices, temp)).astype(int)
+    elif evaluation == 'CV':  # Cross View (Camera IDs)
+        train_ids = [2, 3]
+        test_ids = 1
+        # Get indices of test data
+        temp = np.where(camera == test_ids)[0]  # 0-based index
+        test_indices = np.hstack((test_indices, temp)).astype(int)
+
+        # Get indices of training data
+        for train_id in train_ids:
+            temp = np.where(camera == train_id)[0]  # 0-based index
+            train_indices = np.hstack((train_indices, temp)).astype(int)
+
+    elif evaluation == 'CSet': # Cross Setup (NTU120)
+        train_ids = [i for i in range(1, 33) if i % 2 == 0]  # Even setup
+        test_ids = [i for i in range(1, 33) if i % 2 == 1]  # Odd setup
+
+        # Get indices of test data
+        for test_id in test_ids:
+            temp = np.where(setup == test_id)[0]  # 0-based index
+            test_indices = np.hstack((test_indices, temp)).astype(int)
+
+        # Get indices of training data
+        for train_id in train_ids:
+            temp = np.where(setup == train_id)[0]  # 0-based index
+            train_indices = np.hstack((train_indices, temp)).astype(int)
+    return train_indices, test_indices
+
+
+def concat_poseoff(skes_joints, flow_joints):
+    """
+    Concatenate the flow data to the pose data to create the poseoff data.
+    NOTE: First frame of skeleton data is removed and sequence is shifted by 1 frame.
+    """
+    N, T, MVC = skes_joints.shape
+    # Remove the first frame of the skeleton data (add a zero frame at the end)
+    skes_joints = np.concatenate((skes_joints[:, 1:, :], np.zeros((N, 1, MVC))), axis=1)
+    skes_joints = skes_joints.reshape((N, T, 2, 25, 3))
+    flow_joints = flow_joints.reshape((N, T, 2, 25, 50)) # Assuming flow window = 5
+
+    new_flow_joints = np.empty((N, T, 2, 25, 53), dtype=np.float32)
+    new_flow_joints[:,:,:,:, :3] = skes_joints
+    new_flow_joints[:,:,:,:, 3:] = flow_joints
+    new_flow_joints = new_flow_joints.reshape((N, T, -1))
+
+    return new_flow_joints
+
+
+if __name__ == '__main__':
+    evaluations = ['CS', 'CV'] if dataset == 'ntu' else ['CSub', 'CSet']
+
+    # Load data statistics
+    frames_cnt = np.loadtxt('./data/ntu/statistics/frames_cnt.txt', dtype=int)
+    skes_name = np.loadtxt('./data/ntu/statistics/ntu_rgbd-available.txt', dtype=str)
+    if dataset=='ntu120':
+        frames_cnt = np.hstack((frames_cnt, np.loadtxt(frames_file, dtype=int)))
+        skes_name = np.hstack((skes_name, np.loadtxt(skes_name_file, dtype=str)))
+    details = get_details(skes_name, frames_cnt)
+
+    print(f'Dataset: {dataset}')
+    if args.split:
+        print('Splitting dataset')
+    if args.flow:
+        print('Processing optical flow data\n')
+
+    for evaluation in evaluations:
+        train_indices, test_indices = get_indices(
+            details['Performer'],
+            details['Camera'],
+            details['Setup'],
+            evaluation)
+        print(f'\t\tTrain indices length: {len(train_indices)}')
+        print(f'\t\tTest indices length: {len(test_indices)}')
+        print(f'\tTotal skes names: {len(skes_name)}\n')
+
+    # If this split=True, create the train/test splits for the dataset
+    if args.split:
+        # Load the ntu skeleton data regardless of the dataset
+        # NOTE: cant use paths defined at top of file (in the event that it's the ntu120 dataset)
+        # So you must load the flow_data from the ntu dataset before anything else
+        with open('./data/ntu/denoised_data/raw_denoised_joints.pkl', 'rb') as fr:
+            skes_joints = pickle.load(fr)
+        if args.flow:
+            with open(f"./data/ntu/flow_data/{flow_type}/flow_data_{flow_type}_D{dilation}.pkl", 'rb') as fr:
+                flow_joints = pickle.load(fr)
+        else:
+            flow_joints = None
+
+        if dataset == 'ntu120':
+            # Load the raw data
+            with open(raw_skes_joints_pkl, 'rb') as fr:
+                for skel in pickle.load(fr):
+                    skes_joints.append(skel)
+            # Also load the flow if we pass the argument!
+            if args.flow:
+                with open(raw_flow_joints_pkl, 'rb') as fr:
+                    for skel in pickle.load(fr):
+                        flow_joints.append(skel)
+                print(f'\tFlow joints dtype: {flow_joints[0].dtype}', flush=True)
+            else:
+                flow_joints = None
+        print(
+            f'\tLoaded {len(skes_joints)} skeleton sequences and {len(flow_joints)} flow sequences',
+              flush=True
+        )
+
+        # Translates the sequence to a new origin first non-zero frame of the first actor
+        skes_joints = seq_translation(skes_joints, flow_joints)
+
+        # Aligned to the same frame length
+        skes_joints = align_frames(skes_joints, frames_cnt)
+        if args.flow:
+            flow_joints = align_frames(flow_joints, frames_cnt, MVC=2500)
+            print(f'\tFull flow sequence shape: {flow_joints.shape}', flush=True)
+            print(f'\tFull skeleton sequence shape: {skes_joints.shape}', flush=True)
+            flow_joints = concat_poseoff(skes_joints, flow_joints)
+            print(f'\tFull poseoff sequence shape: {flow_joints.shape}', flush=True)
+            print(f'\tPose only approximate size: {sys.getsizeof(skes_joints, 5)/1e9:.2f} GB', flush=True)
+            print(f'\tPoseoff approximate size: {sys.getsizeof(flow_joints, 5)/1e9:.2f} GB', flush=True)
+            with open(raw_poseoff_pkl, 'wb') as f:
+                pickle.dump(flow_joints, f, pickle.HIGHEST_PROTOCOL)
+
+        # Generate train-test splits and save the data
+        file_list = []
+        for evaluation in evaluations:
+            # Split the pose joints, this will be the same array shape regardless of dilation
+            # saves as: {dataset}_{evaluation}-{data_type}{mod}.npz
+            file_save_path = split_dataset(skes_joints, details, evaluation,
+                                           save_name, save_path,
+                                           data_type='pose', mod='')
+            print(f'\tSaved pose {evaluation}', flush=True)
+            file_list.append(file_save_path)
+            # If flow arg is passed, also split the poseoff dataset
+            if args.flow:
+                file_save_path = split_dataset(flow_joints, details, evaluation,
+                                               save_name, save_path,
+                                               data_type='poseoff', mod=mod)
+                print(f'\tSaved poseoff {evaluation}', flush=True)
+                file_list.append(file_save_path)
+
+    else:
+        file_list = []
+        file_list += [
+            osp.join(
+                save_path, # ./data/ntu(120)/aligned_data/
+                'pose', # ./data/ntu(120)/aligned_data/pose/
+                save_name.format(
+                    dataset=dataset,
+                    evaluation=evaluation,
+                    data_type='pose',
+                    mod=''
+                )
+            )
+                     for evaluation in evaluations]
+        if args.flow:
+            file_list += [
+                osp.join(
+                    save_path, # ./data/ntu(120)/aligned_data/
+                    'poseoff', # ./data/ntu(120)/aligned_data/poseoff/
+                    flow_type, # ./data/ntu(120)/aligned_data/poseoff/(RAFT, LK...)/
+                    save_name.format(
+                        dataset=dataset,
+                        evaluation=evaluation,
+                        data_type='poseoff',
+                        mod=mod
+                    )
+                )
+                for evaluation in evaluations]
+        print(file_list, flush=True)
+
+        # Create the aligned dataset
+        create_aligned_dataset(file_list=file_list)
+        print('\tAligned datasets created successfully!', flush=True)
+
+        # Get mean map for dataset...
+        aligned_file_list = [file_name.replace(".npz", "_aligned.npz") for file_name in file_list]
+        get_mean_map(file_list=aligned_file_list)
