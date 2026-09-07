@@ -224,7 +224,6 @@ class PoseOFFSampler:
     """
     def __init__(
             self,
-            *args,
             window_size: int = 3,
             threshold: float = 0.05,
             loop: bool = True,
@@ -233,6 +232,7 @@ class PoseOFFSampler:
             ntu: bool = False,
             dilation: int = 1,
             debug_vis: bool = False,
+            *args,
             **kwargs
     ):
         self.window_size = window_size  # Window size about pose keypoint
@@ -276,7 +276,6 @@ class PoseOFFSampler:
             poses = self.pose_match(poses)
 
         if self.ntu:  # NTU does not return confidence values for keypoints
-            # TODO: check a) poses array is needed anymore
             # Remove nan values (replace with zeros)
             pose_points = np.nan_to_num(poses, nan=0)
             # Scale between x:[0-1919] y:[0-1079]

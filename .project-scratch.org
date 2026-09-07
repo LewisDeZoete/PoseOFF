@@ -477,15 +477,15 @@ First, train each model on the NTU-CS and the UCF101-1 splits with each dilation
         - [X] D1
         - [X] D2
         - [X] D3
-  - [-] ST-GCN++
-    - [-] cnn
+  - [X] ST-GCN++
+    - [X] cnn
       - [X] RAFT
         - [X] D1
         - [X] D2
         - [X] D3
-      - [-] LK
+      - [X] LK
         - [X] D1
-        - [-] D2
+        - [X] D2
         - [X] D3
       - [X] NF
         - [X] D1

@@ -9,7 +9,7 @@ from feeders import tools
 
 class Feeder(Dataset):
     """
-    TODO: Based on `split` input, split the data based on the 3 train/test splits outlined in
+    TODO: Using `split` input, split the data based on the 3 train/test splits outlined in
     the .txt files in the dataset folder Feeder class for loading and processing dataset.
     NOTE: If you're finding issues with this feeder, it might be caused by 
     the renaming of folders and videos, and to keep consistencies 

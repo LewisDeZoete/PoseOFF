@@ -11,29 +11,20 @@
 
 * Quick tests
 #+begin_src python :results output
-class TMP():
-    def __init__(self, name, *args, **kwargs):
-        self.name = name
-        try:
-            self.age = kwargs['age']
-        except KeyError:
-            print("No age provided")
+import mmnpz
+from einops import rearrange
+import numpy as np
 
-        print(self.name)
-        print("Args")
-        for arg in args:
-            print(f"\t{ arg }")
-        print(f"\t{ kwargs }")
+path = "/fred/oz141/ldezoete/PoseOFF_NT/data/ntu/aligned_data/poseoff/NF/ntu_CS-poseoff_NF_D1_aligned.npz"
+data = mmnpz.load(path)
+sample = data['x_train'][0]
+np.save("../sample1.npy", sample)
+# sample = rearrange(sample, "T (M V C) -> T M V C", M=2, V=17, C=53)
+# print(sample[2, 0, 0])
 
-tmp = TMP("First name", "Second name", age=15)
 #+end_src
 
 #+RESULTS:
-: First name
-: Args
-: 	Second name
-: 	{'age': 15}
-
 * FEEDER: NTU Color skel points data
 #+begin_src python :results output
 import h5py

@@ -10,9 +10,9 @@
 
 export dataset="ucf101" # (ntu, ntu120, ucf101)
 export evaluation="1" # (CS/CV, CSub/CSet, 1/2/3)
-export model="stgcn2" # (infogcn2, msg3d, stgcn2)
+export model="infogcn2" # (infogcn2, msg3d, stgcn2)
 export flow_embedding="cnn" # (base, cnn, abs, avg)
-export flow_type="LK" # (RAFT, LK, norm, ???)
+export flow_type="LK" # (RAFT, LK, NF, ???)
 export dilation=2
 export phase="train" # (train/eval) - eval is just used to test obs_ratio really
 export obs_ratio="1.0"
