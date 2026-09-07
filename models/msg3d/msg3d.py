@@ -240,25 +240,11 @@ if __name__ == "__main__":
     model_type="msg3d"
     dataset = "ucf101"
     flow_embedding = "cnn"
-    evaluation = "CS"
-
-    run_name = f"{model_type}_{dataset}_{evaluation}_{flow_embedding}"
 
     # Get the config file and use the model arguments defined within
     arg = ArgClass(f'config/{model_type}/{dataset}/{flow_embedding}.yaml', verbose=True)
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
-    arg.evaluation = evaluation
-    arg.run_name = run_name
-
-    # # Define and attempt to load a checkpoint time
-    # arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
-    #     arg.save_location,
-    #     arg.evaluation,
-    #     "train",
-    #     arg.run_name + ".pt"
-    # )
 
     # Create the model, set to train
     modelLoader = ModelLoader(arg)
@@ -271,7 +257,10 @@ if __name__ == "__main__":
     T = 64
     V = arg.model_args["num_point"]
     M = 2
+
     x = torch.randn((8, C, T, V, 2)).to(device)
+    print(f"Data input shape: {x.shape}")
+    print(f"N-classes: {arg.model_args['num_class']}")
     logger.info(f"Model: {flow_embedding}")
     logger.info(f"Input channels: {C}\n")
     logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
@@ -279,6 +268,7 @@ if __name__ == "__main__":
     # Pass input to model
     try:
         y_hat = model(x)
+        print(f"Data passed through model! - y_hat: {y_hat.shape}")
         logger.info(f"y_hat: {y_hat.shape}")
         logger.info(f"y_hat argmax: {torch.argmax(y_hat, dim=1)}")
     except:

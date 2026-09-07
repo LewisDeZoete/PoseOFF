@@ -490,61 +490,40 @@ if __name__ == "__main__":
         level=logging.DEBUG
     )
 
+    model_type = "infogcn2"
     dataset = 'ntu120'
     flow_embedding = "base"
-    evaluation = "CSet"
-
-    run_name = f"infogcn2_{dataset}_{evaluation}_{flow_embedding}"
 
     # Get the config file and use the model arguments defined within
-    arg = ArgClass(f"config/infogcn2/{dataset}/{flow_embedding}.yaml", verbose=True)
-
+    arg = ArgClass(f'config/{model_type}/{dataset}/{flow_embedding}.yaml', verbose=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
-    arg.evaluation = evaluation
-    arg.run_name = run_name
 
-    # Define and attempt to load a checkpoint time
-    arg.checkpoint_file = osp.join(  # results/{dataset}/{eval}/train/{run}.pt
-        arg.save_location,
-        arg.evaluation,
-        "train",
-        arg.run_name + ".pt"
-    )
-
-    # Create the model, set to train
+    # Create the model
     modelLoader = ModelLoader(arg)
     model = modelLoader.model
-    model.train()
+    print(f"\nModel arguments: {arg.model_args}")
+    print('Model loaded')
 
-    # # Create the datasets and dataloaders
-    FeederClass = arg.import_class(arg.feeder)
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=arg.batch_size,
-        num_workers=2,
-        shuffle=True,
-        pin_memory=True,
-    )
-    test_dataloader = DataLoader(
-        test_dataset,
-        batch_size=arg.batch_size,
-        num_workers=2,
-        shuffle=False,
-        pin_memory=True,
-    )
     # Create dummy input
     # N, C, T, V, M
+    # Batch, channels, frames, keypoints, bodies
     C = arg.model_args["flow_channels"] + arg.model_args["pose_channels"]
+    T = 64
     V = arg.model_args["num_point"]
-    x = torch.randn((8, C, 64, V, 2)).to(device)
+    M = 2
+
+    x = torch.randn((8, C, T, V, M)).to(device)
+    print(f"Data input shape: {x.shape}")
+    print(f"N-classes: {arg.model_args['num_class']}")
     logger.info(f"Model: {flow_embedding}")
-    logger.info(f"Input channels: {C}\n")
+    logger.info(f"Input channels: {C}")
     logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
 
     # Pass input to model
     try:
         y_hat, x_hat, z_0, z_hat_shifted, zero = model(x)
+        print(f"Data passed through model! - y_hat: {y_hat.shape}")
         logger.info(f"\ny_hat: {y_hat.shape},\nx_hat: {x_hat.shape},\nz_0: {z_0.shape},\nz_hat_shifted: {z_hat_shifted.shape}\n")
         logger.info(f"y_hat argmax shape: {torch.argmax(y_hat, dim=1).shape}")
         logger.info(f"y_hat argmax: {torch.argmax(y_hat, dim=1)}")

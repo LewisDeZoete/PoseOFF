@@ -1,25 +1,6 @@
 #!/usr/bin/env python3
 # CREDIT: https://github.com/kennymckormick/pyskl/tree/main
 
-# backbone=dict(
-#     type='STGCN',
-#     gcn_adaptive='init',
-#     gcn_with_res=True,
-#     tcn_type='mstcn',
-#     graph_cfg=dict(
-#         layout='nturgb+d',
-#         mode='spatial',
-# ))
-# cls_head=dict(
-#     type='GCNHead',
-#     num_classes=120,
-#     in_channels=256
-# )
-# optimiser=dict(type='SGD', lr=0.1, momentum=0.9, 'weight_decay=0.0005, nesterov=True)
-# optimiser_config=dict(grad_clip=None)
-# lr_config=dict(policy='CosineAnnealing', min_lr=0, by_epoch=False)
-# total_epochs=16
-
 import math
 import copy as cp
 import torch
@@ -83,7 +64,7 @@ class STGCNBlock(nn.Module):
 
 
 class STGCN2(nn.Module):
-    # TODO: Rename models and stuff
+    # PoseOFF implementation / modification of ST-GCN++
     def __init__(self,
                  num_class=60,
                  num_point=25,
@@ -103,6 +84,7 @@ class STGCN2(nn.Module):
                  pretrained=None,
                  device=None,
                  cnn=False,
+                 *args,
                  **kwargs,
                  ):
         super().__init__()
@@ -234,10 +216,10 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     arg.model_args["device"] = device
 
+    # Create the model
     modelLoader = ModelLoader(arg)
     model = modelLoader.model
     print(f"\nModel arguments: {arg.model_args}")
-
     print('Model loaded')
 
     # Create dummy input
@@ -247,7 +229,10 @@ if __name__ == '__main__':
     T = 160
     V = arg.model_args["num_point"]
     M = 2
+
     x = torch.randn((8, C, T, V, M)).to(device)
+    print(f"Data input shape: {x.shape}")
+    print(f"N-classes: {arg.model_args['num_class']}")
     logger.info(f"Model: {flow_embedding}")
     logger.info(f"Input channels: {C}")
     logger.info(f"Input shape: {x.shape}\n    (B, C, T, V, M)")
@@ -255,6 +240,7 @@ if __name__ == '__main__':
     # Pass input to model
     try:
         y_hat = model(x)
+        print(f"Data passed through model! - y_hat: {y_hat.shape}")
         logger.info(f"y_hat: {y_hat.shape}")
         logger.info(f"y_hat argmax: {torch.argmax(y_hat, dim=1)}")
     except:
