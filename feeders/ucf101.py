@@ -9,9 +9,7 @@ from feeders import tools
 
 class Feeder(Dataset):
     """
-    TODO: Using `split` input, split the data based on the 3 train/test splits outlined in
-    the .txt files in the dataset folder Feeder class for loading and processing dataset.
-    NOTE: If you're finding issues with this feeder, it might be caused by 
+    NOTE: If you're finding issues with this feeder, it might be caused by
     the renaming of folders and videos, and to keep consistencies 
     in naming (eg. HandstandPushups -> HandStandPushups, HandstandWalking etc.)
 
@@ -46,7 +44,7 @@ class Feeder(Dataset):
 
     def __init__(
             self,
-            data_paths: str,
+            data_paths: dict,
             eval: str = "1",
             label_path=None,
             labels=None,
@@ -69,6 +67,8 @@ class Feeder(Dataset):
             vel: bool = False,
             sort: bool = False,
             A=None,
+            *args,
+            **kwargs
             ):
         self.eval = eval
         self.data_path = data_paths[self.eval]
@@ -209,14 +209,7 @@ class Feeder(Dataset):
         data_numpy = tools.valid_crop_resize(
             data_numpy, valid_frame_num, self.p_interval, self.window_size
         )
-        # TODO: RM ----------------------------------------------------------------------
-        try:
-            if data_numpy == None:
-                logging.debug(f"Borked Index: {index}")
-                quit()
-        except ValueError:
-            pass
-        # TODO: RM ----------------------------------------------------------------------
+
         mask = abs(data_numpy.sum(0, keepdims=True).sum(2, keepdims=True)) > 0
         # Apply optional transforms
         if self.random_shift:

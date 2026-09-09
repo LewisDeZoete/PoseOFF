@@ -35,8 +35,10 @@ class Feeder(Dataset):
             vel: bool = False,
             sort: bool = False,
             A=None,
+            *args,
+            **kwargs
             ):
-        '''Feeder class for the NTU60 and NTU120 datasets.
+        """Feeder class for the NTU60 and NTU120 datasets.
 
         Args:
             data_path (str):
@@ -63,7 +65,7 @@ class Feeder(Dataset):
             vel (bool): Use motion modality or not. Default is False.
             sort (bool):
             A: Adjacency matrix
-        '''
+        """
 
         self.eval = eval
         self.data_path = data_paths[eval]
@@ -305,7 +307,7 @@ if __name__ == "__main__":
         "-e",
         dest="evaluation",
         help="Evaluation benchmark used for specific dataset \
-            (eg. 1-3 for ucf101, CV/CS for NTU_RGB+D)"
+            (CV/CS for ntu60, CSub/CSert for ntu120)"
     )
     parser.add_argument(
         "-o",
