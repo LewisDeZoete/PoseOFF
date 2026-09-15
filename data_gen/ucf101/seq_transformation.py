@@ -5,38 +5,6 @@ from config.argclass import ArgClass
 from einops import rearrange
 import argparse
 
-parser = argparse.ArgumentParser(prog="poseoff_seq_transform")
-
-parser.add_argument(
-    '--dilation',
-    dest='dilation',
-    default=None,
-    type=int,
-    help='Overwrite the dilation value from the yaml config.'
-)
-parser.add_argument(
-    '--flow_type',
-    dest='flow_type',
-    default=None,
-    type=str,
-    help='Flow type used to extraction PoseOFF motion windows.'
-)
-
-parsed = parser.parse_args()
-arg = ArgClass("./config/infogcn2/ucf101/base.yaml")
-labels = arg.feeder_args['labels']
-
-dilation = parsed.dilation
-flow_type = parsed.flow_type
-
-# Define the paths
-data_labels_root = './data/ucf101/statistics/'
-poseoff_path = './data/ucf101/poseoff'
-save_root = './data/ucf101/aligned_data'
-save_path = osp.join(save_root, flow_type) # e.g. ./data/ucf141/aligned_data/RAFT
-
-# Create the save directory if it doesn't exist
-os.makedirs(save_path, exist_ok=True)
 
 def combine_data(all_paths):
     '''Load and combine all of the poseoff data from the given paths.
@@ -157,6 +125,39 @@ def split_dataset(joints, labels, evaluation, dilation, flow_type, save_path, da
 
 if __name__ == '__main__':
     from sys import getsizeof
+    parser = argparse.ArgumentParser(prog="poseoff_seq_transform")
+
+    parser.add_argument(
+        '--dilation',
+        dest='dilation',
+        default=None,
+        type=int,
+        help='Overwrite the dilation value from the yaml config.'
+    )
+    parser.add_argument(
+        '--flow_type',
+        dest='flow_type',
+        default=None,
+        type=str,
+        help='Flow type used to extraction PoseOFF motion windows.'
+    )
+
+    parsed = parser.parse_args()
+    arg = ArgClass("./config/infogcn2/ucf101/base.yaml")
+    labels = arg.feeder_args['labels']
+
+    dilation = parsed.dilation
+    flow_type = parsed.flow_type
+
+    # Define the paths
+    data_labels_root = './data/ucf101/statistics/'
+    poseoff_path = './data/ucf101/poseoff'
+    save_root = './data/ucf101/aligned_data'
+    save_path = osp.join(save_root, flow_type) # e.g. ./data/ucf141/aligned_data/RAFT
+
+    # Create the save directory if it doesn't exist
+    os.makedirs(save_path, exist_ok=True)
+
     # Get the paths for the poseoff data
     poseoff_paths = [osp.join(poseoff_path, item)+'.npy' for item in list(arg.feeder_args['labels'].keys())]
 
