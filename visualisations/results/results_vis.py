@@ -1,3 +1,8 @@
+"""Result graphing
+Graphs loss, classification accuracy and observation accuracy (for infogcn2),
+Optionally, graph the confusion matrices and the number of times classes were predicted (no idea why...)
+"""
+
 import os
 import os.path as osp
 
@@ -11,7 +16,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 # - edit the `dataset` and `evaluation` variables below
 # - Set values of plot_* as needed, if True, that plot will be generated
 # - edit the `plot_data` for specific extensions (keys) and plot params
-#      python ./results/visualisations/results_vis.py
+#      python ./visualisations/results/results_vis.py
 
 model_type = "msg3d" # infogcn2, msg3d, stgcn2
 dataset = 'ntu'  # ntu, ntu120, ucf101
@@ -32,7 +37,7 @@ results_root = f"results/{model_type}/{dataset}/{evaluation}/train"
 # We use the train results dict for now
 
 # Create a directory, ignoring if it already exists
-save_root = f"./results/plots/{model_type}/{dataset}/{evaluation}/"
+save_root = f".visualisations/results/plots/{model_type}/{dataset}/{evaluation}/"
 os.makedirs(save_root, exist_ok=True)
 
 # Define plotting parameters, the extension is the name of the checkpoint
