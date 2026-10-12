@@ -34,7 +34,7 @@ extractor:
     ntu: True
     dilation: 3
     # PoseOFFSampler_LK
-    lk_winSize: (15 15)
+    lk_winSize: [15, 15]
     lk_maxLevel: 3
     mag_threshold: 100
     # PoseOFFSampler_NF
