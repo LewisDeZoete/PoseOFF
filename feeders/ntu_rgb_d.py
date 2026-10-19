@@ -1,20 +1,22 @@
+#!/usr/bin/env python3
 import numpy as np
-import pickle
 import mmnpz
 
 from torch.utils.data import Dataset
 
 from feeders import tools
 
+# 0-based indices (NTU joint order) of the 17 joints that can be derived from COCO-17
+# keypoints: SpineBase, SpineMid, Neck, Head, L/R shoulder, elbow, wrist, L/R hip,
+# knee, ankle, SpineShoulder. Excludes hands, feet, hand tips and thumbs.
+NTU17_JOINTS = [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20]
 
 
 class Feeder(Dataset):
     def __init__(
             self,
-            data_paths: str,
+            data_paths: dict,
             eval=None,
-            label_path=None,
-            labels=None,
             split: str ="train",
             random_choose: bool = False,
             random_shift: bool = False,
@@ -33,8 +35,11 @@ class Feeder(Dataset):
             debug: bool = False,
             use_mmap: bool = True,
             vel: bool = False,
-            sort: bool = False,
             A=None,
+            num_joints: int = 25,
+            num_persons: int = 2,
+            joint_subset: bool = False,
+            stats_path: str = None,
             *args,
             **kwargs
             ):
@@ -63,18 +68,20 @@ class Feeder(Dataset):
             debug (bool): If true, only use the first 100 samples. Default is False.
             use_mmap (bool): If true, use mmap mode to load data, which can save the running memory. Default is False.
             vel (bool): Use motion modality or not. Default is False.
-            sort (bool):
             A: Adjacency matrix
+            num_joints (int): Joints per body in the stored data (25 for NTU, 17 for COCO). Default is 25.
+            num_persons (int): Bodies per frame in the stored data. Default is 2.
+            joint_subset (bool): If given, keep only the COCO joints (indices into the stored
+                joint order) when loading, e.g. NTU17_JOINTS. mean/std maps are subset to match.
+            stats_path (str): Optional .npz holding mean_map/std_map from the *source* dataset, so
+                new data is normalised with the pretrained model's statistics. Default is the data file.
         """
 
         self.eval = eval
         self.data_path = data_paths[eval]
-        # TODO: Test before removing label_path and labels
-        # self.label_path = label_path
-        # self.labels = labels
         self.split = split
-        if split not in ["train", "test"]:
-            raise ValueError("split must be 'train' or 'test'")
+        if split not in ["train", "val", "test"]:
+            raise ValueError("split must be 'train', 'val' or 'test'")
         if split == "train":
             self.p_interval = p_interval
             self.random_shift = random_shift
@@ -107,10 +114,12 @@ class Feeder(Dataset):
         self.use_mmap = use_mmap
         self.vel = vel
         self.A = A
+        self.V_total = num_joints          # joints stored in the file
+        self.M = num_persons
+        self.joint_subset = None if not joint_subset else np.asarray(NTU17_JOINTS, dtype=int)
+        self.V = self.V_total if not joint_subset else len(NTU17_JOINTS)
+        self.stats_path = stats_path
         self.data = None  # defer loading (lazy loading)
-        if sort:
-            self.get_n_per_class()
-            self.sort()
 
     def load_data(self):
         if self.data is None:
@@ -122,17 +131,12 @@ class Feeder(Dataset):
                 npz_data = np.load(self.data_path)
                 print("\tLoaded data into memory")
 
-            if self.split == "train":
-                self.data = npz_data["x_train"]
-                print("\tSelf.data assigned")
-                self.labels = np.argmax(npz_data["y_train"], axis=-1)
-                print("\tSelf.labels assigned")
-            elif self.split == "test":
-                self.data = npz_data["x_test"]
-                self.labels = np.argmax(npz_data["y_test"], axis=-1)
-            else:
-                raise NotImplementedError(
-                    "data split only supports train/test")
+            self.data = npz_data[f"x_{self.split}"]
+            print("\tSelf.data assigned")
+            y = npz_data[f"y_{self.split}"]
+            # Accept one-hot (N, num_classes) or integer (N,) labels
+            self.labels = np.argmax(y, axis=-1) if y.ndim > 1 else np.asarray(y).astype(int)
+            print("\tSelf.labels assigned")
             print(f"\tAssigned self.data to unique split ({self.split})")
             if self.debug:
                 self.data = self.data[:100]
@@ -150,11 +154,16 @@ class Feeder(Dataset):
                 self.labels = self.labels[nan_out]
 
             N, T, _ = self.data.shape
-            C = (
-                53 if self.data.shape[-1] > 150 else 3
-            ) # If the dataset doesn't have flow, this is false
+            # Channels per joint (3 = xyz / xy+conf, 53 = plus 50 flow features), inferred from
+            # the stored width rather than a magic threshold.
+            width = self.data.shape[-1]
+            if width % (self.M * self.V_total) != 0:
+                raise ValueError(
+                    f"Feature width {width} is not divisible by num_persons*num_joints "
+                    f"({self.M}*{self.V_total}); check num_joints/num_persons.")
+            self.C = width // (self.M * self.V_total)
             if self.A is not None:
-                self.data = self.data.reshape((N * T * 2, 25, C))
+                self.data = self.data.reshape((N * T * self.M, self.V_total, self.C))
                 self.data = np.array(self.A) @ self.data
             print("\tFinished loading data!")
 
@@ -168,15 +177,23 @@ class Feeder(Dataset):
             self.n_per_cls[labels] += 1
         self.csum_n_per_cls = np.insert(np.cumsum(self.n_per_cls), 0, 0)
 
-    def sort(self):
-        sorted_idx = self.labels.argsort()
-        self.data = self.data[sorted_idx]
-        self.labels = self.labels[sorted_idx]
+    def _subset_joints_axis(self, arr):
+        """Select self.joint_subset along the (unique) axis of size V_total, if there is one."""
+        if self.joint_subset is None:
+            return arr
+        axes = [a for a, n in enumerate(arr.shape) if n == self.V_total]
+        if len(axes) == 0:
+            return arr                      # per-channel statistics only
+        if len(axes) > 1:
+            raise ValueError(f"Ambiguous joint axis in map of shape {arr.shape}")
+        return np.take(arr, self.joint_subset, axis=axes[0])
 
     def get_mean_map(self, npz_data):
+        if self.stats_path is not None:     # use the source dataset's statistics
+            npz_data = np.load(self.stats_path)
         try:
-            self.mean_map = npz_data['mean_map']
-            self.std_map = npz_data['std_map']
+            self.mean_map = self._subset_joints_axis(npz_data['mean_map'])
+            self.std_map = self._subset_joints_axis(npz_data['std_map'])
         except KeyError as e:
             print("Feeder failed to obtain mean map")
             print(f"Data does not contain key: {e}")
@@ -185,16 +202,14 @@ class Feeder(Dataset):
         self.load_data()
         return len(self.labels)
 
-    def __iter__(self):
-        return self
-
     def _reshape(self, data_numpy):
         T, _ = data_numpy.shape
-        C = (53 if self.data.shape[-1] > 150 else 3)
         # data_numpy = np.array(data_numpy)
-        data_numpy = data_numpy.reshape(T, 2, 25, C).transpose(
+        data_numpy = data_numpy.reshape(T, self.M, self.V_total, self.C).transpose(
             3, 0, 2, 1
         )
+        if self.joint_subset is not None:   # keep only the requested joints
+            data_numpy = data_numpy[:, :, self.joint_subset, :]
         if self.no_flow:  # If no_flow argument is passed, only take x,y,z positions
             data_numpy = data_numpy[:3, ...]
         if self.no_Z:
@@ -316,6 +331,11 @@ if __name__ == "__main__":
         help="Observation ratio, used for training or evaluation."
     )
     parser.add_argument(
+        "-j", "--joint_subset",
+        dest="joint_subset", action="store_true",
+        help="If passed, take a 17-point coco-style joint subset for the dataset"
+    )
+    parser.add_argument(
         "--debug", help="Use to debug, only take first 100 samples",
         action="store_true"
     )
@@ -343,6 +363,9 @@ if __name__ == "__main__":
         )
         arg.feeder_args['data_paths'][parsed.evaluation] = parsed.data_path_overwrite
 
+    if arg.joint_subset and arg.dataset in ["ntu", "ntu120"]:
+        arg.feeder_args["joint_subset"] = NTU17_JOINTS if parsed.joint_subset else None
+
     # Parse the observation ratio
     if arg.obs_ratio != "1.0":
         arg.feeder_args['obs_ratio'] = float(arg.obs_ratio)
@@ -357,7 +380,7 @@ if __name__ == "__main__":
         **arg.feeder_args,
         eval=arg.evaluation,
         split="train",
-        debug=parsed.debug
+        debug=parsed.debug,
     )
     train_dataloader = DataLoader(
         train_dataset,
@@ -371,7 +394,8 @@ if __name__ == "__main__":
         **arg.feeder_args,
         eval=arg.evaluation,
         split="test",
-        debug=parsed.debug)
+        debug=parsed.debug,
+    )
     test_dataloader = DataLoader(
         test_dataset,
         batch_size=arg.batch_size,
@@ -396,14 +420,19 @@ if __name__ == "__main__":
         'test': {'total_count': 0}
     }
 
-    C = 3 if arg.flow_embedding=='base' else 53
-    V = 25
-
     # iterate over the train dataloader
     for iter_number, (data_numpy, label, mask, index) in enumerate(train_dataloader):
         # data_numpy shape: (B, C, T, V, M)
         for sample_label in label:
             debug_labels['train'][sample_label] += 1
+
+    logger.debug("TRAIN DATA:")
+    logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
+    logger.debug(f"\tMask shape: {mask.shape}")
+    logger.debug(f"\tLabel shape: {label.shape}")
+
+    logger.debug(f"train labels: {debug_labels['train']}")
+
 
     # iterate over the test dataloader
     for iter_number, (data_numpy, label, mask, index) in enumerate(test_dataloader):
@@ -411,16 +440,9 @@ if __name__ == "__main__":
         for sample_label in label:
             debug_labels['test'][sample_label] += 1
 
-
-    logger.debug("TRAIN DATA:")
-    logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
-    logger.debug(f"\tMask shape: {mask.shape}")
-    logger.debug(f"\tLabel shape: {label.shape}")
-
     logger.debug("TEST DATA:")
     logger.debug(f"\tData shape: {data_numpy.shape}")  # (60, 3/53, 64, 25, 2)
     logger.debug(f"\tMask shape: {mask.shape}")
     logger.debug(f"\tLabel shape: {label.shape}")
 
-    logger.debug(f"train labels: {debug_labels['train']}")
     logger.debug(f"test labels: {debug_labels['test']}")
