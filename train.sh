@@ -45,6 +45,7 @@ echo -e "Run name: ${run_name}\n"
 # -o : observation ratio for training and testing (default 1.0)
 # -r : run_name (eg. nturgbd_CV_cnn_full_flow)
 #         checkpoint_file = '{arg.save_location}/{evaluation}/run_name'
+# --joint_subset : train on 17-point subset of ntu joints
 # --desc : description (eg. 'nturgbd-cross-view cnn full flow')
 # --data_path_overwrite : overwrites the path to the dataset
 # -v : verbose
@@ -62,6 +63,12 @@ args=(
      "--data_path_overwrite" "${data_path}"
      "-v"
 )
+
+# If joint-subset is passed from run.sh
+if $joint_subset
+then
+    args+=("--joint_subset")
+fi
 
 # Debug is passed from run.sh
 if $debug

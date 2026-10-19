@@ -8,21 +8,23 @@
 # bash run.sh
 # ```
 
-export dataset="ucf101" # (ntu, ntu120, ucf101)
-export evaluation="1" # (CS/CV, CSub/CSet, 1/2/3)
-export model="infogcn2" # (infogcn2, msg3d, stgcn2)
+export dataset="ntu" # (ntu, ntu120, ucf101)
+export evaluation="CS" # (CS/CV, CSub/CSet, 1/2/3)
+export model="msg3d" # (infogcn2, msg3d, stgcn2)
 export flow_embedding="cnn" # (base, cnn, abs, avg)
-export flow_type="LK" # (RAFT, LK, NF, ???)
-export dilation=2
+export flow_type="RAFT" # (RAFT, LK, NF, ???)
+export dilation=3
 export phase="train" # (train/eval) - eval is just used to test obs_ratio really
 export obs_ratio="1.0"
+export joint_subset=false
 export debug=false
 
 # ALWAYS START MODIFIER WITH "_"
 # still loads ${dataset}/{flow_embedding}.yaml config... adds to run_name
 export modifier=""
+# export modifier="_NTU17_TEST"
 if ! [[ $flow_embedding == "base" ]]; then
-    export modifier="_${flow_type}_D${dilation}"
+    export modifier="_${flow_type}_D${dilation}${modifier}"
 fi
 # export modifier="_BLANK_EVAL" # Only used for timing model inference...
 

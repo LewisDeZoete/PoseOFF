@@ -64,6 +64,11 @@ parser.add_argument(
     help="name to save the results dictionary as after training",
 )
 parser.add_argument(
+    "-j", "--joint_subset",
+    dest="joint_subset", action="store_true",
+    help="If passed, take a 17-point coco-style joint subset for the dataset"
+)
+parser.add_argument(
     "--desc",
     dest="description",
     default="",
@@ -109,6 +114,12 @@ if arg.data_path_overwrite is not None:
             list(arg.feeder_args['data_paths'].values()))
     )
     arg.feeder_args['data_paths'][arg.evaluation] = arg.data_path_overwrite
+
+# Overwrite feeder and model args if taking ntu joint subset (17 COCO joints)
+if arg.joint_subset and arg.dataset == "ntu":
+    arg.feeder_args["joint_subset"]=True
+    arg.model_args["num_point"] = 17
+    arg.model_args["graph"] = "graph.yolo_pose.Graph"
 
 if arg.obs_ratio != "1.0":
     assert float(arg.obs_ratio) < 1.0
