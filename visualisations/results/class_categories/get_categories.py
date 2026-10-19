@@ -1,3 +1,9 @@
+'''Create a graph of the given model backbone on a split of the NTU datasets
+NOTE: This is a work in progress...
+usage:
+    Edit the values for dataset, evaluation etc.
+    python visualisations/results/class_categories/get_categories.py
+'''
 import os
 import os.path as osp
 import numpy as np
@@ -7,19 +13,29 @@ import matplotlib.pyplot as plt
 
 dataset = "ntu"
 evaluation = "CS"
-model_type = "cnn"
+backbone = "infogcn2"
+embedding = "cnn"
+flow_type = "RAFT"
+dilation = 3
 
-all_classes_path = './NTU120_classes_MACRO(Classes).csv'
-classes_60_path = './NTU120_classes_MACRO(Class_categories_60).csv'
-classes_120_path = './NTU120_classes_MACRO(Class_categories_120).csv'
-results_root_path = f'./data/{dataset}/{evaluation}/'
-plot_path = f'./plots/{dataset}/{evaluation}/'
+root_path = "./visualisations/results/class_categories"
+
+all_classes_path = osp.join(root_path, 'NTU120_classes_MACRO(Classes).csv')
+classes_60_path = osp.join(root_path, 'NTU120_classes_MACRO(Class_categories_60).csv')
+classes_120_path = osp.join(root_path, 'NTU120_classes_MACRO(Class_categories_120).csv')
+
+results_root_path = f'./results/{backbone}/{dataset}/{evaluation}/train'
+plot_path = osp.join(root_path, "output", dataset, evaluation)
+
+os.makedirs(plot_path, exist_ok=True)
 
 res_dict = {} # will contain {'avg': {}, 'abs': {}, 'base': {}, 'cnn': {}}
 
 for file_name in os.listdir(results_root_path):
-    full_path = osp.join(results_root_path,file_name)
-    res_dict[(file_name.split('_')[-1]).split('.')[0]] = torch.load(full_path, map_location='cpu', weights_only=False)
+    full_path = osp.join(results_root_path, file_name)
+
+    print(full_path)
+    # res_dict[(file_name.split('_')[-1]).split('.')[0]] = torch.load(full_path, map_location='cpu', weights_only=False)
 
 # Get the results dictionaries
 avg = res_dict['avg']
@@ -50,9 +66,9 @@ class_names = all_classes['Original class'][:60]
 # GRAPHING
 fig, ax = plt.subplots(figsize=(40, 20))
 
-# ax.bar(np.linspace(0, 60, num=60), pred_topk, label=f"Predicted class frequency {model_type}")
-ax.bar(np.arange(0, 60, 1), pred_bins, label=f"Predicted class frequency {model_type}")
-ax.set_title(f"{model_type} class prediction frequency", fontsize=60)
+# ax.bar(np.linspace(0, 60, num=60), pred_topk, label=f"Predicted class frequency {embedding}")
+ax.bar(np.arange(0, 60, 1), pred_bins, label=f"Predicted class frequency {embedding}")
+ax.set_title(f"{embedding} class prediction frequency", fontsize=60)
 ax.set_xlabel("Class number", fontsize=50)
 ax.set_xlim(-1, 60)
 ax.set_ylabel("Prediction frequency", fontsize=50)
@@ -65,8 +81,6 @@ ax.plot(np.linspace(0, 60, 60), np.ones(60)*275, '--', color='red', label="Media
 
 ax.legend(loc='lower right', fontsize=40)
 
-plt.savefig(f"plots/ntu/CS/{model_type}_pred.png")
-
-# classes_60_df = pd.read_csv(classes_60_path)
+plt.savefig(osp.join(plot_path, f"{embedding}_pred.png"))
 
 
