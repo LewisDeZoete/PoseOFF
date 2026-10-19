@@ -246,6 +246,7 @@ if __name__ == "__main__":
     import math
     import logging
     import argparse
+    import yaml
     import os.path as osp
     from einops import rearrange
     from config.argclass import ArgClass
@@ -283,8 +284,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-e",
         dest="evaluation",
-        help="Evaluation benchmark used for specific dataset \
-            (eg. 1-3 for ucf101, CV/CS for NTU_RGB+D)"
+        default="1",
+        help="Evaluation benchmark used for specific dataset: 1-3 for ucf101 (default='1')"
     )
     parser.add_argument(
         "-o",
@@ -309,6 +310,17 @@ if __name__ == "__main__":
     # Pass the argparse.Namespace object (parsed) to ArgClass to create an arg obj
     # `with open(f'./config/{arg.model_type}/{arg.config}/{arg.flow_embedding}.yaml', 'r')...`
     arg = ArgClass(arg=parsed)
+
+    # -------------------------------------------------------------------------------
+    # Opens the feeder_idx_to_filenames file, allowing us to get the filename based
+    # on the index given to the dataloader
+    with open("./data/ucf101/statistics/feeder_idx_to_filename.yaml", 'r') as file:
+        feeder_idx_filenames = yaml.safe_load(file)
+        feeder_idx_filenames = feeder_idx_filenames[arg.evaluation]
+
+    print(feeder_idx_filenames['train'][:5])
+    print(feeder_idx_filenames['test'][:5])
+    # -------------------------------------------------------------------------------
 
     # Pass root path for the dataset objects
     if parsed.data_path_overwrite is not None:
