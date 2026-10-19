@@ -6,8 +6,7 @@ from einops import rearrange
 
 
 def create_class_folder(arg, class_name: str, modality: str):
-    """
-    Creates a directory for a specific class and modality if it does not already exist.
+    """Creates a directory for a specific class and modality if it does not already exist.
 
     Args:
         arg: An object containing feeder arguments, specifically a dictionary with data paths.
@@ -22,8 +21,8 @@ def create_class_folder(arg, class_name: str, modality: str):
 
 
 def get_incomplete(arg, modality: str):
-    """
-    Identifies and writes a yaml file of unprocessed videos for each class per-modality.
+    """Identifies and writes a yaml file of unprocessed videos for each class per-modality.
+
     Args:
         arg: An object containing feeder arguments and data paths.
         modality (str): The modality type (e.g., 'rgb', 'flow', 'pose') to check for unprocessed videos.
@@ -56,8 +55,8 @@ def get_incomplete(arg, modality: str):
 
 
 def get_class_by_index(modality: str, process_number: int):
-    """
-    Retrieve the class name and video names by the given process number.
+    """Retrieve the class name and video names of incomplete classes by the given process number.
+
     Args:
         arg: The argument to be passed to the get_incomplete function.
         process_number (int): The index of the process to retrieve.
@@ -78,15 +77,16 @@ def get_class_by_index(modality: str, process_number: int):
     return class_name, video_names
 
 
-# def is_null(data):
-#     """Check if the data is filled with zeros"""
-#     if isinstance(data, torch.Tensor):
-#         return torch.all(data == 0).item()
-#     if isinstance(data, np.ndarray):
-#         return np.all(data == 0)
-#     return False
+def is_null(data):
+    """Check if the data is filled with zeros"""
+    if isinstance(data, torch.Tensor):
+        return torch.all(data == 0).item()
+    if isinstance(data, np.ndarray):
+        return np.all(data == 0)
+    return False
 
 
+# TODO: RM? This should be handled with 
 # def log_zero_data(class_name, video_name):
 #     """Function to log the name of the data to a text file"""
 #     with open(f"./TMP/zero_data_{class_name}.txt", "a") as f:
@@ -145,6 +145,8 @@ def extract_data(
             video_path = f"{os.path.join(arg.extractor['data_paths']['rgb_path'], class_name, video_name)}.avi"
             # Transform and estimate poses or flow
             data = transforms(video_path)
+
+        # # Log instances where the data is zeros!
         # if is_null(data):  # Check if the data is all zeros
         #     log_zero_data(class_name=class_name, video_name=video_name)
 
@@ -176,6 +178,9 @@ if __name__ == "__main__":
         "-m", dest="modality", help="Modality to check for incomplete classes"
     )
     parsed = parser.parse_args()
+
+    assert parsed.modality in ["pose", "flow", "poseoff"], \
+        "Modality must be one of 'pose', 'flow' or 'poseoff'"
 
     print("\tIncomplete classes will be written to: ")
     print(f"\t\t./data/ucf101/statistics/{parsed.modality}_incomplete_classes.yaml")

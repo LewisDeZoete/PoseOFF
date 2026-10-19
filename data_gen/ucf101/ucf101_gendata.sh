@@ -25,27 +25,28 @@
 # Once extraction is complete, aligned data is written to `./data/ucf101/aligned_data`
 # --------------------------------------
 
-export dilation=3 # 1,2,3,...
+export dilation=1 # 1,2,3,...
 export flow_type="NF" # RAFT, LK, NF, ...
 
 # Which modalities to check incomplete classes for and run
-modalities=("poseoff") # "pose", "flow", "poseoff"
+modalities=(poseoff) # "pose", "flow", "poseoff"
 # If passed, gives the option to delete the folder containing the data...
-redo_modalities=("poseoff") # "pose", "flow", "poseoff"
+redo_modalities=(poseoff) # "pose", "flow", "poseoff"
 
 # If redo_modalities is not empty, check if you want to delete the folders...
 if ! [[ ${#redo_modalities[@]} == 0 ]]; then
-    read -r -p "Do you want to delete the folders for: ./data/ucf101/${redo_modalities[@]}? [y/N] " response
-    case "$response" in
-        [yY][eE][sS]|[yY])
-            for redo_modality in "${redo_modalities[@]}"; do
+    for redo_modality in "${redo_modalities[@]}"; do
+        read -r -p "Do you want to delete the folders for: ./data/ucf101/${redo_modality}? [y/N] " response
+        case "$response" in [yY][eE][sS]|[yY])
                 echo "Deleting folder ./data/ucf101/${redo_modality}"
                 rm -rf "./data/ucf101/${redo_modality}"
                 echo "Deleted folder ./data/ucf101/${redo_modality}"
-            done;;
-        *)
-            echo "No folders deleted..."
-    esac
+                ;;
+            *)
+                echo "No folders deleted..."
+                ;;
+        esac
+    done
 fi
 
 # Create temporary directory to add video instances that don't contain poses
@@ -143,7 +144,7 @@ if ! [[ $NUM_INCOMPLETE_CLASSES = 0 ]]; then
         --export=ALL \
         --job-name=ucf101_extract_poseoff \
         --array=0-$(($NUM_INCOMPLETE_CLASSES-1)) \
-        --time=0:15:00 \
+        --time=0:25:00 \
         --parsable \
         --output=./logs/EXTRACT/ucf101/ucf101_extract_poseoff_${flow_type}_D${dilation}.out \
         --error=./logs/EXTRACT/ucf101/error_ucf101_extract_poseoff_${flow_type}_D${dilation}.out \

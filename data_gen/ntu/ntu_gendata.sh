@@ -7,7 +7,7 @@
 # Change the dilation value (1 is default)
 
 export dataset=ntu # ntu, ntu120
-export dilation=1
+export dilation=3
 export flow_type=NF # LK, NF, RAFT, or WAFT
 export mag_threshold=100 # For thresholding LK flow. Default is 100.
 
