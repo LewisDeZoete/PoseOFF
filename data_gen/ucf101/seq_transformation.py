@@ -44,10 +44,12 @@ def one_hot_vector(labels):
     return labels_vector
 
 
-def get_indices(evaluation: int, data_labels_root: str):
+def get_indices(labels, evaluation: int, data_labels_root: str):
     '''Get the indices of the training and testing data for the given evaluation number.
 
     Args:
+        labels: dictionary containing labels
+            (e.g. {"ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c01": 0, ...})
         evaluation (int): The evaluation number (1, 2, or 3).
         data_labels_root (str): Root path to where the evaluation lists live
     '''
@@ -84,7 +86,7 @@ def split_dataset(joints, labels, evaluation, dilation, flow_type, save_path, da
 
     Args:
         joints (numpy.ndarray): A numpy array containing joint data for all sequences.
-        labels (numpy.ndarray): A numpy array containing the label number corresponding to the sequences.
+        labels (dict): Dict containing the labels as {"video_pth/video_name": label}.
         evaluation (int): An integer representing the evaluation index used to split the dataset.
         dilation (int): Dilation factor used to extract the PoseOFF windows of optical flow.
         flow_type (str): Type of motion estimation used during PoseOFF extraction.
@@ -106,11 +108,13 @@ def split_dataset(joints, labels, evaluation, dilation, flow_type, save_path, da
             - `x_test`: Testing set joint data.
             - `y_test`: One-hot encoded testing labels.
     """
-    train_indices, test_indices = get_indices(evaluation, data_labels_root)
+    train_indices, test_indices = get_indices(labels, evaluation, data_labels_root)
+
+    label_numbers = np.array(list(labels.values()))
 
     # Save labels and num_frames for each sequence of each data set
-    train_labels = labels[train_indices]
-    test_labels = labels[test_indices]
+    train_labels = label_numbers[train_indices]
+    test_labels = label_numbers[test_indices]
 
     train_x = joints[train_indices]
     train_y = one_hot_vector(train_labels)
@@ -171,7 +175,7 @@ if __name__ == '__main__':
     for evaluation in range(1, 4):
         save_name = split_dataset(
             joints,
-            labels=np.array(list(arg.feeder_args['labels'].values())),
+            labels=arg.feeder_args['labels'],
             evaluation=evaluation,
             dilation=dilation,
             flow_type=flow_type,
