@@ -77,13 +77,13 @@ class GetPoses_YOLO:
         # Output from yolo is (x,y,conf), normalised between 0 and 1
         # Centralisation (about zero [-0.5 : 0.5])
         data_torch[0:2] = data_torch[0:2] - 0.5
-        data_torch[1:2] = -data_torch[1:2]
-        
+        # data_torch[1:2] = -data_torch[1:2] # Flip Y-axis (we use the poses for sampling videos!)
+
         # Set x and y to zero if confidence is zero
         data_torch[0][data_torch[2] == 0] = 0
         data_torch[1][data_torch[2] == 0] = 0
 
-        # sort by score
+        # sort bodies by score
         sort_index = (-data_torch[2, :, :, :].sum(axis=1)).argsort(axis=1)
         for t, s in enumerate(sort_index):
             # Took out a `.transpose(1,2,0)` on the second tensor... did it break?
@@ -344,10 +344,10 @@ class PoseOFFSampler_LK(PoseOFFSampler):
     """
     def __init__(
             self,
-            *args,
-            lk_winSize: tuple[int] = (15, 15),
+            lk_winSize: tuple[int, int] = (15, 15),
             lk_maxLevel: int = 3,
             mag_threshold: int = 100,
+            *args,
             **kwargs
     ):
         """Initialises the PoseOFF Sampler.
@@ -359,7 +359,7 @@ class PoseOFFSampler_LK(PoseOFFSampler):
         """
         super().__init__(*args, **kwargs)
         self.lk_params = {
-            "winSize": lk_winSize,
+            "winSize": tuple(lk_winSize),
             "maxLevel": lk_maxLevel,
             "criteria": (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03)
         }
@@ -463,7 +463,7 @@ class PoseOFFSampler_LK(PoseOFFSampler):
             try:
                 p1, st, err = cv2.calcOpticalFlowPyrLK(old_grey, frame_grey, p0, None, **self.lk_params)
             except Exception as e:
-                print("LK Flow calculation failed, likely due to incorrect dtype (must be uint8)")
+                print("LK Flow calculation failed, it may be due to incorrect dtype (must be uint8)")
                 print(e)
                 break
 
