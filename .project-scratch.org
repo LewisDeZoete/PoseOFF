@@ -2,11 +2,20 @@
 #+STARTUP: fold
 
 * General
-365-390
-- Last seen, ntu120 CSet was broken
-- *NOTE:* Testing the inference time (for now) on
-  - stgcn2_ucf101_1_cnn_D1    |    stgcn2_ntu_CV_cnn_D3
-  - NEED TO IMPLEMENT AND TEST PROPERLY IN INFOGCN++ EVAL!!
+** Visualisations
+*** Data visualisations
+Checking/visualising the outputs of the data extraction pipeline:
+**** NTU
+#+begin_src bash
+python visualisations/data/feeder_vis/feeder_vis_cv.py -e CV -n 50train --dilation 3 --size 720 --flow_type LK --max_mag 20
+#+end_src
+
+**** UCF101
+It's tricky to get the right sample number, -e 1 -s 600test (Bowling/v_Bowling_g07_c02) is a good one as it's bowling :)
+#+begin_src bash
+python visualisations/data/feeder_vis/feeder_vis_cv_ucf101.py -e 1 -n 600test --dilation 3 --conf 0.5 --flow_type LK
+#+end_src
+
 * REWORKING VIS UTILS
 ** File and function layout
 *** visualisations/interactive_vis.py
@@ -34,10 +43,16 @@ THIS IS OBVIOUSLY THE MAIN FILE
   - They are skewed by the auto-padding since they are calculated from the output of the feeder (which ALWAYS uses auto-padding)
 
 ***** Normal flow
-- [ ] Gaussian blur pre-gradient calculations 
-- [ ] Temporal Sobel filter
+- [X] Gaussian blur pre-gradient calculations
+- [X] Temporal Sobel filter
 
 **** Model training
+***** Models for realtime
+- [ ] ST-GCN++ ntu 17
+- [ ] InfoGCN++ ntu 17
+- [ ] MS-G3D ntu 17
+
+***** Dilation testing
 Training right now:
 - ALL MODELS NTU - CS - LK - D1-5
   
@@ -135,11 +150,11 @@ I need to conduct the following tests:
       - [ ] Norm
 **** Code tidying
 - [ ] Change arg (loaded from =config=) to configs in all the files😟
+- [ ] Integrate write_sample_name_feeder_idxs.py into data_gens 
 - [ ] data_gen files
   - [ ] ntu
   - [ ] ntu120
   - [ ] ucf101
-- [ ] configs to handle different flow types
 - [ ] Clean up unnecessary files
   - [ ] ./data/*
   - [ ] ./logs/*
@@ -385,7 +400,7 @@ ntu, - CS
 ntu120, - CSet
 #+end_example
 * What models need to train?
-First, train each model on the NTU-CS and the UCF101-1 splits with each dilation factor:
+First, train each model on the NTU-CS, NTU120-CSet and the UCF101-1 splits with each dilation factor:
 ** Dilation testing
 - [-] NTU RGB+D / CS
   - [-] InfoGCN++
@@ -448,30 +463,91 @@ First, train each model on the NTU-CS and the UCF101-1 splits with each dilation
         - [ ] D3
         - [ ] D4
         - [ ] D5
-- [-] UCF101 / 1
-  - [-] InfoGCN++
-    - [-] cnn
+- [ ] NTU RGB+D 120 / CSet
+  - [ ] InfoGCN++
+    - [ ] cnn
+      - [ ] RAFT
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+      - [ ] LK
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+      - [ ] NF
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+  - [ ] MS-G3D
+    - [ ] cnn
+      - [ ] RAFT
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+      - [ ] LK
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+      - [ ] NF
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+  - [ ] ST-GCN++
+    - [ ] cnn
+      - [ ] RAFT
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+      - [ ] LK
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+      - [ ] NF
+        - [ ] D1
+        - [ ] D2
+        - [ ] D3
+        - [ ] D4
+        - [ ] D5
+- [X] UCF101 / 1
+  - [X] InfoGCN++
+    - [X] cnn
       - [X] RAFT
         - [X] D1
         - [X] D2
         - [X] D3
-      - [-] LK
+      - [X] LK
         - [X] D1
-        - [-] D2
+        - [X] D2
         - [X] D3
       - [X] NF
         - [X] D1
         - [X] D2
         - [X] D3
-  - [-] MS-G3D
-    - [-] cnn
+  - [X] MS-G3D
+    - [X] cnn
       - [X] RAFT
         - [X] D1
         - [X] D2
         - [X] D3
-      - [-] LK
+      - [X] LK
         - [X] D1
-        - [-] D2
+        - [X] D2
         - [X] D3
       - [X] NF
         - [X] D1
@@ -491,3 +567,4 @@ First, train each model on the NTU-CS and the UCF101-1 splits with each dilation
         - [X] D1
         - [X] D2
         - [X] D3
+          

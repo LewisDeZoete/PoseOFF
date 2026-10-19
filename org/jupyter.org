@@ -11,20 +11,94 @@
 
 * Quick tests
 #+begin_src python :results output
-import mmnpz
-from einops import rearrange
+from visualisations.data.vis_utils import draw_bones
+import cv2
 import numpy as np
+from einops import rearrange
 
-path = "/fred/oz141/ldezoete/PoseOFF_NT/data/ntu/aligned_data/poseoff/NF/ntu_CS-poseoff_NF_D1_aligned.npz"
-data = mmnpz.load(path)
-sample = data['x_train'][0]
-np.save("../sample1.npy", sample)
-# sample = rearrange(sample, "T (M V C) -> T M V C", M=2, V=17, C=53)
-# print(sample[2, 0, 0])
+# COCO-17 chains (same as skeleton_drawing_mpl.py), plus the hip line
+BONE_CHAINS = [
+    [4, 2, 0, 1, 3],        # head
+    [9, 7, 5, 6, 8, 10],    # arms / shoulders
+    [15, 13, 11, 5],        # left leg to shoulder
+    [16, 14, 12, 6],        # right leg to shoulder
+]
+BONES = [(a, b) for chain in BONE_CHAINS for a, b in zip(chain[:-1], chain[1:])]
+BONES.append((11, 12))
+BONE_COLOR = (255, 0, 0, 255)
+JOINT_COLOR = (0, 0, 255, 255)
+
+def _pt(p):
+    return int(round(p[0])), int(round(p[1]))
+
+# Writing on whiteboard
+datapath = "/fred/oz141/ldezoete/PoseOFF_NT/data/ucf101/pose/WritingOnBoard/v_WritingOnBoard_g22_c03.npy"
+savename = "./imgs/bowling_skel.png"
+
+pose = np.load(datapath) # C T M V
+pose = rearrange(pose[:2, 5, ...], "C V M -> M V C")
+frame = np.zeros((720, 720, 4)).astype(np.uint8)
+
+def draw_frame(canvas, pts):
+    """pts (M,V,2) canvas coords, joint_ok (M,V) bool, flow as in split_frame."""
+    canvas = canvas.copy()
+    H, W = canvas.shape[:2]
+    pts = ((pts+0.5))*H # Normalise
+    M, V, _ = pts.shape
+
+    for m in range(M):
+        for a, b in BONES:
+            if 0. in pts[m,a] or 0. in pts[m,b]:
+                continue
+            cv2.line(canvas, _pt(pts[m, a]), _pt(pts[m, b]), BONE_COLOR, 2, cv2.LINE_AA)
+
+        for v in range(V):
+            x, y = pts[m, v]
+            cv2.circle(canvas, _pt((x, y)), 4, JOINT_COLOR, -1, cv2.LINE_AA)
+    return canvas
+
+frame = draw_frame(frame, pose)
+
+cv2.imwrite(savename, frame)
+#+end_src
+
+#+RESULTS:
+
+#+begin_src python :results output
+from data_gen.utils import GetPoses_YOLO, LoadVideo
+from ultralytics import YOLO
+from config import ArgClass
+import torchvision.transforms.v2 as v2
+import torch
+
+arg = ArgClass(arg=f"../config/infogcn2/ucf101/cnn.yaml")
+transform_arg = arg.extractor
+device = torch.device("cpu")
+
+rgb_name = "../../Datasets/UCF-101/WritingOnBoard/v_WritingOnBoard_g22_c03.avi"
+
+# Create the pose model
+detector = YOLO(transform_arg['pose']['weights'])
+detector.to(device)
+transform_pose = v2.Compose([
+    LoadVideo(max_frames=300),
+    v2.Resize(size=(384,640)), # YOLO pose has a minimum input image size
+    v2.ToDtype(torch.float32),
+    v2.Lambda(lambda x: x/255.0), # Normalises the image to [0,1]
+])
+
+
+getPose = GetPoses_YOLO(detector=detector, num_joints=17)
+rgb_pose = transform_pose(rgb_name)
+poses = getPose(rgb_pose)
 
 #+end_src
 
 #+RESULTS:
+: Could not file label file: './data/ucf101/statistics/ucf101_annotations.yaml'
+: Creating empty labels dictionary
+
+
 * FEEDER: NTU Color skel points data
 #+begin_src python :results output
 import h5py
@@ -84,7 +158,7 @@ def print_results(dataset, split):
         for model in models:
             incomplete[model] = {flow_type: []}
             results[model] = {} # init empty dict for model...
-            for dilation in range(1,4):
+            for dilation in range(1,6):
                 res_path = osp.join(
                     root_path,
                     model,
@@ -97,27 +171,24 @@ def print_results(dataset, split):
                         split=split,
                         flow_type=flow_type,
                         dilation=dilation
+                        )
                     )
-                )
 
                 if osp.exists(res_path):
                     print(f"\t{model} - D{dilation}")
                     get_eval_results(res_path)
-                    # results[model][dilation] = get_eval_results(res_path)
                 else:
                     incomplete[model][flow_type].append(dilation)
-                    # print(f"NO TRAINING DATA FOR: {model} - D{dilation}")
-                    # print(f"Couldn't find file: {res_path}")
 
-        print(incomplete)
+        print(f"Incomplete: {incomplete}")
 #+end_src
 
 #+RESULTS:
 : None
 
 #+begin_src python :results output :session res_check
-dataset = "ucf101" # ntu, ntu120, ucf101
-split = "1" # CS/CV, CSub/CSet, ucf101
+dataset = "ntu" # ntu, ntu120, ucf101
+split = "CS" # CS/CV, CSub/CSet, ucf101
 
 print_results(dataset, split)
 #+end_src
@@ -126,64 +197,70 @@ print_results(dataset, split)
 #+begin_example
 RAFT
 	infogcn2 - D1
-		65.64%
+		88.33%
 	infogcn2 - D2
-		66.28%
+		88.40%
 	infogcn2 - D3
-		67.55%
+		88.88%
+	infogcn2 - D4
+		89.11%
+	infogcn2 - D5
+		89.05%
 	stgcn2 - D1
-		57.81%
+		88.72%
 	stgcn2 - D2
-		58.83%
+		88.71%
 	stgcn2 - D3
-		58.54%
+		88.98%
+	stgcn2 - D4
+		88.86%
+	stgcn2 - D5
+		88.74%
 	msg3d - D1
-		63.92%
+		87.12%
 	msg3d - D2
-		61.74%
+		87.15%
 	msg3d - D3
-		63.65%
-{'infogcn2': {'RAFT': []}, 'stgcn2': {'RAFT': []}, 'msg3d': {'RAFT': []}}
+		89.95%
+	msg3d - D4
+		87.55%
+	msg3d - D5
+		87.74%
+Incomplete: {'infogcn2': {'RAFT': []}, 'stgcn2': {'RAFT': []}, 'msg3d': {'RAFT': []}}
 LK
 	infogcn2 - D1
-		65.99%
+		89.59%
 	infogcn2 - D2
-0%
+		89.46%
 	infogcn2 - D3
-		65.64%
+		89.71%
+	infogcn2 - D4
+		89.62%
+	infogcn2 - D5
+		89.51%
 	stgcn2 - D1
-		58.70%
+		88.72%
 	stgcn2 - D2
-0%
+		88.66%
 	stgcn2 - D3
-		59.08%
+		89.16%
+	stgcn2 - D4
+		88.82%
+	stgcn2 - D5
+		89.12%
 	msg3d - D1
-		61.95%
+		87.26%
 	msg3d - D2
-0%
+		87.60%
 	msg3d - D3
-		63.51%
-{'infogcn2': {'LK': []}, 'stgcn2': {'LK': []}, 'msg3d': {'LK': []}}
+		87.96%
+	msg3d - D4
+		88.08%
+	msg3d - D5
+		88.11%
+Incomplete: {'infogcn2': {'LK': []}, 'stgcn2': {'LK': []}, 'msg3d': {'LK': []}}
 NF
-	infogcn2 - D1
-		56.63%
-	infogcn2 - D2
-		56.92%
-	infogcn2 - D3
-		67.01%
-	stgcn2 - D1
-		47.51%
-	stgcn2 - D2
-		49.33%
-	stgcn2 - D3
-		59.77%
-	msg3d - D1
-		63.98%
-	msg3d - D2
-		63.87%
-	msg3d - D3
-		63.43%
-{'infogcn2': {'NF': []}, 'stgcn2': {'NF': []}, 'msg3d': {'NF': []}}
+Incomplete: {'infogcn2': {'NF': [1, 2, 3, 4, 5]}, 'stgcn2': {'NF': [1, 2, 3, 4, 5]}, 'msg3d': {'NF': [1, 2, 3, 4, 5]}}
 #+end_example
 
 * Data extraction validation

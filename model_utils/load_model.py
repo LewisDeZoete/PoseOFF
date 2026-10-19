@@ -11,7 +11,7 @@ class ModelLoader:
     def __init__(self, arg):
         self.arg = arg
         # If cuda isn't available device is cpu, print device name debug
-        if not torch.cuda.is_available():
+        if not torch.cuda.is_available() or not hasattr(arg, "device"):
             output_device = torch.device('cpu')
         else:
             output_device = torch.device(self.arg.device[0]) if type(
