@@ -1,5 +1,5 @@
 # PoseOFF
-PoseOFF is an acronym - Pose-guided Optical Flow Features. With a simple modification to existing skeleton-based action recognition neural networks, PoseOFF provides enhanced action recognition and action anticipation performance - even to networks designed for offline action recognition! See the figures below, or request access to the PoseOFF paper [in-prep] by contacting the manager of this repository.
+PoseOFF is an acronym - Pose-guided Optical Flow Features. With a simple modification to existing skeleton-based action recognition neural networks, PoseOFF provides enhanced action recognition and action anticipation performance - even to networks designed for offline action recognition! This work found it's home at the IEEE International Workshop on Robot and Human Communication (RO-MAN) 2026. The published work is available online through the [conference proceedings](https://ieeexplore.ieee.org/xpl/conhome/11714246/proceeding), or on the [arXiv](https://arxiv.org/pdf/2608.25495)
 
 This repo provides the code to:
 - Extract the PoseOFF data from three different datasets ([NTU RGB+D, NTU RGB+D 120](https://rose1.ntu.edu.sg/dataset/actionRecognition/) and [UCF101](https://www.crcv.ucf.edu/research/data-sets/ucf101/)).
